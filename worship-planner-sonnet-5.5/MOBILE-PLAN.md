@@ -16,7 +16,7 @@ Self-contained: it doesn't depend on the mockup code. The mockup (`mobile.html`,
 | Mockup feature | Status |
 |---|---|
 | "Last sung" / usage history / freshness warnings | Removed |
-| Durations, start times, time budget, Live timer, drift | Removed (maybe later) |
+| Durations, start times, time budget, Live timer, drift | Removed. Services aren't timed, so timing isn't part of the product |
 | Song-leader-per-song, "Me" tab, accept/decline, notification toggles | Removed |
 | Hymn search, filters, topic chips, add-to-service | Removed (read-only) |
 | Edit mode, reorder, plan check, service switcher, FAB | Removed |
@@ -235,7 +235,7 @@ LinkHandler  →  PlanRepository  →  PlanStore (cache)  →  PlanViewModel  �
 | **3. Pitch** | `PitchPlayer` plus the Play button, silent-switch handling, restart behavior. | Test on real devices |
 | **4. Link entry** | Deep link / paste / QR; persistence; "forget this plan". | |
 | **5. Polish** | Dark mode, dynamic type, accessibility, refresh UX, "Updated at". | |
-| **Later** | Multiple plans, verse-1 lyrics for public-domain hymns, durations/timing. | Deliberately deferred |
+| **Later** | Multiple plans, verse-1 lyrics for public-domain hymns. | Deliberately deferred |
 
 ### 5.4 Testing / acceptance
 

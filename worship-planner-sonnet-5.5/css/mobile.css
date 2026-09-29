@@ -65,9 +65,6 @@ mark { background: var(--mark); color: inherit; border-radius: 2px; }
 .banner { display: flex; gap: 10px; align-items: center; background: var(--warn-soft); color: var(--warn); border-radius: 14px; padding: 11px 13px; font-size: 13.5px; font-weight: 600; margin-bottom: 12px; width: 100%; border: 0; text-align: left; }
 .banner span { flex: 1; color: var(--ink); font-weight: 550; }
 .banner b { color: var(--warn); }
-.budget { display: flex; height: 7px; border-radius: 5px; overflow: hidden; gap: 1px; background: var(--panel3); margin: 8px 0 4px; }
-.budget i { display: block; height: 100%; }
-.budget i.song { background: var(--c-song); } .budget i.prayer { background: var(--c-prayer); } .budget i.scripture { background: var(--c-scripture); } .budget i.supper { background: var(--c-supper); } .budget i.give { background: var(--c-give); } .budget i.sermon { background: var(--c-sermon); } .budget i.welcome, .budget i.custom { background: var(--c-welcome); }
 .mtile { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 11px; color: #fff; flex: none; }
 .mtile.song { background: var(--c-song); } .mtile.prayer { background: var(--c-prayer); } .mtile.scripture { background: var(--c-scripture); } .mtile.supper { background: var(--c-supper); } .mtile.give { background: var(--c-give); } .mtile.sermon { background: var(--c-sermon); } .mtile.welcome, .mtile.custom { background: var(--c-welcome); }
 :root[data-theme="dark"] .mtile { color: #10131b; }
@@ -76,10 +73,9 @@ mark { background: var(--mark); color: inherit; border-radius: 2px; }
 /* ------------------------------ Plan ------------------------------ */
 .msec { font-size: 11.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 18px 4px 7px; }
 .mlist { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; box-shadow: var(--shadow); }
-.mrow { display: grid; grid-template-columns: 44px 36px 1fr auto; gap: 10px; align-items: center; width: 100%; text-align: left; border: 0; background: none; padding: 11px 12px 11px 8px; border-bottom: 1px solid var(--line); }
+.mrow { display: grid; grid-template-columns: 36px 1fr auto; gap: 12px; align-items: center; width: 100%; text-align: left; border: 0; background: none; padding: 11px 12px 11px 8px; border-bottom: 1px solid var(--line); }
 .mrow:last-child { border-bottom: 0; }
 .mrow:active { background: var(--panel2); }
-.mrow .mt { font: 600 12px var(--mono); color: var(--muted); text-align: right; }
 .mrow .mtl { font-weight: 650; font-size: 15px; line-height: 1.25; }
 .mrow .mtl.serif { font: 600 16px var(--serif); }
 .mrow .msub { color: var(--muted); font-size: 12.5px; margin-top: 1px; }
@@ -165,9 +161,6 @@ mark { background: var(--mark); color: inherit; border-radius: 2px; }
 .screen.live-mode, .live { --bg: #0d1017; --panel: #171b25; --panel2: #1d2230; --panel3: #242a3a; --ink: #eceef5; --ink2: #b8bece; --muted: #8690a8; --line: #2a3145; --line2: #3a4360; --accent: #8ea8e8; --accent-soft: #232c48; --accent-ink: #0d1424; --ok: #6fcf9f; --warn: #e5b060; --warn-soft: #3b2f18; --ok-soft: #1c3a2e; --panel-ink: #eceef5; --shadow: none; color: var(--ink); background: var(--bg); }
 .live { margin: 0 -16px; padding: 4px 16px 20px; min-height: 100%; }
 .live .h-large h1 { color: var(--ink); }
-.live .clock { font: 600 30px var(--mono); letter-spacing: -.03em; }
-.live .drift { font-size: 12.5px; color: var(--ok); font-weight: 650; }
-.live .drift.late { color: var(--warn); }
 .now { border-radius: 22px; background: linear-gradient(160deg, #22305a, #151b31); padding: 18px; border: 1px solid #2f3b66; }
 .now .lab { font-size: 11.5px; letter-spacing: .12em; text-transform: uppercase; color: #a9b7e6; font-weight: 700; display: flex; justify-content: space-between; }
 .now h2 { margin: 6px 0 2px; font: 700 28px/1.12 var(--serif); }
@@ -185,12 +178,10 @@ mark { background: var(--mark); color: inherit; border-radius: 2px; }
 .nav2 { display: grid; grid-template-columns: 1fr 2fr; gap: 10px; margin: 12px 0; }
 .nav2 button { height: 54px; border-radius: 16px; border: 1px solid var(--line2); background: var(--panel); font-weight: 700; font-size: 16px; color: var(--ink); }
 .nav2 button.go { background: var(--accent); color: var(--accent-ink); border-color: transparent; }
-.up { display: grid; grid-template-columns: 46px 1fr auto; gap: 10px; align-items: center; padding: 10px 4px; border-bottom: 1px solid var(--line); opacity: .8; }
+.up { display: grid; grid-template-columns: 26px 1fr; gap: 10px; align-items: center; padding: 10px 4px; border-bottom: 1px solid var(--line); opacity: .8; }
 .up.done { opacity: .35; } .up.cur { opacity: 1; background: var(--panel); border-radius: 12px; padding: 10px 8px; }
 .up .t { font: 600 12px var(--mono); color: var(--muted); }
 .up .n { font-weight: 600; } .up .s { font-size: 12.5px; color: var(--muted); }
-.start-btn { width: 100%; height: 48px; border-radius: 14px; border: 0; background: var(--ok); color: #0b1a12; font-weight: 800; font-size: 16px; margin: 6px 0 12px; }
-.start-btn.stop { background: var(--panel3); color: var(--ink); }
 
 /* ------------------------------ Me ------------------------------ */
 .who-card { display: flex; gap: 14px; align-items: center; }
@@ -214,5 +205,5 @@ mark { background: var(--mark); color: inherit; border-radius: 2px; }
 :root[data-theme="dark"] .mtoast { background: #e9ebf2; color: #11141c; }
 .empty { text-align: center; color: var(--muted); padding: 50px 20px; } .empty b { display: block; color: var(--ink); font-size: 16px; margin-bottom: 4px; }
 
-.mrow > span:nth-child(3) { min-width: 0; }
+.mrow > span:nth-child(2) { min-width: 0; }
 .hcard > div:first-child { min-width: 0; }

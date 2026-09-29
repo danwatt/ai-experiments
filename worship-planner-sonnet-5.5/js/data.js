@@ -392,87 +392,87 @@ const ALL_TOPICS = [...new Set(HYMNS.flatMap(h => h.topics))].sort();
 /* ------------------------------ Services ------------------------------ */
 let _uid = 0;
 const nid = () => 'i' + (++_uid);
-const item = (type, title, dur, who, extra = {}) => ({ id: nid(), type, title, dur, who: who || null, ...extra });
-const song = (hymn, role, who = 'dbrooks', dur = 3, extra = {}) =>
-  item('song', hymn ? HYMN[hymn].title : ROLES[role].label, dur, who,
+const item = (type, title, who, extra = {}) => ({ id: nid(), type, title, who: who || null, ...extra });
+const song = (hymn, role, who = 'dbrooks', extra = {}) =>
+  item('song', hymn ? HYMN[hymn].title : ROLES[role].label, who,
        { hymn, role, verses: hymn ? HYMN[hymn].sec.map((_, i) => i) : [], shift: 0, ...extra });
 
 const SERVICES = [
   {
-    id: 's1', kind: 'Sunday Morning', title: 'Sunday Morning Worship', date: '2026-10-04', time: '10:30', status: 'draft', target: 75,
+    id: 's1', kind: 'Sunday Morning', title: 'Sunday Morning Worship', date: '2026-10-04', status: 'draft',
     theme: 'Grace', text: 'Ephesians 2:1–10',
     items: [
-      Object.assign(item('welcome', 'Welcome & Announcements', 3, 'mhollis', { notes: 'Visitors card, benevolence update, Wednesday night class change.' }), { section: 'Gathering' }),
-      Object.assign(song('holy-holy-holy', 'opening', 'dbrooks', 3, { notes: 'Start softly, build in v2.' }), { section: 'Gathering' }),
-      Object.assign(item('prayer', 'Opening Prayer', 2, 'twhitaker', { notes: 'Thanks for the Lord’s day; those who are sick or traveling.' }), { section: 'Gathering' }),
+      Object.assign(item('welcome', 'Welcome & Announcements', 'mhollis', { notes: 'Visitors card, benevolence update, Wednesday night class change.' }), { section: 'Gathering' }),
+      Object.assign(song('holy-holy-holy', 'opening', 'dbrooks', { notes: 'Start softly, build in v2.' }), { section: 'Gathering' }),
+      Object.assign(item('prayer', 'Opening Prayer', 'twhitaker', { notes: 'Thanks for the Lord’s day; those who are sick or traveling.' }), { section: 'Gathering' }),
       Object.assign(song('come-thou-fount', 'general'), { section: 'Gathering' }),
       Object.assign(song('blessed-assurance', 'general'), { section: 'Gathering' }),
-      Object.assign(item('scripture', 'Scripture Reading', 2, 'kray', { ref: 'Psalm 103:1–14' }), { section: 'Gathering' }),
+      Object.assign(item('scripture', 'Scripture Reading', 'kray', { ref: 'Psalm 103:1–14' }), { section: 'Gathering' }),
 
       Object.assign(song('when-i-survey', 'communion'), { section: 'The Lord’s Supper' }),
-      Object.assign(item('supper', 'Communion Thoughts', 4, 'jpatterson', { ref: '1 Corinthians 11:23–29' }), { section: 'The Lord’s Supper' }),
-      Object.assign(item('prayer', 'Prayer for the Bread', 1, 'acoleman'), { section: 'The Lord’s Supper' }),
-      Object.assign(item('prayer', 'Prayer for the Fruit of the Vine', 1, 'sortiz'), { section: 'The Lord’s Supper' }),
-      Object.assign(song('there-is-a-fountain', 'communion', 'dbrooks', 3, { notes: 'Sung while the emblems are served.' }), { section: 'The Lord’s Supper' }),
+      Object.assign(item('supper', 'Communion Thoughts', 'jpatterson', { ref: '1 Corinthians 11:23–29' }), { section: 'The Lord’s Supper' }),
+      Object.assign(item('prayer', 'Prayer for the Bread', 'acoleman'), { section: 'The Lord’s Supper' }),
+      Object.assign(item('prayer', 'Prayer for the Fruit of the Vine', 'sortiz'), { section: 'The Lord’s Supper' }),
+      Object.assign(song('there-is-a-fountain', 'communion', 'dbrooks', { notes: 'Sung while the emblems are served.' }), { section: 'The Lord’s Supper' }),
 
-      Object.assign(item('give', 'Contribution', 3, 'rthompson', { notes: 'Prayer, then collectors come forward.' }), { section: 'Giving' }),
+      Object.assign(item('give', 'Contribution', 'rthompson', { notes: 'Prayer, then collectors come forward.' }), { section: 'Giving' }),
 
       Object.assign(song('trust-and-obey', 'general'), { section: 'The Word' }),
-      Object.assign(item('sermon', 'The Sufficiency of Grace', 30, 'pmaddox', { ref: 'Ephesians 2:1–10', notes: 'Series: Ephesians (Part 4).' }), { section: 'The Word' }),
+      Object.assign(item('sermon', 'The Sufficiency of Grace', 'pmaddox', { ref: 'Ephesians 2:1–10', notes: 'Series: Ephesians (Part 4).' }), { section: 'The Word' }),
 
-      Object.assign(song(null, 'invitation', 'dbrooks', 4), { section: 'Response' }),
-      Object.assign(item('prayer', 'Closing Prayer', 2, 'wlindgren'), { section: 'Response' })
+      Object.assign(song(null, 'invitation', 'dbrooks'), { section: 'Response' }),
+      Object.assign(item('prayer', 'Closing Prayer', 'wlindgren'), { section: 'Response' })
     ]
   },
   {
-    id: 's2', kind: 'Sunday Evening', title: 'Sunday Evening Worship', date: '2026-10-04', time: '18:00', status: 'draft', target: 60,
+    id: 's2', kind: 'Sunday Evening', title: 'Sunday Evening Worship', date: '2026-10-04', status: 'draft',
     theme: '', text: '1 Peter 1:3–9',
     items: [
       Object.assign(song('great-is-thy-faithfulness', 'opening', 'sortiz'), { section: 'Gathering' }),
-      Object.assign(item('prayer', 'Opening Prayer', 2, 'gsanders'), { section: 'Gathering' }),
+      Object.assign(item('prayer', 'Opening Prayer', 'gsanders'), { section: 'Gathering' }),
       Object.assign(song('leaning', 'general', 'sortiz'), { section: 'Gathering' }),
-      Object.assign(item('sermon', 'Living Hope', 25, 'pmaddox', { ref: '1 Peter 1:3–9' }), { section: 'The Word' }),
-      Object.assign(song(null, 'invitation', 'sortiz', 4), { section: 'Response' }),
-      Object.assign(item('prayer', 'Closing Prayer', 2, 'cnguyen'), { section: 'Response' })
+      Object.assign(item('sermon', 'Living Hope', 'pmaddox', { ref: '1 Peter 1:3–9' }), { section: 'The Word' }),
+      Object.assign(song(null, 'invitation', 'sortiz'), { section: 'Response' }),
+      Object.assign(item('prayer', 'Closing Prayer', 'cnguyen'), { section: 'Response' })
     ]
   },
   {
-    id: 's3', kind: 'Wednesday Bible Class', title: 'Wednesday Evening', date: '2026-10-07', time: '19:00', status: 'draft', target: 60,
+    id: 's3', kind: 'Wednesday Bible Class', title: 'Wednesday Evening', date: '2026-10-07', status: 'draft',
     theme: '', text: 'Acts 2',
     items: [
       Object.assign(song('what-a-friend', 'opening', 'bkessler'), { section: 'Gathering' }),
-      Object.assign(item('prayer', 'Opening Prayer', 2, 'kray'), { section: 'Gathering' }),
-      Object.assign(item('custom', 'Bible Class: The Early Church', 40, 'pmaddox', { ref: 'Acts 2:42–47' }), { section: 'Class' }),
+      Object.assign(item('prayer', 'Opening Prayer', 'kray'), { section: 'Gathering' }),
+      Object.assign(item('custom', 'Bible Class: The Early Church', 'pmaddox', { ref: 'Acts 2:42–47' }), { section: 'Class' }),
       Object.assign(song('take-my-life', 'closing', 'bkessler'), { section: 'Response' }),
-      Object.assign(item('prayer', 'Closing Prayer', 2, 'twhitaker'), { section: 'Response' })
+      Object.assign(item('prayer', 'Closing Prayer', 'twhitaker'), { section: 'Response' })
     ]
   },
   {
-    id: 's4', kind: 'Sunday Morning', title: 'Sunday Morning Worship', date: '2026-10-11', time: '10:30', status: 'draft', target: 75,
+    id: 's4', kind: 'Sunday Morning', title: 'Sunday Morning Worship', date: '2026-10-11', status: 'draft',
     theme: '', text: '',
     items: [
       Object.assign(song(null, 'opening'), { section: 'Gathering' }),
-      Object.assign(item('prayer', 'Opening Prayer', 2, null), { section: 'Gathering' }),
+      Object.assign(item('prayer', 'Opening Prayer', null), { section: 'Gathering' }),
       Object.assign(song(null, 'general'), { section: 'Gathering' }),
       Object.assign(song(null, 'communion'), { section: 'The Lord’s Supper' }),
-      Object.assign(item('supper', 'Communion Thoughts', 4, null), { section: 'The Lord’s Supper' }),
-      Object.assign(item('give', 'Contribution', 3, null), { section: 'Giving' }),
-      Object.assign(item('sermon', 'Sermon', 30, 'pmaddox'), { section: 'The Word' }),
+      Object.assign(item('supper', 'Communion Thoughts', null), { section: 'The Lord’s Supper' }),
+      Object.assign(item('give', 'Contribution', null), { section: 'Giving' }),
+      Object.assign(item('sermon', 'Sermon', 'pmaddox'), { section: 'The Word' }),
       Object.assign(song(null, 'invitation'), { section: 'Response' }),
-      Object.assign(item('prayer', 'Closing Prayer', 2, null), { section: 'Response' })
+      Object.assign(item('prayer', 'Closing Prayer', null), { section: 'Response' })
     ]
   },
   {
-    id: 's0', kind: 'Sunday Morning', title: 'Sunday Morning Worship', date: '2026-09-27', time: '10:30', status: 'done', target: 75,
+    id: 's0', kind: 'Sunday Morning', title: 'Sunday Morning Worship', date: '2026-09-27', status: 'done',
     theme: 'Grace', text: 'Ephesians 1:3–14',
     items: [
       Object.assign(song('all-hail-the-power', 'opening', 'dbrooks'), { section: 'Gathering' }),
-      Object.assign(item('prayer', 'Opening Prayer', 2, 'kray'), { section: 'Gathering' }),
+      Object.assign(item('prayer', 'Opening Prayer', 'kray'), { section: 'Gathering' }),
       Object.assign(song('nothing-but-the-blood', 'communion'), { section: 'The Lord’s Supper' }),
-      Object.assign(item('supper', 'Communion Thoughts', 4, 'jpatterson'), { section: 'The Lord’s Supper' }),
-      Object.assign(item('sermon', 'Blessed in Christ', 30, 'pmaddox', { ref: 'Ephesians 1:3–14' }), { section: 'The Word' }),
+      Object.assign(item('supper', 'Communion Thoughts', 'jpatterson'), { section: 'The Lord’s Supper' }),
+      Object.assign(item('sermon', 'Blessed in Christ', 'pmaddox', { ref: 'Ephesians 1:3–14' }), { section: 'The Word' }),
       Object.assign(song('just-as-i-am', 'invitation'), { section: 'Response' }),
-      Object.assign(item('prayer', 'Closing Prayer', 2, 'twhitaker'), { section: 'Response' })
+      Object.assign(item('prayer', 'Closing Prayer', 'twhitaker'), { section: 'Response' })
     ]
   }
 ];

@@ -14,7 +14,6 @@ let lastResults = [];
 
 const svc = () => S.services.find(s => s.id === S.cur);
 const selItem = () => svc().items.find(i => i.id === S.sel) || null;
-const totalMin = s => s.items.reduce((a, i) => a + i.dur, 0);
 const pname = id => (id ? PERSON[id].name : null);
 const hnPick = it => { const h = HYMN[it.hymn]; return it.hnPick && h.hn[it.hnPick] ? it.hnPick : Object.keys(h.hn)[0]; };
 const ROLE_FOR = { song: 'song', prayer: 'prayer', scripture: 'reader', supper: 'table', give: 'give', sermon: 'preacher', welcome: 'welcome' };
@@ -51,12 +50,12 @@ function svcPill(s) {
   return open ? `<span class="pill warn">${open} open</span>` : '<span class="pill ok">Ready</span>';
 }
 function renderSidebar() {
-  const sorted = [...S.services].sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+  const sorted = [...S.services].sort((a, b) => a.date.localeCompare(b.date));
   const one = s => {
     const d = parseDate(s.date);
     return `<button class="svc ${s.id === S.cur ? 'on' : ''}" data-svc="${s.id}" title="${esc(s.kind)}">
       <div class="dt"><small>${MONTHS[d.getMonth()]}</small><b>${d.getDate()}</b></div>
-      <div><div class="nm">${esc(s.kind)}</div><div class="tm">${fmtClockAP(toMin(s.time))}</div></div>${svcPill(s)}</button>`;
+      <div><div class="nm">${esc(s.kind)}</div><div class="tm">${s.items.length} items</div></div>${svcPill(s)}</button>`;
   };
   $('#sidebar').innerHTML = `
     <div class="side-sec"><div class="side-h"><span>Upcoming</span><button data-a="newsvc">+ New</button></div>
@@ -75,24 +74,19 @@ function renderCrumbs() {
   $('#crumbs').innerHTML = `<span style="color:var(--muted)">Services</span>${icon('chevR', 14)}<b>${esc(s.title)}</b><span style="color:var(--muted)">· ${MONTHS[d.getMonth()]} ${d.getDate()}</span>`;
 }
 function renderHead() {
-  const s = svc(), tot = totalMin(s), start = toMin(s.time), over = tot > s.target;
-  const segs = s.items.map(i => `<i class="${ITEM_TYPES[i.type].color}" style="flex:${i.dur}" title="${esc(i.title)} · ${i.dur} min"></i>`).join('');
+  const s = svc(), nSongs = s.items.filter(i => i.type === 'song').length;
   $('#svcHead').innerHTML = `
     <div class="svc-title"><input id="svcTitle" value="${esc(s.title)}" aria-label="Service title" spellcheck="false"></div>
     <div class="svc-meta">
       <span>${icon('calendar', 14)} ${fmtLong(s.date)}</span>
-      <span>${icon('clock', 14)} ${fmtClockAP(start)} – ${fmtClockAP(start + tot)}</span>
+      <span>${icon('list', 14)} ${s.items.length} items · ${nSongs} songs</span>
       ${s.theme ? `<span class="tag">Theme: ${esc(s.theme)}</span>` : ''}
       ${s.text ? `<span class="tag">${icon('scripture', 12)} ${esc(s.text)}</span>` : ''}
-    </div>
-    <div class="budget ${over ? 'over' : ''}">
-      <div class="budget-top"><span><b>${tot} min</b> planned of ${s.target}</span><span>${over ? `${tot - s.target} min over` : `${s.target - tot} min open`}</span></div>
-      <div class="budget-bar">${segs}</div>
     </div>`;
 }
 
 /* ------------------------------ Order list ------------------------------ */
-function rowHtml(it, startMin) {
+function rowHtml(it) {
   const t = ITEM_TYPES[it.type];
   const h = it.type === 'song' && it.hymn ? HYMN[it.hymn] : null;
   const empty = it.type === 'song' && !h;
@@ -115,18 +109,16 @@ function rowHtml(it, startMin) {
   }
   return `<div class="row ${S.sel === it.id ? 'sel' : ''} ${empty ? 'empty' : ''}" draggable="true" data-id="${it.id}" tabindex="0">
     <span class="grip">${icon('grip', 14)}</span>
-    <span class="tm">${fmtClock(startMin)}</span>
     <span class="tile ${t.color}">${empty ? icon('plus', 16) : icon(it.type, 16)}</span>
     <div class="main"><div class="ttl ${h ? 'serif' : ''}">${esc(title)}</div><div class="sub">${sub}</div></div>
-    <button class="dur" data-a="dur" title="Change duration">${it.dur} min</button>
     <button class="kebab" data-a="kebab" aria-label="Item actions">${icon('more', 16)}</button>
   </div>`;
 }
 function renderOrder() {
-  const s = svc(); let t = toMin(s.time), prev = null, html = '';
+  const s = svc(); let prev = null, html = '';
   s.items.forEach(it => {
     if (it.section !== prev) { html += `<div class="sec-h">${esc(it.section)}</div>`; prev = it.section; }
-    html += rowHtml(it, t); t += it.dur;
+    html += rowHtml(it);
   });
   $('#orderList').innerHTML = html;
 }
@@ -282,8 +274,7 @@ function renderItem() {
     const roleSel = `<div class="fld"><label>Purpose</label><select data-f="role">${Object.entries(ROLES).map(([k, v]) => `<option value="${k}" ${it.role === k ? 'selected' : ''}>${v.label}</option>`).join('')}</select></div>`;
     if (!h) {
       body = `<div class="card" style="border-style:dashed;text-align:center;padding:26px"><b style="font-size:15px">No hymn chosen yet</b><div class="sub" style="color:var(--muted);margin:4px 0 12px">Search ${HYMNS.length} hymns with ready-made slides, filtered for this purpose.</div><button class="btn primary" data-a="viewlib">${icon('search', 15)} Search the library</button></div>
-        <div class="form-2"><div class="fld"><label>Song leader</label>${personSelect('who', it.who, 'song')}</div>${roleSel}</div>
-        <div class="form-2"><div class="fld"><label>Duration (min)</label><input type="number" min="1" max="90" data-f="dur" value="${it.dur}"></div><div></div></div>`;
+        <div class="form-2"><div class="fld"><label>Song leader</label>${personSelect('who', it.who, 'song')}</div>${roleSel}</div>`;
     } else {
       const sp = startPitch(h, it.shift || 0), base = startPitch(h);
       const shifts = [-3, -2, -1, 0, 1, 2, 3].map(n => `<option value="${n}" ${n === (it.shift || 0) ? 'selected' : ''}>${n === 0 ? `As printed — key of ${h.key}` : `${n > 0 ? '↑' : '↓'} ${Math.abs(n)} half step${Math.abs(n) > 1 ? 's' : ''} — key of ${shiftedKey(h.key, n)}`}</option>`).join('');
@@ -306,13 +297,12 @@ function renderItem() {
           <div class="help">Song leaders get the start pitch on the mobile app’s Leader view.</div></div>
         <div class="form-2"><div class="fld"><label>Song leader</label>${personSelect('who', it.who, 'song')}</div>
           <div class="fld"><label>Announce as</label><select data-f="hnPick">${Object.entries(h.hn).map(([k, v]) => `<option value="${k}" ${hnPick(it) === k ? 'selected' : ''}>${k} #${v} — ${esc(HYMNALS[k])}</option>`).join('')}</select></div></div>
-        <div class="form-2"><div class="fld"><label>Duration (min)</label><input type="number" min="1" max="90" data-f="dur" value="${it.dur}"></div>${roleSel}</div>`;
+        <div class="form-2">${roleSel}<div></div></div>`;
     }
   } else {
     const showRef = ['scripture', 'supper', 'sermon', 'custom'].includes(it.type);
     body = `<div class="form-2"><div class="fld" style="grid-column: span 2"><label>Title</label><input type="text" data-f="title" value="${esc(it.title)}"></div></div>
-      <div class="form-2"><div class="fld"><label>${it.type === 'sermon' ? 'Speaker' : it.type === 'scripture' ? 'Reader' : 'Assigned to'}</label>${personSelect('who', it.who, it.type)}</div>
-        <div class="fld"><label>Duration (min)</label><input type="number" min="1" max="90" data-f="dur" value="${it.dur}"></div></div>
+      <div class="form-2"><div class="fld"><label>${it.type === 'sermon' ? 'Speaker' : it.type === 'scripture' ? 'Reader' : 'Assigned to'}</label>${personSelect('who', it.who, it.type)}</div><div></div></div>
       ${showRef ? `<div class="fld"><label>Scripture reference</label><input type="text" data-f="ref" value="${esc(it.ref || '')}" placeholder="e.g. Ephesians 2:1–10"><div class="help">Shown on the slide with the text from your default version (Settings → Bible version).</div></div>` : ''}
       ${it.type === 'supper' || it.type === 'give' ? `<div class="fld"><label>${it.type === 'supper' ? 'Servers' : 'Collectors'}</label><div class="people-chips">${PEOPLE.filter(p => p.roles.some(r => ['table', 'give', 'elder'].includes(r))).map(p => `<button class="sp ${(it.helpers || []).includes(p.id) ? 'on' : ''}" data-a="helper" data-id="${p.id}">${(it.helpers || []).includes(p.id) ? icon('check', 13) : ''}${esc(p.name)}</button>`).join('')}</div></div>` : ''}
       ${it.type === 'sermon' ? `<div class="fld"><label>Slides</label>${it.attached ? `<span class="pill ok">${icon('file', 12)} ${esc(it.attached)}</span>` : `<button class="btn sm" data-a="attach">${icon('plus', 14)} Attach PowerPoint…</button>`}<div class="help">Attached decks are merged after the hymn slides when you export.</div></div>` : ''}
@@ -393,7 +383,7 @@ function addHymn(hid) {
   } else {
     const idx = sel ? s.items.indexOf(sel) + 1 : s.items.length;
     const anchor = sel || s.items[s.items.length - 1];
-    const it = { id: nid(), type: 'song', title: h.title, dur: 3, who: sel && sel.type === 'song' ? sel.who : ME, hymn: hid, role: 'general', verses: h.sec.map((_, i) => i), shift: 0, notes: '', section: anchor ? anchor.section : 'Gathering' };
+    const it = { id: nid(), type: 'song', title: h.title, who: sel && sel.type === 'song' ? sel.who : ME, hymn: hid, role: 'general', verses: h.sec.map((_, i) => i), shift: 0, notes: '', section: anchor ? anchor.section : 'Gathering' };
     s.items.splice(idx, 0, it); S.sel = it.id;
     toast(`Added “${h.title}”${sel ? ' after the selected item' : ''}`);
   }
@@ -410,14 +400,13 @@ function moveItem(id, targetId, before) {
 function insertHymnAt(hid, targetId, before) {
   const s = svc(), h = HYMN[hid], tg = s.items.find(i => i.id === targetId);
   if (tg && tg.type === 'song' && !tg.hymn) { S.sel = tg.id; addHymn(hid); return; }
-  const it = { id: nid(), type: 'song', title: h.title, dur: 3, who: ME, hymn: hid, role: 'general', verses: h.sec.map((_, i) => i), shift: 0, notes: '', section: tg ? tg.section : s.items[s.items.length - 1].section };
+  const it = { id: nid(), type: 'song', title: h.title, who: ME, hymn: hid, role: 'general', verses: h.sec.map((_, i) => i), shift: 0, notes: '', section: tg ? tg.section : s.items[s.items.length - 1].section };
   let idx = tg ? s.items.indexOf(tg) + (before ? 0 : 1) : s.items.length;
   s.items.splice(idx, 0, it); S.sel = it.id; S.ctx = null; toast(`Added “${h.title}”`); refresh();
 }
-const DEFAULT_DUR = { song: 3, prayer: 2, scripture: 2, supper: 4, give: 3, sermon: 25, welcome: 3, custom: 5 };
 function addItemOfType(type) {
   const s = svc(), sel = selItem(), anchor = sel || s.items[s.items.length - 1];
-  const it = { id: nid(), type, title: type === 'song' ? ROLES.general.label : ITEM_TYPES[type].label, dur: DEFAULT_DUR[type], who: type === 'song' ? ME : null, section: anchor ? anchor.section : 'Gathering' };
+  const it = { id: nid(), type, title: type === 'song' ? ROLES.general.label : ITEM_TYPES[type].label, who: type === 'song' ? ME : null, section: anchor ? anchor.section : 'Gathering' };
   if (type === 'song') Object.assign(it, { hymn: null, role: 'general', verses: [], shift: 0 });
   if (type === 'prayer') it.title = 'Prayer';
   if (type === 'scripture') it.title = 'Scripture Reading';
@@ -446,7 +435,7 @@ function newService() {
   const n = S.services.filter(x => x.id.startsWith('new')).length;
   const tpl = S.services.find(x => x.id === 's4');
   const d = new Date(2026, 9, 18 + n * 7);
-  const ns = { id: 'new' + (n + 1), kind: 'Sunday Morning', title: 'Sunday Morning Worship', date: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`, time: '10:30', status: 'draft', target: 75, theme: '', text: '', items: tpl.items.map(i => ({ ...i, id: nid(), hymn: i.type === 'song' ? null : i.hymn, who: i.type === 'song' ? ME : null, title: i.type === 'song' ? ROLES[i.role].label : i.title, dur: i.dur, verses: [] })) };
+  const ns = { id: 'new' + (n + 1), kind: 'Sunday Morning', title: 'Sunday Morning Worship', date: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`, status: 'draft', theme: '', text: '', items: tpl.items.map(i => ({ ...i, id: nid(), hymn: i.type === 'song' ? null : i.hymn, who: i.type === 'song' ? ME : null, title: i.type === 'song' ? ROLES[i.role].label : i.title, verses: [] })) };
   S.services.push(ns); S.cur = ns.id; S.sel = null; S.ctx = null; S.tab = 'library'; toast('New service created from your Sunday morning template'); refresh();
 }
 
@@ -465,10 +454,6 @@ function act(name, el, e) {
         ...(it.type === 'song' && it.hymn ? [{ label: 'Replace hymn…', html: icon('swap', 15), run: () => { it.hymn = null; it.verses = []; selectItem(id); } }] : []),
         { hr: 1 }, { label: 'Remove', html: icon('trash', 15), run: () => removeItem(id) }
       ], { align: 'right' }); break;
-    }
-    case 'dur': {
-      const id = el.closest('.row').dataset.id, it = svc().items.find(i => i.id === id);
-      showMenu(el, [{ header: 'Duration' }, ...[1, 2, 3, 4, 5, 8, 10, 15, 20, 25, 30, 35, 40].map(m => ({ label: `${m} min`, small: m === it.dur ? '✓' : '', run: () => { it.dur = m; refresh(); } }))], { align: 'right' }); break;
     }
     case 'addmenu':
       showMenu(el, [{ header: 'Add to order' },
@@ -553,7 +538,7 @@ $('#fSort').addEventListener('change', e => { S.sort = e.target.value; renderRes
 $('#paneItem').addEventListener('input', e => {
   const f = e.target.dataset.f; if (!f || e.target.tagName === 'SELECT') return;
   const it = selItem(); if (!it) return;
-  it[f] = f === 'dur' ? Math.max(1, parseInt(e.target.value) || 1) : e.target.value;
+  it[f] = e.target.value;
   renderHead(); renderOrder(); renderCheck();
 });
 $('#paneItem').addEventListener('change', e => {

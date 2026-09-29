@@ -59,13 +59,6 @@ const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', '
 const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const parseDate = s => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); };
 const fmtLong = s => { const d = parseDate(s); return `${DAYS[d.getDay()]}, ${MONTHS[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`; };
-const toMin = t => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
-const fmtClock = mins => {
-  const h24 = Math.floor(mins / 60) % 24, m = mins % 60;
-  const h = h24 % 12 || 12;
-  return `${h}:${String(m).padStart(2, '0')}`;
-};
-const fmtClockAP = mins => fmtClock(mins) + (Math.floor(mins / 60) % 24 >= 12 ? ' PM' : ' AM');
 const agoText = d => {
   if (d == null) return 'Never';
   if (d < 1) return 'Today';
@@ -197,7 +190,6 @@ const ITEM_TYPES = {
 /* Plan checks shared by desktop + mobile. */
 function planChecks(svc) {
   const out = [];
-  const total = svc.items.reduce((a, i) => a + i.dur, 0);
   svc.items.forEach(it => {
     if (it.type === 'song' && !it.hymn) out.push({ level: 'warn', id: it.id, text: `No hymn chosen for “${ROLES[it.role].label}”.` });
     if (it.type === 'song' && it.hymn) {
@@ -212,6 +204,5 @@ function planChecks(svc) {
     const a = HYMN[songs[i - 1].hymn], b = HYMN[songs[i].hymn];
     if (keyGap(a.key, b.key) >= 5) out.push({ level: 'info', id: songs[i].id, text: `Big pitch jump: ${a.title} (${a.key}) → ${b.title} (${b.key}).` });
   }
-  if (total > svc.target) out.push({ level: 'warn', id: null, text: `Running ${total - svc.target} min over the ${svc.target}-minute target.` });
   return out;
 }

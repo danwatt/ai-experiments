@@ -16,7 +16,7 @@ python3 -m http.server 5178
 
 ## Desktop: what to try
 
-- **Order of service** (middle column): drag to reorder, click a row to edit, `⋯` for duplicate/move/remove, duration pill to change length.
+- **Order of service** (middle column): drag to reorder, click a row to edit, `⋯` for duplicate/move/remove. Services aren't timed, so there are no durations or clock times.
   Sections follow a typical Church of Christ assembly (Gathering, The Lord's Supper, Giving, The Word, Response).
 - **Empty song slot** (“Choose invitation song…”): click it. The library opens pre-filtered for that purpose and sorted by longest-since-sung.
 - **Hymn library** (right): full-text search across title, first line, lyrics, tune, author, scripture reference and hymnal number
@@ -24,13 +24,13 @@ python3 -m http.server 5178
   Arrow keys move through results, Enter adds, drag a result into the order.
 - **Preview**: sheet-music slide for each verse/refrain, start pitch (with a playable tone), meter, tune, hymnal numbers, scripture, topics, 12-month usage history, license.
 - **Selected item**: choose slides to include, shift the starting pitch, pick the hymnal number to announce, assign people, add notes.
-- **Plan check**: flags open slots, recently sung hymns, big key jumps between songs, unassigned items, running over time.
+- **Plan check**: flags open slots, recently sung hymns, big key jumps between songs, unassigned items.
 - **Slide deck / Present** (`F5`): the assembled deck, including hymn slides, scripture, communion and prayer slides.
 - `⌘K` / `Ctrl+K` or `/` focuses search. Light/dark toggle in the top bar.
 
 ## Mobile: what to try
 
-Plan (view/reorder, add hymns), Hymns (metadata search), Live (song-leader view with start pitch + announce number + timer), Me (accept/decline assignments).
+Plan (view/reorder, add hymns), Hymns (metadata search), Live (song-leader view with start pitch + announce number), Me (accept/decline assignments).
 
 ## Notes
 

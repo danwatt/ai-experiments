@@ -7,7 +7,7 @@ const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 const M = {
   tab: 'plan', svc: 's1', edit: false,
   q: '', topic: '', sort: 'relevance', ctx: null, added: new Set(),
-  sheet: null, live: { idx: 0, run: false, t: 0 },
+  sheet: null, live: { idx: 0 },
   confirmed: new Set(['s1:dbrooks:song']), declined: new Set(),
   notif: { assign: true, changes: true, reminders: false }
 };
@@ -27,32 +27,28 @@ function songSub(it) {
   return `<div class="mchips"><span class="ch key">Key ${sp.keyShifted}</span><span class="ch">Start ${sp.name} (${sp.solfege})</span><span class="ch">${num} ${h.hn[num]}</span>${h.last != null && h.last < 21 ? `<span class="ch warn">Sung ${agoText(h.last).toLowerCase()}</span>` : ''}</div>`;
 }
 function planView() {
-  const s = cur(), tot = s.items.reduce((a, i) => a + i.dur, 0), open = s.items.filter(i => i.type === 'song' && !i.hymn);
+  const s = cur(), open = s.items.filter(i => i.type === 'song' && !i.hymn);
   const d = parseDate(s.date);
-  let t = toMin(s.time), prev = null, rows = '';
+  let prev = null, rows = '';
   const flush = () => { if (rows) out += `<div class="mlist">${rows}</div>`; rows = ''; };
   let out = '';
   s.items.forEach((it, idx) => {
     if (it.section !== prev) { flush(); out += `<div class="msec">${esc(it.section)}</div>`; prev = it.section; }
     const h = it.type === 'song' && it.hymn ? HYMN[it.hymn] : null, empty = it.type === 'song' && !h;
     const title = h ? h.title : empty ? `Choose ${ROLES[it.role].label.toLowerCase()}` : it.title;
-    const sub = h ? `${esc(pname(it.who) || 'No leader')} · ${it.dur} min` : empty ? `<span style="color:var(--warn);font-weight:650">Tap to find a hymn</span>` : `${esc(pname(it.who) || 'Unassigned')}${it.ref ? ' · ' + esc(it.ref) : ''} · ${it.dur} min`;
+    const sub = h ? `${esc(pname(it.who) || '')}` : empty ? `<span style="color:var(--warn);font-weight:650">Tap to find a hymn</span>` : `${esc(pname(it.who) || 'Unassigned')}${it.ref ? ' · ' + esc(it.ref) : ''}`;
     rows += `<button class="mrow ${empty ? 'open' : ''}" data-a="${empty ? 'fill' : 'item'}" data-id="${it.id}">
-      <span class="mt">${fmtClock(t)}</span>
       <span class="mtile ${empty ? 'empty' : ITEM_TYPES[it.type].color}">${icon(empty ? 'plus' : it.type, 18)}</span>
       <span><div class="mtl ${h ? 'serif' : ''}">${esc(title)}</div><div class="msub">${sub}</div>${h ? songSub(it) : ''}</span>
       ${M.edit ? `<span class="edit-ctl"><button data-a="up" data-id="${it.id}" aria-label="Move up">${icon('up', 14)}</button><button data-a="down" data-id="${it.id}" aria-label="Move down">${icon('down', 14)}</button></span>` : `<span class="go">${icon('chevR', 16)}</span>`}
     </button>`;
-    t += it.dur;
   });
   flush();
-  const segs = s.items.map(i => `<i class="${ITEM_TYPES[i.type].color}" style="flex:${i.dur}"></i>`).join('');
   return `
-    <div class="h-large"><div><h1>${DAYS[d.getDay()] === 'Sunday' ? 'Sunday' : DAYS[d.getDay()]}${s.kind.includes('Morning') ? ' morning' : s.kind.includes('Evening') && d.getDay() === 0 ? ' evening' : ''}</h1><div class="sub">${MONTHS[d.getMonth()]} ${d.getDate()} · ${fmtClockAP(toMin(s.time))} – ${fmtClockAP(toMin(s.time) + tot)}</div></div>
+    <div class="h-large"><div><h1>${DAYS[d.getDay()] === 'Sunday' ? 'Sunday' : DAYS[d.getDay()]}${s.kind.includes('Morning') ? ' morning' : s.kind.includes('Evening') && d.getDay() === 0 ? ' evening' : ''}</h1><div class="sub">${MONTHS[d.getMonth()]} ${d.getDate()} · ${s.items.length} items</div></div>
       <button class="ibtn ${M.edit ? 'on' : ''}" data-a="edit">${M.edit ? 'Done' : 'Edit'}</button></div>
     <div class="seg">${['s1', 's2', 's3'].map(id => `<button class="${M.svc === id ? 'on' : ''}" data-a="svc" data-id="${id}">${SHORT[id]}</button>`).join('')}</div>
     ${open.length ? `<button class="banner" data-a="fill" data-id="${open[0].id}">${icon('alert', 20)}<span><b>${open.length} song slot${open.length > 1 ? 's' : ''} still open.</b> Find a hymn</span>${icon('chevR', 16)}</button>` : ''}
-    <div class="card" style="margin-bottom:4px;padding:12px 14px"><div style="display:flex;justify-content:space-between;font-size:13px;color:var(--ink2)"><span><b style="color:var(--ink)">${tot} min</b> planned</span><span>${s.target - tot >= 0 ? `${s.target - tot} min open` : `${tot - s.target} over`}</span></div><div class="budget">${segs}</div></div>
     ${out}
     <button class="fab" data-a="tab" data-t="hymns" aria-label="Add hymn">${icon('plus', 26)}</button>`;
 }
@@ -91,7 +87,7 @@ function hymnSheet(id, itemId) {
   const spx = it ? startPitch(h, it.shift || 0) : sp;
   return `<div class="grab"></div>
     <div class="sh-h"><div><h2>${esc(h.title)}</h2><div class="p-first">“${esc(h.first)}…”</div><div class="p-credit">${esc(h.by)}</div></div><button class="sh-x" data-a="closeSheet" aria-label="Close">${icon('x', 16)}</button></div>
-    ${it ? `<div class="card" style="margin-top:12px;padding:10px 14px;font-size:14px"><b>${esc(ITEM_TYPES.song.label)}</b> · ${esc(pname(it.who) || 'No leader')} · ${it.dur} min${it.notes ? `<div style="color:var(--muted);margin-top:3px">“${esc(it.notes)}”</div>` : ''}</div>` : ''}
+    ${it ? `<div class="card" style="margin-top:12px;padding:10px 14px;font-size:14px"><b>${esc(ITEM_TYPES.song.label)}</b>${it.who ? ' · ' + esc(pname(it.who)) : ''}${it.notes ? `<div style="color:var(--muted);margin-top:3px">“${esc(it.notes)}”</div>` : ''}</div>` : ''}
     <div class="pitch"><div class="big">${spx.name}</div><div class="txt"><b>Start on ${spx.name} (${spx.solfege})</b>Key of ${spx.keyShifted} · a cappella</div><button class="play" data-a="pitch" data-id="${h.id}" data-shift="${it ? it.shift || 0 : 0}" aria-label="Play pitch">${icon('volume', 22)}</button></div>
     <div class="grid3"><div class="fact"><small>Time</small><b>${h.time}</b><div class="s">${esc(h.tempo.split(',')[0])}</div></div><div class="fact"><small>Meter</small><b style="font-size:13px">${esc(h.meter.split(' ')[0])}</b><div class="s">${esc(h.tune)}</div></div><div class="fact"><small>Slides</small><b>${h.slides}</b><div class="s">on desktop</div></div></div>
     <div class="blk"><div class="blk-h">Announce as</div><div class="tags">${Object.entries(h.hn).map(([k, v]) => `<span class="tagc" title="${esc(HYMNALS[k])}"><b style="color:var(--ink)">${k}</b> ${v}</span>`).join('')}</div></div>
@@ -108,25 +104,19 @@ function itemSheet(id) {
   if (it.type === 'song' && it.hymn) return hymnSheet(it.hymn, id);
   return `<div class="grab"></div>
     <div class="sh-h"><div style="display:flex;gap:12px;align-items:center"><span class="mtile ${ITEM_TYPES[it.type].color}" style="width:44px;height:44px">${icon(it.type, 22)}</span><div><h2 style="font-size:23px">${esc(it.title)}</h2><div class="p-credit">${ITEM_TYPES[it.type].label}</div></div></div><button class="sh-x" data-a="closeSheet">${icon('x', 16)}</button></div>
-    <dl class="kv" style="margin-top:18px"><dt>${it.type === 'sermon' ? 'Speaker' : 'Assigned to'}</dt><dd>${esc(pname(it.who) || 'Unassigned')}</dd>${it.ref ? `<dt>Scripture</dt><dd>${esc(it.ref)}</dd>` : ''}<dt>Duration</dt><dd>${it.dur} min</dd>${it.notes ? `<dt>Notes</dt><dd>${esc(it.notes)}</dd>` : ''}</dl>
+    <dl class="kv" style="margin-top:18px"><dt>${it.type === 'sermon' ? 'Speaker' : 'Assigned to'}</dt><dd>${esc(pname(it.who) || 'Unassigned')}</dd>${it.ref ? `<dt>Scripture</dt><dd>${esc(it.ref)}</dd>` : ''}${it.notes ? `<dt>Notes</dt><dd>${esc(it.notes)}</dd>` : ''}</dl>
     ${it.who ? '' : `<button class="cta">${icon('person', 18)} Assign someone</button>`}`;
 }
 
 /* ------------------------------ Live ------------------------------ */
-const mmss = s => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 function liveView() {
   const s = cur(), L = M.live;
   L.idx = Math.max(0, Math.min(L.idx, s.items.length - 1));
   const it = s.items[L.idx], nx = s.items[L.idx + 1];
-  const plannedSec = s.items.slice(0, L.idx).reduce((a, i) => a + i.dur, 0) * 60;
-  const drift = L.t - plannedSec, late = drift > 30;
   const h = it.type === 'song' && it.hymn ? HYMN[it.hymn] : null, sp = h ? startPitch(h, it.shift || 0) : null;
-  let t = toMin(s.time);
-  const list = s.items.map((x, i) => { const r = `<div class="up ${i < L.idx ? 'done' : ''} ${i === L.idx ? 'cur' : ''}" data-a="jump" data-i="${i}"><span class="t">${fmtClock(t)}</span><span><div class="n">${esc(x.type === 'song' && x.hymn ? HYMN[x.hymn].title : x.title)}</div><div class="s">${esc(pname(x.who) || '—')}</div></span><span class="ch">${x.dur}m</span></div>`; t += x.dur; return r; }).join('');
+  const list = s.items.map((x, i) => { const r = `<div class="up ${i < L.idx ? 'done' : ''} ${i === L.idx ? 'cur' : ''}" data-a="jump" data-i="${i}"><span class="t">${i + 1}</span><span><div class="n">${esc(x.type === 'song' && x.hymn ? HYMN[x.hymn].title : x.title)}</div><div class="s">${esc(pname(x.who) || '—')}</div></span></div>`; return r; }).join('');
   return `<div class="live">
-    <div class="h-large"><div><h1>Leader view</h1><div class="sub">${esc(s.title)} · ${fmtClockAP(toMin(s.time))}</div></div><div style="text-align:right"><div class="clock">${mmss(L.t)}</div><div class="drift ${late ? 'late' : ''}">${L.run ? (Math.abs(drift) < 30 ? 'On plan' : drift > 0 ? `${mmss(drift)} behind` : `${mmss(-drift)} ahead`) : L.t ? 'Paused' : 'Not started'}</div></div></div>
-    <button class="start-btn ${L.run ? 'stop' : ''}" data-a="run">${L.run ? 'Pause timer' : L.t ? 'Resume timer' : 'Start service'}</button>
-    <div class="now"><div class="lab"><span>Now · ${L.idx + 1} of ${s.items.length}</span><span>${it.dur} min</span></div>
+    <div class="h-large"><div><h1>Leader view</h1><div class="sub">${esc(s.title)}</div></div></div>    <div class="now"><div class="lab"><span>Now · ${L.idx + 1} of ${s.items.length}</span><span>${ITEM_TYPES[it.type].label}</span></div>
       <h2>${esc(h ? h.title : it.title)}</h2><div class="who">${esc(pname(it.who) || 'Unassigned')}${it.ref ? ' · ' + esc(it.ref) : ''}</div>
       ${h ? `<div class="num"><div><small>Start pitch</small><b>${sp.name}</b><div class="s">${sp.solfege} · key of ${sp.keyShifted}</div></div><div><small>Announce</small><b>${hnPick(it)} ${h.hn[hnPick(it)]}</b><div class="s">${it.verses.length} verse/refrain slide${it.verses.length === 1 ? '' : 's'}</div></div></div>
         <div class="row2"><button class="play2" data-a="pitch" data-id="${h.id}" data-shift="${it.shift || 0}">${icon('volume', 17)} Play pitch</button><button class="sec2" data-a="hymn" data-id="${h.id}">Details</button></div>` : ''}
@@ -150,7 +140,7 @@ function meView() {
   const rows = mine.map(m => {
     const d = parseDate(m.s.date), ok = M.confirmed.has(m.key), no = M.declined.has(m.key);
     return `<div class="assn"><div class="a1"><b>${esc(m.label)}</b>${ok ? '<span class="pill ok">Confirmed</span>' : no ? '<span class="pill bad">Declined</span>' : '<span class="pill warn">Needs reply</span>'}</div>
-      <div class="a2">${DAYS[d.getDay()]}, ${MONTHS[d.getMonth()]} ${d.getDate()} · ${fmtClockAP(toMin(m.s.time))}${m.detail ? ' · ' + esc(m.detail) : ''}</div>
+      <div class="a2">${DAYS[d.getDay()]}, ${MONTHS[d.getMonth()]} ${d.getDate()}${m.detail ? ' · ' + esc(m.detail) : ''}</div>
       ${!ok && !no ? `<div class="btns"><button data-a="decline" data-k="${m.key}">Can’t make it</button><button class="yes" data-a="accept" data-k="${m.key}">Accept</button></div>` : ''}</div>`;
   }).join('');
   const tg = (k, l, s) => `<div class="setrow"><div>${l}<small>${s}</small></div><button class="tgl ${M.notif[k] ? 'on' : ''}" data-a="tgl" data-k="${k}" aria-label="${l}"></button></div>`;
@@ -192,7 +182,7 @@ function addHymn(id) {
   if (slot) { slot.hymn = id; slot.title = h.title; slot.verses = h.sec.map((_, i) => i); toast(`“${h.title}” → ${ROLES[slot.role].label.toLowerCase()}`); }
   else {
     const last = s.items[s.items.length - 1];
-    s.items.splice(s.items.length - 1, 0, { id: nid(), type: 'song', title: h.title, dur: 3, who: ME, hymn: id, role: 'general', verses: h.sec.map((_, i) => i), shift: 0, section: last.section });
+    s.items.splice(s.items.length - 1, 0, { id: nid(), type: 'song', title: h.title, who: ME, hymn: id, role: 'general', verses: h.sec.map((_, i) => i), shift: 0, section: last.section });
     toast(`Added “${h.title}” before the closing prayer`);
   }
   if (h.last != null && h.last < 21) setTimeout(() => toast(`Heads up: sung ${agoText(h.last).toLowerCase()}`, 'alert'), 1400);
@@ -218,7 +208,6 @@ document.addEventListener('click', e => {
     case 'clearCtx': M.ctx = null; render(); break;
     case 'sort': M.sort = M.sort === 'title' || M.sort === 'relevance' ? 'stale' : M.sort === 'stale' ? 'recent' : 'title'; render(); break;
     case 'pitch': { const h = HYMN[d.id], sp = startPitch(h, +(d.shift || 0)); playPitch(sp.freq); toast(`Playing ${sp.name} (${sp.solfege})`, 'volume'); break; }
-    case 'run': M.live.run = !M.live.run; render(); break;
     case 'next': M.live.idx++; render(); break; case 'prev': M.live.idx--; render(); break;
     case 'jump': M.live.idx = +d.i; render(); break;
     case 'accept': M.confirmed.add(d.k); M.declined.delete(d.k); toast('Confirmed — thanks!'); render(); break;
@@ -234,6 +223,5 @@ document.addEventListener('input', e => {
   render(); const i = $('#mq'); i.focus(); i.setSelectionRange(pos, pos); v.scrollTop = top;
 });
 $('#themeBtn').addEventListener('click', () => { const t = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'; document.documentElement.dataset.theme = t; try { localStorage.setItem('selah-theme', t); } catch (_) {} });
-setInterval(() => { if (M.live.run) { M.live.t++; if (M.tab === 'live' && !M.sheet) { const v = $('#view'), y = v.scrollTop; render(); v.scrollTop = y; } } }, 1000);
 addEventListener('resize', fitPhone);
 fitPhone(); render();
