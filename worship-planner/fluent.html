@@ -476,7 +476,7 @@ mark { background: color-mix(in srgb, var(--accent) 24%, transparent); color: in
 .olist { flex: 1; overflow: auto; padding: 0 16px 28px; outline: none; }
 .ghead { position: sticky; top: 0; z-index: 2; display: flex; align-items: baseline; justify-content: space-between; padding: 14px 8px 6px; background: var(--layer); font-weight: 600; border-bottom: 1px solid var(--stroke-divider); margin-bottom: 2px; }
 .ghead span { font-size: 12px; font-weight: 400; color: var(--text-2); font-variant-numeric: tabular-nums; }
-.li { position: relative; display: grid; grid-template-columns: 10px 38px 32px minmax(0, 1fr) auto 44px 32px; align-items: center; gap: 10px; min-height: 52px; padding: 5px 4px 5px 8px; margin: 2px 0; border-radius: 4px; }
+.li { position: relative; display: grid; grid-template-columns: 10px 32px minmax(0, 1fr) auto 32px; align-items: center; gap: 10px; min-height: 52px; padding: 5px 4px 5px 8px; margin: 2px 0; border-radius: 4px; }
 .li:hover, .li.sel { background: var(--subtle-hover); }
 .li.empty { box-shadow: inset 0 0 0 1px var(--stroke-control-2); }
 .li.dragging { opacity: .4; }
@@ -486,7 +486,6 @@ mark { background: color-mix(in srgb, var(--accent) 24%, transparent); color: in
 .grip { opacity: 0; color: var(--text-3); cursor: grab; display: grid; }
 .grip svg { width: 10px; height: 14px; fill: currentColor; }
 .li:hover .grip { opacity: 1; }
-.li-time { font-size: 12px; color: var(--text-2); font-variant-numeric: tabular-nums; }
 .li-ico { width: 32px; height: 32px; border-radius: 4px; display: grid; place-items: center; background: var(--card); border: 1px solid var(--stroke-card); color: var(--text-2); }
 .li[data-type="hymn"] .li-ico { color: var(--accent-text); }
 .li-main { display: grid; min-width: 0; }
@@ -494,7 +493,6 @@ mark { background: color-mix(in srgb, var(--accent) 24%, transparent); color: in
 .tt { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .st { font-size: 12px; line-height: 16px; color: var(--text-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .slot { color: var(--text-2); }
-.li-dur { font-size: 12px; color: var(--text-2); text-align: right; font-variant-numeric: tabular-nums; }
 .li-more { opacity: 0; }
 .li:hover .li-more, .li.sel .li-more { opacity: 1; }
 .bdg { display: inline-flex; align-items: center; gap: 4px; height: 20px; padding: 0 8px; border-radius: 10px; font-size: 12px; line-height: 16px; white-space: nowrap; }
@@ -555,6 +553,7 @@ mark { background: color-mix(in srgb, var(--accent) 24%, transparent); color: in
 .pctl { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: end; }
 .fld { display: grid; gap: 4px; }
 .lbl { font-size: 12px; line-height: 16px; }
+.pitchv { display: inline-flex; align-items: center; height: 32px; font-weight: 600; }
 .vrow { display: flex; gap: 4px; }
 .pact { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding-top: 4px; border-top: 1px solid var(--stroke-divider); padding-top: 10px; }
 .pact .grow { flex: 1; }
@@ -603,7 +602,7 @@ mark { background: color-mix(in srgb, var(--accent) 24%, transparent); color: in
 .pr-top button, .pr-nav button { border: 1px solid rgb(255 255 255 / .18); background: rgb(255 255 255 / .06); color: var(--stage-fg); border-radius: 4px; height: 32px; padding: 0 12px; }
 .pr-body { display: grid; grid-template-columns: 250px minmax(0, 1fr) 300px; gap: 20px; padding: 20px; min-height: 0; }
 .pr-list { overflow: auto; display: grid; align-content: start; gap: 1px; font-size: 13px; }
-.pr-list button { border: 0; background: transparent; color: var(--stage-muted); text-align: left; padding: 6px 8px; border-radius: 4px; display: grid; grid-template-columns: 42px 1fr; gap: 8px; }
+.pr-list button { border: 0; background: transparent; color: var(--stage-muted); text-align: left; padding: 6px 8px; border-radius: 4px; }
 .pr-list button.on { background: rgb(255 255 255 / .1); color: var(--stage-fg); }
 .pr-cur { display: grid; align-content: center; gap: 12px; min-width: 0; }
 .pr-side { display: grid; align-content: start; gap: 8px; font-size: 12px; color: var(--stage-muted); font-weight: 600; }
@@ -676,7 +675,7 @@ mark { background: color-mix(in srgb, var(--accent) 24%, transparent); color: in
         </label>
         <div class="tb-right">
           <span class="tb-sync" id="tb-sync"></span>
-          <span class="avatar" title="Bro. Daniel Price, song leader">DP</span>
+          <span class="avatar" title="Daniel Price, song leader">DP</span>
           <span class="caption" id="caption"></span>
         </div>
       </div>
@@ -693,7 +692,7 @@ mark { background: color-mix(in srgb, var(--accent) 24%, transparent); color: in
             <div id="olist" class="olist" tabindex="0" role="listbox" aria-label="Order of worship" data-ctl="ListView (CanReorderItems)"></div>
           </main>
           <aside class="songpane" aria-label="Songbook">
-            <div class="sp-h"><h2>Songbook</h2><span class="cap">612 songs · 588 with four-part slides</span><button class="icon-btn" id="popout" data-action="toast" data-msg="The songbook opens in its own window, handy on a second monitor" title="Open in new window" aria-label="Open in new window"></button></div>
+            <div class="sp-h"><h2>Songbook</h2><span class="cap">612 songs</span><button class="icon-btn" id="popout" data-action="toast" data-msg="The songbook opens in its own window, handy on a second monitor" title="Open in new window" aria-label="Open in new window"></button></div>
             <label class="tbox" data-ctl="AutoSuggestBox">
               <input id="q" type="search" autocomplete="off" spellcheck="false" placeholder="Title, number, tune, scripture, topic" aria-label="Search the songbook">
               <span id="q-ico"></span>
@@ -729,8 +728,8 @@ mark { background: color-mix(in srgb, var(--accent) 24%, transparent); color: in
         <tr><td>Songbook filters</td><td><code>ToggleButton</code>, <code>ComboBox</code></td><td></td></tr>
         <tr><td>Results</td><td><code>ListView</code>, item template with an <code>Image</code> thumbnail</td><td><kbd>↑↓</kbd> browses while search has focus; <kbd>Enter</kbd> adds.</td></tr>
         <tr><td>Preview tabs</td><td><code>SelectorBar</code></td><td>Added in Windows App SDK 1.5. Check support in your Uno version; Uno Toolkit <code>TabBar</code> also works.</td></tr>
-        <tr><td>Slides</td><td><code>FlipView</code>, <code>PipsPager</code>, <code>GridView</code> thumbnails</td><td>One image asset per song, verse, key and notehead style.</td></tr>
-        <tr><td>Verses, pitch, noteheads</td><td><code>ToggleButton</code> row, <code>ComboBox</code>, <code>RadioButtons</code> or Community Toolkit <code>Segmented</code></td><td></td></tr>
+        <tr><td>Slides</td><td><code>FlipView</code>, <code>PipsPager</code>, <code>GridView</code> thumbnails</td><td>One image asset per song and verse. Pitch and shape notes are fixed by the songbook, so there is nothing to choose.</td></tr>
+        <tr><td>Verses</td><td><code>ToggleButton</code> row</td><td>Pitch shows as read-only text.</td></tr>
         <tr><td>Notifications</td><td><code>InfoBar</code> in an overlay layer, <code>Severity="Success"</code></td><td>Carries Undo.</td></tr>
         <tr><td>Dialogs</td><td><code>ContentDialog</code>, <code>DefaultButton="Primary"</code></td><td>Send assignments.</td></tr>
         <tr><td>Presenter</td><td>Second <code>AppWindow</code> on the projector display</td><td>The mockup shows the presenter console inside the main window.</td></tr>
@@ -891,7 +890,7 @@ const slot = (section, role, hymnId = null, verses = []) => it(section, 'hymn', 
 
 function lordsDayAM(o) {
   return [
-    it('opening','spoken',{ title:'Welcome', sub:'Bro. Mark Ellis', dur:2, slides:1 }),
+    it('opening','spoken',{ title:'Welcome', sub:'Mark Ellis', dur:2, slides:1 }),
     slot('opening','Opening song', o.open, o.open ? [1,2,3] : []),
     it('opening','prayer',{ title:'Opening Prayer', sub:'Not assigned', dur:2, slides:0 }),
     slot('opening','Second song'),
@@ -904,7 +903,7 @@ function lordsDayAM(o) {
     it('word','scripture',{ title:'Scripture Reading', sub:o.text, dur:2, slides:2 }),
     it('word','sermon',{ title:'Lesson', sub:`“${o.lesson}” · ${o.preacher}`, dur:30, slides:'needs' }),
     slot('closing','Invitation song', o.inv, o.inv ? [1,2,3,4] : []),
-    it('closing','spoken',{ title:'Announcements', sub:'Bro. Mark Ellis', dur:3, slides:4 }),
+    it('closing','spoken',{ title:'Announcements', sub:'Mark Ellis', dur:3, slides:4 }),
     it('closing','prayer',{ title:'Closing Prayer', sub:'Not assigned', dur:1, slides:0 }),
   ];
 }
@@ -912,28 +911,28 @@ function lordsDayAM(o) {
 const SERVICES = [
   { id:'s1', date:'2026-10-04', start:600, name:'Sunday Morning Worship', short:'Sun AM', where:'Auditorium', series:'Built on the Rock', part:'3 of 6', sugKey:'BOR',
     lesson:'The Stone the Builders Rejected', text:'Matthew 21:33–46', saved:'2 min ago',
-    people:[['Preaching','Bro. Greg Holt'],['Song leader','Bro. Daniel Price'],['Lord’s Supper','Bro. Kevin Walsh']],
+    people:[['Preaching','Greg Holt'],['Song leader','Daniel Price'],['Lord’s Supper','Kevin Walsh']],
     items:[
-      it('opening','spoken',{ title:'Welcome', sub:'Bro. Mark Ellis', dur:2, slides:1 }),
+      it('opening','spoken',{ title:'Welcome', sub:'Mark Ellis', dur:2, slides:1 }),
       slot('opening','Opening song','h138',[1,2,4]),
-      it('opening','prayer',{ title:'Opening Prayer', sub:'Bro. James Carter', dur:2, slides:0 }),
+      it('opening','prayer',{ title:'Opening Prayer', sub:'James Carter', dur:2, slides:0 }),
       slot('opening','Second song','h463',[1,2,3]),
       slot('supper','Before the Supper','h382',[1,2,3,4]),
-      it('supper','supper',{ title:'Communion Thoughts', sub:'1 Corinthians 11:23–26 · Bro. Kevin Walsh', dur:3, slides:1 }),
-      it('supper','supper',{ title:'Prayer for the Bread', sub:'Bro. Kevin Walsh · served by 8 men', dur:3, slides:1 }),
-      it('supper','supper',{ title:'Prayer for the Cup', sub:'Bro. Kevin Walsh', dur:3, slides:1 }),
-      it('giving','giving',{ title:'Contribution', sub:'Prayer: Bro. Tom Hale · separate from the Supper', dur:3, slides:1 }),
+      it('supper','supper',{ title:'Communion Thoughts', sub:'1 Corinthians 11:23–26 · Kevin Walsh', dur:3, slides:1 }),
+      it('supper','supper',{ title:'Prayer for the Bread', sub:'Kevin Walsh · served by 8 men', dur:3, slides:1 }),
+      it('supper','supper',{ title:'Prayer for the Cup', sub:'Kevin Walsh', dur:3, slides:1 }),
+      it('giving','giving',{ title:'Contribution', sub:'Prayer: Tom Hale · separate from the Supper', dur:3, slides:1 }),
       slot('word','Before the lesson','h545',[1,2,4]),
-      it('word','scripture',{ title:'Scripture Reading', sub:'Matthew 21:33–46 · Bro. Luke Adams', dur:3, slides:3 }),
-      it('word','sermon',{ title:'Lesson', sub:'“The Stone the Builders Rejected” · Bro. Greg Holt', dur:30, slides:'needs' }),
+      it('word','scripture',{ title:'Scripture Reading', sub:'Matthew 21:33–46 · Luke Adams', dur:3, slides:3 }),
+      it('word','sermon',{ title:'Lesson', sub:'“The Stone the Builders Rejected” · Greg Holt', dur:30, slides:'needs' }),
       { ...slot('closing','Invitation song','h934',[1,2,3,4]), dur:5 },
-      it('closing','spoken',{ title:'Announcements', sub:'Bro. Mark Ellis', dur:3, slides:4 }),
+      it('closing','spoken',{ title:'Announcements', sub:'Mark Ellis', dur:3, slides:4 }),
       { ...slot('closing','Closing song','h95',[1]), dur:1 },
-      it('closing','prayer',{ title:'Closing Prayer', sub:'Bro. Sam Reed', dur:1, slides:0 }),
+      it('closing','prayer',{ title:'Closing Prayer', sub:'Sam Reed', dur:1, slides:0 }),
     ] },
   { id:'s2', date:'2026-10-04', start:1080, name:'Sunday Evening Worship', short:'Sun PM', where:'Auditorium', series:'Built on the Rock', part:'3b', sugKey:'BOR',
     lesson:'Living Stones', text:'1 Peter 2:4–10', saved:'Sep 28',
-    people:[['Preaching','Bro. Greg Holt'],['Song leader','Bro. Nathan Price']],
+    people:[['Preaching','Greg Holt'],['Song leader','Nathan Price']],
     items:[
       slot('opening','Opening song'),
       it('opening','prayer',{ title:'Opening Prayer', sub:'Not assigned', dur:2, slides:0 }),
@@ -941,28 +940,28 @@ const SERVICES = [
       it('supper','supper',{ title:'Lord’s Supper', sub:'For those who could not attend this morning', dur:5, slides:1 }),
       slot('word','Before the lesson'),
       it('word','scripture',{ title:'Scripture Reading', sub:'1 Peter 2:4–10', dur:2, slides:2 }),
-      it('word','sermon',{ title:'Lesson', sub:'“Living Stones” · Bro. Greg Holt', dur:25, slides:'needs' }),
+      it('word','sermon',{ title:'Lesson', sub:'“Living Stones” · Greg Holt', dur:25, slides:'needs' }),
       slot('closing','Invitation song'),
       it('closing','prayer',{ title:'Closing Prayer', sub:'Not assigned', dur:1, slides:0 }),
     ] },
   { id:'s3', date:'2026-10-07', start:1140, name:'Wednesday Bible Study', short:'Wed', where:'Fellowship room', series:'Acts: The Church Begins', part:'week 5', sugKey:'ACTS',
     lesson:'They Continued Steadfastly', text:'Acts 2:37–47', saved:'Sep 30',
-    people:[['Teaching','Bro. Luke Adams'],['Song leader','Bro. Daniel Price']],
+    people:[['Teaching','Luke Adams'],['Song leader','Daniel Price']],
     items:[
       slot('opening','Opening song','h201',[1,2,3,4]),
       it('opening','prayer',{ title:'Opening Prayer', sub:'Not assigned', dur:2, slides:0 }),
-      it('class','class',{ title:'Adult Bible Class', sub:'Acts 2:37–47 · Bro. Luke Adams', dur:45, slides:8 }),
+      it('class','class',{ title:'Adult Bible Class', sub:'Acts 2:37–47 · Luke Adams', dur:45, slides:8 }),
       slot('closing','Closing song'),
       it('closing','prayer',{ title:'Closing Prayer', sub:'Not assigned', dur:1, slides:0 }),
     ] },
   { id:'s4', date:'2026-10-11', start:600, name:'Sunday Morning Worship', short:'Sun AM', where:'Auditorium', series:'Built on the Rock', part:'4 of 6', sugKey:'BOR',
     lesson:'The Wise and Foolish Builders', text:'Matthew 7:24–27', saved:'Sep 21',
-    people:[['Preaching','Bro. Greg Holt'],['Song leader','Bro. Daniel Price'],['Lord’s Supper','Not assigned']],
-    o:{ open:'h368', text:'Matthew 7:24–27', lesson:'The Wise and Foolish Builders', preacher:'Bro. Greg Holt' } },
+    people:[['Preaching','Greg Holt'],['Song leader','Daniel Price'],['Lord’s Supper','Not assigned']],
+    o:{ open:'h368', text:'Matthew 7:24–27', lesson:'The Wise and Foolish Builders', preacher:'Greg Holt' } },
   { id:'s5', date:'2026-10-18', start:600, name:'Fall Gospel Meeting', short:'Meeting', where:'Auditorium', series:'Gospel Meeting', part:'day 1 of 4', sugKey:'GM',
     lesson:'Come Unto Me', text:'Matthew 11:28–30', saved:'Sep 14',
-    people:[['Guest preacher','Bro. Allen Brooks'],['Song leader','Bro. Daniel Price']],
-    o:{ inv:'h934', text:'Matthew 11:28–30', lesson:'Come Unto Me', preacher:'Bro. Allen Brooks' } },
+    people:[['Guest preacher','Allen Brooks'],['Song leader','Daniel Price']],
+    o:{ inv:'h934', text:'Matthew 11:28–30', lesson:'Come Unto Me', preacher:'Allen Brooks' } },
 ];
 SERVICES.forEach(s => { if (!s.items) s.items = lordsDayAM(s.o); });
 
@@ -1232,8 +1231,8 @@ const pad2 = n => String(n).padStart(2, '0');
 const isoOf = d => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
 const TYPE_ICON = { spoken:'chat', hymn:'music', prayer:'heart', scripture:'bookOpen', sermon:'lectern', supper:'cup', giving:'basket', class:'people' };
 const NAV = [['planner', 'Planner', 'cal'], ['songbook', 'Songbook', 'music'], ['slides', 'Slide sets', 'slides'], ['people', 'Assignments', 'people'], ['reports', 'Reports', 'chart']];
-const TEAM = [['Preaching', 'Bro. Greg Holt'], ['Song leader', 'Bro. Daniel Price'], ['Opening prayer', 'Bro. James Carter'], ['Lord’s Supper', 'Bro. Kevin Walsh'],
-  ['Contribution prayer', 'Bro. Tom Hale'], ['Scripture reading', 'Bro. Luke Adams'], ['Closing prayer', 'Bro. Sam Reed'], ['Welcome and announcements', 'Bro. Mark Ellis'], ['Sound and slides', 'Bro. Evan Cole']];
+const TEAM = [['Preaching', 'Greg Holt'], ['Song leader', 'Daniel Price'], ['Opening prayer', 'James Carter'], ['Lord’s Supper', 'Kevin Walsh'],
+  ['Contribution prayer', 'Tom Hale'], ['Scripture reading', 'Luke Adams'], ['Closing prayer', 'Sam Reed'], ['Welcome and announcements', 'Mark Ellis'], ['Sound and slides', 'Evan Cole']];
 const initials = n => { if (/^Not assigned/.test(n)) return '?'; const p = n.replace(/^Bro\.\s*/, '').split(/\s+/); return p[0][0] + (p.length > 1 ? p[p.length - 1][0] : ''); };
 const orderedItems = s => SECTIONS.flatMap(([k]) => s.items.filter(i => i.section === k));
 const isEmptySlot = i => i.type === 'hymn' && !i.hymnId;
@@ -1293,7 +1292,7 @@ function renderHead() {
   $('#ohead').innerHTML = `
     <nav class="crumbs" data-ctl="BreadcrumbBar" aria-label="Breadcrumb"><button data-action="noop">Services</button>${icon('chevR')}<button data-action="noop">${MON[d.getMonth()]} ${d.getDate()}</button>${icon('chevR')}<span aria-current="page">${esc(s.name)}</span></nav>
     <h1 class="ttl">${esc(s.name)}</h1>
-    <div class="cap tab">${longDate(s.date)} · ${startLabel(s)} · ${esc(s.where)} · ${t.songs} songs, ${fmtMin(t.min)}, ${t.slides} slides · Draft, saved ${esc(s.saved)}</div>
+    <div class="cap tab">${longDate(s.date)} · ${startLabel(s)} · ${esc(s.where)} · ${t.songs} songs, ${t.slides} slides · Draft, saved ${esc(s.saved)}</div>
     <div class="ppl" data-ctl="PersonPicture">${s.people.map(([r, n]) => `<span class="pp"><span class="pic">${initials(n)}</span><span><span class="r">${esc(r)}</span><span class="nm">${esc(n)}</span></span></span>`).join('')}
       <span class="tag">${icon('lectern')}“${esc(s.lesson)}” · ${esc(s.text)} · ${esc(s.series)}, ${esc(s.part)}</span></div>
     <div class="cmdbar" data-ctl="CommandBar">
@@ -1324,8 +1323,7 @@ function renderOrder() {
   let html = '';
   SECTIONS.forEach(([key, name]) => {
     const rows = tl.filter(r => r.item.section === key); if (!rows.length) return;
-    const mins = rows.reduce((a, r) => a + itemDur(r.item), 0);
-    html += `<div class="ghead">${name}<span>${clock(rows[0].start)} · ${mins} min</span></div>`;
+    html += `<div class="ghead">${name}</div>`;
     rows.forEach(({ item: i, start }) => {
       const sel = i.id === state.sel, empty = isEmptySlot(i);
       let main;
@@ -1333,8 +1331,8 @@ function renderOrder() {
       else if (i.type === 'hymn') { const h = H[i.hymnId]; main = `<span class="ov">${esc(i.role)}</span><span class="tt">${h.no} · ${esc(h.title)}</span><span class="st">Pitch ${esc(i.key || h.key)} · ${h.time}${h.v > 1 ? ' · ' + versesText(i.verses) : ''} · ${esc(h.tune)}</span>`; }
       else main = `<span class="tt">${esc(i.title)}</span><span class="st">${esc(i.sub || '')}</span>`;
       html += `<div class="li${sel ? ' sel' : ''}${empty ? ' empty' : ''}" data-item="${i.id}" data-type="${i.type}" draggable="true" data-action="selitem" data-id="${i.id}" role="option" aria-selected="${sel}">
-        <span class="grip" aria-hidden="true">${GRIP}</span><span class="li-time">${clock(start)}</span><span class="li-ico">${icon(TYPE_ICON[i.type])}</span>
-        <span class="li-main">${main}</span><span>${badge(i)}</span><span class="li-dur">${itemDur(i)} min</span>
+        <span class="grip" aria-hidden="true">${GRIP}</span><span class="li-ico">${icon(TYPE_ICON[i.type])}</span>
+        <span class="li-main">${main}</span><span>${badge(i)}</span>
         <button class="icon-btn li-more" data-action="rowmenu" data-id="${i.id}" aria-label="More options for ${esc(itemLabel(i))}" aria-haspopup="menu">${icon('more', 'fill')}</button></div>`;
     });
   });
@@ -1346,7 +1344,6 @@ function renderFilters() {
   const combo = (id, k, arr, all) => `<span class="combo${f[k] ? ' on' : ''}"><select id="${id}" class="fsel" data-k="${k}" aria-label="${all}"><option value="">${all}</option>${[...new Set(arr)].sort().map(v => `<option${v === f[k] ? ' selected' : ''}>${esc(v)}</option>`).join('')}</select>${icon('chevD')}</span>`;
   $('#filters').innerHTML = `
     <button class="tbtn" data-action="filt" data-k="pd" aria-pressed="${f.pd}">Public domain</button>
-    <button class="tbtn" data-action="filt" data-k="full" aria-pressed="${f.full}">Four-part</button>
     <button class="tbtn" data-action="filt" data-k="fresh" aria-pressed="${f.fresh}">Unsung 8 wks</button>
     ${combo('f-topic', 'topic', SONGS.flatMap(h => h.topics), 'Any topic')}
     ${combo('f-key', 'key', SONGS.map(h => h.key), 'Any pitch')}`;
@@ -1397,14 +1394,13 @@ function renderPreview() {
       <div class="strip" data-ctl="GridView">${Array.from({ length: total }, (_, i) => `<button class="sthumb" data-action="slide" data-i="${i}" aria-current="${i === slide}"><span class="thumb">${slideSVG(h, i, verses, key, total)}</span>${i === 0 ? 'Title' : 'Verse ' + verses[i - 1]}</button>`).join('')}</div>
       <div class="pctl">
         ${h.v > 1 ? `<div class="fld" data-ctl="ToggleButton"><span class="lbl">Verses</span><span class="vrow">${Array.from({ length: h.v }, (_, i) => `<button class="tbtn sq" data-action="verse" data-v="${i + 1}" aria-pressed="${verses.includes(i + 1)}">${i + 1}</button>`).join('')}</span></div>` : ''}
-        <div class="fld" data-ctl="ComboBox"><span class="lbl">Pitch</span><span class="combo lg"><select id="pkey" aria-label="Pitch">${h.keys.map(k => `<option${k === key ? ' selected' : ''}>${esc(k)}</option>`).join('')}</select>${icon('chevD')}</span></div>
-        <div class="fld" data-ctl="RadioButtons"><span class="lbl">Noteheads</span><span class="segm" role="radiogroup" aria-label="Noteheads"><button role="radio" data-action="notes" data-v="shape" aria-pressed="${state.notes === 'shape'}" aria-checked="${state.notes === 'shape'}">Shape</button><button role="radio" data-action="notes" data-v="round" aria-pressed="${state.notes === 'round'}" aria-checked="${state.notes === 'round'}">Round</button></span></div>
+        <div class="fld"><span class="lbl">Pitch</span><span class="pitchv">${esc(key)} · ${h.time}</span></div>
       </div>
       <div class="pact">
-        ${bi ? `<span class="bound"><b>${esc(bi.role)}</b> at ${clock(tl.find(r => r.item.id === bi.id).start)} · ${total} slides</span><span class="grow"></span>
+        ${bi ? `<span class="bound">In service as <b>${esc(bi.role.toLowerCase())}</b> · ${total} slides</span><span class="grow"></span>
             <button class="fbtn" data-action="del" data-id="${bi.id}">${icon('trash')}Remove</button>
             <button class="fbtn" data-action="present" data-item="${bi.id}">${icon('play')}Present from here</button>`
-          : `<span class="combo lg"><select id="after" aria-label="Position in service">${s.items.map(i => `<option value="${i.id}"${i.id === state.sel ? ' selected' : ''}>${fill && i.id === state.sel ? 'Fill' : 'After'} ${clock(tl.find(r => r.item === i).start)} · ${esc(itemLabel(i))}</option>`).join('')}</select>${icon('chevD')}</span>
+          : `<span class="combo lg"><select id="after" aria-label="Position in service">${s.items.map(i => `<option value="${i.id}"${i.id === state.sel ? ' selected' : ''}>${fill && i.id === state.sel ? 'Fill' : 'After'}: ${esc(itemLabel(i))}</option>`).join('')}</select>${icon('chevD')}</span>
             <span class="grow"></span>
             <button class="fbtn accent" data-action="add">${icon(fill ? 'swap' : 'add')}${fill ? 'Use as ' + esc(selItem.role.toLowerCase()) : 'Add to service'}</button>`}
       </div>`;
@@ -1412,7 +1408,7 @@ function renderPreview() {
     body = `<dl class="dl">
       <dt>Song</dt><dd class="tab">#${h.no}</dd><dt>Words</dt><dd>${esc(h.text)}</dd><dt>Music</dt><dd>${esc(h.music)}</dd>
       <dt>Tune</dt><dd>${esc(h.tune)}</dd><dt>Meter</dt><dd>${esc(h.meter)}</dd>
-      <dt>Pitch, time</dt><dd>${esc(h.key)}, ${h.time}. Slides in ${h.keys.map(esc).join(', ')}</dd>
+      <dt>Pitch, time</dt><dd>${esc(h.key)}, ${h.time}</dd>
       <dt>Verses</dt><dd>${h.v}${h.lines[0] ? ` · <i>${esc(plainLine(h.lines[0]))}</i>` : ''}</dd>
       <dt>Scripture</dt><dd><span class="tags">${h.scripture.map(x => `<span class="tg">${esc(x)}</span>`).join('')}</span></dd>
       <dt>Topics</dt><dd><span class="tags">${h.topics.map(x => `<span class="tg">${esc(x)}</span>`).join('')}</span></dd>
@@ -1445,7 +1441,7 @@ function renderPresenter() {
   host.innerHTML = `<div class="present" role="dialog" aria-label="Presenter view">
     <div class="pr-top"><b>Presenter view</b><span>${esc(s.name)}</span><span class="tab">Slide ${at + 1} of ${dk.length}</span><span class="spacer"></span><span>Projector: Display 2 · ← → step · Esc ends</span><button data-action="present-close">End show</button></div>
     <div class="pr-body">
-      <div class="pr-list">${s.items.filter(i => dk.some(d => d.item === i)).map(i => `<button class="${i === cur.item ? 'on' : ''}" data-action="present" data-item="${i.id}"><span class="tab">${clock(tl.find(r => r.item === i).start)}</span><span>${esc(itemLabel(i))}</span></button>`).join('')}</div>
+      <div class="pr-list">${s.items.filter(i => dk.some(d => d.item === i)).map(i => `<button class="${i === cur.item ? 'on' : ''}" data-action="present" data-item="${i.id}">${esc(itemLabel(i))}</button>`).join('')}</div>
       <div class="pr-cur"><div class="bigslide">${deckSVG(cur, s)}</div><div class="pr-nav"><button data-action="step" data-d="-1">Previous</button><button data-action="step" data-d="1">Next</button></div></div>
       <div class="pr-side">Next${nxt ? `<div class="bigslide">${deckSVG(nxt, s)}</div><span>${esc(itemLabel(nxt.item))}</span>` : '<span>End of service</span>'}</div>
     </div></div>`;
@@ -1571,7 +1567,7 @@ function addType(kind) {
     prayer: { type:'prayer', title:'Prayer', sub:'Not assigned', dur:2, slides:0 },
     scripture: { type:'scripture', title:'Scripture Reading', sub:'Reference to come', dur:3, slides:'needs' },
     lesson: { type:'sermon', title:'Lesson', sub:'Title to come', dur:25, slides:'needs' },
-    announce: { type:'spoken', title:'Announcements', sub:'Bro. Mark Ellis', dur:3, slides:1 },
+    announce: { type:'spoken', title:'Announcements', sub:'Mark Ellis', dur:3, slides:1 },
   }[kind];
   snapshot();
   const item = { id:uid(), section, ...T };
@@ -1621,7 +1617,6 @@ document.addEventListener('click', e => {
     case 'pick': pickHymn(id); break;
     case 'ptab': state.preview.tab = el.dataset.t; renderPreview(); break;
     case 'slide': state.preview.slide = +el.dataset.i; renderPreview(); break;
-    case 'notes': state.notes = el.dataset.v; renderResults(); renderPreview(); break;
     case 'verse': {
       const v = +el.dataset.v, bi = boundItem();
       if (bi) { bi.verses = toggleVerse(bi.verses, v); bindPreviewTo(bi); render(); }
@@ -1664,11 +1659,6 @@ document.addEventListener('change', e => {
   if (t.matches('.fsel')) { state.f[t.dataset.k] = t.value; renderFilters(); renderResults(); }
   else if (t.id === 'sort') { state.sort = t.value; renderResults(); }
   else if (t.id === 'after') { state.sel = t.value; renderOrder(); renderPreview(); }
-  else if (t.id === 'pkey') {
-    const bi = boundItem();
-    if (bi) { if (t.value === H[bi.hymnId].key) delete bi.key; else bi.key = t.value; render(); }
-    else { state.preview.key = t.value; renderPreview(); }
-  }
 });
 document.addEventListener('input', e => {
   if (e.target.id === 'q' || e.target.id === 'gq') {

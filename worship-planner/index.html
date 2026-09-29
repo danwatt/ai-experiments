@@ -145,7 +145,7 @@ mark { background: color-mix(in srgb, var(--accent) 22%, transparent); color: in
 .sect { position: sticky; top: 0; z-index: 2; display: flex; align-items: baseline; gap: 10px; padding: 12px 24px 6px; background: var(--surface); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; font-weight: 700; color: var(--accent); }
 .sect span { font-family: var(--f-mono); letter-spacing: 0; color: var(--faint); font-weight: 400; }
 .sect::after { content: ""; flex: 1; height: 1px; background: var(--line); align-self: center; }
-.row { position: relative; display: grid; grid-template-columns: 14px 40px 58px minmax(0, 1fr) auto 40px 24px; align-items: center; gap: 10px; padding: 9px 16px 9px 12px; margin-inline: 8px; border-radius: 8px; cursor: default; }
+.row { position: relative; display: grid; grid-template-columns: 14px 58px minmax(0, 1fr) auto 24px; align-items: center; gap: 10px; padding: 9px 16px 9px 12px; margin-inline: 8px; border-radius: 8px; cursor: default; }
 .row:hover { background: var(--surface-2); }
 .row.is-sel { background: color-mix(in srgb, var(--accent) 10%, var(--surface)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 45%, transparent); }
 .row.dragging { opacity: .4; }
@@ -250,9 +250,6 @@ kbd { font-family: var(--f-mono); font-size: 11px; border: 1px solid var(--line-
 .uses .mono { font-size: 12.5px; color: var(--muted); }
 .note { font-size: 12.5px; color: var(--muted); border-left: 2px solid var(--line-strong); padding-left: 10px; }
 
-.nseg { display: inline-flex; border: 1px solid var(--line-strong); border-radius: 6px; overflow: hidden; }
-.nseg button { border: 0; background: var(--surface); padding: 3px 8px; font-size: 12px; font-weight: 700; color: var(--muted); }
-.nseg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
 
 /* status footer inside library */
 .kbar { display: flex; gap: 12px; padding: 6px 16px; border-top: 1px solid var(--line); font-size: 11.5px; color: var(--faint); }
@@ -278,7 +275,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; border: 1px solid var(--line-
 .pr-top button { border: 1px solid rgb(255 255 255 / .2); background: transparent; color: var(--stage-fg); border-radius: 7px; padding: 4px 10px; font-weight: 700; font-size: 12.5px; }
 .pr-body { display: grid; grid-template-columns: 250px minmax(0, 1fr) 300px; gap: 20px; padding: 20px; min-height: 0; }
 .pr-list { overflow: auto; display: grid; align-content: start; gap: 1px; font-size: 13px; }
-.pr-list button { border: 0; background: transparent; color: var(--stage-muted); text-align: left; padding: 6px 8px; border-radius: 6px; display: grid; grid-template-columns: 42px 1fr; gap: 8px; }
+.pr-list button { border: 0; background: transparent; color: var(--stage-muted); text-align: left; padding: 6px 8px; border-radius: 6px; }
 .pr-list button.on { background: rgb(255 255 255 / .09); color: var(--stage-fg); }
 .pr-list .mono { font-size: 11.5px; }
 .pr-cur { display: grid; align-content: center; gap: 10px; min-width: 0; }
@@ -312,6 +309,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; border: 1px solid var(--line-
 .m-row { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--line); align-items: start; border-inline: 0; border-top: 0; background: transparent; text-align: left; width: 100%; }
 button.m-row:active { background: var(--surface-2); }
 .m-row .mono { font-size: 11.5px; color: var(--muted); padding-top: 3px; }
+.m-row.nt { grid-template-columns: minmax(0, 1fr) auto; }
 .m-row .tt { font-family: var(--f-display); font-weight: 700; font-size: 15.5px; line-height: 1.2; }
 .m-row .ss { font-size: 12px; color: var(--muted); }
 .m-row .role { font-size: 10px; }
@@ -372,7 +370,7 @@ button.m-row:active { background: var(--surface-2); }
     <div class="intro-text">
       <span class="eyebrow">UI mockup · sample data</span>
       <h1>Lectern worship planner</h1>
-      <p>Plan worship around a cappella singing. Build the order, set each song’s starting pitch, and pull four-part shape-note slides from the songbook. The desktop app carries the slide engine. The phone app carries services, songs and pitches for the song leader.</p>
+      <p>Plan worship around a cappella singing. Build the order, see each song’s pitch, and pull four-part shape-note slides from the songbook. The desktop app carries the slide engine. The phone app carries services, songs and pitches for the song leader.</p>
       <a class="fluent-link" href="fluent.html">Desktop app in Fluent (WinUI) style →</a>
     </div>
     <div class="seg" role="group" aria-label="Platform">
@@ -398,7 +396,7 @@ button.m-row:active { background: var(--surface-2); }
         </main>
         <section class="lib" aria-label="Songbook">
           <div class="lsearch">
-            <div class="lib-h"><h2>Songbook</h2><span>612 songs · 588 with four-part slides</span></div>
+            <div class="lib-h"><h2>Songbook</h2><span>612 songs</span></div>
             <label class="qbox">
               <svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
               <input id="q" type="search" autocomplete="off" spellcheck="false" placeholder="Title, first line, number, tune, scripture, topic, author" aria-label="Search songs">
@@ -432,7 +430,7 @@ button.m-row:active { background: var(--surface-2); }
     <div>
       <h3>Desktop only</h3>
       <ul>
-        <li><b>Four-part slides</b> per verse and per key, in shape notes or round notes to match the congregation’s songbook.</li>
+        <li><b>Four-part shape-note slides</b>, one per verse, at the songbook’s pitch.</li>
         <li>Drag and drop between library and order, keyboard-first search, presenter view.</li>
         <li>Export to .pptx for the projection computer. The in-window menu moves to the system menu bar on macOS.</li>
       </ul>
@@ -587,7 +585,7 @@ const slot = (section, role, hymnId = null, verses = []) => it(section, 'hymn', 
 
 function lordsDayAM(o) {
   return [
-    it('opening','spoken',{ title:'Welcome', sub:'Bro. Mark Ellis', dur:2, slides:1 }),
+    it('opening','spoken',{ title:'Welcome', sub:'Mark Ellis', dur:2, slides:1 }),
     slot('opening','Opening song', o.open, o.open ? [1,2,3] : []),
     it('opening','prayer',{ title:'Opening Prayer', sub:'Not assigned', dur:2, slides:0 }),
     slot('opening','Second song'),
@@ -600,7 +598,7 @@ function lordsDayAM(o) {
     it('word','scripture',{ title:'Scripture Reading', sub:o.text, dur:2, slides:2 }),
     it('word','sermon',{ title:'Lesson', sub:`“${o.lesson}” · ${o.preacher}`, dur:30, slides:'needs' }),
     slot('closing','Invitation song', o.inv, o.inv ? [1,2,3,4] : []),
-    it('closing','spoken',{ title:'Announcements', sub:'Bro. Mark Ellis', dur:3, slides:4 }),
+    it('closing','spoken',{ title:'Announcements', sub:'Mark Ellis', dur:3, slides:4 }),
     it('closing','prayer',{ title:'Closing Prayer', sub:'Not assigned', dur:1, slides:0 }),
   ];
 }
@@ -608,28 +606,28 @@ function lordsDayAM(o) {
 const SERVICES = [
   { id:'s1', date:'2026-10-04', start:600, name:'Sunday Morning Worship', short:'Sun AM', where:'Auditorium', series:'Built on the Rock', part:'3 of 6', sugKey:'BOR',
     lesson:'The Stone the Builders Rejected', text:'Matthew 21:33–46', saved:'2 min ago',
-    people:[['Preaching','Bro. Greg Holt'],['Song leader','Bro. Daniel Price'],['Lord’s Supper','Bro. Kevin Walsh']],
+    people:[['Preaching','Greg Holt'],['Song leader','Daniel Price'],['Lord’s Supper','Kevin Walsh']],
     items:[
-      it('opening','spoken',{ title:'Welcome', sub:'Bro. Mark Ellis', dur:2, slides:1 }),
+      it('opening','spoken',{ title:'Welcome', sub:'Mark Ellis', dur:2, slides:1 }),
       slot('opening','Opening song','h138',[1,2,4]),
-      it('opening','prayer',{ title:'Opening Prayer', sub:'Bro. James Carter', dur:2, slides:0 }),
+      it('opening','prayer',{ title:'Opening Prayer', sub:'James Carter', dur:2, slides:0 }),
       slot('opening','Second song','h463',[1,2,3]),
       slot('supper','Before the Supper','h382',[1,2,3,4]),
-      it('supper','supper',{ title:'Communion Thoughts', sub:'1 Corinthians 11:23–26 · Bro. Kevin Walsh', dur:3, slides:1 }),
-      it('supper','supper',{ title:'Prayer for the Bread', sub:'Bro. Kevin Walsh · served by 8 men', dur:3, slides:1 }),
-      it('supper','supper',{ title:'Prayer for the Cup', sub:'Bro. Kevin Walsh', dur:3, slides:1 }),
-      it('giving','giving',{ title:'Contribution', sub:'Prayer: Bro. Tom Hale · separate from the Supper', dur:3, slides:1 }),
+      it('supper','supper',{ title:'Communion Thoughts', sub:'1 Corinthians 11:23–26 · Kevin Walsh', dur:3, slides:1 }),
+      it('supper','supper',{ title:'Prayer for the Bread', sub:'Kevin Walsh · served by 8 men', dur:3, slides:1 }),
+      it('supper','supper',{ title:'Prayer for the Cup', sub:'Kevin Walsh', dur:3, slides:1 }),
+      it('giving','giving',{ title:'Contribution', sub:'Prayer: Tom Hale · separate from the Supper', dur:3, slides:1 }),
       slot('word','Before the lesson','h545',[1,2,4]),
-      it('word','scripture',{ title:'Scripture Reading', sub:'Matthew 21:33–46 · Bro. Luke Adams', dur:3, slides:3 }),
-      it('word','sermon',{ title:'Lesson', sub:'“The Stone the Builders Rejected” · Bro. Greg Holt', dur:30, slides:'needs' }),
+      it('word','scripture',{ title:'Scripture Reading', sub:'Matthew 21:33–46 · Luke Adams', dur:3, slides:3 }),
+      it('word','sermon',{ title:'Lesson', sub:'“The Stone the Builders Rejected” · Greg Holt', dur:30, slides:'needs' }),
       { ...slot('closing','Invitation song','h934',[1,2,3,4]), dur:5 },
-      it('closing','spoken',{ title:'Announcements', sub:'Bro. Mark Ellis', dur:3, slides:4 }),
+      it('closing','spoken',{ title:'Announcements', sub:'Mark Ellis', dur:3, slides:4 }),
       { ...slot('closing','Closing song','h95',[1]), dur:1 },
-      it('closing','prayer',{ title:'Closing Prayer', sub:'Bro. Sam Reed', dur:1, slides:0 }),
+      it('closing','prayer',{ title:'Closing Prayer', sub:'Sam Reed', dur:1, slides:0 }),
     ] },
   { id:'s2', date:'2026-10-04', start:1080, name:'Sunday Evening Worship', short:'Sun PM', where:'Auditorium', series:'Built on the Rock', part:'3b', sugKey:'BOR',
     lesson:'Living Stones', text:'1 Peter 2:4–10', saved:'Sep 28',
-    people:[['Preaching','Bro. Greg Holt'],['Song leader','Bro. Nathan Price']],
+    people:[['Preaching','Greg Holt'],['Song leader','Nathan Price']],
     items:[
       slot('opening','Opening song'),
       it('opening','prayer',{ title:'Opening Prayer', sub:'Not assigned', dur:2, slides:0 }),
@@ -637,28 +635,28 @@ const SERVICES = [
       it('supper','supper',{ title:'Lord’s Supper', sub:'For those who could not attend this morning', dur:5, slides:1 }),
       slot('word','Before the lesson'),
       it('word','scripture',{ title:'Scripture Reading', sub:'1 Peter 2:4–10', dur:2, slides:2 }),
-      it('word','sermon',{ title:'Lesson', sub:'“Living Stones” · Bro. Greg Holt', dur:25, slides:'needs' }),
+      it('word','sermon',{ title:'Lesson', sub:'“Living Stones” · Greg Holt', dur:25, slides:'needs' }),
       slot('closing','Invitation song'),
       it('closing','prayer',{ title:'Closing Prayer', sub:'Not assigned', dur:1, slides:0 }),
     ] },
   { id:'s3', date:'2026-10-07', start:1140, name:'Wednesday Bible Study', short:'Wed', where:'Fellowship room', series:'Acts: The Church Begins', part:'week 5', sugKey:'ACTS',
     lesson:'They Continued Steadfastly', text:'Acts 2:37–47', saved:'Sep 30',
-    people:[['Teaching','Bro. Luke Adams'],['Song leader','Bro. Daniel Price']],
+    people:[['Teaching','Luke Adams'],['Song leader','Daniel Price']],
     items:[
       slot('opening','Opening song','h201',[1,2,3,4]),
       it('opening','prayer',{ title:'Opening Prayer', sub:'Not assigned', dur:2, slides:0 }),
-      it('class','class',{ title:'Adult Bible Class', sub:'Acts 2:37–47 · Bro. Luke Adams', dur:45, slides:8 }),
+      it('class','class',{ title:'Adult Bible Class', sub:'Acts 2:37–47 · Luke Adams', dur:45, slides:8 }),
       slot('closing','Closing song'),
       it('closing','prayer',{ title:'Closing Prayer', sub:'Not assigned', dur:1, slides:0 }),
     ] },
   { id:'s4', date:'2026-10-11', start:600, name:'Sunday Morning Worship', short:'Sun AM', where:'Auditorium', series:'Built on the Rock', part:'4 of 6', sugKey:'BOR',
     lesson:'The Wise and Foolish Builders', text:'Matthew 7:24–27', saved:'Sep 21',
-    people:[['Preaching','Bro. Greg Holt'],['Song leader','Bro. Daniel Price'],['Lord’s Supper','Not assigned']],
-    o:{ open:'h368', text:'Matthew 7:24–27', lesson:'The Wise and Foolish Builders', preacher:'Bro. Greg Holt' } },
+    people:[['Preaching','Greg Holt'],['Song leader','Daniel Price'],['Lord’s Supper','Not assigned']],
+    o:{ open:'h368', text:'Matthew 7:24–27', lesson:'The Wise and Foolish Builders', preacher:'Greg Holt' } },
   { id:'s5', date:'2026-10-18', start:600, name:'Fall Gospel Meeting', short:'Meeting', where:'Auditorium', series:'Gospel Meeting', part:'day 1 of 4', sugKey:'GM',
     lesson:'Come Unto Me', text:'Matthew 11:28–30', saved:'Sep 14',
-    people:[['Guest preacher','Bro. Allen Brooks'],['Song leader','Bro. Daniel Price']],
-    o:{ inv:'h934', text:'Matthew 11:28–30', lesson:'Come Unto Me', preacher:'Bro. Allen Brooks' } },
+    people:[['Guest preacher','Allen Brooks'],['Song leader','Daniel Price']],
+    o:{ inv:'h934', text:'Matthew 11:28–30', lesson:'Come Unto Me', preacher:'Allen Brooks' } },
 ];
 SERVICES.forEach(s => { if (!s.items) s.items = lordsDayAM(s.o); });
 
@@ -959,7 +957,7 @@ function renderHead() {
     <div class="readings">${s.people.map(([r, n]) => `<span class="reading"><b>${esc(r)}</b>${esc(n)}</span>`).join('')}<span class="reading"><b>Singing</b>A cappella · 4 parts</span></div>
     <div class="oh-bar">
       <div class="stats">
-        <span><b>${t.songs}</b> songs</span><span><b>${fmtMin(t.min)}</b></span><span><b>${t.slides}</b> slides</span>
+        <span><b>${t.songs}</b> songs</span><span><b>${t.slides}</b> slides</span>
         ${t.empty ? `<span class="w"><b>${t.empty}</b> song${t.empty > 1 ? 's' : ''} not picked</span>` : ''}
         ${t.needs ? `<span class="w"><b>${t.needs}</b> waiting on slides</span>` : ''}
         ${t.lic ? `<span><b>${t.lic}</b> to CCLI report</span>` : ''}
@@ -988,7 +986,7 @@ function renderOrder() {
   SECTIONS.forEach(([key, name]) => {
     const rows = tl.filter(r => r.item.section === key);
     if (!rows.length) return;
-    html += `<div class="sect" data-section="${key}">${name}<span>${clock(rows[0].start)}</span></div>`;
+    html += `<div class="sect" data-section="${key}">${name}</div>`;
     rows.forEach(({ item: i, start }) => {
       const sel = i.id === state.sel;
       let main;
@@ -1003,11 +1001,9 @@ function renderOrder() {
       }
       html += `<div class="row${sel ? ' is-sel' : ''}${i.type === 'hymn' && !i.hymnId ? ' is-empty' : ''}" data-item="${i.id}" data-type="${i.type}" draggable="true" data-action="selitem" data-id="${i.id}" aria-selected="${sel}">
         <span class="grip" title="Drag to reorder">${GRIP}</span>
-        <span class="t-time">${clock(start)}</span>
         <span class="t-type">${TYPE_LABEL[i.type]}</span>
         <span class="t-main">${main}</span>
         <span class="t-slides">${slidesChip(i)}</span>
-        <span class="t-dur">${itemDur(i)} min</span>
         <button class="t-del" data-action="del" data-id="${i.id}" title="Remove from service" aria-label="Remove ${esc(itemLabel(i))}">${icon('x')}</button>
       </div>`;
     });
@@ -1020,7 +1016,6 @@ function renderFilters() {
   const opts = (arr, cur, all) => `<option value="">${all}</option>` + [...new Set(arr)].sort().map(v => `<option${v === cur ? ' selected' : ''}>${esc(v)}</option>`).join('');
   $('#filters').innerHTML = `
     <button class="fchip" data-action="filt" data-k="pd" aria-pressed="${f.pd}">${f.pd ? icon('check') : ''}Public domain</button>
-    <button class="fchip" data-action="filt" data-k="full" aria-pressed="${f.full}">${f.full ? icon('check') : ''}Four-part slides</button>
     <button class="fchip" data-action="filt" data-k="fresh" aria-pressed="${f.fresh}">${f.fresh ? icon('check') : ''}Unsung 8 wks</button>
     <select id="f-topic" class="fsel${f.topic ? ' on' : ''}" data-k="topic" aria-label="Topic">${opts(SONGS.flatMap(h => h.topics), f.topic, 'Any topic')}</select>
     <select id="f-key" class="fsel${f.key ? ' on' : ''}" data-k="key" aria-label="Key">${opts(SONGS.map(h => h.key), f.key, 'Any key')}</select>
@@ -1088,16 +1083,15 @@ function renderPreview() {
         `<button class="sthumb" data-action="slide" data-i="${i}" aria-current="${i === slide}"><span class="thumb">${slideSVG(h, i, verses, key, total)}</span>${i === 0 ? 'Title' : 'V. ' + verses[i - 1]}</button>`).join('')}</div>
       <div class="pctl">
         ${h.v > 1 ? `<span>Verses</span><span class="vchips">${Array.from({ length: h.v }, (_, i) => `<button class="vchip" data-action="verse" data-v="${i + 1}" aria-pressed="${verses.includes(i + 1)}">${i + 1}</button>`).join('')}</span>` : '<span>One verse</span>'}
-        <label>Pitch <select id="pkey">${h.keys.map(k => `<option${k === key ? ' selected' : ''}>${esc(k)}</option>`).join('')}</select></label>
-        <span class="nseg" role="group" aria-label="Noteheads"><button data-action="notes" data-v="shape" aria-pressed="${state.notes === 'shape'}">Shape</button><button data-action="notes" data-v="round" aria-pressed="${state.notes === 'round'}">Round</button></span>
+        <span>Pitch <b>${esc(key)}</b></span>
         <span>${total} slides${h.slides === 'lyrics' ? ' · words only' : ''}</span>
       </div>
       <div class="pact">
-        ${bi ? `<span class="bound"><b>${esc(bi.role)}</b> at ${clock(tl.find(r => r.item.id === bi.id).start)}</span><span class="grow"></span>
+        ${bi ? `<span class="bound">In service as <b>${esc(bi.role.toLowerCase())}</b></span><span class="grow"></span>
           <button class="btn ghost sm danger" data-action="del" data-id="${bi.id}">Remove</button>
           <button class="btn sm" data-action="present" data-item="${bi.id}">${icon('play')}Present from here</button>`
         : `<span class="lbl">${fill ? 'Fill' : 'Add after'}</span>
-          <select id="after" aria-label="Position in service">${s.items.map(i => `<option value="${i.id}"${i.id === state.sel ? ' selected' : ''}>${clock(tl.find(r => r.item === i).start)} · ${esc(itemLabel(i))}</option>`).join('')}</select>
+          <select id="after" aria-label="Position in service">${s.items.map(i => `<option value="${i.id}"${i.id === state.sel ? ' selected' : ''}>${esc(itemLabel(i))}</option>`).join('')}</select>
           <span class="grow"></span>
           <button class="btn primary" data-action="add">${icon(fill ? 'swap' : 'plus')}${fill ? 'Use as ' + esc(selItem.role.toLowerCase()) : 'Add to service'}</button>`}
       </div>`;
@@ -1108,7 +1102,7 @@ function renderPreview() {
       <dt>Music</dt><dd>${esc(h.music)}</dd>
       <dt>Tune</dt><dd>${esc(h.tune)}</dd>
       <dt>Meter</dt><dd class="mono">${esc(h.meter)}</dd>
-      <dt>Pitch · time</dt><dd>${esc(h.key)} · <span class="mono">${h.time}</span> · slides in ${h.keys.map(esc).join(', ')}</dd>
+      <dt>Pitch · time</dt><dd>${esc(h.key)} · <span class="mono">${h.time}</span></dd>
       <dt>Verses</dt><dd>${h.v}${h.lines[0] ? ` · <i style="font-family:var(--f-display)">${esc(plainLine(h.lines[0]))}</i>` : ''}</dd>
       <dt>Scripture</dt><dd><span class="tags">${h.scripture.map(x => `<span class="tag">${esc(x)}</span>`).join('')}</span></dd>
       <dt>Topics</dt><dd><span class="tags">${h.topics.map(x => `<span class="tag">${esc(x)}</span>`).join('')}</span></dd>
@@ -1146,7 +1140,7 @@ function renderPresenter() {
   host.innerHTML = `<div class="present" role="dialog" aria-label="Presenter view">
     <div class="pr-top"><b>Presenting</b><span>${esc(s.name)}</span><span class="mono">Slide ${at + 1} of ${dk.length}</span><span class="spacer"></span><span><kbd>←</kbd> <kbd>→</kbd> step · <kbd>Esc</kbd> close</span><button data-action="present-close">Close</button></div>
     <div class="pr-body">
-      <div class="pr-list">${s.items.filter(i => dk.some(d => d.item === i)).map(i => `<button class="${i === cur.item ? 'on' : ''}" data-action="present" data-item="${i.id}"><span class="mono">${clock(tl.find(r => r.item === i).start)}</span><span>${esc(itemLabel(i))}</span></button>`).join('')}</div>
+      <div class="pr-list">${s.items.filter(i => dk.some(d => d.item === i)).map(i => `<button class="${i === cur.item ? 'on' : ''}" data-action="present" data-item="${i.id}"><span>${esc(itemLabel(i))}</span></button>`).join('')}</div>
       <div class="pr-cur"><div class="bigslide">${deckSVG(cur, s)}</div>
         <div class="pr-nav"><button data-action="step" data-d="-1">Previous</button><button data-action="step" data-d="1">Next</button></div></div>
       <div class="pr-side">Next${nxt ? `<div class="bigslide">${deckSVG(nxt, s)}</div><span style="text-transform:none;letter-spacing:0;font-weight:400">${esc(itemLabel(nxt.item))}</span>` : '<span style="text-transform:none;letter-spacing:0;font-weight:400">End of service</span>'}</div>
@@ -1166,20 +1160,20 @@ function mService(i) {
   const s = svc(), tl = timeline(s), t = totals(s);
   let html = `<div class="m-date">${longDate(s.date).replace(/, \d{4}$/, '')} · ${startLabel(s)}</div>
     <h2 class="m-h1">${esc(s.name)}</h2>
-    <div class="m-sub"><span class="season"><i></i>${esc(s.series)}</span><span>${t.songs} songs · ${fmtMin(t.min)}</span></div>`;
+    <div class="m-sub"><span class="season"><i></i>${esc(s.series)}</span><span>${t.songs} songs</span></div>`;
   SECTIONS.forEach(([key, name]) => {
     const rows = tl.filter(r => r.item.section === key); if (!rows.length) return;
     html += `<div class="m-sect">${name}</div><div class="m-list">`;
     rows.forEach(({ item: it, start }) => {
       if (it.type === 'hymn' && it.hymnId) {
         const h = H[it.hymnId];
-        html += `<button class="m-row" data-action="mopen" data-p="${i}" data-id="${h.id}" data-item="${it.id}"><span class="mono">${clock(start)}</span>
+        html += `<button class="m-row nt" data-action="mopen" data-p="${i}" data-id="${h.id}" data-item="${it.id}">
           <span><span class="role">${esc(it.role)}</span><br><span class="tt">${h.no} · ${esc(h.title)}</span><br><span class="ss"><span class="pitch">Pitch ${esc(it.key || h.key)}</span>${h.v > 1 ? ' · ' + versesText(it.verses) : ''}</span></span>
           <span class="chev">${icon('chev')}</span></button>`;
       } else if (it.type === 'hymn') {
-        html += `<button class="m-row" data-action="mslot" data-p="${i}" data-id="${it.id}"><span class="mono">${clock(start)}</span><span><span class="role">${esc(it.role)}</span><br><span class="tt empty-slot">Not picked yet</span><br><span class="ss">Tap to search the songbook</span></span><span class="chev">${icon('search')}</span></button>`;
+        html += `<button class="m-row nt" data-action="mslot" data-p="${i}" data-id="${it.id}"><span><span class="role">${esc(it.role)}</span><br><span class="tt empty-slot">Not picked yet</span><br><span class="ss">Tap to search the songbook</span></span><span class="chev">${icon('search')}</span></button>`;
       } else {
-        html += `<div class="m-row"><span class="mono">${clock(start)}</span><span><span class="tt">${esc(it.title)}</span><br><span class="ss">${esc((it.sub || '').split(' · ').slice(-1)[0])}</span></span><span></span></div>`;
+        html += `<div class="m-row nt"><span><span class="tt">${esc(it.title)}</span><br><span class="ss">${esc((it.sub || '').split(' · ').slice(-1)[0])}</span></span><span></span></div>`;
       }
     });
     html += `</div>`;
@@ -1193,7 +1187,6 @@ function mLibrary(i) {
     <div class="m-chips">
       <button class="fchip" data-action="mfilt" data-p="${i}" data-k="fresh" aria-pressed="${!!ph.fresh}">Unsung 8 wks</button>
       <button class="fchip" data-action="mfilt" data-p="${i}" data-k="pd" aria-pressed="${!!ph.pd}">Public domain</button>
-      <button class="fchip" data-action="mfilt" data-p="${i}" data-k="full" aria-pressed="${!!ph.full}">Four-part slides</button>
     </div>
     <div class="p-results" id="mres-${i}">${mResults(i)}</div>`;
 }
@@ -1228,7 +1221,7 @@ function mDetail(i) {
       return `<button class="m-verse" data-action="mverse" data-p="${i}" data-v="${n}" aria-pressed="${on}"><span class="box">${on ? icon('check') : ''}</span><span class="n">${n}</span><span class="l">${h.lines[k] ? esc(plainLine(h.lines[k])) : (h.license === 'pd' ? 'Verse ' + n : 'Licensed words')}</span></button>`;
     }).join('')}</div></div>` : ''}
     <div class="m-note">${icon('desktop')}<span>${h.slides === 'full' ? `${1 + verses.length} four-part slides are ready on the desktop app.` : `Words-only slides. Four-part music needs a reprint license.`} The phone keeps song details, not slide files.</span></div>
-    ${item ? `<div class="m-note">${icon('check')}<span>${esc(item.role)} · ${esc(s.short)} ${shortDate(s.date)} at ${clock(tl.find(r => r.item === item).start)}</span></div>`
+    ${item ? `<div class="m-note">${icon('check')}<span>${esc(item.role)} · ${esc(s.short)}, ${shortDate(s.date)}</span></div>`
       : `<button class="btn primary m-btn" data-action="madd" data-p="${i}">${icon('plus')}Add to ${esc(s.short)}, ${shortDate(s.date)}</button>`}`;
 }
 function mCalendar(i) {
@@ -1239,9 +1232,9 @@ function mCalendar(i) {
 }
 function mTeam() {
   const s = svc();
-  const team = [['Preaching', 'Bro. Greg Holt', 'Confirmed', 'ok'], ['Song leader', 'Bro. Daniel Price', 'Confirmed', 'ok'], ['Opening prayer', 'Bro. James Carter', 'Confirmed', 'ok'],
-    ['Lord’s Supper', 'Bro. Kevin Walsh', 'Confirmed', 'ok'], ['Serving', '8 men', '6 of 8', 'p'], ['Contribution prayer', 'Bro. Tom Hale', 'Pending', 'p'],
-    ['Scripture reading', 'Bro. Luke Adams', 'Confirmed', 'ok'], ['Closing prayer', 'Bro. Sam Reed', 'Pending', 'p'], ['Sound & slides', 'Bro. Evan Cole', 'Confirmed', 'ok']];
+  const team = [['Preaching', 'Greg Holt', 'Confirmed', 'ok'], ['Song leader', 'Daniel Price', 'Confirmed', 'ok'], ['Opening prayer', 'James Carter', 'Confirmed', 'ok'],
+    ['Lord’s Supper', 'Kevin Walsh', 'Confirmed', 'ok'], ['Serving', '8 men', '6 of 8', 'p'], ['Contribution prayer', 'Tom Hale', 'Pending', 'p'],
+    ['Scripture reading', 'Luke Adams', 'Confirmed', 'ok'], ['Closing prayer', 'Sam Reed', 'Pending', 'p'], ['Sound & slides', 'Evan Cole', 'Confirmed', 'ok']];
   return `<div class="m-date">${esc(s.short)} · ${shortDate(s.date)}</div><h2 class="m-h1">Serving</h2>
     <div>${team.map(([r, n, st, c]) => `<div class="m-team"><span class="r">${r}</span><span>${esc(n)}</span><span class="st ${c}">${st}</span></div>`).join('')}</div>
     <p class="m-note">Sample names. Reminders go out Wednesday evening.</p>`;
@@ -1342,7 +1335,6 @@ document.addEventListener('click', e => {
     case 'pick': pickHymn(el.dataset.id); break;
     case 'ptab': state.preview.tab = el.dataset.t; renderPreview(); break;
     case 'slide': state.preview.slide = +el.dataset.i; renderPreview(); break;
-    case 'notes': state.notes = el.dataset.v; renderResults(); renderPreview(); break;
     case 'verse': {
       const v = +el.dataset.v, bi = boundItem();
       if (bi) { bi.verses = toggleVerse(bi.verses, v); bindPreviewTo(bi); render(); }
@@ -1391,11 +1383,6 @@ document.addEventListener('change', e => {
   if (t.matches('.fsel')) { state.f[t.dataset.k] = t.value; renderFilters(); renderResults(); }
   else if (t.id === 'sort') { state.sort = t.value; renderResults(); }
   else if (t.id === 'after') { state.sel = t.value; renderOrder(); renderPreview(); }
-  else if (t.id === 'pkey') {
-    const bi = boundItem();
-    if (bi) { if (t.value === H[bi.hymnId].key) delete bi.key; else bi.key = t.value; render(); }
-    else { state.preview.key = t.value; renderPreview(); }
-  }
 });
 
 document.addEventListener('input', e => {
