@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f3f3f3">
+  <title>Gather — Fluent desktop concept</title>
+  <link rel="stylesheet" href="fluent.css">
+</head>
+<body>
+  <header class="app-titlebar">
+    <button id="toggle-navigation" class="icon-button" aria-label="Toggle navigation" aria-expanded="true"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+    <span class="app-icon" data-icon="music"></span><strong>Gather</strong><span class="titlebar-divider"></span><span class="window-title">Worship planner</span>
+    <div class="titlebar-actions"><span class="concept-label">Fluent desktop concept</span><a href="index.html" class="original-link">Original design <span aria-hidden="true">↗</span></a><button id="fullscreen" class="icon-button" aria-label="Enter full screen" data-icon="expand"></button></div>
+  </header>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Workspace navigation">
+      <button class="church-switch" id="church-info"><span class="church-avatar" data-icon="church"></span><span><strong>Brookside</strong><small>Church of Christ</small></span><span data-icon="down"></span></button>
+      <nav class="main-nav" aria-label="Main navigation">
+        <button class="nav-item active" data-nav="planner" title="Service planner"><span data-icon="calendar"></span><span class="nav-text">Service planner</span><span class="nav-count">3</span></button>
+        <button class="nav-item" data-nav="library" title="Hymn library"><span data-icon="music"></span><span class="nav-text">Hymn library</span></button>
+        <button class="nav-item" data-nav="saved" title="Saved collections"><span data-icon="bookmark"></span><span class="nav-text">Collections</span></button>
+        <button class="nav-item" data-nav="team" title="People"><span data-icon="users"></span><span class="nav-text">People</span></button>
+      </nav>
+      <div class="nav-label upcoming-label">Upcoming services<button id="new-service" class="icon-button" aria-label="Create service" data-icon="plus"></button></div>
+      <button class="upcoming selected" data-service="morning"><span class="date-block"><small>OCT</small>04</span><span><strong>Sunday morning</strong><small>9:30 AM · Auditorium</small></span></button>
+      <button class="upcoming" data-service="evening"><span class="date-block"><small>OCT</small>04</span><span><strong>Sunday evening</strong><small>5:00 PM · Auditorium</small></span></button>
+      <button class="upcoming" data-service="wednesday"><span class="date-block"><small>OCT</small>07</span><span><strong>Wednesday gathering</strong><small>7:00 PM · Fellowship hall</small></span></button>
+      <div class="sidebar-bottom"><button class="nav-item" id="help"><span data-icon="help"></span><span class="nav-text">Help &amp; about</span></button><button class="profile" id="profile"><span class="avatar">JW</span><span><strong>James Wilson</strong><small>Worship coordinator</small></span></button></div>
+    </aside>
+    <main>
+      <header class="page-heading"><div><div class="breadcrumb"><span>Services</span><span data-icon="right"></span><span id="breadcrumb-date">October 4, 2026</span></div><div class="title-line"><h1 id="service-title">Sunday morning</h1><span class="draft-badge">Draft</span></div><div class="service-meta"><span data-icon="calendar"></span><span id="service-date">October 4, 2026</span><span class="meta-dot">·</span><span data-icon="clock"></span><span id="service-time">9:30 AM</span><span class="meta-dot">·</span><span id="service-location">Auditorium</span></div></div><div class="heading-context"><span class="avatar">JW</span><span>Service coordinator<strong>James Wilson</strong></span></div></header>
+      <div class="commandbar" role="toolbar" aria-label="Service commands"><button class="button" id="add-item"><span data-icon="plus"></span>Add item<span data-icon="down"></span></button><span class="command-divider"></span><button class="button" id="export"><span data-icon="upload"></span>Export plan</button><button class="button" id="order-options" aria-label="Service options"><span data-icon="more"></span><span class="options-label">More</span></button><span class="command-spacer"></span><span class="saved-state"><span data-icon="check-circle"></span>Saved on this device</span><button class="button primary" id="present"><span data-icon="play"></span>Present</button></div>
+      <div class="theme-strip"><span data-icon="sun"></span><span class="theme-prefix">Service theme</span><strong id="theme-title">Great is Your faithfulness</strong><span class="theme-verse" hidden></span><span class="verse-ref" hidden></span><button class="icon-button" id="edit-theme" aria-label="Edit service theme" data-icon="edit"></button></div>
+      <div class="mobile-tabs" role="tablist" aria-label="Workspace panes"><button class="active" data-mobile="order" role="tab" aria-selected="true">Service order</button><button data-mobile="library" role="tab" aria-selected="false">Hymn library</button><button data-mobile="preview" role="tab" aria-selected="false">Preview</button></div>
+      <div class="workspace">
+        <section class="order-panel" aria-label="Service order"><div class="panel-heading"><div><h2>Service order</h2><p><span id="item-count">9</span> items <span>·</span> <span id="duration">54</span> min</p></div><span class="panel-icon" data-icon="calendar"></span></div><div class="order-guide"><span>ORDER / ITEM</span><span>DURATION</span></div><ol class="service-list" id="service-list"></ol><div class="order-bottom"><button class="button" id="append-item"><span data-icon="plus"></span>Add service item</button><kbd>Ctrl K</kbd></div><div class="order-footer"><span data-icon="info"></span>Drag to reorder. Select an item to preview.</div></section>
+        <section class="library-panel" aria-label="Hymn library"><div class="library-heading"><div><h2>Hymn library</h2><p>Find sheet music for your service</p></div><span class="library-total"><span id="total-hymns">12</span></span></div><div class="search-box"><input id="hymn-search" type="search" placeholder="Search hymns, lyrics, or scripture" aria-label="Search hymn library" autocomplete="off"><span data-icon="search"></span></div><div class="filter-row"><button class="filter-chip active" id="ready-filter" aria-pressed="true"><span data-icon="check"></span>Slide-ready</button><div class="select-wrap"><select id="theme-filter" aria-label="Filter by theme"><option value="all">All themes</option><option>Faithfulness</option><option>Praise</option><option>Communion</option><option>Invitation</option><option>Assurance</option></select><span data-icon="down"></span></div><button class="icon-button filter-settings" id="more-filters" aria-label="More filters" aria-expanded="false" data-icon="sliders"></button></div><div id="extra-filters" hidden><div class="select-wrap"><select id="key-filter" aria-label="Filter by key"><option value="all">Any key</option><option>C</option><option>D</option><option>E♭</option><option>F</option><option>G</option><option>A♭</option><option>B♭</option></select><span data-icon="down"></span></div><label><input type="checkbox" id="favorites-filter"> Saved only</label><label><input type="checkbox" id="fourpart-filter"> SATB</label></div><div class="results-heading"><span id="result-count">11 hymns</span><div class="sort-wrap"><select id="sort" aria-label="Sort hymns"><option value="recommended">Suggested</option><option value="title">Title A–Z</option><option value="number">Hymn number</option></select><span data-icon="down"></span></div></div><div class="hymn-results" id="hymn-results"></div><div class="library-status"><span data-icon="cloud"></span>Sample library available offline</div></section>
+        <aside class="inspector-panel" aria-label="Hymn preview"><div class="inspector-heading"><h2>Hymn preview</h2><span data-icon="slides"></span></div><div class="selection-detail" id="selection-detail"></div><div class="library-footnote"><span data-icon="info"></span>Illustrative notation · Sample slide assets</div></aside>
+      </div>
+    </main>
+  </div>
+  <footer class="statusbar"><span><span class="sync-dot"></span>Local workspace</span><span class="status-center">Brookside Church of Christ</span><span id="status-hint">Select a hymn to preview its slides</span><span class="status-version">Concept 02</span></footer>
+  <div class="toast" id="toast" role="status"></div>
+  <dialog id="dialog"><div id="dialog-content"></div></dialog>
+  <script src="fluent.js"></script>
+</body>
+</html>

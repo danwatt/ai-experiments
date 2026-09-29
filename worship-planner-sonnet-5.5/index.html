@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Selah — Worship Planner (Desktop mockup)</title>
+<script>
+  try { const t = localStorage.getItem('selah-theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); document.documentElement.dataset.theme = t; } catch (e) { document.documentElement.dataset.theme = 'light'; }
+</script>
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<div class="app" id="app">
+
+  <!-- ============ Top bar ============ -->
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M6 9h12"/><path d="M4 21h16" opacity=".5"/></svg>
+      </span>
+      <span class="brand-name">Selah</span>
+      <span class="brand-sub">Worship Planner</span>
+    </div>
+    <div class="crumbs" id="crumbs"></div>
+    <div class="top-spacer"></div>
+    <button class="btn ghost sync" id="btnSync" title="Slide database version 2026.09 — all changes saved"><span id="syncIcon"></span><span>Synced · offline ready</span></button>
+    <button class="btn ghost" id="btnTheme" title="Toggle light / dark"></button>
+    <div class="menu-wrap">
+      <button class="btn" id="btnShare">Share <span id="shareChev"></span></button>
+    </div>
+    <div class="menu-wrap">
+      <button class="btn" id="btnExport">Export <span id="exportChev"></span></button>
+    </div>
+    <button class="btn primary" id="btnPresent"><span id="presentIcon"></span> Present <kbd>F5</kbd></button>
+    <a class="btn ghost" href="mobile.html" title="Open the mobile companion mockup">Mobile app →</a>
+    <div class="avatar" title="David Brooks · Song leader">DB</div>
+  </header>
+
+  <!-- ============ Sidebar ============ -->
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <!-- ============ Order of service ============ -->
+  <section class="order-col" id="orderCol" aria-label="Order of service">
+    <div class="svc-head" id="svcHead"></div>
+    <div class="order-scroll" id="orderScroll">
+      <div id="orderList"></div>
+      <div class="add-row">
+        <button class="btn add-btn" id="btnAddItem"><span id="addIcon"></span> Add to order</button>
+        <span class="hint">Drag hymns from the library straight into the order</span>
+      </div>
+    </div>
+    <div class="check-dock" id="checkDock"></div>
+  </section>
+
+  <!-- ============ Workspace ============ -->
+  <main class="work-col" aria-label="Workspace">
+    <div class="tabs" role="tablist" id="tabs">
+      <button role="tab" data-tab="library" class="tab"><span data-i="library"></span> Hymn library</button>
+      <button role="tab" data-tab="item" class="tab"><span data-i="sparkle"></span> Selected item</button>
+      <button role="tab" data-tab="deck" class="tab"><span data-i="present"></span> Slide deck <span class="count" id="deckCount"></span></button>
+      <div class="tab-spacer"></div>
+      <span class="db-note" id="dbNote"></span>
+    </div>
+
+    <!-- Library -->
+    <div class="pane" id="paneLibrary">
+      <div class="lib-top">
+        <div id="ctxBanner"></div>
+        <div class="searchbar">
+          <span class="s-ic" data-i="search"></span>
+          <input id="q" type="search" autocomplete="off" spellcheck="false" placeholder="Search hymns — title, first line, lyrics, tune, author, scripture, or hymnal number (try “blood”, “Eph 2”, “SFP 236”)">
+          <kbd class="s-kbd">⌘K</kbd>
+        </div>
+        <div class="chips-row" id="topicChips"></div>
+        <div class="filters">
+          <label class="sel"><span>Key</span><select id="fKey"></select></label>
+          <label class="sel"><span>Time</span><select id="fTime"></select></label>
+          <label class="sel"><span>Meter</span><select id="fMeter"></select></label>
+          <label class="sel"><span>Hymnal</span><select id="fHymnal"></select></label>
+          <label class="tog"><input type="checkbox" id="fPd"> Public domain</label>
+          <label class="tog"><input type="checkbox" id="fFresh"> Not sung in 8 wks</label>
+          <div class="f-spacer"></div>
+          <label class="sel"><span>Sort</span>
+            <select id="fSort">
+              <option value="relevance">Relevance</option>
+              <option value="title">Title A–Z</option>
+              <option value="recent">Recently sung</option>
+              <option value="stale">Longest since sung</option>
+              <option value="count">Most sung (12 mo)</option>
+            </select></label>
+          <div class="seg" id="viewSeg">
+            <button data-view="list" title="List view"></button><button data-view="grid" title="Slide grid"></button>
+          </div>
+        </div>
+      </div>
+      <div class="lib-body">
+        <div class="results" id="results"></div>
+        <div class="preview" id="preview"></div>
+      </div>
+    </div>
+
+    <!-- Selected item -->
+    <div class="pane" id="paneItem" hidden></div>
+
+    <!-- Deck -->
+    <div class="pane" id="paneDeck" hidden></div>
+  </main>
+</div>
+
+<!-- Presenter overlay -->
+<div class="presenter" id="presenter" hidden>
+  <div class="pres-stage" id="presStage"></div>
+  <div class="pres-bar">
+    <div class="pres-info" id="presInfo"></div>
+    <div class="pres-ctl">
+      <button id="presPrev" aria-label="Previous slide"></button>
+      <span id="presCount"></span>
+      <button id="presNext" aria-label="Next slide"></button>
+      <button id="presClose" aria-label="Exit (Esc)"></button>
+    </div>
+  </div>
+</div>
+
+<div class="toasts" id="toasts" aria-live="polite"></div>
+<div class="menu" id="menu" hidden></div>
+
+<script src="js/data.js"></script>
+<script src="js/core.js"></script>
+<script src="js/notation.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

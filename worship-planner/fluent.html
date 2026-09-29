@@ -1,0 +1,1781 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lectern Desktop Fluent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,700;1,8..60,400&family=Noto+Music&display=swap">
+<style>
+/* Layout: page header with view options, a desktop "wallpaper" stage holding one WinUI-style window
+   (title bar | NavigationView rail | layer: services + calendar | order of worship | songbook pane),
+   then a control map for the Uno developers. Colors are the WinUI Fluent theme resources' default values;
+   the window can run its own light/dark theme independent of the page. */
+:root {
+  --mica: #F3F3F3;
+  --layer: #F9F9F9;
+  --layer-alt: #FCFCFC;
+  --card: #FFFFFF;
+  --card-solid: #FFFFFF;
+  --control: rgba(255,255,255,.7);
+  --control-hover: rgba(249,249,249,.5);
+  --control-pressed: rgba(249,249,249,.3);
+  --control-input: #FFFFFF;
+  --control-alt: rgba(0,0,0,.024);
+  --subtle-hover: rgba(0,0,0,.037);
+  --subtle-pressed: rgba(0,0,0,.024);
+  --stroke-control: rgba(0,0,0,.058);
+  --stroke-control-2: rgba(0,0,0,.162);
+  --stroke-strong: rgba(0,0,0,.447);
+  --stroke-card: rgba(0,0,0,.058);
+  --stroke-divider: rgba(0,0,0,.08);
+  --stroke-surface: rgba(117,117,117,.4);
+  --stroke-flyout: rgba(0,0,0,.058);
+  --stroke-accent: rgba(255,255,255,.08);
+  --stroke-accent-2: rgba(0,0,0,.4);
+  --text-1: rgba(0,0,0,.894);
+  --text-2: rgba(0,0,0,.62);
+  --text-3: rgba(0,0,0,.447);
+  --text-disabled: rgba(0,0,0,.361);
+  --accent: #005FB8;
+  --accent-hover: rgba(0,95,184,.9);
+  --accent-pressed: rgba(0,95,184,.8);
+  --accent-text: #003E92;
+  --on-accent: #FFFFFF;
+  --on-accent-2: rgba(255,255,255,.7);
+  --success: #0F7B0F;
+  --success-bg: #DFF6DD;
+  --caution: #9D5D00;
+  --caution-text: #9D5D00;
+  --caution-bg: #FFF4CE;
+  --info-bg: #F6F6F6;
+  --ib-glyph: #FFFFFF;
+  --acrylic: rgba(252,252,252,.86);
+  --tooltip: #F9F9F9;
+  --shadow-flyout: 0 8px 16px rgba(0,0,0,.14);
+  --shadow-dialog: 0 32px 64px rgba(0,0,0,.19), 0 2px 21px rgba(0,0,0,.15);
+  --shadow-window: 0 32px 64px rgba(0,0,0,.18), 0 2px 21px rgba(0,0,0,.14);
+  --shadow-soft: rgba(0,0,0,.12);
+  --smoke: rgba(0,0,0,.3);
+  --dlg-top: #FFFFFF;
+  --dlg-foot: #F3F3F3;
+  --pic-bg: rgba(0,0,0,.08);
+  --page: #ECEEF1;
+  --wall-1: #B9D1F0;
+  --wall-2: #E4ECF7;
+  --f-ui: "Segoe UI Variable Text", "Segoe UI", "Open Sans", system-ui, sans-serif;
+  --f-display: "Segoe UI Variable Display", "Segoe UI", "Open Sans", system-ui, sans-serif;
+  --f-mono: "Cascadia Mono", "Cascadia Code", Consolas, ui-monospace, "SF Mono", Menlo, monospace;
+  --f-serif: "Source Serif 4", Georgia, serif;
+  --f-music: "Noto Music", "Bravura", "Segoe UI Symbol", serif;
+  --slide-bg: #FFFFFF;
+  --slide-ink: #151515;
+  --slide-muted: #6A6A6A;
+  --stage: #0B0B0B;
+  --stage-fg: #EDEDED;
+  --stage-muted: #9A9A9A;
+  --traffic-r: #FF5F57; --traffic-y: #FEBC2E; --traffic-g: #28C840;
+  --close-hover: #C42B1C; --close-ink: #FFFFFF;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+  --mica: #202020;
+  --layer: #282828;
+  --layer-alt: #2C2C2C;
+  --card: #2D2D2D;
+  --card-solid: #3D3D3D;
+  --control: rgba(255,255,255,.061);
+  --control-hover: rgba(255,255,255,.084);
+  --control-pressed: rgba(255,255,255,.033);
+  --control-input: #1F1F1F;
+  --control-alt: rgba(0,0,0,.1);
+  --subtle-hover: rgba(255,255,255,.061);
+  --subtle-pressed: rgba(255,255,255,.042);
+  --stroke-control: rgba(255,255,255,.07);
+  --stroke-control-2: rgba(255,255,255,.093);
+  --stroke-strong: rgba(255,255,255,.545);
+  --stroke-card: rgba(0,0,0,.2);
+  --stroke-divider: rgba(255,255,255,.084);
+  --stroke-surface: rgba(117,117,117,.4);
+  --stroke-flyout: rgba(0,0,0,.2);
+  --stroke-accent: rgba(255,255,255,.08);
+  --stroke-accent-2: rgba(0,0,0,.14);
+  --text-1: #FFFFFF;
+  --text-2: rgba(255,255,255,.786);
+  --text-3: rgba(255,255,255,.545);
+  --text-disabled: rgba(255,255,255,.363);
+  --accent: #60CDFF;
+  --accent-hover: rgba(96,205,255,.9);
+  --accent-pressed: rgba(96,205,255,.8);
+  --accent-text: #99EBFF;
+  --on-accent: #000000;
+  --on-accent-2: rgba(0,0,0,.5);
+  --success: #6CCB5F;
+  --success-bg: #393D1B;
+  --caution: #FCE100;
+  --caution-text: #FCE100;
+  --caution-bg: #433519;
+  --info-bg: #2D2D2D;
+  --ib-glyph: #000000;
+  --acrylic: rgba(44,44,44,.96);
+  --tooltip: #2C2C2C;
+  --shadow-flyout: 0 8px 16px rgba(0,0,0,.26);
+  --shadow-dialog: 0 32px 64px rgba(0,0,0,.37), 0 2px 21px rgba(0,0,0,.37);
+  --shadow-window: 0 32px 64px rgba(0,0,0,.56), 0 2px 21px rgba(0,0,0,.55);
+  --shadow-soft: rgba(0,0,0,.4);
+  --smoke: rgba(0,0,0,.4);
+  --dlg-top: #2B2B2B;
+  --dlg-foot: #202020;
+  --pic-bg: rgba(255,255,255,.08);
+    --page: #121417; --wall-1: #0E2446; --wall-2: #1A2433;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --mica: #202020;
+  --layer: #282828;
+  --layer-alt: #2C2C2C;
+  --card: #2D2D2D;
+  --card-solid: #3D3D3D;
+  --control: rgba(255,255,255,.061);
+  --control-hover: rgba(255,255,255,.084);
+  --control-pressed: rgba(255,255,255,.033);
+  --control-input: #1F1F1F;
+  --control-alt: rgba(0,0,0,.1);
+  --subtle-hover: rgba(255,255,255,.061);
+  --subtle-pressed: rgba(255,255,255,.042);
+  --stroke-control: rgba(255,255,255,.07);
+  --stroke-control-2: rgba(255,255,255,.093);
+  --stroke-strong: rgba(255,255,255,.545);
+  --stroke-card: rgba(0,0,0,.2);
+  --stroke-divider: rgba(255,255,255,.084);
+  --stroke-surface: rgba(117,117,117,.4);
+  --stroke-flyout: rgba(0,0,0,.2);
+  --stroke-accent: rgba(255,255,255,.08);
+  --stroke-accent-2: rgba(0,0,0,.14);
+  --text-1: #FFFFFF;
+  --text-2: rgba(255,255,255,.786);
+  --text-3: rgba(255,255,255,.545);
+  --text-disabled: rgba(255,255,255,.363);
+  --accent: #60CDFF;
+  --accent-hover: rgba(96,205,255,.9);
+  --accent-pressed: rgba(96,205,255,.8);
+  --accent-text: #99EBFF;
+  --on-accent: #000000;
+  --on-accent-2: rgba(0,0,0,.5);
+  --success: #6CCB5F;
+  --success-bg: #393D1B;
+  --caution: #FCE100;
+  --caution-text: #FCE100;
+  --caution-bg: #433519;
+  --info-bg: #2D2D2D;
+  --ib-glyph: #000000;
+  --acrylic: rgba(44,44,44,.96);
+  --tooltip: #2C2C2C;
+  --shadow-flyout: 0 8px 16px rgba(0,0,0,.26);
+  --shadow-dialog: 0 32px 64px rgba(0,0,0,.37), 0 2px 21px rgba(0,0,0,.37);
+  --shadow-window: 0 32px 64px rgba(0,0,0,.56), 0 2px 21px rgba(0,0,0,.55);
+  --shadow-soft: rgba(0,0,0,.4);
+  --smoke: rgba(0,0,0,.4);
+  --dlg-top: #2B2B2B;
+  --dlg-foot: #202020;
+  --pic-bg: rgba(255,255,255,.08);
+  --page: #121417; --wall-1: #0E2446; --wall-2: #1A2433;
+  color-scheme: dark;
+}
+.win[data-app-theme="light"] {
+  --mica: #F3F3F3;
+  --layer: #F9F9F9;
+  --layer-alt: #FCFCFC;
+  --card: #FFFFFF;
+  --card-solid: #FFFFFF;
+  --control: rgba(255,255,255,.7);
+  --control-hover: rgba(249,249,249,.5);
+  --control-pressed: rgba(249,249,249,.3);
+  --control-input: #FFFFFF;
+  --control-alt: rgba(0,0,0,.024);
+  --subtle-hover: rgba(0,0,0,.037);
+  --subtle-pressed: rgba(0,0,0,.024);
+  --stroke-control: rgba(0,0,0,.058);
+  --stroke-control-2: rgba(0,0,0,.162);
+  --stroke-strong: rgba(0,0,0,.447);
+  --stroke-card: rgba(0,0,0,.058);
+  --stroke-divider: rgba(0,0,0,.08);
+  --stroke-surface: rgba(117,117,117,.4);
+  --stroke-flyout: rgba(0,0,0,.058);
+  --stroke-accent: rgba(255,255,255,.08);
+  --stroke-accent-2: rgba(0,0,0,.4);
+  --text-1: rgba(0,0,0,.894);
+  --text-2: rgba(0,0,0,.62);
+  --text-3: rgba(0,0,0,.447);
+  --text-disabled: rgba(0,0,0,.361);
+  --accent: #005FB8;
+  --accent-hover: rgba(0,95,184,.9);
+  --accent-pressed: rgba(0,95,184,.8);
+  --accent-text: #003E92;
+  --on-accent: #FFFFFF;
+  --on-accent-2: rgba(255,255,255,.7);
+  --success: #0F7B0F;
+  --success-bg: #DFF6DD;
+  --caution: #9D5D00;
+  --caution-text: #9D5D00;
+  --caution-bg: #FFF4CE;
+  --info-bg: #F6F6F6;
+  --ib-glyph: #FFFFFF;
+  --acrylic: rgba(252,252,252,.86);
+  --tooltip: #F9F9F9;
+  --shadow-flyout: 0 8px 16px rgba(0,0,0,.14);
+  --shadow-dialog: 0 32px 64px rgba(0,0,0,.19), 0 2px 21px rgba(0,0,0,.15);
+  --shadow-window: 0 32px 64px rgba(0,0,0,.18), 0 2px 21px rgba(0,0,0,.14);
+  --shadow-soft: rgba(0,0,0,.12);
+  --smoke: rgba(0,0,0,.3);
+  --dlg-top: #FFFFFF;
+  --dlg-foot: #F3F3F3;
+  --pic-bg: rgba(0,0,0,.08);
+  color-scheme: light;
+}
+.win[data-app-theme="dark"] {
+  --mica: #202020;
+  --layer: #282828;
+  --layer-alt: #2C2C2C;
+  --card: #2D2D2D;
+  --card-solid: #3D3D3D;
+  --control: rgba(255,255,255,.061);
+  --control-hover: rgba(255,255,255,.084);
+  --control-pressed: rgba(255,255,255,.033);
+  --control-input: #1F1F1F;
+  --control-alt: rgba(0,0,0,.1);
+  --subtle-hover: rgba(255,255,255,.061);
+  --subtle-pressed: rgba(255,255,255,.042);
+  --stroke-control: rgba(255,255,255,.07);
+  --stroke-control-2: rgba(255,255,255,.093);
+  --stroke-strong: rgba(255,255,255,.545);
+  --stroke-card: rgba(0,0,0,.2);
+  --stroke-divider: rgba(255,255,255,.084);
+  --stroke-surface: rgba(117,117,117,.4);
+  --stroke-flyout: rgba(0,0,0,.2);
+  --stroke-accent: rgba(255,255,255,.08);
+  --stroke-accent-2: rgba(0,0,0,.14);
+  --text-1: #FFFFFF;
+  --text-2: rgba(255,255,255,.786);
+  --text-3: rgba(255,255,255,.545);
+  --text-disabled: rgba(255,255,255,.363);
+  --accent: #60CDFF;
+  --accent-hover: rgba(96,205,255,.9);
+  --accent-pressed: rgba(96,205,255,.8);
+  --accent-text: #99EBFF;
+  --on-accent: #000000;
+  --on-accent-2: rgba(0,0,0,.5);
+  --success: #6CCB5F;
+  --success-bg: #393D1B;
+  --caution: #FCE100;
+  --caution-text: #FCE100;
+  --caution-bg: #433519;
+  --info-bg: #2D2D2D;
+  --ib-glyph: #000000;
+  --acrylic: rgba(44,44,44,.96);
+  --tooltip: #2C2C2C;
+  --shadow-flyout: 0 8px 16px rgba(0,0,0,.26);
+  --shadow-dialog: 0 32px 64px rgba(0,0,0,.37), 0 2px 21px rgba(0,0,0,.37);
+  --shadow-window: 0 32px 64px rgba(0,0,0,.56), 0 2px 21px rgba(0,0,0,.55);
+  --shadow-soft: rgba(0,0,0,.4);
+  --smoke: rgba(0,0,0,.4);
+  --dlg-top: #2B2B2B;
+  --dlg-foot: #202020;
+  --pic-bg: rgba(255,255,255,.08);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--page); color: var(--text-1); font: 14px/20px var(--f-ui); }
+button, input, select { font: inherit; color: inherit; }
+button { cursor: default; }
+[hidden] { display: none !important; }
+:focus-visible { outline: 2px solid var(--text-1); outline-offset: 1px; border-radius: 4px; }
+svg.i { width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+svg.i.sm { width: 12px; height: 12px; }
+svg.i.fill { fill: currentColor; stroke: none; }
+mark { background: color-mix(in srgb, var(--accent) 24%, transparent); color: inherit; border-radius: 2px; }
+.tab { font-variant-numeric: tabular-nums; }
+
+/* ---------- page ---------- */
+.page { max-width: 1600px; margin: 0 auto; padding-inline: 24px; padding-block: 24px 64px; display: grid; gap: 20px; }
+.intro { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 16px 32px; }
+.intro-text { display: grid; gap: 6px; min-width: 0; max-width: 72ch; }
+.backlink { color: var(--accent-text); text-decoration: none; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; width: fit-content; }
+.backlink:hover { text-decoration: underline; }
+.eyebrow { font-size: 12px; font-weight: 600; color: var(--text-2); }
+.intro h1 { margin: 0; font: 600 clamp(28px, 4vw, 40px)/1.15 var(--f-display); text-wrap: balance; }
+.intro p { margin: 0; color: var(--text-2); }
+.hints { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12.5px; color: var(--text-2); }
+.hints kbd { font: 12px var(--f-mono); padding: 0 5px; border-radius: 4px; border: 1px solid var(--stroke-control); border-bottom-color: var(--stroke-control-2); background: var(--control); }
+.opts { display: flex; flex-wrap: wrap; gap: 12px 22px; align-items: center; }
+.opt { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--text-2); }
+.segm { display: inline-flex; padding: 2px; gap: 2px; border-radius: 5px; background: var(--subtle-hover); border: 1px solid var(--stroke-control); }
+.segm button { height: 26px; padding: 0 10px; border: 0; border-radius: 3px; background: transparent; color: var(--text-2); font-size: 13px; }
+.segm button:hover { color: var(--text-1); }
+.segm button[aria-pressed="true"] { background: var(--card-solid); color: var(--text-1); box-shadow: 0 0 0 1px var(--stroke-control), 0 1px 0 var(--stroke-control-2); }
+.tsw { position: relative; width: 40px; height: 20px; padding: 0; border-radius: 10px; border: 1px solid var(--stroke-strong); background: var(--control-alt); }
+.tsw i { position: absolute; left: 4px; top: 50%; width: 12px; height: 12px; margin-top: -6px; border-radius: 50%; background: var(--text-2); transition: left .12s; }
+.tsw[aria-checked="true"] { background: var(--accent); border-color: var(--accent); }
+.tsw[aria-checked="true"] i { left: 23px; background: var(--on-accent); }
+.stage { overflow-x: auto; padding: 32px; border-radius: 12px; background: radial-gradient(120% 90% at 20% 10%, var(--wall-1), var(--wall-2)); }
+.narrow-note { display: none; font-size: 12.5px; color: var(--text-2); }
+@media (max-width: 900px) { .narrow-note { display: block; } .stage { padding: 12px; } .page { padding-inline: 16px; } }
+
+/* ---------- window ---------- */
+.win { position: relative; min-width: 1320px; height: 900px; display: grid; grid-template-rows: 48px minmax(0, 1fr);
+  background: var(--mica); color: var(--text-1); font: 14px/20px var(--f-ui);
+  border: 1px solid var(--stroke-surface); border-radius: 8px; overflow: hidden; box-shadow: var(--shadow-window); }
+.titlebar { display: grid; grid-template-columns: 1fr minmax(0, 440px) 1fr; align-items: center; user-select: none; }
+.tb-left { display: flex; align-items: center; gap: 4px; padding-left: 4px; min-width: 0; }
+.traffic { display: none; gap: 8px; padding: 0 12px 0 10px; }
+.traffic i { width: 12px; height: 12px; border-radius: 50%; background: var(--traffic-r); }
+.traffic i:nth-child(2) { background: var(--traffic-y); }
+.traffic i:nth-child(3) { background: var(--traffic-g); }
+.win[data-chrome="mac"] .traffic { display: flex; }
+.win[data-chrome="mac"] .caption { display: none; }
+.win[data-chrome="mac"] .tb-right { padding-right: 12px; }
+.tb-back { width: 40px; height: 36px; border: 0; border-radius: 4px; background: transparent; color: var(--text-disabled); display: grid; place-items: center; }
+.tb-app { display: flex; align-items: center; gap: 12px; padding-left: 6px; font-size: 12px; white-space: nowrap; }
+.tb-app svg { width: 16px; height: 16px; color: var(--accent); }
+.tb-app .sub { color: var(--text-2); }
+.tb-right { justify-self: end; display: flex; align-items: center; gap: 12px; height: 100%; }
+.tb-sync { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-2); }
+.tb-sync svg { color: var(--success); }
+.avatar { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: var(--pic-bg); font-size: 11px; font-weight: 600; }
+.caption { display: flex; height: 100%; }
+.caption button { width: 46px; height: 100%; border: 0; background: transparent; color: var(--text-1); display: grid; place-items: center; }
+.caption button:hover { background: var(--subtle-hover); }
+.caption button.close:hover { background: var(--close-hover); color: var(--close-ink); }
+.caption svg { width: 10px; height: 10px; stroke-width: 2.4; }
+
+/* text box / auto-suggest */
+.tbox { display: flex; align-items: center; gap: 8px; height: 32px; padding: 0 8px 0 11px; background: var(--control); border: 1px solid var(--stroke-control); border-bottom-color: var(--stroke-strong); border-radius: 4px; }
+.tbox:hover { background: var(--control-hover); }
+.tbox:focus-within { background: var(--control-input); border-bottom-color: var(--accent); box-shadow: inset 0 -1px 0 var(--accent); }
+.tbox input { flex: 1; min-width: 0; height: 100%; border: 0; outline: 0; background: transparent; color: var(--text-1); }
+.tbox input::placeholder { color: var(--text-2); }
+.tbox input::-webkit-search-cancel-button { display: none; }
+.tbox svg { color: var(--text-2); }
+.tbox kbd { font: 11px var(--f-mono); color: var(--text-3); }
+
+/* buttons */
+.fbtn, .tbtn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 32px; padding: 0 12px; border-radius: 4px; white-space: nowrap;
+  background: var(--control); color: var(--text-1); border: 1px solid var(--stroke-control); border-bottom-color: var(--stroke-control-2); }
+.fbtn:hover, .tbtn:hover { background: var(--control-hover); }
+.fbtn:active, .tbtn:active { background: var(--control-pressed); color: var(--text-2); border-bottom-color: var(--stroke-control); }
+.fbtn.accent, .tbtn[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); border-color: var(--stroke-accent); border-bottom-color: var(--stroke-accent-2); }
+.fbtn.accent:hover, .tbtn[aria-pressed="true"]:hover { background: var(--accent-hover); }
+.fbtn.accent:active, .tbtn[aria-pressed="true"]:active { background: var(--accent-pressed); color: var(--on-accent-2); }
+.tbtn { height: 28px; padding: 0 10px; font-size: 13px; }
+.tbtn.sq { width: 32px; height: 32px; padding: 0; font-size: 14px; }
+.icon-btn { width: 32px; height: 32px; flex: none; border: 0; border-radius: 4px; background: transparent; color: var(--text-1); display: inline-grid; place-items: center; }
+.icon-btn:hover { background: var(--subtle-hover); }
+.icon-btn:active { background: var(--subtle-pressed); color: var(--text-2); }
+.hl { border: 0; background: transparent; color: var(--accent-text); padding: 1px 4px; border-radius: 4px; }
+.hl:hover { background: var(--subtle-hover); }
+.combo { position: relative; display: inline-flex; align-items: center; }
+.combo select { appearance: none; -webkit-appearance: none; height: 28px; padding: 0 30px 0 10px; border-radius: 4px; font-size: 13px;
+  background: var(--control); color: var(--text-1); border: 1px solid var(--stroke-control); border-bottom-color: var(--stroke-control-2); }
+.combo select:hover { background: var(--control-hover); }
+.combo.lg select { height: 32px; font-size: 14px; padding-left: 11px; }
+.combo.on select { border-color: var(--accent); }
+.combo svg { position: absolute; right: 10px; width: 12px; height: 12px; pointer-events: none; color: var(--text-2); }
+
+/* ---------- body: navigation + layer ---------- */
+.body { display: grid; grid-template-columns: 48px minmax(0, 1fr); min-height: 0; }
+.body.nav-open { grid-template-columns: 220px minmax(0, 1fr); }
+.nav { display: flex; flex-direction: column; gap: 4px; padding: 0 4px 6px; min-height: 0; }
+.nav-item { position: relative; display: flex; align-items: center; gap: 14px; height: 36px; padding: 0 12px; border: 0; border-radius: 4px; background: transparent; color: var(--text-1); text-align: left; white-space: nowrap; }
+.nav-item:hover { background: var(--subtle-hover); }
+.nav-item:active { background: var(--subtle-pressed); }
+.nav-item.on { background: var(--subtle-hover); }
+.nav-l { display: none; }
+.body.nav-open .nav-l { display: inline; }
+.nav-sp { flex: 1; }
+.body:not(.nav-open) .nav-item:hover::after { content: attr(data-tip); position: absolute; left: 46px; top: 50%; transform: translateY(-50%); z-index: 45;
+  padding: 5px 8px 6px; font-size: 12px; line-height: 16px; border-radius: 4px; background: var(--tooltip); border: 1px solid var(--stroke-flyout); box-shadow: var(--shadow-flyout); pointer-events: none; }
+.sv.sel::before, .li.sel::before, .ri.on::before, .nav-item.on::before {
+  content: ""; position: absolute; left: 0; top: 50%; width: 3px; height: 16px; margin-top: -8px; border-radius: 2px; background: var(--accent); }
+
+.layer { display: grid; grid-template-columns: 256px minmax(0, 1fr) 456px; min-height: 0; background: var(--layer);
+  border-top: 1px solid var(--stroke-card); border-left: 1px solid var(--stroke-card); border-top-left-radius: 8px; overflow: hidden; }
+
+/* services column */
+.svcpane { display: flex; flex-direction: column; min-height: 0; border-right: 1px solid var(--stroke-divider); }
+#cal { padding: 10px 12px 6px; }
+.cal-h { display: flex; align-items: center; gap: 2px; padding-bottom: 2px; }
+.cal-title { border: 0; background: transparent; font-weight: 600; padding: 4px 6px; border-radius: 4px; }
+.cal-title:hover { background: var(--subtle-hover); }
+.cal-h .sp { flex: 1; }
+.cal-g { display: grid; grid-template-columns: repeat(7, 1fr); row-gap: 2px; text-align: center; }
+.cw { font-size: 12px; line-height: 26px; font-weight: 600; }
+.cd { position: relative; width: 30px; height: 30px; justify-self: center; border: 0; padding: 0; border-radius: 50%; background: transparent; font-size: 13px; display: grid; place-items: center; }
+.cd:hover { background: var(--subtle-hover); }
+.cd.out { color: var(--text-3); }
+.cd.today { background: var(--accent); color: var(--on-accent); font-weight: 600; }
+.cd.selday { box-shadow: inset 0 0 0 2px var(--accent); }
+.cd.today.selday { box-shadow: inset 0 0 0 2px var(--accent), inset 0 0 0 4px var(--layer); }
+.cd .dots { position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%); display: flex; gap: 2px; }
+.cd .dots b { width: 4px; height: 4px; border-radius: 50%; background: var(--accent); }
+.cd.today .dots b { background: var(--on-accent); }
+.cal-div { height: 1px; background: var(--stroke-divider); margin: 4px 12px 0; }
+#svclist { flex: 1; overflow: auto; padding-bottom: 8px; }
+.pane-h { display: flex; align-items: center; justify-content: space-between; padding: 8px 8px 0 16px; font-weight: 600; }
+.grp-h { display: flex; justify-content: space-between; gap: 8px; padding: 12px 16px 4px; font-size: 12px; line-height: 16px; font-weight: 600; }
+.grp-h span { font-weight: 400; color: var(--text-2); }
+.sv { position: relative; display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; gap: 10px; align-items: center; width: calc(100% - 8px); margin: 1px 4px; padding: 6px 8px 6px 10px; border: 0; border-radius: 4px; background: transparent; text-align: left; }
+.sv:hover, .sv.sel { background: var(--subtle-hover); }
+.sv-d { display: grid; justify-items: center; line-height: 1.1; }
+.sv-d .c { font-size: 11px; color: var(--text-2); }
+.sv-d .n { font-size: 18px; font-weight: 600; line-height: 22px; }
+.sv-t { display: grid; min-width: 0; }
+.sv-t .n { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sv-t .c { font-size: 12px; line-height: 16px; color: var(--text-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.badge { min-width: 16px; height: 16px; padding: 0 4px; border-radius: 8px; background: var(--accent); color: var(--on-accent); font-size: 11px; line-height: 16px; font-weight: 600; text-align: center; }
+
+/* order of worship */
+.orderpane { display: flex; flex-direction: column; min-height: 0; min-width: 0; }
+#ohead { padding: 12px 24px 8px; display: grid; gap: 6px; }
+.crumbs { display: flex; align-items: center; gap: 2px; font-size: 14px; color: var(--text-2); }
+.crumbs button { border: 0; background: transparent; color: var(--text-2); padding: 2px 4px; border-radius: 4px; }
+.crumbs button:hover { background: var(--subtle-hover); color: var(--text-1); }
+.crumbs [aria-current] { color: var(--text-1); padding: 2px 4px; }
+.crumbs svg { width: 12px; height: 12px; color: var(--text-2); }
+.ttl { margin: 0; font: 600 28px/36px var(--f-display); }
+.cap { font-size: 12px; line-height: 16px; color: var(--text-2); }
+.ppl { display: flex; flex-wrap: wrap; gap: 8px 20px; align-items: center; padding-top: 4px; }
+.pp { display: flex; align-items: center; gap: 8px; }
+.pic { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: var(--pic-bg); font-size: 11px; font-weight: 600; flex: none; }
+.pp .r { display: block; font-size: 12px; line-height: 15px; color: var(--text-2); }
+.pp .nm { display: block; font-size: 13px; line-height: 17px; }
+.tag { display: inline-flex; align-items: center; gap: 6px; min-height: 24px; padding: 2px 8px; border-radius: 4px; background: var(--subtle-hover); font-size: 12px; color: var(--text-2); }
+.cmdbar { display: flex; align-items: center; gap: 2px; margin: 4px 0 0 -4px; }
+.abb { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 10px; border: 0; border-radius: 4px; background: transparent; color: var(--text-1); white-space: nowrap; }
+.abb:hover { background: var(--subtle-hover); }
+.abb:active { background: var(--subtle-pressed); color: var(--text-2); }
+.abb:disabled { color: var(--text-disabled); background: transparent; }
+.cmdbar .fbtn { margin-right: 6px; }
+.cmdbar .sep { width: 1px; height: 20px; background: var(--stroke-divider); margin: 0 4px; }
+.cmdbar .sp { flex: 1; }
+.cmdbar .stat { font-size: 12px; color: var(--text-2); padding-right: 4px; }
+.infobar { display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 6px 6px 6px 16px; border-radius: 4px; border: 1px solid var(--stroke-card); }
+.infobar.info { background: var(--info-bg); }
+.infobar.caution { background: var(--caution-bg); }
+.infobar.success { background: var(--success-bg); }
+.ib-badge { width: 16px; height: 16px; flex: none; border-radius: 50%; display: grid; place-items: center; font: 700 11px/1 var(--f-ui); color: var(--ib-glyph); }
+.infobar.info .ib-badge { background: var(--accent); }
+.infobar.caution .ib-badge { background: var(--caution); }
+.infobar.success .ib-badge { background: var(--success); }
+.ib-txt { flex: 1; min-width: 0; }
+.ib-txt b { font-weight: 600; margin-right: 10px; }
+
+.olist { flex: 1; overflow: auto; padding: 0 16px 28px; outline: none; }
+.ghead { position: sticky; top: 0; z-index: 2; display: flex; align-items: baseline; justify-content: space-between; padding: 14px 8px 6px; background: var(--layer); font-weight: 600; border-bottom: 1px solid var(--stroke-divider); margin-bottom: 2px; }
+.ghead span { font-size: 12px; font-weight: 400; color: var(--text-2); font-variant-numeric: tabular-nums; }
+.li { position: relative; display: grid; grid-template-columns: 10px 38px 32px minmax(0, 1fr) auto 44px 32px; align-items: center; gap: 10px; min-height: 52px; padding: 5px 4px 5px 8px; margin: 2px 0; border-radius: 4px; }
+.li:hover, .li.sel { background: var(--subtle-hover); }
+.li.empty { box-shadow: inset 0 0 0 1px var(--stroke-control-2); }
+.li.dragging { opacity: .4; }
+.li.drop-before { box-shadow: inset 0 2px 0 var(--accent); }
+.li.drop-after { box-shadow: inset 0 -2px 0 var(--accent); }
+.li.drop-fill { box-shadow: inset 0 0 0 2px var(--accent); }
+.grip { opacity: 0; color: var(--text-3); cursor: grab; display: grid; }
+.grip svg { width: 10px; height: 14px; fill: currentColor; }
+.li:hover .grip { opacity: 1; }
+.li-time { font-size: 12px; color: var(--text-2); font-variant-numeric: tabular-nums; }
+.li-ico { width: 32px; height: 32px; border-radius: 4px; display: grid; place-items: center; background: var(--card); border: 1px solid var(--stroke-card); color: var(--text-2); }
+.li[data-type="hymn"] .li-ico { color: var(--accent-text); }
+.li-main { display: grid; min-width: 0; }
+.ov { font-size: 12px; line-height: 15px; font-weight: 600; color: var(--accent-text); }
+.tt { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.st { font-size: 12px; line-height: 16px; color: var(--text-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.slot { color: var(--text-2); }
+.li-dur { font-size: 12px; color: var(--text-2); text-align: right; font-variant-numeric: tabular-nums; }
+.li-more { opacity: 0; }
+.li:hover .li-more, .li.sel .li-more { opacity: 1; }
+.bdg { display: inline-flex; align-items: center; gap: 4px; height: 20px; padding: 0 8px; border-radius: 10px; font-size: 12px; line-height: 16px; white-space: nowrap; }
+.bdg svg.i { width: 12px; height: 12px; stroke-width: 2; }
+.bdg.b-ok { background: var(--success-bg); color: var(--success); }
+.bdg.b-caution { background: var(--caution-bg); color: var(--caution-text); }
+.bdg.b-neutral { background: var(--subtle-hover); color: var(--text-2); }
+.bdg.b-none { color: var(--text-3); padding: 0; }
+
+/* songbook pane */
+.songpane { display: grid; grid-template-rows: auto auto auto auto minmax(0, 1fr) 472px; min-height: 0; border-left: 1px solid var(--stroke-divider); background: var(--layer-alt); }
+.sp-h { display: flex; align-items: center; gap: 8px; padding: 10px 10px 8px 16px; }
+.sp-h h2 { margin: 0; font: 600 20px/28px var(--f-display); }
+.sp-h .cap { flex: 1; }
+.songpane > .tbox { margin: 0 16px; }
+.filters { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 16px 6px; }
+.rmeta { display: flex; justify-content: space-between; align-items: center; gap: 8px; min-height: 32px; padding: 0 16px; font-size: 12px; color: var(--text-2); }
+.results { overflow: auto; padding: 0 8px 8px; }
+.sug-h { padding: 8px 8px 4px; font-size: 12px; font-weight: 600; }
+.sug-h.muted { color: var(--text-2); }
+.ri { position: relative; display: grid; grid-template-columns: 84px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 6px 8px 6px 10px; margin: 1px 0; border-radius: 4px; }
+.ri:hover, .ri.on { background: var(--subtle-hover); }
+.ri.cur { box-shadow: inset 0 0 0 1px var(--stroke-strong); }
+.thumb { display: block; width: 84px; max-width: 100%; aspect-ratio: 16 / 9; border-radius: 4px; overflow: hidden; background: var(--slide-bg); box-shadow: 0 0 0 1px var(--stroke-card); }
+.thumb svg, .bigslide svg { display: block; width: 100%; height: 100%; }
+.rm { display: grid; min-width: 0; }
+.rm .t { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rm .m, .rm .w { font-size: 12px; line-height: 16px; color: var(--text-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rm .w b { font-weight: 600; color: var(--text-1); }
+.side { display: grid; justify-items: end; gap: 2px; font-size: 12px; line-height: 16px; color: var(--text-2); }
+.side .no { color: var(--text-1); font-variant-numeric: tabular-nums; }
+.lic { font-size: 11px; font-weight: 600; padding: 0 6px; border-radius: 4px; background: var(--subtle-hover); }
+.insvc { color: var(--accent-text); font-weight: 600; }
+.empty-res { padding: 28px 16px; text-align: center; color: var(--text-2); display: grid; gap: 10px; justify-items: center; }
+
+.preview { display: grid; grid-template-rows: auto minmax(0, 1fr); min-height: 0; border-top: 1px solid var(--stroke-divider); }
+.selbar { display: flex; align-items: center; gap: 2px; padding: 4px 12px 0; }
+.sb { position: relative; height: 36px; padding: 0 10px; border: 0; border-radius: 4px; background: transparent; color: var(--text-2); }
+.sb:hover { background: var(--subtle-hover); color: var(--text-1); }
+.sb.on { color: var(--text-1); font-weight: 600; }
+.sb.on::after { content: ""; position: absolute; left: 50%; bottom: 3px; width: 16px; height: 3px; margin-left: -8px; border-radius: 2px; background: var(--accent); }
+.selbar .ptitle { margin-left: auto; font-size: 12px; color: var(--text-2); max-width: 55%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pbody { overflow: auto; padding: 8px 16px 14px; display: grid; gap: 10px; align-content: start; }
+.flip { position: relative; }
+.bigslide { position: relative; aspect-ratio: 16 / 9; max-width: 100%; border-radius: 4px; overflow: hidden; background: var(--slide-bg); box-shadow: 0 0 0 1px var(--stroke-card), 0 2px 8px var(--shadow-soft); }
+.flip-btn { position: absolute; top: 50%; margin-top: -19px; width: 18px; height: 38px; padding: 0; border-radius: 3px; border: 1px solid var(--stroke-flyout); background: var(--acrylic); color: var(--text-2); display: grid; place-items: center; opacity: 0; }
+.flip:hover .flip-btn { opacity: 1; }
+.flip-btn.prev { left: 6px; } .flip-btn.next { right: 6px; }
+.flip-btn svg { width: 10px; height: 10px; stroke-width: 2; }
+.pips { display: flex; justify-content: center; }
+.pip { width: 12px; height: 12px; padding: 0; border: 0; background: transparent; display: grid; place-items: center; }
+.pip::before { content: ""; width: 4px; height: 4px; border-radius: 50%; background: var(--text-3); }
+.pip.on::before { width: 6px; height: 6px; background: var(--text-2); }
+.strip { display: flex; gap: 6px; overflow-x: auto; padding: 2px; }
+.sthumb { flex: none; width: 72px; border: 0; padding: 0; background: transparent; display: grid; gap: 3px; justify-items: center; font-size: 11px; color: var(--text-2); }
+.sthumb .thumb { width: 72px; }
+.sthumb[aria-current="true"] .thumb { box-shadow: 0 0 0 2px var(--accent); }
+.pctl { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: end; }
+.fld { display: grid; gap: 4px; }
+.lbl { font-size: 12px; line-height: 16px; }
+.vrow { display: flex; gap: 4px; }
+.pact { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding-top: 4px; border-top: 1px solid var(--stroke-divider); padding-top: 10px; }
+.pact .grow { flex: 1; }
+.pact .combo select { max-width: 210px; }
+.bound { font-size: 13px; color: var(--text-2); }
+.bound b { color: var(--accent-text); font-weight: 600; }
+.dl { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 8px 12px; margin: 0; padding: 12px 14px; border-radius: 4px; background: var(--card); border: 1px solid var(--stroke-card); }
+.dl dt { font-size: 12px; color: var(--text-2); padding-top: 1px; }
+.dl dd { margin: 0; min-width: 0; }
+.tags { display: flex; flex-wrap: wrap; gap: 4px; }
+.tg { font-size: 12px; padding: 0 8px; border-radius: 4px; background: var(--subtle-hover); }
+.uses { display: grid; border-radius: 4px; background: var(--card); border: 1px solid var(--stroke-card); }
+.uses div { display: grid; grid-template-columns: 110px 1fr; gap: 12px; padding: 8px 14px; border-top: 1px solid var(--stroke-divider); }
+.uses div:first-child { border-top: 0; }
+.uses .d { color: var(--text-2); font-variant-numeric: tabular-nums; }
+
+/* flyouts, dialogs, toasts */
+.scrim-clear { position: absolute; inset: 0; z-index: 55; }
+.menu { position: absolute; z-index: 60; min-width: 232px; padding: 4px; border-radius: 8px; background: var(--acrylic); -webkit-backdrop-filter: blur(30px) saturate(1.3); backdrop-filter: blur(30px) saturate(1.3); border: 1px solid var(--stroke-flyout); box-shadow: var(--shadow-flyout); }
+.mi { display: grid; grid-template-columns: 16px 1fr auto; gap: 12px; align-items: center; width: 100%; height: 32px; padding: 0 12px 0 11px; margin: 2px 0; border: 0; border-radius: 4px; background: transparent; color: var(--text-1); text-align: left; }
+.mi:hover { background: var(--subtle-hover); }
+.mi:disabled { color: var(--text-disabled); background: transparent; }
+.mi .acc { font-size: 12px; color: var(--text-2); }
+.mi:disabled .acc { color: var(--text-disabled); }
+.msep { height: 1px; background: var(--stroke-divider); margin: 2px -4px; }
+.smoke { position: absolute; inset: 0; z-index: 70; background: var(--smoke); }
+.dialog { position: absolute; z-index: 71; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 460px; max-width: calc(100% - 48px); border-radius: 8px; overflow: hidden; border: 1px solid var(--stroke-surface); box-shadow: var(--shadow-dialog); }
+.dlg-body { padding: 24px; display: grid; gap: 12px; background: var(--dlg-top); }
+.dlg-body h2 { margin: 0; font: 600 20px/28px var(--f-display); }
+.dlg-body p { margin: 0; color: var(--text-1); }
+.checks { display: grid; gap: 0; max-height: 330px; overflow: auto; }
+.chk { display: flex; align-items: center; gap: 12px; border: 0; background: transparent; padding: 6px 0; text-align: left; }
+.chk .box { width: 20px; height: 20px; flex: none; border-radius: 4px; border: 1px solid var(--stroke-strong); background: var(--control-alt); display: grid; place-items: center; color: transparent; }
+.chk[aria-checked="true"] .box { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.chk .box svg { width: 12px; height: 12px; stroke-width: 2.2; }
+.chk .r { display: block; font-size: 12px; line-height: 15px; color: var(--text-2); }
+.dlg-foot { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 24px; background: var(--dlg-foot); border-top: 1px solid var(--stroke-card); }
+.toast-host { position: absolute; right: 16px; bottom: 16px; z-index: 80; width: min(440px, calc(100% - 32px)); }
+.toast-host .infobar { box-shadow: var(--shadow-flyout); }
+
+/* presenter (runs on the projector window) */
+.present { position: absolute; inset: 0; z-index: 90; background: var(--stage); color: var(--stage-fg); display: grid; grid-template-rows: 48px minmax(0, 1fr); }
+.pr-top { display: flex; align-items: center; gap: 16px; padding-inline: 16px; font-size: 13px; color: var(--stage-muted); border-bottom: 1px solid rgb(255 255 255 / .08); }
+.pr-top b { color: var(--stage-fg); font-weight: 600; }
+.pr-top .spacer { flex: 1; }
+.pr-top button, .pr-nav button { border: 1px solid rgb(255 255 255 / .18); background: rgb(255 255 255 / .06); color: var(--stage-fg); border-radius: 4px; height: 32px; padding: 0 12px; }
+.pr-body { display: grid; grid-template-columns: 250px minmax(0, 1fr) 300px; gap: 20px; padding: 20px; min-height: 0; }
+.pr-list { overflow: auto; display: grid; align-content: start; gap: 1px; font-size: 13px; }
+.pr-list button { border: 0; background: transparent; color: var(--stage-muted); text-align: left; padding: 6px 8px; border-radius: 4px; display: grid; grid-template-columns: 42px 1fr; gap: 8px; }
+.pr-list button.on { background: rgb(255 255 255 / .1); color: var(--stage-fg); }
+.pr-cur { display: grid; align-content: center; gap: 12px; min-width: 0; }
+.pr-side { display: grid; align-content: start; gap: 8px; font-size: 12px; color: var(--stage-muted); font-weight: 600; }
+.pr-side span { font-weight: 400; }
+.pr-nav { display: flex; justify-content: center; gap: 8px; }
+
+/* slides (always paper: projected output) */
+.sl-bg { fill: var(--slide-bg); }
+.sl-ink { fill: var(--slide-ink); }
+.sl-hollow { fill: none; stroke: var(--slide-ink); stroke-width: 3.2; }
+.sl-stroke { stroke: var(--slide-ink); }
+.sl-line { stroke: var(--slide-ink); stroke-width: 2; }
+.sl-muted { fill: var(--slide-muted); }
+.sl-rule { stroke: var(--slide-muted); stroke-width: 1.5; opacity: .5; }
+.sl-bar { fill: var(--slide-muted); opacity: .22; }
+.sl-glyph { font-family: var(--f-music); fill: var(--slide-ink); }
+.sl-serif { font-family: var(--f-serif); fill: var(--slide-ink); }
+.sl-sans { font-family: var(--f-ui); fill: var(--slide-muted); }
+
+/* control-name overlay for developers */
+.win.inspect [data-ctl] { outline: 1px dashed var(--accent); outline-offset: -1px; }
+.win.inspect [data-ctl]:not(.abs) { position: relative; }
+.win.inspect [data-ctl]::after { content: attr(data-ctl); position: absolute; top: 2px; right: 2px; z-index: 50; padding: 2px 5px; border-radius: 3px;
+  font: 600 10px/14px var(--f-mono); background: var(--accent); color: var(--on-accent); pointer-events: none; white-space: nowrap; }
+.win.inspect .titlebar[data-ctl]::after { right: auto; left: 50%; top: 32px; transform: translateX(-50%); }
+
+/* control map */
+.notes { display: grid; gap: 10px; }
+.notes h2 { margin: 8px 0 0; font: 600 20px/28px var(--f-display); }
+.notes > p { margin: 0; color: var(--text-2); max-width: 80ch; }
+.tablewrap { overflow-x: auto; border-radius: 8px; border: 1px solid var(--stroke-card); background: var(--layer); }
+.notes table { border-collapse: collapse; width: 100%; min-width: 760px; font-size: 13px; }
+.notes th, .notes td { text-align: left; vertical-align: top; padding: 9px 14px; border-top: 1px solid var(--stroke-divider); }
+.notes thead th { border-top: 0; font-size: 12px; font-weight: 600; color: var(--text-2); }
+.notes td:first-child { font-weight: 600; white-space: nowrap; }
+.notes code { font: 12px var(--f-mono); }
+
+@media (prefers-reduced-motion: reduce) { .tsw i { transition: none; } }
+</style>
+</head>
+<body>
+<div class="page">
+  <header class="intro">
+    <div class="intro-text">
+      <a class="backlink" href="index.html">← Original mockup, desktop and phone</a>
+      <span class="eyebrow">UI mockup · Fluent styling for the Uno Platform desktop app · sample data</span>
+      <h1>Lectern for desktop</h1>
+      <p>The same planner laid out as a native WinUI window: Mica title bar, navigation rail, a layered content area, command bar, flyouts and dialogs. Colors and type follow the Fluent theme resources, in light and dark.</p>
+      <div class="hints"><span>Right-click an item</span><span>Drag a song into the order</span><span><kbd>F5</kbd> present</span><span><kbd>Ctrl</kbd>+<kbd>E</kbd> search</span><span><kbd>Del</kbd> <kbd>Alt</kbd>+<kbd>↑↓</kbd> <kbd>Ctrl</kbd>+<kbd>Z</kbd> on the order</span></div>
+    </div>
+    <div class="opts">
+      <div class="opt"><span>Title bar</span><span class="segm" role="group" aria-label="Title bar style"><button type="button" data-action="chrome" data-v="win" aria-pressed="true">Windows</button><button type="button" data-action="chrome" data-v="mac" aria-pressed="false">macOS</button></span></div>
+      <div class="opt"><span>App theme</span><span class="segm" role="group" aria-label="App theme"><button type="button" data-action="apptheme" data-v="" aria-pressed="true">System</button><button type="button" data-action="apptheme" data-v="light" aria-pressed="false">Light</button><button type="button" data-action="apptheme" data-v="dark" aria-pressed="false">Dark</button></span></div>
+      <div class="opt"><span id="insp-l">Control names</span><button type="button" class="tsw" role="switch" aria-checked="false" aria-labelledby="insp-l" data-action="inspect"><i></i></button></div>
+    </div>
+  </header>
+  <p class="narrow-note">This is a desktop window mockup. Scroll sideways, or open it on a wider screen.</p>
+
+  <div class="stage">
+    <div class="win" id="win" data-chrome="win">
+      <div class="titlebar" data-ctl="TitleBar (ExtendsContentIntoTitleBar)">
+        <div class="tb-left">
+          <span class="traffic" aria-hidden="true"><i></i><i></i><i></i></span>
+          <button class="tb-back" disabled aria-label="Back" id="tb-back"></button>
+          <span class="tb-app" id="tb-app"></span>
+        </div>
+        <label class="tbox" data-ctl="AutoSuggestBox">
+          <input id="gq" type="search" autocomplete="off" spellcheck="false" placeholder="Search songs" aria-label="Search songs">
+          <span id="gq-ico"></span>
+        </label>
+        <div class="tb-right">
+          <span class="tb-sync" id="tb-sync"></span>
+          <span class="avatar" title="Bro. Daniel Price, song leader">DP</span>
+          <span class="caption" id="caption"></span>
+        </div>
+      </div>
+      <div class="body" id="body">
+        <nav class="nav" id="nav" data-ctl="NavigationView" aria-label="Main"></nav>
+        <div class="layer">
+          <section class="svcpane" aria-label="Services">
+            <div id="cal" data-ctl="CalendarView"></div>
+            <div class="cal-div"></div>
+            <div id="svclist" data-ctl="ListView (grouped)"></div>
+          </section>
+          <main class="orderpane">
+            <div id="ohead"></div>
+            <div id="olist" class="olist" tabindex="0" role="listbox" aria-label="Order of worship" data-ctl="ListView (CanReorderItems)"></div>
+          </main>
+          <aside class="songpane" aria-label="Songbook">
+            <div class="sp-h"><h2>Songbook</h2><span class="cap">612 songs · 588 with four-part slides</span><button class="icon-btn" id="popout" data-action="toast" data-msg="The songbook opens in its own window, handy on a second monitor" title="Open in new window" aria-label="Open in new window"></button></div>
+            <label class="tbox" data-ctl="AutoSuggestBox">
+              <input id="q" type="search" autocomplete="off" spellcheck="false" placeholder="Title, number, tune, scripture, topic" aria-label="Search the songbook">
+              <span id="q-ico"></span>
+            </label>
+            <div class="filters" id="filters" data-ctl="ToggleButton · ComboBox"></div>
+            <div class="rmeta" id="rmeta"></div>
+            <div class="results" id="results" role="listbox" aria-label="Songs" data-ctl="ListView"></div>
+            <div class="preview" id="preview"></div>
+          </aside>
+        </div>
+      </div>
+      <div id="overlay"></div>
+      <div id="presenter"></div>
+      <div id="toast-host" class="toast-host"></div>
+    </div>
+  </div>
+
+  <section class="notes" aria-label="Control map">
+    <h2>Control map for the Uno build</h2>
+    <p>Uno Platform turns on Fluent styles the same way WinUI does, through <code>XamlControlsResources</code> in <code>App.xaml</code>. Turn on Control names above to see these labels on the window.</p>
+    <div class="tablewrap"><table>
+      <thead><tr><th>Region</th><th>WinUI / Uno control</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Title bar</td><td><code>Window.ExtendsContentIntoTitleBar</code>, custom title bar grid</td><td>Set the drag region with <code>SetTitleBar</code>. Windows draws the caption buttons. On macOS keep the native traffic lights.</td></tr>
+        <tr><td>Global search</td><td><code>AutoSuggestBox</code> with <code>QueryIcon="Find"</code></td><td><kbd>Ctrl</kbd>+<kbd>E</kbd> focuses search. It feeds the Songbook pane.</td></tr>
+        <tr><td>Left rail</td><td><code>NavigationView</code>, <code>PaneDisplayMode="LeftCompact"</code></td><td>The hamburger button expands it. Settings sits in the footer.</td></tr>
+        <tr><td>Month</td><td><code>CalendarView</code></td><td>Mark service days in <code>CalendarViewDayItemChanging</code> (density colors). Today is filled; the open service is ringed.</td></tr>
+        <tr><td>Services</td><td><code>ListView</code> over a grouped <code>CollectionViewSource</code></td><td>Grouped by week. An <code>InfoBadge</code> counts songs not picked.</td></tr>
+        <tr><td>Page header</td><td><code>BreadcrumbBar</code>, <code>TitleTextBlockStyle</code>, <code>PersonPicture</code></td><td>Who is preaching, leading singing and presiding at the Supper.</td></tr>
+        <tr><td>Toolbar</td><td><code>CommandBar</code> with <code>AppBarButton</code>, <code>DefaultLabelPosition="Right"</code></td><td>Present is a <code>Button</code> with <code>AccentButtonStyle</code>. Add is a <code>DropDownButton</code> with a <code>MenuFlyout</code>. <kbd>F5</kbd> and <kbd>Ctrl</kbd>+<kbd>Z</kbd> are <code>KeyboardAccelerator</code>s.</td></tr>
+        <tr><td>Status</td><td><code>InfoBar</code>, Informational or Warning, with <code>ActionButton</code></td><td>Open song slots, or slides still owed by the preacher.</td></tr>
+        <tr><td>Order of worship</td><td><code>ListView</code> with <code>CanReorderItems</code>, <code>AllowDrop</code>, grouped headers</td><td><code>ContextFlyout</code> is a <code>MenuFlyout</code>. <kbd>Del</kbd> removes, <kbd>Alt</kbd>+<kbd>↑↓</kbd> moves, and a song dragged from the Songbook inserts or fills a slot.</td></tr>
+        <tr><td>Songbook filters</td><td><code>ToggleButton</code>, <code>ComboBox</code></td><td></td></tr>
+        <tr><td>Results</td><td><code>ListView</code>, item template with an <code>Image</code> thumbnail</td><td><kbd>↑↓</kbd> browses while search has focus; <kbd>Enter</kbd> adds.</td></tr>
+        <tr><td>Preview tabs</td><td><code>SelectorBar</code></td><td>Added in Windows App SDK 1.5. Check support in your Uno version; Uno Toolkit <code>TabBar</code> also works.</td></tr>
+        <tr><td>Slides</td><td><code>FlipView</code>, <code>PipsPager</code>, <code>GridView</code> thumbnails</td><td>One image asset per song, verse, key and notehead style.</td></tr>
+        <tr><td>Verses, pitch, noteheads</td><td><code>ToggleButton</code> row, <code>ComboBox</code>, <code>RadioButtons</code> or Community Toolkit <code>Segmented</code></td><td></td></tr>
+        <tr><td>Notifications</td><td><code>InfoBar</code> in an overlay layer, <code>Severity="Success"</code></td><td>Carries Undo.</td></tr>
+        <tr><td>Dialogs</td><td><code>ContentDialog</code>, <code>DefaultButton="Primary"</code></td><td>Send assignments.</td></tr>
+        <tr><td>Presenter</td><td>Second <code>AppWindow</code> on the projector display</td><td>The mockup shows the presenter console inside the main window.</td></tr>
+        <tr><td>Brushes</td><td><code>LayerFillColorDefaultBrush</code>, <code>CardBackgroundFillColorDefaultBrush</code>, <code>SubtleFillColorSecondaryBrush</code>, <code>ControlFillColorDefaultBrush</code>, <code>AccentFillColorDefaultBrush</code>, <code>SystemFillColorCautionBackgroundBrush</code></td><td>This page uses those resources' default light and dark values.</td></tr>
+        <tr><td>Type</td><td><code>CaptionTextBlockStyle</code>, <code>BodyTextBlockStyle</code>, <code>BodyStrongTextBlockStyle</code>, <code>SubtitleTextBlockStyle</code>, <code>TitleTextBlockStyle</code></td><td>Segoe UI Variable on Windows. Elsewhere Uno's default is Open Sans, which this page falls back to.</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+</div>
+<script>
+/* ============================================================ icons (Fluent-style line glyphs) */
+const I = {
+  blank: '',
+  menu: '<path d="M4 7h16M4 12h16M4 17h16"/>',
+  cal: '<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/>',
+  music: '<path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/>',
+  slides: '<rect x="3" y="5" width="18" height="12" rx="2"/><path d="M7 9.5h10M7 13h6M9 21h6"/>',
+  people: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20.5a6.5 6.5 0 0 1 13 0"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.2a6.5 6.5 0 0 1 3.5 6.3"/>',
+  chart: '<path d="M4 20V11M10 20V5M16 20v-6M21 20H3"/>',
+  gear: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
+  add: '<path d="M12 5v14M5 12h14"/>',
+  x: '<path d="M6 6l12 12M18 6 6 18"/>',
+  check: '<path d="m5 12.5 4.5 4.5L19 7"/>',
+  warn: '<path d="M12 4 2.8 20h18.4z"/><path d="M12 10v4.5M12 17.2v.3"/>',
+  play: '<path d="M7 4.5 19 12 7 19.5z"/>',
+  share: '<path d="M12 3v12M7.5 7.5 12 3l4.5 4.5"/><path d="M5 13v6.5A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5V13"/>',
+  send: '<path d="M21 3 10 14"/><path d="M21 3 14.5 21 10 14 3 9.5z"/>',
+  undo: '<path d="M9 14 4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/>',
+  chevD: '<path d="m6 9 6 6 6-6"/>', down: '<path d="m6 9 6 6 6-6"/>', up: '<path d="m6 15 6-6 6 6"/>',
+  chevR: '<path d="m9 6 6 6-6 6"/>', chevL: '<path d="m15 6-6 6 6 6"/>',
+  more: '<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>',
+  search: '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
+  back: '<path d="M20 12H4M10 6l-6 6 6 6"/>',
+  popout: '<path d="M14 4h6v6M20 4l-8 8"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>',
+  cloud: '<path d="M7 18h10a4 4 0 0 0 .6-7.96A6 6 0 0 0 6.1 9.2 4.4 4.4 0 0 0 7 18z"/><path d="m9.5 13.5 2 2 3.5-4"/>',
+  min: '<path d="M2 12h20"/>', max: '<rect x="2" y="2" width="20" height="20" rx="2"/>', close: '<path d="M2 2l20 20M22 2 2 22"/>',
+  chat: '<path d="M4 5h16v11H9l-5 4z"/>',
+  heart: '<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>',
+  bookOpen: '<path d="M2 5h6a4 4 0 0 1 4 4v11a3 3 0 0 0-3-3H2z"/><path d="M22 5h-6a4 4 0 0 0-4 4v11a3 3 0 0 1 3-3h7z"/>',
+  lectern: '<path d="M4 6h16l-2.5 4.5h-11z"/><path d="M12 10.5V20M8 20h8"/>',
+  cup: '<path d="M7 3h10l-1 7a4 4 0 0 1-8 0z"/><path d="M12 14v6M8.5 20h7"/>',
+  basket: '<path d="M3 10h18l-2 9.5H5z"/><path d="M8 10l4-6 4 6"/>',
+  trash: '<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>',
+  copy: '<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/>',
+  swap: '<path d="M7 4 3 8l4 4M3 8h14M17 20l4-4-4-4M21 16H7"/>',
+};
+const icon = (n, cls = '') => `<svg class="i ${cls}" viewBox="0 0 24 24" aria-hidden="true">${I[n]}</svg>`;
+const GRIP = '<svg viewBox="0 0 10 14" aria-hidden="true"><circle cx="2.5" cy="3" r="1.2"/><circle cx="7.5" cy="3" r="1.2"/><circle cx="2.5" cy="7" r="1.2"/><circle cx="7.5" cy="7" r="1.2"/><circle cx="2.5" cy="11" r="1.2"/><circle cx="7.5" cy="11" r="1.2"/></svg>';
+
+/* ============================================================ data */
+// Sample songbook. Public-domain texts are shown; licensed songs show metadata only.
+// sug: series keys this song pairs with (BOR = "Built on the Rock", GM = gospel meeting).
+const SONGS = [
+  { id:'h138', no:138, title:'Holy, Holy, Holy! Lord God Almighty', tune:'NICAEA', meter:'11.12.12.10', key:'D', keys:['E♭','D','C'], time:'4/4', v:4,
+    lines:['Ho-ly, ho-ly, ho-ly! Lord God Al-might-y!','Ho-ly, ho-ly, ho-ly! All the saints a-dore thee','Ho-ly, ho-ly, ho-ly! Though the dark-ness hide thee','Ho-ly, ho-ly, ho-ly! Lord God Al-might-y!'],
+    text:'Reginald Heber, 1826', music:'John B. Dykes, 1861', license:'pd', topics:['Praise','Holiness'], scripture:['Rev 4:8–11','Isa 6:3'], last:'2026-05-31', uses:6, sug:{} },
+  { id:'h201', no:201, title:'Amazing Grace', tune:'NEW BRITAIN', meter:'C.M. (8.6.8.6)', key:'G', keys:['A♭','G','F'], time:'3/4', v:5,
+    lines:['A-maz-ing grace! how sweet the sound','’Twas grace that taught my heart to fear','Through man-y dan-gers, toils and snares','The Lord has prom-ised good to me','When we’ve been there ten thou-sand years'],
+    text:'John Newton, 1779; v. 5 anonymous', music:'Virginia Harmony, 1831', license:'pd', topics:['Grace','Salvation'], scripture:['Eph 2:8–9','1 Chr 17:16–17'], last:'2026-08-23', uses:9, sug:{} },
+  { id:'h221', no:221, title:'It Is Well with My Soul', tune:'VILLE DU HAVRE', meter:'11.8.11.9 with refrain', key:'C', keys:['D♭','C'], time:'4/4', v:4,
+    lines:['When peace like a riv-er at-tend-eth my way','Though Sa-tan should buf-fet, though tri-als should come','My sin, oh, the bliss of this glo-ri-ous thought','And, Lord, haste the day when my faith shall be sight'],
+    text:'Horatio G. Spafford, 1873', music:'Philip P. Bliss, 1876', license:'pd', topics:['Peace','Assurance'], scripture:['Phil 4:7','Isa 26:3'], last:'2026-07-26', uses:7, sug:{} },
+  { id:'h402', no:402, title:'Blessed Assurance', tune:'ASSURANCE', meter:'9.10.9.9 with refrain', key:'D', keys:['D','C'], time:'9/8', v:3,
+    lines:['Bless-ed as-sur-ance, Je-sus is mine!'],
+    text:'Fanny J. Crosby, 1873', music:'Phoebe P. Knapp, 1873', license:'pd', topics:['Assurance','Praise'], scripture:['Heb 10:22','1 John 5:13'], last:'2026-09-13', uses:8, sug:{} },
+  { id:'h545', no:545, title:'The Church’s One Foundation', tune:'AURELIA', meter:'7.6.7.6 D', key:'E♭', keys:['E♭','D','C'], time:'4/4', v:5,
+    lines:['The Church’s one foun-da-tion','E-lect from ev-ery na-tion','Though with a scorn-ful won-der','Mid toil and trib-u-la-tion','Yet she on earth hath un-ion'],
+    text:'Samuel J. Stone, 1866', music:'Samuel S. Wesley, 1864', license:'pd', topics:['Church','Christ'], scripture:['1 Cor 3:11','Eph 2:19–22','Ps 118:22'], last:'2026-06-14', uses:3,
+    sug:{ BOR:'Matthew 21:42 · the cornerstone' } },
+  { id:'h463', no:463, title:'How Firm a Foundation', tune:'FOUNDATION', meter:'11.11.11.11', key:'A♭', keys:['A♭','G','F'], time:'3/4', v:5,
+    lines:['How firm a foun-da-tion, ye saints of the Lord'],
+    text:'“K” in Rippon’s Selection, 1787', music:'Funk’s Compilation of Genuine Church Music, 1832', license:'pd', topics:['Assurance','Trust','Scripture'], scripture:['Isa 43:2','Heb 13:5','2 Pet 1:4'], last:'2026-02-22', uses:2,
+    sug:{ BOR:'Series theme · a firm foundation' } },
+  { id:'h368', no:368, title:'My Hope Is Built on Nothing Less', tune:'SOLID ROCK', meter:'8.8.8.8 with refrain', key:'G', keys:['A♭','G'], time:'4/4', v:4,
+    lines:['My hope is built on noth-ing less'],
+    text:'Edward Mote, 1834', music:'William B. Bradbury, 1863', license:'pd', topics:['Assurance','Christ','Faith'], scripture:['Matt 7:24–27','1 Cor 3:11','Heb 6:19'], last:'2026-08-16', uses:5,
+    sug:{ BOR:'Matthew 7:24 · the solid rock' } },
+  { id:'h361', no:361, title:'Rock of Ages, Cleft for Me', tune:'TOPLADY', meter:'7.7.7.7.7.7', key:'B♭', keys:['B♭','A'], time:'4/4', v:4,
+    lines:['Rock of A-ges, cleft for me'],
+    text:'Augustus M. Toplady, 1776', music:'Thomas Hastings, 1830', license:'pd', topics:['Grace','Cross'], scripture:['Ex 33:22','1 Cor 10:4','John 19:34'], last:'2026-03-22', uses:2,
+    sug:{ BOR:'1 Corinthians 10:4 · that Rock was Christ' } },
+  { id:'h382', no:382, title:'When I Survey the Wondrous Cross', tune:'HAMBURG', meter:'L.M. (8.8.8.8)', key:'F', keys:['F','E♭'], time:'2/2', v:4,
+    lines:['When I sur-vey the won-drous cross'],
+    text:'Isaac Watts, 1707', music:'Lowell Mason, 1824', license:'pd', topics:['Lord’s Supper','Cross'], scripture:['Gal 6:14','Phil 3:7–8'], last:'2026-09-20', uses:11, sug:{} },
+  { id:'h389', no:389, title:'’Tis Midnight, and on Olive’s Brow', tune:'OLIVE’S BROW', meter:'L.M. (8.8.8.8)', key:'A♭', keys:['A♭','G'], time:'4/4', v:4,
+    lines:['’Tis mid-night, and on Ol-ive’s brow'],
+    text:'William B. Tappan, 1822', music:'William B. Bradbury, 1853', license:'pd', topics:['Lord’s Supper','Cross'], scripture:['Luke 22:39–44','Matt 26:36–46'], last:'2026-08-02', uses:5, sug:{} },
+  { id:'h391', no:391, title:'The Old Rugged Cross', tune:'OLD RUGGED CROSS', meter:'Irregular with refrain', key:'B♭', keys:['B♭','A'], time:'6/8', v:4,
+    lines:['On a hill far a-way stood an old rug-ged cross'],
+    text:'George Bennard, 1913', music:'George Bennard, 1913', license:'pd', topics:['Lord’s Supper','Cross'], scripture:['Gal 6:14','Col 1:20'], last:'2026-09-27', uses:9, sug:{} },
+  { id:'h384', no:384, title:'Jesus, Keep Me Near the Cross', tune:'NEAR THE CROSS', meter:'7.6.7.6 with refrain', key:'F', keys:['G','F'], time:'4/4', v:4,
+    lines:['Je-sus, keep me near the cross'],
+    text:'Fanny J. Crosby, 1869', music:'William H. Doane, 1869', license:'pd', topics:['Lord’s Supper','Cross'], scripture:['Gal 6:14','1 Cor 1:18'], last:'2026-07-05', uses:6, sug:{} },
+  { id:'h386', no:386, title:'Alas! and Did My Savior Bleed', tune:'MARTYRDOM', meter:'C.M. (8.6.8.6)', key:'F', keys:['F','E♭'], time:'3/4', v:4,
+    lines:['A-las! and did my Sav-ior bleed'],
+    text:'Isaac Watts, 1707', music:'Hugh Wilson, c. 1800', license:'pd', topics:['Lord’s Supper','Cross'], scripture:['Isa 53:5','Rom 5:8'], last:'2026-04-19', uses:4, sug:{} },
+  { id:'h934', no:934, title:'Softly and Tenderly', tune:'THOMPSON', meter:'11.7.11.7 with refrain', key:'A♭', keys:['A♭','G'], time:'4/4', v:4,
+    lines:['Soft-ly and ten-der-ly Je-sus is call-ing'],
+    text:'Will L. Thompson, 1880', music:'Will L. Thompson, 1880', license:'pd', topics:['Invitation'], scripture:['Matt 11:28–30','Rev 22:17'], last:'2026-06-28', uses:6,
+    sug:{ GM:'Matthew 11:28 · lesson text' } },
+  { id:'h929', no:929, title:'Just As I Am', tune:'WOODWORTH', meter:'8.8.8.6', key:'E♭', keys:['E♭','D'], time:'4/4', v:6,
+    lines:['Just as I am, with-out one plea'],
+    text:'Charlotte Elliott, 1835', music:'William B. Bradbury, 1849', license:'pd', topics:['Invitation','Surrender'], scripture:['John 6:37','Rev 22:17'], last:'2026-09-06', uses:10,
+    sug:{ GM:'Invitation · John 6:37' } },
+  { id:'h935', no:935, title:'Have Thine Own Way, Lord', tune:'ADELAIDE', meter:'5.4.5.4 D', key:'E♭', keys:['E♭','D'], time:'3/4', v:4,
+    lines:['Have thine own way, Lord! Have thine own way!'],
+    text:'Adelaide A. Pollard, 1907', music:'George C. Stebbins, 1907', license:'pd', topics:['Invitation','Surrender'], scripture:['Jer 18:6','Rom 12:1'], last:'2026-05-17', uses:4, sug:{} },
+  { id:'h938', no:938, title:'Where He Leads Me', tune:'NORRIS', meter:'8.8.8.9 with refrain', key:'F', keys:['F','E♭'], time:'4/4', v:4,
+    lines:['I can hear my Sav-ior call-ing'],
+    text:'E. W. Blandy, 1890', music:'John S. Norris, 1890', license:'pd', topics:['Invitation','Discipleship'], scripture:['Luke 9:23','Matt 16:24'], last:'2026-03-08', uses:3, sug:{} },
+  { id:'h937', no:937, title:'There Is Power in the Blood', tune:'POWER IN THE BLOOD', meter:'Irregular with refrain', key:'B♭', keys:['B♭','A'], time:'4/4', v:4,
+    lines:['Would you be free from the bur-den of sin?'],
+    text:'Lewis E. Jones, 1899', music:'Lewis E. Jones, 1899', license:'pd', topics:['Invitation','Salvation'], scripture:['1 John 1:7','Rev 1:5'], last:'2025-12-07', uses:2,
+    sug:{ GM:'Invitation · 1 John 1:7' } },
+  { id:'h95', no:95, title:'Praise God, from Whom All Blessings Flow', tune:'OLD HUNDREDTH', meter:'L.M. (8.8.8.8)', key:'G', keys:['A','G'], time:'4/4', v:1,
+    lines:['Praise God, from whom all bless-ings flow'],
+    text:'Thomas Ken, 1695', music:'Louis Bourgeois, 1551', license:'pd', topics:['Praise','Closing'], scripture:['Ps 150:6','Ps 100'], last:'2026-09-27', uses:31, sug:{} },
+  { id:'h860', no:860, title:'When We All Get to Heaven', tune:'HEAVEN', meter:'8.7.8.7 with refrain', key:'A♭', keys:['A♭','G'], time:'4/4', v:4,
+    lines:['Sing the won-drous love of Je-sus'],
+    text:'Eliza E. Hewitt, 1898', music:'Emily D. Wilson, 1898', license:'pd', topics:['Heaven','Closing'], scripture:['John 14:2–3','Rev 21:4'], last:'2026-09-27', uses:12, sug:{} },
+  { id:'h127', no:127, title:'Guide Me, O Thou Great Jehovah', tune:'CWM RHONDDA', meter:'8.7.8.7.8.7.7', key:'A♭', keys:['A♭','G'], time:'4/4', v:3,
+    lines:['Guide me, O thou great Je-ho-vah','O-pen now the crys-tal foun-tain','When I tread the verge of Jor-dan'],
+    text:'William Williams, 1745; tr. Peter Williams, 1771', music:'John Hughes, 1907', license:'pd', topics:['Guidance','Heaven'], scripture:['Ex 13:21','Ex 16:4','Josh 3:17'], last:'2026-07-12', uses:3, sug:{} },
+  { id:'h356', no:356, title:'Come, Thou Fount of Every Blessing', tune:'NETTLETON', meter:'8.7.8.7 D', key:'D', keys:['E♭','D'], time:'3/4', v:3,
+    lines:['Come, thou Fount of ev-ery bless-ing'],
+    text:'Robert Robinson, 1758', music:'Wyeth’s Repository of Sacred Music, 1813', license:'pd', topics:['Grace','Praise'], scripture:['1 Sam 7:12'], last:'2026-08-30', uses:4, sug:{} },
+  { id:'h705', no:705, title:'Love Lifted Me', tune:'SAFETY', meter:'Irregular with refrain', key:'B♭', keys:['B♭','A'], time:'4/4', v:3,
+    lines:['I was sink-ing deep in sin'],
+    text:'James Rowe, 1912', music:'Howard E. Smith, 1912', license:'pd', topics:['Salvation','Grace'], scripture:['Ps 40:2','Matt 14:31'], last:'2026-02-15', uses:3, sug:{} },
+  { id:'h470', no:470, title:'Nearer, My God, to Thee', tune:'BETHANY', meter:'6.4.6.4.6.6.6.4', key:'G', keys:['A♭','G'], time:'4/4', v:4,
+    lines:['Near-er, my God, to thee'],
+    text:'Sarah F. Adams, 1841', music:'Lowell Mason, 1856', license:'pd', topics:['Devotion'], scripture:['Gen 28:10–22','Jas 4:8'], last:'2025-11-16', uses:2, sug:{} },
+  { id:'h89', no:89, title:'Joyful, Joyful, We Adore Thee', tune:'HYMN TO JOY', meter:'8.7.8.7 D', key:'G', keys:['G','F'], time:'4/4', v:4,
+    lines:['Joy-ful, joy-ful, we a-dore thee'],
+    text:'Henry van Dyke, 1907', music:'Ludwig van Beethoven, 1824; arr. Edward Hodges, 1864', license:'pd', topics:['Praise','Joy'], scripture:['Phil 4:4','Ps 98'], last:'2026-04-12', uses:3, sug:{} },
+  { id:'h110', no:110, title:'A Mighty Fortress Is Our God', tune:'EIN FESTE BURG', meter:'8.7.8.7.6.6.6.6.7', key:'C', keys:['D','C'], time:'4/4', v:4,
+    lines:['A might-y for-tress is our God'],
+    text:'Martin Luther, 1529; tr. Frederick H. Hedge, 1853', music:'Martin Luther, 1529', license:'pd', topics:['Trust','Praise'], scripture:['Ps 46'], last:'2025-10-26', uses:1,
+    sug:{ BOR:'Psalm 46 · God our refuge' } },
+  { id:'h140', no:140, title:'Great Is Thy Faithfulness', tune:'FAITHFULNESS', meter:'11.10.11.10 with refrain', key:'D', keys:['E♭','D'], time:'3/4', v:3,
+    lines:[], text:'Thomas O. Chisholm, 1923', music:'William M. Runyan, 1923', license:'ccli', copyright:'© 1923, ren. 1951 Hope Publishing Co.',
+    topics:['Faithfulness','Praise'], scripture:['Lam 3:22–23'], last:'2026-09-13', uses:5, sug:{} },
+  { id:'h612', no:612, title:'In Christ Alone', tune:'IN CHRIST ALONE', meter:'Irregular', key:'D', keys:['D'], time:'3/4', v:4,
+    lines:[], text:'Keith Getty and Stuart Townend, 2001', music:'Keith Getty and Stuart Townend, 2001', license:'ccli', copyright:'© 2001 Thankyou Music',
+    topics:['Christ','Cross','Assurance'], scripture:['1 Cor 2:2','Rom 8:38–39'], last:'2026-09-20', uses:6, sug:{} },
+];
+SONGS.forEach(h => h.slides = h.license === 'pd' ? 'full' : 'lyrics');
+const H = Object.fromEntries(SONGS.map(h => [h.id, h]));
+
+// Worship follows the New Testament pattern: singing, prayer, the Lord's Supper every
+// Lord's Day, the contribution (kept separate from the Supper), preaching, and the invitation.
+const SECTIONS = [['opening','Opening'],['supper','The Lord’s Supper'],['giving','Contribution'],['word','The Lesson'],['closing','Invitation & Closing'],['class','Class']];
+const TYPE_LABEL = { spoken:'Spoken', hymn:'Song', prayer:'Prayer', scripture:'Scripture', sermon:'Lesson', supper:'Supper', giving:'Giving', class:'Class' };
+
+let uidN = 100; const uid = () => 'i' + (++uidN);
+const it = (section, type, o) => ({ id: uid(), section, type, ...o });
+const slot = (section, role, hymnId = null, verses = []) => it(section, 'hymn', { role, hymnId, verses });
+
+function lordsDayAM(o) {
+  return [
+    it('opening','spoken',{ title:'Welcome', sub:'Bro. Mark Ellis', dur:2, slides:1 }),
+    slot('opening','Opening song', o.open, o.open ? [1,2,3] : []),
+    it('opening','prayer',{ title:'Opening Prayer', sub:'Not assigned', dur:2, slides:0 }),
+    slot('opening','Second song'),
+    slot('supper','Before the Supper'),
+    it('supper','supper',{ title:'Communion Thoughts', sub:'1 Corinthians 11:23–26 · Not assigned', dur:3, slides:1 }),
+    it('supper','supper',{ title:'Prayer for the Bread', sub:'Served by the men', dur:3, slides:1 }),
+    it('supper','supper',{ title:'Prayer for the Cup', sub:'Served by the men', dur:3, slides:1 }),
+    it('giving','giving',{ title:'Contribution', sub:'Prayer, then collection', dur:3, slides:1 }),
+    slot('word','Before the lesson'),
+    it('word','scripture',{ title:'Scripture Reading', sub:o.text, dur:2, slides:2 }),
+    it('word','sermon',{ title:'Lesson', sub:`“${o.lesson}” · ${o.preacher}`, dur:30, slides:'needs' }),
+    slot('closing','Invitation song', o.inv, o.inv ? [1,2,3,4] : []),
+    it('closing','spoken',{ title:'Announcements', sub:'Bro. Mark Ellis', dur:3, slides:4 }),
+    it('closing','prayer',{ title:'Closing Prayer', sub:'Not assigned', dur:1, slides:0 }),
+  ];
+}
+
+const SERVICES = [
+  { id:'s1', date:'2026-10-04', start:600, name:'Sunday Morning Worship', short:'Sun AM', where:'Auditorium', series:'Built on the Rock', part:'3 of 6', sugKey:'BOR',
+    lesson:'The Stone the Builders Rejected', text:'Matthew 21:33–46', saved:'2 min ago',
+    people:[['Preaching','Bro. Greg Holt'],['Song leader','Bro. Daniel Price'],['Lord’s Supper','Bro. Kevin Walsh']],
+    items:[
+      it('opening','spoken',{ title:'Welcome', sub:'Bro. Mark Ellis', dur:2, slides:1 }),
+      slot('opening','Opening song','h138',[1,2,4]),
+      it('opening','prayer',{ title:'Opening Prayer', sub:'Bro. James Carter', dur:2, slides:0 }),
+      slot('opening','Second song','h463',[1,2,3]),
+      slot('supper','Before the Supper','h382',[1,2,3,4]),
+      it('supper','supper',{ title:'Communion Thoughts', sub:'1 Corinthians 11:23–26 · Bro. Kevin Walsh', dur:3, slides:1 }),
+      it('supper','supper',{ title:'Prayer for the Bread', sub:'Bro. Kevin Walsh · served by 8 men', dur:3, slides:1 }),
+      it('supper','supper',{ title:'Prayer for the Cup', sub:'Bro. Kevin Walsh', dur:3, slides:1 }),
+      it('giving','giving',{ title:'Contribution', sub:'Prayer: Bro. Tom Hale · separate from the Supper', dur:3, slides:1 }),
+      slot('word','Before the lesson','h545',[1,2,4]),
+      it('word','scripture',{ title:'Scripture Reading', sub:'Matthew 21:33–46 · Bro. Luke Adams', dur:3, slides:3 }),
+      it('word','sermon',{ title:'Lesson', sub:'“The Stone the Builders Rejected” · Bro. Greg Holt', dur:30, slides:'needs' }),
+      { ...slot('closing','Invitation song','h934',[1,2,3,4]), dur:5 },
+      it('closing','spoken',{ title:'Announcements', sub:'Bro. Mark Ellis', dur:3, slides:4 }),
+      { ...slot('closing','Closing song','h95',[1]), dur:1 },
+      it('closing','prayer',{ title:'Closing Prayer', sub:'Bro. Sam Reed', dur:1, slides:0 }),
+    ] },
+  { id:'s2', date:'2026-10-04', start:1080, name:'Sunday Evening Worship', short:'Sun PM', where:'Auditorium', series:'Built on the Rock', part:'3b', sugKey:'BOR',
+    lesson:'Living Stones', text:'1 Peter 2:4–10', saved:'Sep 28',
+    people:[['Preaching','Bro. Greg Holt'],['Song leader','Bro. Nathan Price']],
+    items:[
+      slot('opening','Opening song'),
+      it('opening','prayer',{ title:'Opening Prayer', sub:'Not assigned', dur:2, slides:0 }),
+      slot('opening','Second song'),
+      it('supper','supper',{ title:'Lord’s Supper', sub:'For those who could not attend this morning', dur:5, slides:1 }),
+      slot('word','Before the lesson'),
+      it('word','scripture',{ title:'Scripture Reading', sub:'1 Peter 2:4–10', dur:2, slides:2 }),
+      it('word','sermon',{ title:'Lesson', sub:'“Living Stones” · Bro. Greg Holt', dur:25, slides:'needs' }),
+      slot('closing','Invitation song'),
+      it('closing','prayer',{ title:'Closing Prayer', sub:'Not assigned', dur:1, slides:0 }),
+    ] },
+  { id:'s3', date:'2026-10-07', start:1140, name:'Wednesday Bible Study', short:'Wed', where:'Fellowship room', series:'Acts: The Church Begins', part:'week 5', sugKey:'ACTS',
+    lesson:'They Continued Steadfastly', text:'Acts 2:37–47', saved:'Sep 30',
+    people:[['Teaching','Bro. Luke Adams'],['Song leader','Bro. Daniel Price']],
+    items:[
+      slot('opening','Opening song','h201',[1,2,3,4]),
+      it('opening','prayer',{ title:'Opening Prayer', sub:'Not assigned', dur:2, slides:0 }),
+      it('class','class',{ title:'Adult Bible Class', sub:'Acts 2:37–47 · Bro. Luke Adams', dur:45, slides:8 }),
+      slot('closing','Closing song'),
+      it('closing','prayer',{ title:'Closing Prayer', sub:'Not assigned', dur:1, slides:0 }),
+    ] },
+  { id:'s4', date:'2026-10-11', start:600, name:'Sunday Morning Worship', short:'Sun AM', where:'Auditorium', series:'Built on the Rock', part:'4 of 6', sugKey:'BOR',
+    lesson:'The Wise and Foolish Builders', text:'Matthew 7:24–27', saved:'Sep 21',
+    people:[['Preaching','Bro. Greg Holt'],['Song leader','Bro. Daniel Price'],['Lord’s Supper','Not assigned']],
+    o:{ open:'h368', text:'Matthew 7:24–27', lesson:'The Wise and Foolish Builders', preacher:'Bro. Greg Holt' } },
+  { id:'s5', date:'2026-10-18', start:600, name:'Fall Gospel Meeting', short:'Meeting', where:'Auditorium', series:'Gospel Meeting', part:'day 1 of 4', sugKey:'GM',
+    lesson:'Come Unto Me', text:'Matthew 11:28–30', saved:'Sep 14',
+    people:[['Guest preacher','Bro. Allen Brooks'],['Song leader','Bro. Daniel Price']],
+    o:{ inv:'h934', text:'Matthew 11:28–30', lesson:'Come Unto Me', preacher:'Bro. Allen Brooks' } },
+];
+SERVICES.forEach(s => { if (!s.items) s.items = lordsDayAM(s.o); });
+
+/* ============================================================ state */
+const state = {
+  device: 'desktop',
+  serviceId: 's1',
+  sel: null,
+  q: 'foundation',
+  f: { pd:false, full:false, fresh:false, meter:'', key:'', topic:'' },
+  sort: 'best',
+  cursor: -1,
+  notes: 'shape',
+  preview: { hymnId:'h545', itemId:null, verses:[1,2,4], key:'E♭', slide:1, tab:'slides' },
+  present: null,
+  undo: null,
+  phones: [ { screen:'service' }, { screen:'library', q:'' }, { screen:'detail', hymnId:'h934', prev:'service' } ],
+};
+const svc = () => SERVICES.find(s => s.id === state.serviceId);
+{ const first = svc().items.find(i => i.hymnId === 'h545'); state.sel = first.id; state.preview.itemId = first.id; }
+
+/* ============================================================ helpers */
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]));
+const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const MONTH = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DOW = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const D = s => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); };
+const shortDate = (s, refYear = 2026) => { const d = D(s); return d.getFullYear() === refYear ? `${MON[d.getMonth()]} ${d.getDate()}` : `${MON[d.getMonth()]} ${d.getFullYear()}`; };
+const longDate = s => { const d = D(s); return `${DOW[d.getDay()]}, ${MONTH[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`; };
+const clock = (m, base = svc().start) => { const t = base + m; const h = Math.floor(t / 60), mm = t % 60; return `${h > 12 ? h - 12 : h}:${String(mm).padStart(2, '0')}`; };
+const startLabel = s => `${clock(0, s.start)} ${s.start >= 720 ? 'PM' : 'AM'}`;
+const weeksBetween = (a, b) => Math.round((D(b) - D(a)) / (7 * 864e5));
+const plainLine = l => l.replace(/-/g, '');
+const versesText = vs => {
+  if (!vs.length) return '';
+  if (vs.length === 1) return `v. ${vs[0]}`;
+  const run = vs.every((v, i) => i === 0 || v === vs[i - 1] + 1);
+  return run && vs.length > 2 ? `vv. ${vs[0]}–${vs[vs.length - 1]}` : `vv. ${vs.join(', ')}`;
+};
+const licLabel = h => h.license === 'pd' ? 'Public domain' : 'CCLI';
+const licShort = h => h.license === 'pd' ? 'PD' : 'CCLI';
+const hymnDur = i => i.dur ?? Math.max(2, Math.round(i.verses.length * 1.2 + 0.5));
+const itemDur = i => i.type === 'hymn' ? (i.hymnId ? hymnDur(i) : 4) : i.dur;
+const itemSlides = i => i.type === 'hymn' ? (i.hymnId ? 1 + i.verses.length : 0) : i.slides;
+const itemLabel = i => i.type === 'hymn' ? (i.hymnId ? H[i.hymnId].title : i.role) : i.title;
+function timeline(s) { let m = 0; return s.items.map(i => { const r = { item:i, start:m }; m += itemDur(i); return r; }); }
+function totals(s) {
+  let min = 0, slides = 0, needs = 0, lic = 0, empty = 0, songs = 0;
+  s.items.forEach(i => { min += itemDur(i); const sl = itemSlides(i); if (typeof sl === 'number') slides += sl; else needs++;
+    if (i.type === 'hymn') { if (i.hymnId) songs++; else empty++; }
+    if (i.hymnId && H[i.hymnId].license !== 'pd') lic++; });
+  return { min, slides, needs, lic, empty, songs, count: s.items.length };
+}
+const fmtMin = m => m >= 60 ? `${Math.floor(m / 60)} h ${m % 60} m` : `${m} min`;
+
+function rng(seed) {
+  let h = 1779033703 ^ seed.length;
+  for (let i = 0; i < seed.length; i++) { h = Math.imul(h ^ seed.charCodeAt(i), 3432918353); h = h << 13 | h >>> 19; }
+  let a = h >>> 0;
+  return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+}
+function usageDates(h) {
+  const r = rng(h.id + 'u'); const out = []; let d = D(h.last);
+  for (let i = 0; i < Math.min(h.uses, 5); i++) {
+    out.push(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`);
+    d = new Date(d.getTime() - (7 * (5 + Math.floor(r() * 12))) * 864e5);
+  }
+  return out;
+}
+
+/* ============================================================ slide engraving (mock) */
+const KEYSIG = { 'C':0, 'G':1, 'D':2, 'A':3, 'E':4, 'F':-1, 'B♭':-2, 'E♭':-3, 'A♭':-4, 'D♭':-5 };
+const TONIC = { 'C':0, 'D♭':1, 'D':1, 'E♭':2, 'E':2, 'F':3, 'G':4, 'A♭':5, 'A':5, 'B♭':6 };   // letter index, C = 0
+const SHARP_STEPS = [8, 5, 9, 6, 3], FLAT_STEPS = [4, 7, 3, 6, 2];
+function voices(h) {
+  if (h._v) return h._v;
+  const r = rng(h.id); const S = [], A = [], T = [], B = [];
+  let s = 3 + Math.floor(r() * 3);
+  for (let i = 0; i < 16; i++) {
+    if (i > 0) s = Math.max(1, Math.min(8, s + [-2, -1, -1, 0, 1, 1, 2, -1, 1][Math.floor(r() * 9)]));
+    S.push(s); A.push(Math.max(-1, s - 2 - Math.floor(r() * 3)));
+    const b = Math.max(0, Math.min(5, 2 + Math.round(r() * 4 - 2))); B.push(b); T.push(Math.min(9, b + 2 + Math.floor(r() * 3)));
+  }
+  return h._v = { S, A, T, B };
+}
+function sylls(line) {
+  const out = [];
+  line.split(' ').forEach(w => { const parts = w.split('-'); parts.forEach((p, i) => out.push({ t:p, hy: i < parts.length - 1 })); });
+  return out;
+}
+function splitTitle(t) {
+  if (t.length <= 26) return [t];
+  const m = t.match(/^(.+?[!,])\s+(.+)$/); if (m && m[1].length > 8) return [m[1], m[2]];
+  const words = t.split(' '); let a = ''; while (words.length && (a + ' ' + words[0]).trim().length <= t.length / 2 + 3) a = (a + ' ' + words.shift()).trim();
+  return [a, words.join(' ')];
+}
+// 7-shape (Aikin) noteheads: do ▲, re bowl, mi ◆, fa right triangle, sol oval, la ■, ti cone.
+function notehead(x, y, deg, hollow) {
+  const c = hollow ? 'sl-hollow' : 'sl-ink';
+  if (state.notes === 'round' || deg === 4) return `<ellipse class="${c}" cx="${x}" cy="${y}" rx="13" ry="9.5" transform="rotate(-20 ${x} ${y})"/>`;
+  const P = pts => `<polygon class="${c}" points="${pts.map(p => p.join(',')).join(' ')}"/>`;
+  switch (deg) {
+    case 0: return P([[x - 13, y + 9.5], [x + 13, y + 9.5], [x, y - 9.5]]);
+    case 1: return `<path class="${c}" d="M${x - 13} ${y - 7} L${x + 13} ${y - 7} A13 15 0 0 1 ${x - 13} ${y - 7} Z"/>`;
+    case 2: return P([[x, y - 10.5], [x + 13, y], [x, y + 10.5], [x - 13, y]]);
+    case 3: return P([[x - 13, y - 9.5], [x + 13, y + 9.5], [x - 13, y + 9.5]]);
+    case 5: return `<rect class="${c}" x="${x - 12}" y="${y - 8}" width="24" height="16"/>`;
+    default: return `<path class="${c}" d="M${x - 12} ${y - 3} A12 7 0 0 1 ${x + 12} ${y - 3} L${x} ${y + 10.5} Z"/>`;
+  }
+}
+function slideSVG(h, idx, verses, key, total) {
+  const W = 1600, Hh = 900;
+  let o = `<svg viewBox="0 0 ${W} ${Hh}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect class="sl-bg" width="${W}" height="${Hh}"/>`;
+  const foot = h.license === 'pd' ? 'Public domain' : `${h.copyright} · Used under CCLI license`;
+  if (idx === 0) {
+    const tl = splitTitle(h.title); const fs = tl.length > 1 ? 88 : 96;
+    o += `<text class="sl-sans" x="800" y="${tl.length > 1 ? 250 : 300}" text-anchor="middle" font-size="30" letter-spacing="6" font-weight="700">SONG ${h.no}</text>`;
+    tl.forEach((l, i) => o += `<text class="sl-serif" x="800" y="${(tl.length > 1 ? 360 : 410) + i * 100}" text-anchor="middle" font-size="${fs}" font-weight="700">${esc(l)}</text>`);
+    const y0 = tl.length > 1 ? 560 : 510;
+    o += `<text class="sl-sans" x="800" y="${y0}" text-anchor="middle" font-size="32">Key of ${esc(key)} · ${esc(h.meter)}</text>`;
+    o += `<line class="sl-rule" x1="700" x2="900" y1="${y0 + 50}" y2="${y0 + 50}"/>`;
+    o += `<text class="sl-sans" x="800" y="${y0 + 115}" text-anchor="middle" font-size="28">Words: ${esc(h.text)}</text>`;
+    o += `<text class="sl-sans" x="800" y="${y0 + 160}" text-anchor="middle" font-size="28">Music: ${esc(h.music)}</text>`;
+    if (h.v > 1) o += `<text class="sl-serif" x="800" y="${y0 + 240}" text-anchor="middle" font-size="36" font-style="italic">Verses ${esc(verses.join(', '))}</text>`;
+    return o + '</svg>';
+  }
+  const vn = verses[idx - 1];
+  o += `<text class="sl-sans" x="90" y="92" font-size="26" letter-spacing="4" font-weight="700">${h.no} · ${esc(h.title.toUpperCase())}</text>`;
+  o += `<text class="sl-sans" x="1510" y="92" text-anchor="end" font-size="26">Key of ${esc(key)}</text>`;
+  o += `<line class="sl-rule" x1="90" x2="1510" y1="118" y2="118"/>`;
+  o += `<text class="sl-sans" x="90" y="840" font-size="22">${esc(foot)}</text>`;
+  o += `<text class="sl-sans" x="1510" y="840" text-anchor="end" font-size="22">Verse ${vn} · ${idx + 1} / ${total}</text>`;
+
+  if (h.slides === 'lyrics') {
+    o += `<text class="sl-serif" x="160" y="330" font-size="64" font-weight="700">${vn}</text>`;
+    [0, 1, 2, 3].forEach(i => { const w = [1080, 960, 1140, 820][(i + vn) % 4]; o += `<rect class="sl-bar" x="240" y="${282 + i * 110}" width="${w}" height="46" rx="10"/>`; });
+    o += `<text class="sl-sans" x="800" y="760" text-anchor="middle" font-size="26" font-style="italic">Words-only slide · licensed text is not reproduced in this mockup</text>`;
+    return o + '</svg>';
+  }
+
+  const LS = 20, TB = 340, BB = 600;
+  const ty = st => TB - st * LS / 2, by = st => BB - st * LS / 2;
+  const tonic = TONIC[key] ?? 0;
+  const degT = st => (((2 + st - tonic) % 7) + 7) % 7, degB = st => (((4 + st - tonic) % 7) + 7) % 7;
+  const x0 = 96, x1 = 1510;
+  for (let i = 0; i < 5; i++) { o += `<line class="sl-line" x1="${x0}" x2="${x1}" y1="${TB - i * LS}" y2="${TB - i * LS}"/><line class="sl-line" x1="${x0}" x2="${x1}" y1="${BB - i * LS}" y2="${BB - i * LS}"/>`; }
+  o += `<rect class="sl-ink" x="${x0 - 14}" y="${TB - 4 * LS}" width="7" height="${BB - TB + 4 * LS}"/><line class="sl-line" x1="${x0}" x2="${x0}" y1="${TB - 4 * LS}" y2="${BB}"/>`;
+  o += `<text class="sl-glyph" x="${x0 + 12}" y="${ty(2)}" font-size="${LS * 4}">𝄞</text>`;
+  o += `<text class="sl-glyph" x="${x0 + 12}" y="${by(6)}" font-size="${LS * 4}">𝄢</text>`;
+  const ks = KEYSIG[key] ?? 0; let kx = x0 + 78;
+  for (let i = 0; i < Math.abs(ks); i++) {
+    const st = ks > 0 ? SHARP_STEPS[i] : FLAT_STEPS[i]; const g = ks > 0 ? '♯' : '♭';
+    o += `<text class="sl-glyph" x="${kx}" y="${ty(st)}" font-size="${LS * 4}">${g}</text><text class="sl-glyph" x="${kx}" y="${by(st - 2)}" font-size="${LS * 4}">${g}</text>`;
+    kx += 20;
+  }
+  const [tn, td] = h.time.split('/');
+  const tx = kx + 26;
+  [TB, BB].forEach(b => {
+    o += `<text class="sl-serif" x="${tx}" y="${b - 2 * LS - 3}" text-anchor="middle" font-size="46" font-weight="700">${tn}</text><text class="sl-serif" x="${tx}" y="${b + 13}" text-anchor="middle" font-size="46" font-weight="700">${td}</text>`;
+  });
+  const syl = sylls(h.lines[vn - 1] || h.lines[0]);
+  const hasText = !!h.lines[vn - 1];
+  const n = syl.length; const v = voices(h);
+  const start = tx + 70, span = (x1 - 40) - start, dx = span / n;
+  const beats = +tn === 2 ? 4 : +tn;
+  const stem = (x, y, up) => up ? `<line class="sl-stroke" stroke-width="2.6" x1="${x + 12}" y1="${y - 2}" x2="${x + 12}" y2="${y - 66}"/>` : `<line class="sl-stroke" stroke-width="2.6" x1="${x - 12}" y1="${y + 2}" x2="${x - 12}" y2="${y + 66}"/>`;
+  const lyY = (TB + BB - 4 * LS) / 2 + 26;
+  o += `<text class="sl-serif" x="${start - 44}" y="${lyY}" text-anchor="end" font-size="38">${vn}.</text>`;
+  const tonicStepT = ((tonic - 2) % 7 + 7) % 7, tonicStepB = ((tonic - 4) % 7 + 7) % 7;
+  for (let i = 0; i < n; i++) {
+    const x = start + dx * i + dx / 2; const last = i === n - 1;
+    const s = last ? tonicStepT + (tonicStepT < 2 ? 7 : 0) : v.S[i];
+    const a = last ? s - 2 : v.A[i];
+    const b = last ? tonicStepB : v.B[i];
+    const t = last ? b + 4 : v.T[i];
+    o += notehead(x, ty(s), degT(s), last) + stem(x, ty(s), true) + notehead(x, ty(a), degT(a), last) + stem(x, ty(a), false);
+    o += notehead(x, by(t), degB(t), last) + stem(x, by(t), true) + notehead(x, by(b), degB(b), last) + stem(x, by(b), false);
+    if (hasText) {
+      o += `<text class="sl-serif" x="${x}" y="${lyY}" text-anchor="middle" font-size="40">${esc(syl[i].t)}</text>`;
+      if (syl[i].hy) o += `<text class="sl-serif" x="${x + dx / 2}" y="${lyY}" text-anchor="middle" font-size="34">–</text>`;
+    } else {
+      o += `<rect class="sl-bar" x="${x - dx * 0.34}" y="${lyY - 26}" width="${dx * 0.68}" height="30" rx="7"/>`;
+    }
+    if (!last && (i + 1) % beats === 0) {
+      const bx = x + dx / 2;
+      o += `<line class="sl-line" x1="${bx}" x2="${bx}" y1="${TB - 4 * LS}" y2="${TB}"/><line class="sl-line" x1="${bx}" x2="${bx}" y1="${BB - 4 * LS}" y2="${BB}"/>`;
+    }
+  }
+  [TB, BB].forEach(b => { o += `<line class="sl-line" x1="${x1 - 12}" x2="${x1 - 12}" y1="${b - 4 * LS}" y2="${b}"/><rect class="sl-ink" x="${x1 - 6}" y="${b - 4 * LS}" width="6" height="${4 * LS}"/>`; });
+  if (!hasText) o += `<text class="sl-sans" x="800" y="770" text-anchor="middle" font-size="24" font-style="italic">Verse ${vn} words come from the songbook slide set</text>`;
+  return o + '</svg>';
+}
+function textSlideSVG(item, i, n, s) {
+  let o = `<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect class="sl-bg" width="1600" height="900"/>`;
+  o += `<text class="sl-sans" x="800" y="330" text-anchor="middle" font-size="30" letter-spacing="6" font-weight="700">${esc(TYPE_LABEL[item.type].toUpperCase())}</text>`;
+  o += `<text class="sl-serif" x="800" y="440" text-anchor="middle" font-size="92" font-weight="700">${esc(item.title)}</text>`;
+  const sub = (item.sub || '').split(' · ')[0];
+  if (sub) o += `<text class="sl-serif" x="800" y="530" text-anchor="middle" font-size="44" font-style="italic">${esc(sub)}</text>`;
+  if (n > 1) o += `<text class="sl-sans" x="1510" y="840" text-anchor="end" font-size="22">${i + 1} / ${n}</text>`;
+  o += `<text class="sl-sans" x="90" y="840" font-size="22">${esc(s.name)}</text>`;
+  return o + '</svg>';
+}
+
+/* ============================================================ search */
+const ALIASES = [[/\bpsalms?\b/g, 'ps'], [/\bmatthew\b/g, 'matt'], [/\bexodus\b/g, 'ex'], [/\bisaiah\b/g, 'isa'], [/\brevelation\b/g, 'rev'], [/\bephesians\b/g, 'eph'],
+  [/\bcorinthians\b/g, 'cor'], [/\bhebrews\b/g, 'heb'], [/\bpeter\b/g, 'pet'], [/\bsamuel\b/g, 'sam'], [/\bphilippians\b/g, 'phil'], [/\blamentations\b/g, 'lam'],
+  [/\bgalatians\b/g, 'gal'], [/\bromans\b/g, 'rom'], [/\bjeremiah\b/g, 'jer'], [/\bcolossians\b/g, 'col'], [/\bgenesis\b/g, 'gen'], [/\bjames\b/g, 'jas']];
+const norm = s => { let t = s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[–—]/g, '-').replace(/[’'“”"]/g, ''); ALIASES.forEach(([re, r]) => t = t.replace(re, r)); return t; };
+function fields(h) {
+  return [
+    ['Song #', String(h.no), 7], ['Title', h.title, 6], ['Tune', h.tune, 5], ['First line', h.lines[0] ? plainLine(h.lines[0]) : '', 4],
+    ['Scripture', h.scripture.join(' · '), 4], ['Meter', h.meter, 3], ['Topic', h.topics.join(' · '), 3], ['Words', h.text, 2], ['Music', h.music, 2],
+  ];
+}
+// What the empty-search suggestions should be, given the selected slot.
+function suggestCtx(s) {
+  const sel = s.items.find(i => i.id === state.sel);
+  const role = sel && sel.type === 'hymn' ? sel.role || '' : '';
+  if (/invitation/i.test(role)) return { label:'Invitation songs', test:h => h.topics.includes('Invitation'), why:h => h.sug[s.sugKey] || h.scripture[0] };
+  if (/supper/i.test(role)) return { label:'Songs before the Supper', test:h => h.topics.includes('Lord’s Supper'), why:h => h.scripture[0] };
+  if (/closing/i.test(role)) return { label:'Closing songs', test:h => h.topics.includes('Closing') || h.topics.includes('Heaven'), why:h => h.topics.join(' · ') };
+  return { label:`Pairs with “${s.lesson}” · ${s.text}`, test:h => !!h.sug[s.sugKey], why:h => h.sug[s.sugKey] };
+}
+function search(q, f, s, sort) {
+  const nq = norm(q.trim());
+  const toks = nq.split(/\s+/).filter(Boolean);
+  let list = SONGS.filter(h =>
+    (!f.pd || h.license === 'pd') && (!f.full || h.slides === 'full') &&
+    (!f.fresh || weeksBetween(h.last, s.date) >= 8) &&
+    (!f.meter || h.meter === f.meter) && (!f.key || h.key === f.key) && (!f.topic || h.topics.includes(f.topic)));
+  if (!toks.length) {
+    const ctx = suggestCtx(s);
+    const sug = list.filter(ctx.test).sort((a, b) => D(a.last) - D(b.last)).map(h => ({ h, score:1, why:['Suggested', ctx.why(h)] }));
+    return { mode:'suggest', label:ctx.label, items:sug, rest:list.filter(h => !ctx.test(h)).map(h => ({ h, score:0, why:null })) };
+  }
+  const out = [];
+  for (const h of list) {
+    const fs = fields(h).map(([k, v, w]) => [k, v, w, norm(v)]);
+    let score = 0, ok = true, why = null, whyW = 0;
+    for (const t of toks) {
+      let best = 0, bf = null;
+      for (const fld of fs) { if (fld[3].includes(t) && fld[2] > best) { best = fld[2]; bf = fld; } }
+      if (!best) { ok = false; break; }
+      score += best; if (best > whyW) { whyW = best; why = bf; }
+    }
+    if (!ok) continue;
+    for (const fld of fs) if (fld[3].includes(nq)) { score += fld[2] * 2; if (fld[2] >= whyW || why[0] === fld[0]) { why = fld; whyW = fld[2]; } break; }
+    out.push({ h, score, why: why ? [why[0], why[1]] : null });
+  }
+  const cmp = { best:(a, b) => b.score - a.score, number:(a, b) => a.h.no - b.h.no, rotation:(a, b) => D(a.h.last) - D(b.h.last), title:(a, b) => a.h.title.localeCompare(b.h.title) }[sort];
+  out.sort(cmp);
+  return { mode:'search', items: out, rest: [] };
+}
+function hl(text, q) {
+  const toks = q.trim().split(/\s+/).filter(t => t.length > 1).map(t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+  let s = esc(text);
+  if (!toks.length) return s;
+  return s.replace(new RegExp(`(${toks.join('|')})`, 'gi'), '<mark>$1</mark>');
+}
+
+
+/* ============================================================ fluent shell */
+Object.assign(state, { navOpen:false, calY:2026, calM:9, dismissed:new Set(), menu:null, dialog:null });
+const TODAY = '2026-09-28';
+const pad2 = n => String(n).padStart(2, '0');
+const isoOf = d => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+const TYPE_ICON = { spoken:'chat', hymn:'music', prayer:'heart', scripture:'bookOpen', sermon:'lectern', supper:'cup', giving:'basket', class:'people' };
+const NAV = [['planner', 'Planner', 'cal'], ['songbook', 'Songbook', 'music'], ['slides', 'Slide sets', 'slides'], ['people', 'Assignments', 'people'], ['reports', 'Reports', 'chart']];
+const TEAM = [['Preaching', 'Bro. Greg Holt'], ['Song leader', 'Bro. Daniel Price'], ['Opening prayer', 'Bro. James Carter'], ['Lord’s Supper', 'Bro. Kevin Walsh'],
+  ['Contribution prayer', 'Bro. Tom Hale'], ['Scripture reading', 'Bro. Luke Adams'], ['Closing prayer', 'Bro. Sam Reed'], ['Welcome and announcements', 'Bro. Mark Ellis'], ['Sound and slides', 'Bro. Evan Cole']];
+const initials = n => { if (/^Not assigned/.test(n)) return '?'; const p = n.replace(/^Bro\.\s*/, '').split(/\s+/); return p[0][0] + (p.length > 1 ? p[p.length - 1][0] : ''); };
+const orderedItems = s => SECTIONS.flatMap(([k]) => s.items.filter(i => i.section === k));
+const isEmptySlot = i => i.type === 'hymn' && !i.hymnId;
+
+function render() { renderNav(); renderCalendar(); renderServices(); renderHead(); renderOrder(); renderFilters(); renderResults(); renderPreview(); renderPresenter(); renderOverlay(); }
+
+function renderNav() {
+  $('#nav').innerHTML = `<button class="nav-item" data-action="navtoggle" data-tip="${state.navOpen ? 'Close' : 'Open'} navigation" aria-label="${state.navOpen ? 'Close' : 'Open'} navigation" aria-expanded="${state.navOpen}">${icon('menu')}</button>
+    ${NAV.map(([k, l, ic]) => `<button class="nav-item${k === 'planner' ? ' on' : ''}" data-action="nav" data-k="${k}" data-tip="${l}" aria-label="${l}"${k === 'planner' ? ' aria-current="page"' : ''}>${icon(ic)}<span class="nav-l">${l}</span></button>`).join('')}
+    <span class="nav-sp"></span>
+    <button class="nav-item" data-action="nav" data-k="settings" data-tip="Settings" aria-label="Settings">${icon('gear')}<span class="nav-l">Settings</span></button>`;
+  $('#body').classList.toggle('nav-open', state.navOpen);
+}
+
+function renderCalendar() {
+  const y = state.calY, m = state.calM, s = svc();
+  const first = new Date(y, m, 1), start = new Date(y, m, 1 - first.getDay());
+  const byDate = {}; SERVICES.forEach(x => (byDate[x.date] = byDate[x.date] || []).push(x));
+  let cells = '';
+  for (let i = 0; i < 42; i++) {
+    const d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i), iso = isoOf(d), list = byDate[iso];
+    const cls = ['cd']; if (d.getMonth() !== m) cls.push('out'); if (iso === TODAY) cls.push('today'); if (iso === s.date) cls.push('selday');
+    cells += `<button class="${cls.join(' ')}" ${list ? `data-action="svc" data-id="${list[0].id}"` : 'data-action="noop"'} aria-label="${MONTH[d.getMonth()]} ${d.getDate()}${list ? ', ' + list.length + ' service' + (list.length > 1 ? 's' : '') : ''}">${d.getDate()}${list ? `<i class="dots">${list.map(() => '<b></b>').join('')}</i>` : ''}</button>`;
+  }
+  $('#cal').innerHTML = `<div class="cal-h"><button class="cal-title" data-action="noop">${MONTH[m]} ${y}</button><span class="sp"></span>
+      <button class="icon-btn" data-action="calm" data-d="-1" aria-label="Previous month">${icon('up')}</button><button class="icon-btn" data-action="calm" data-d="1" aria-label="Next month">${icon('down')}</button></div>
+    <div class="cal-g">${['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(d => `<span class="cw">${d}</span>`).join('')}${cells}</div>`;
+}
+
+function weekStart(iso) { const d = D(iso); return new Date(d.getFullYear(), d.getMonth(), d.getDate() - d.getDay()); }
+function renderServices() {
+  const s = svc(), groups = [];
+  SERVICES.forEach(x => { const k = isoOf(weekStart(x.date)); let g = groups.find(g => g.k === k); if (!g) groups.push(g = { k, items: [] }); g.items.push(x); });
+  const thisWeek = weekStart(TODAY);
+  $('#svclist').innerHTML = `<div class="pane-h"><span>Services</span><button class="icon-btn" data-action="toast" data-msg="New service opens from a template: Sunday morning, Sunday evening, Wednesday Bible study, gospel meeting" title="New service" aria-label="New service">${icon('add')}</button></div>`
+    + groups.map(g => {
+      const a = D(g.k), b = new Date(a.getFullYear(), a.getMonth(), a.getDate() + 6);
+      const diff = Math.round((a - thisWeek) / (7 * 864e5));
+      const rel = diff === 0 ? 'This week' : diff === 1 ? 'Next week' : `In ${diff} weeks`;
+      return `<div class="grp-h">${rel}<span>${MON[a.getMonth()]} ${a.getDate()} – ${a.getMonth() === b.getMonth() ? '' : MON[b.getMonth()] + ' '}${b.getDate()}</span></div>`
+        + g.items.map(x => { const d = D(x.date), t = totals(x); return `<button class="sv${x.id === s.id ? ' sel' : ''}" data-action="svc" data-id="${x.id}" aria-current="${x.id === s.id}">
+            <span class="sv-d"><span class="c">${DOW[d.getDay()].slice(0, 3)}</span><span class="n">${d.getDate()}</span></span>
+            <span class="sv-t"><span class="n">${esc(x.name)}</span><span class="c">${startLabel(x)} · ${esc(x.series)}</span></span>
+            ${t.empty ? `<span class="badge" title="${t.empty} song${t.empty > 1 ? 's' : ''} not picked">${t.empty}</span>` : ''}</button>`; }).join('');
+    }).join('');
+}
+
+function infobar(s, t) {
+  if (state.dismissed.has(s.id)) return '';
+  const close = `<button class="icon-btn" data-action="ibclose" aria-label="Close">${icon('x')}</button>`;
+  if (t.empty) return `<div class="infobar info" data-ctl="InfoBar" role="status"><span class="ib-badge">i</span><span class="ib-txt"><b>${t.empty} song${t.empty > 1 ? 's' : ''} not picked</b>The song leader sees open slots on the phone too.</span><button class="fbtn" data-action="nextslot">Pick next</button>${close}</div>`;
+  if (t.needs) return `<div class="infobar caution" data-ctl="InfoBar" role="status"><span class="ib-badge">!</span><span class="ib-txt"><b>Waiting on slides</b>Lesson slides from ${esc(s.people[0][1])} aren’t in yet.</span><button class="fbtn" data-action="remind">Send reminder</button>${close}</div>`;
+  return '';
+}
+function renderHead() {
+  const s = svc(), t = totals(s), d = D(s.date);
+  $('#ohead').innerHTML = `
+    <nav class="crumbs" data-ctl="BreadcrumbBar" aria-label="Breadcrumb"><button data-action="noop">Services</button>${icon('chevR')}<button data-action="noop">${MON[d.getMonth()]} ${d.getDate()}</button>${icon('chevR')}<span aria-current="page">${esc(s.name)}</span></nav>
+    <h1 class="ttl">${esc(s.name)}</h1>
+    <div class="cap tab">${longDate(s.date)} · ${startLabel(s)} · ${esc(s.where)} · ${t.songs} songs, ${fmtMin(t.min)}, ${t.slides} slides · Draft, saved ${esc(s.saved)}</div>
+    <div class="ppl" data-ctl="PersonPicture">${s.people.map(([r, n]) => `<span class="pp"><span class="pic">${initials(n)}</span><span><span class="r">${esc(r)}</span><span class="nm">${esc(n)}</span></span></span>`).join('')}
+      <span class="tag">${icon('lectern')}“${esc(s.lesson)}” · ${esc(s.text)} · ${esc(s.series)}, ${esc(s.part)}</span></div>
+    <div class="cmdbar" data-ctl="CommandBar">
+      <button class="fbtn accent" data-action="present" data-at="0" title="Present (F5)">${icon('play')}Present</button>
+      <button class="abb" data-action="toast" data-msg="Export builds a ${t.slides}-slide .pptx: song title cards, four-part verses, scripture, announcements">${icon('share')}Export</button>
+      <button class="abb" data-action="dialog">${icon('send')}Send assignments</button>
+      <span class="sep"></span>
+      <button class="abb" id="addbtn" data-action="addmenu" aria-haspopup="menu">${icon('add')}Add${icon('chevD', 'sm')}</button>
+      <button class="abb" data-action="undo" ${state.undo ? '' : 'disabled'} title="Undo (Ctrl+Z)">${icon('undo')}Undo</button>
+      <span class="sp"></span>
+      <button class="abb" data-action="toast" data-msg="More: duplicate service, save as template, print the order for the song leader" title="More options" aria-label="More options">${icon('more', 'fill')}</button>
+    </div>
+    ${infobar(s, t)}`;
+}
+
+function badge(i) {
+  if (i.type === 'hymn') {
+    if (!i.hymnId) return '';
+    const h = H[i.hymnId], n = itemSlides(i);
+    return h.slides === 'full' ? `<span class="bdg b-ok">${icon('check')}${n} slides</span>` : `<span class="bdg b-neutral" title="Four-part music needs a reprint license">Words · ${n}</span>`;
+  }
+  if (i.slides === 'needs') return `<span class="bdg b-caution">${icon('warn')}Waiting</span>`;
+  if (!i.slides) return `<span class="bdg b-none">No slides</span>`;
+  return `<span class="bdg b-ok">${icon('check')}${i.slides} slide${i.slides > 1 ? 's' : ''}</span>`;
+}
+function renderOrder() {
+  const s = svc(), tl = timeline(s);
+  let html = '';
+  SECTIONS.forEach(([key, name]) => {
+    const rows = tl.filter(r => r.item.section === key); if (!rows.length) return;
+    const mins = rows.reduce((a, r) => a + itemDur(r.item), 0);
+    html += `<div class="ghead">${name}<span>${clock(rows[0].start)} · ${mins} min</span></div>`;
+    rows.forEach(({ item: i, start }) => {
+      const sel = i.id === state.sel, empty = isEmptySlot(i);
+      let main;
+      if (empty) main = `<span class="ov">${esc(i.role)}</span><span class="slot">Not picked yet · <button class="hl" data-action="findslot" data-id="${i.id}">Choose a song</button></span>`;
+      else if (i.type === 'hymn') { const h = H[i.hymnId]; main = `<span class="ov">${esc(i.role)}</span><span class="tt">${h.no} · ${esc(h.title)}</span><span class="st">Pitch ${esc(i.key || h.key)} · ${h.time}${h.v > 1 ? ' · ' + versesText(i.verses) : ''} · ${esc(h.tune)}</span>`; }
+      else main = `<span class="tt">${esc(i.title)}</span><span class="st">${esc(i.sub || '')}</span>`;
+      html += `<div class="li${sel ? ' sel' : ''}${empty ? ' empty' : ''}" data-item="${i.id}" data-type="${i.type}" draggable="true" data-action="selitem" data-id="${i.id}" role="option" aria-selected="${sel}">
+        <span class="grip" aria-hidden="true">${GRIP}</span><span class="li-time">${clock(start)}</span><span class="li-ico">${icon(TYPE_ICON[i.type])}</span>
+        <span class="li-main">${main}</span><span>${badge(i)}</span><span class="li-dur">${itemDur(i)} min</span>
+        <button class="icon-btn li-more" data-action="rowmenu" data-id="${i.id}" aria-label="More options for ${esc(itemLabel(i))}" aria-haspopup="menu">${icon('more', 'fill')}</button></div>`;
+    });
+  });
+  $('#olist').innerHTML = html;
+}
+
+function renderFilters() {
+  const f = state.f;
+  const combo = (id, k, arr, all) => `<span class="combo${f[k] ? ' on' : ''}"><select id="${id}" class="fsel" data-k="${k}" aria-label="${all}"><option value="">${all}</option>${[...new Set(arr)].sort().map(v => `<option${v === f[k] ? ' selected' : ''}>${esc(v)}</option>`).join('')}</select>${icon('chevD')}</span>`;
+  $('#filters').innerHTML = `
+    <button class="tbtn" data-action="filt" data-k="pd" aria-pressed="${f.pd}">Public domain</button>
+    <button class="tbtn" data-action="filt" data-k="full" aria-pressed="${f.full}">Four-part</button>
+    <button class="tbtn" data-action="filt" data-k="fresh" aria-pressed="${f.fresh}">Unsung 8 wks</button>
+    ${combo('f-topic', 'topic', SONGS.flatMap(h => h.topics), 'Any topic')}
+    ${combo('f-key', 'key', SONGS.map(h => h.key), 'Any pitch')}`;
+}
+
+let lastResults = [];
+function resRow(r, i, s, inSvc) {
+  const h = r.h, on = state.preview.hymnId === h.id, wk = weeksBetween(h.last, s.date);
+  const why = r.why ? `<span class="w"><b>${esc(r.why[0])}:</b> ${r.why[0] === 'Suggested' ? esc(r.why[1]) : hl(r.why[1], state.q)}</span>` : `<span class="w">${esc(h.topics.join(' · '))}</span>`;
+  return `<div class="ri${on ? ' on' : ''}${i === state.cursor ? ' cur' : ''}" role="option" aria-selected="${on}" data-action="pick" data-id="${h.id}" draggable="true" data-hymn="${h.id}">
+    <span class="thumb">${slideSVG(h, h.slides === 'full' ? 1 : 0, [1], h.key, 1 + h.v)}</span>
+    <span class="rm"><span class="t">${hl(h.title, state.q)}</span><span class="m">${esc(h.key)} · ${h.time} · ${esc(h.tune)}</span>${why}</span>
+    <span class="side"><span class="no">#${h.no}</span><span class="lic">${licShort(h)}</span>${inSvc.has(h.id) ? '<span class="insvc">In service</span>' : `<span>${wk < 1 ? 'Last week' : wk + ' wk ago'}</span>`}</span></div>`;
+}
+function renderResults() {
+  const s = svc(), res = search(state.q, state.f, s, state.sort);
+  const inSvc = new Set(s.items.map(i => i.hymnId).filter(Boolean));
+  lastResults = res.items.map(r => r.h.id);
+  if (res.mode === 'suggest') {
+    $('#rmeta').innerHTML = `<span>Suggestions, least recently sung first</span>`;
+    $('#results').innerHTML = (res.items.length ? `<div class="sug-h">${esc(res.label)}</div>` + res.items.map((r, i) => resRow(r, i, s, inSvc)).join('') : '')
+      + `<div class="sug-h muted">Everything else</div>` + res.rest.slice(0, 8).map(r => resRow(r, -1, s, inSvc)).join('');
+    return;
+  }
+  const sortSel = `<span class="combo"><select id="sort" aria-label="Sort results">${[['best', 'Best match'], ['rotation', 'Least recently sung'], ['number', 'Song number'], ['title', 'Title']].map(([v, l]) => `<option value="${v}"${v === state.sort ? ' selected' : ''}>${l}</option>`).join('')}</select>${icon('chevD')}</span>`;
+  $('#rmeta').innerHTML = `<span>${res.items.length} result${res.items.length === 1 ? '' : 's'} for “${esc(state.q.trim())}”</span>${sortSel}`;
+  $('#results').innerHTML = res.items.length ? res.items.map((r, i) => resRow(r, i, s, inSvc)).join('')
+    : `<div class="empty-res"><span>No songs match “${esc(state.q.trim())}” with these filters.</span><button class="fbtn" data-action="clearf">Clear filters</button></div>`;
+}
+
+function boundItem() {
+  const p = state.preview; if (!p.itemId) return null;
+  const i = svc().items.find(x => x.id === p.itemId);
+  return i && i.hymnId === p.hymnId ? i : null;
+}
+function renderPreview() {
+  const p = state.preview, h = H[p.hymnId], s = svc(), bi = boundItem();
+  const verses = bi ? bi.verses : p.verses, key = bi ? (bi.key || h.key) : (p.key || h.key);
+  const total = 1 + verses.length, slide = Math.min(p.slide, total - 1), tl = timeline(s);
+  let body = '';
+  if (p.tab === 'slides') {
+    const selItem = s.items.find(i => i.id === state.sel), fill = selItem && isEmptySlot(selItem);
+    body = `
+      <div class="flip" data-ctl="FlipView"><div class="bigslide">${slideSVG(h, slide, verses, key, total)}</div>
+        <button class="flip-btn prev" data-action="slide" data-i="${slide - 1}" aria-label="Previous slide" ${slide === 0 ? 'hidden' : ''}>${icon('chevL')}</button>
+        <button class="flip-btn next" data-action="slide" data-i="${slide + 1}" aria-label="Next slide" ${slide === total - 1 ? 'hidden' : ''}>${icon('chevR')}</button></div>
+      <div class="pips" data-ctl="PipsPager">${Array.from({ length: total }, (_, i) => `<button class="pip${i === slide ? ' on' : ''}" data-action="slide" data-i="${i}" aria-label="Slide ${i + 1}"></button>`).join('')}</div>
+      <div class="strip" data-ctl="GridView">${Array.from({ length: total }, (_, i) => `<button class="sthumb" data-action="slide" data-i="${i}" aria-current="${i === slide}"><span class="thumb">${slideSVG(h, i, verses, key, total)}</span>${i === 0 ? 'Title' : 'Verse ' + verses[i - 1]}</button>`).join('')}</div>
+      <div class="pctl">
+        ${h.v > 1 ? `<div class="fld" data-ctl="ToggleButton"><span class="lbl">Verses</span><span class="vrow">${Array.from({ length: h.v }, (_, i) => `<button class="tbtn sq" data-action="verse" data-v="${i + 1}" aria-pressed="${verses.includes(i + 1)}">${i + 1}</button>`).join('')}</span></div>` : ''}
+        <div class="fld" data-ctl="ComboBox"><span class="lbl">Pitch</span><span class="combo lg"><select id="pkey" aria-label="Pitch">${h.keys.map(k => `<option${k === key ? ' selected' : ''}>${esc(k)}</option>`).join('')}</select>${icon('chevD')}</span></div>
+        <div class="fld" data-ctl="RadioButtons"><span class="lbl">Noteheads</span><span class="segm" role="radiogroup" aria-label="Noteheads"><button role="radio" data-action="notes" data-v="shape" aria-pressed="${state.notes === 'shape'}" aria-checked="${state.notes === 'shape'}">Shape</button><button role="radio" data-action="notes" data-v="round" aria-pressed="${state.notes === 'round'}" aria-checked="${state.notes === 'round'}">Round</button></span></div>
+      </div>
+      <div class="pact">
+        ${bi ? `<span class="bound"><b>${esc(bi.role)}</b> at ${clock(tl.find(r => r.item.id === bi.id).start)} · ${total} slides</span><span class="grow"></span>
+            <button class="fbtn" data-action="del" data-id="${bi.id}">${icon('trash')}Remove</button>
+            <button class="fbtn" data-action="present" data-item="${bi.id}">${icon('play')}Present from here</button>`
+          : `<span class="combo lg"><select id="after" aria-label="Position in service">${s.items.map(i => `<option value="${i.id}"${i.id === state.sel ? ' selected' : ''}>${fill && i.id === state.sel ? 'Fill' : 'After'} ${clock(tl.find(r => r.item === i).start)} · ${esc(itemLabel(i))}</option>`).join('')}</select>${icon('chevD')}</span>
+            <span class="grow"></span>
+            <button class="fbtn accent" data-action="add">${icon(fill ? 'swap' : 'add')}${fill ? 'Use as ' + esc(selItem.role.toLowerCase()) : 'Add to service'}</button>`}
+      </div>`;
+  } else if (p.tab === 'details') {
+    body = `<dl class="dl">
+      <dt>Song</dt><dd class="tab">#${h.no}</dd><dt>Words</dt><dd>${esc(h.text)}</dd><dt>Music</dt><dd>${esc(h.music)}</dd>
+      <dt>Tune</dt><dd>${esc(h.tune)}</dd><dt>Meter</dt><dd>${esc(h.meter)}</dd>
+      <dt>Pitch, time</dt><dd>${esc(h.key)}, ${h.time}. Slides in ${h.keys.map(esc).join(', ')}</dd>
+      <dt>Verses</dt><dd>${h.v}${h.lines[0] ? ` · <i>${esc(plainLine(h.lines[0]))}</i>` : ''}</dd>
+      <dt>Scripture</dt><dd><span class="tags">${h.scripture.map(x => `<span class="tg">${esc(x)}</span>`).join('')}</span></dd>
+      <dt>Topics</dt><dd><span class="tags">${h.topics.map(x => `<span class="tg">${esc(x)}</span>`).join('')}</span></dd>
+      <dt>License</dt><dd>${h.license === 'pd' ? 'Public domain, no reporting' : `${esc(h.copyright)}. Reported to CCLI when projected`}</dd></dl>`;
+  } else {
+    body = `<div class="cap">Sung ${h.uses} time${h.uses > 1 ? 's' : ''} in the last three years. Last on ${shortDate(h.last)}, ${weeksBetween(h.last, s.date)} weeks before this service.</div>
+      <div class="uses">${usageDates(h).map(d => `<div><span class="d">${shortDate(d, 0)}</span><span>${D(d).getDay() === 3 ? 'Wednesday Bible study' : 'Sunday worship'}</span></div>`).join('')}</div>`;
+  }
+  $('#preview').innerHTML = `<div class="selbar" role="tablist" data-ctl="SelectorBar">${[['slides', 'Slides'], ['details', 'Details'], ['usage', 'Usage']].map(([k, l]) => `<button class="sb${p.tab === k ? ' on' : ''}" role="tab" aria-selected="${p.tab === k}" data-action="ptab" data-t="${k}">${l}</button>`).join('')}<span class="ptitle">#${h.no} ${esc(h.title)}</span></div>
+    <div class="pbody">${body}</div>`;
+}
+
+/* presenter */
+function deck(s) {
+  const out = [];
+  s.items.forEach(i => {
+    if (i.type === 'hymn' && i.hymnId) { const n = 1 + i.verses.length; for (let k = 0; k < n; k++) out.push({ item:i, k, n }); }
+    else if (typeof i.slides === 'number' && i.slides > 0) for (let k = 0; k < i.slides; k++) out.push({ item:i, k, n:i.slides });
+  });
+  return out;
+}
+const deckSVG = (d, s) => d.item.type === 'hymn' ? slideSVG(H[d.item.hymnId], d.k, d.item.verses, d.item.key || H[d.item.hymnId].key, d.n) : textSlideSVG(d.item, d.k, d.n, s);
+function renderPresenter() {
+  const host = $('#presenter');
+  if (state.present == null) { host.innerHTML = ''; return; }
+  const s = svc(), dk = deck(s);
+  if (!dk.length) { state.present = null; host.innerHTML = ''; return; }
+  const at = Math.max(0, Math.min(dk.length - 1, state.present)); state.present = at;
+  const cur = dk[at], nxt = dk[at + 1], tl = timeline(s);
+  host.innerHTML = `<div class="present" role="dialog" aria-label="Presenter view">
+    <div class="pr-top"><b>Presenter view</b><span>${esc(s.name)}</span><span class="tab">Slide ${at + 1} of ${dk.length}</span><span class="spacer"></span><span>Projector: Display 2 · ← → step · Esc ends</span><button data-action="present-close">End show</button></div>
+    <div class="pr-body">
+      <div class="pr-list">${s.items.filter(i => dk.some(d => d.item === i)).map(i => `<button class="${i === cur.item ? 'on' : ''}" data-action="present" data-item="${i.id}"><span class="tab">${clock(tl.find(r => r.item === i).start)}</span><span>${esc(itemLabel(i))}</span></button>`).join('')}</div>
+      <div class="pr-cur"><div class="bigslide">${deckSVG(cur, s)}</div><div class="pr-nav"><button data-action="step" data-d="-1">Previous</button><button data-action="step" data-d="1">Next</button></div></div>
+      <div class="pr-side">Next${nxt ? `<div class="bigslide">${deckSVG(nxt, s)}</div><span>${esc(itemLabel(nxt.item))}</span>` : '<span>End of service</span>'}</div>
+    </div></div>`;
+}
+
+/* flyouts and dialogs */
+function renderOverlay() {
+  let h = '';
+  if (state.menu) {
+    const m = state.menu;
+    h += `<div class="scrim-clear" data-action="closemenu"></div><div class="menu abs" data-ctl="MenuFlyout" role="menu" style="left:${m.x}px;top:${m.y}px">${m.items.map(it => it === '-' ? '<div class="msep" role="separator"></div>'
+      : `<button class="mi" role="menuitem" data-action="${it.a}" data-id="${it.id || ''}" ${it.dis ? 'disabled' : ''}>${icon(it.ic || 'blank')}<span>${it.l}</span><span class="acc">${it.k || ''}</span></button>`).join('')}</div>`;
+  }
+  if (state.dialog) {
+    const s = svc(), c = state.dialog.checked;
+    h += `<div class="smoke"></div><div class="dialog abs" data-ctl="ContentDialog" role="dialog" aria-modal="true" aria-labelledby="dlg-t">
+      <div class="dlg-body"><h2 id="dlg-t">Send assignments</h2><p>Each man gets his part of ${esc(s.short)}, ${shortDate(s.date)}: what he leads and when.</p>
+        <div class="checks">${TEAM.map(([r, n], i) => `<button class="chk" role="checkbox" aria-checked="${c.has(i)}" data-action="dlgchk" data-i="${i}"><span class="box">${icon('check')}</span><span><span>${esc(n)}</span><span class="r">${esc(r)}</span></span></button>`).join('')}</div></div>
+      <div class="dlg-foot"><button class="fbtn accent" data-action="dlgsend" ${c.size ? '' : 'disabled'}>Send to ${c.size}</button><button class="fbtn" data-action="dlgclose">Cancel</button></div></div>`;
+  }
+  $('#overlay').innerHTML = h;
+}
+function openMenu(x, y, items) {
+  state.menu = { x, y, items }; renderOverlay();
+  const el = $('#overlay .menu'), W = $('#win');
+  const nx = Math.max(8, Math.min(x, W.clientWidth - el.offsetWidth - 8)), ny = Math.max(8, Math.min(y, W.clientHeight - el.offsetHeight - 8));
+  el.style.left = nx + 'px'; el.style.top = ny + 'px'; state.menu.x = nx; state.menu.y = ny;
+  el.querySelector('.mi:not(:disabled)')?.focus();
+}
+function anchorBelow(btn) { const r = btn.getBoundingClientRect(), w = $('#win').getBoundingClientRect(); return [r.left - w.left, r.bottom - w.top + 4]; }
+function rowMenuItems(it) {
+  const s = svc(), list = orderedItems(s), idx = list.indexOf(it), empty = isEmptySlot(it), hasSlides = deck(s).some(d => d.item === it);
+  return [
+    empty ? { l:'Choose a song', ic:'search', a:'findslot', id:it.id } : null,
+    it.type === 'hymn' && it.hymnId ? { l:'Show slides', ic:'slides', a:'showslides', id:it.id } : null,
+    { l:'Present from here', ic:'play', a:'present', id:it.id, k:'Shift+F5', dis:!hasSlides },
+    '-',
+    { l:'Move up', ic:'up', a:'mup', id:it.id, k:'Alt+Up', dis:idx === 0 },
+    { l:'Move down', ic:'down', a:'mdown', id:it.id, k:'Alt+Down', dis:idx === list.length - 1 },
+    { l:'Duplicate', ic:'copy', a:'mdup', id:it.id, k:'Ctrl+D' },
+    '-',
+    { l:'Remove', ic:'trash', a:'del', id:it.id, k:'Del' },
+  ].filter(Boolean);
+}
+const ADD_MENU = [{ l:'Song', ic:'music', a:'addtype', id:'song' }, { l:'Prayer', ic:'heart', a:'addtype', id:'prayer' }, { l:'Scripture reading', ic:'bookOpen', a:'addtype', id:'scripture' },
+  { l:'Lesson', ic:'lectern', a:'addtype', id:'lesson' }, '-', { l:'Announcements', ic:'chat', a:'addtype', id:'announce' }];
+
+/* ============================================================ actions */
+function snapshot() { const s = svc(); state.undo = { id:s.id, items: JSON.parse(JSON.stringify(s.items)), sel:state.sel }; }
+let toastTimer;
+function toast(msg, undo = false) {
+  clearTimeout(toastTimer);
+  $('#toast-host').innerHTML = `<div class="infobar success" data-ctl="InfoBar" role="status"><span class="ib-badge">✓</span><span class="ib-txt">${esc(msg)}</span>${undo ? '<button class="hl" data-action="undo">Undo</button>' : ''}<button class="icon-btn" data-action="toastclose" aria-label="Close">${icon('x')}</button></div>`;
+  toastTimer = setTimeout(() => $('#toast-host').innerHTML = '', 5000);
+}
+function bindPreviewTo(item) {
+  const h = H[item.hymnId];
+  state.preview = { ...state.preview, hymnId:h.id, itemId:item.id, verses:[...item.verses], key:item.key || h.key, slide:Math.min(state.preview.slide, item.verses.length) || 1 };
+}
+const defaultVerses = h => Array.from({ length: Math.min(h.v, 4) }, (_, k) => k + 1);
+function previewUnbound(id) { const h = H[id]; state.preview = { ...state.preview, hymnId:id, itemId:null, verses:defaultVerses(h), key:h.key, slide:h.slides === 'full' ? 1 : 0 }; }
+function setQuery(v) { state.q = v; state.cursor = -1; $('#q').value = v; $('#gq').value = v; }
+function selectItem(id, focusList = true) {
+  const item = svc().items.find(i => i.id === id); if (!item) return;
+  state.sel = id;
+  if (item.type === 'hymn' && item.hymnId) bindPreviewTo(item); else state.preview.itemId = null;
+  render();
+  if (focusList) $('#olist').focus({ preventScroll:true });
+  $(`#olist .li[data-item="${id}"]`)?.scrollIntoView({ block:'nearest' });
+}
+function pickHymn(id) {
+  const inItem = svc().items.find(i => i.hymnId === id);
+  if (inItem && state.preview.hymnId !== id) { state.sel = inItem.id; bindPreviewTo(inItem); }
+  else if (!inItem) previewUnbound(id);
+  render();
+}
+function findSlot(id) { state.sel = id; state.preview.itemId = null; setQuery(''); render(); $('#q').focus(); }
+function addHymn(hid, verses, key, targetId) {
+  const s = svc(), h = H[hid]; snapshot();
+  const target = s.items.find(i => i.id === (targetId || state.sel));
+  if (target && isEmptySlot(target)) {
+    target.hymnId = hid; target.verses = [...verses]; if (key !== h.key) target.key = key;
+    state.sel = target.id; bindPreviewTo(target); render();
+    toast(`${h.title} is the ${target.role.toLowerCase()}`, true); return target;
+  }
+  const pos = target ? s.items.indexOf(target) + 1 : s.items.length;
+  const item = { id:uid(), section: target ? target.section : 'closing', type:'hymn', role:'Song', hymnId:hid, verses:[...verses] };
+  if (key !== h.key) item.key = key;
+  s.items.splice(pos, 0, item);
+  state.sel = item.id; bindPreviewTo(item); render();
+  toast(`Added ${h.title}${target ? ' after ' + itemLabel(target) : ''}`, true);
+  return item;
+}
+function removeItem(id) {
+  const s = svc(), idx = s.items.findIndex(i => i.id === id); if (idx < 0) return;
+  snapshot();
+  const list = orderedItems(s), pos = list.findIndex(i => i.id === id);
+  const [gone] = s.items.splice(idx, 1);
+  if (state.sel === id) { const nb = list[pos + 1] || list[pos - 1]; state.sel = nb && nb.id !== id ? nb.id : null; }
+  if (state.preview.itemId === id) state.preview.itemId = null;
+  render(); toast(`Removed ${itemLabel(gone)}`, true);
+}
+function moveItem(id, d) {
+  const s = svc(), list = orderedItems(s), idx = list.findIndex(i => i.id === id), it = list[idx], nb = list[idx + d];
+  if (!it || !nb) return;
+  snapshot();
+  if (nb.section !== it.section) it.section = nb.section;
+  else { const a = s.items.indexOf(it), b = s.items.indexOf(nb); [s.items[a], s.items[b]] = [s.items[b], s.items[a]]; }
+  render(); $(`#olist .li[data-item="${id}"]`)?.scrollIntoView({ block:'nearest' });
+}
+function dupItem(id) {
+  const s = svc(), it = s.items.find(i => i.id === id); if (!it) return;
+  snapshot();
+  const copy = JSON.parse(JSON.stringify(it)); copy.id = uid();
+  s.items.splice(s.items.indexOf(it) + 1, 0, copy);
+  state.sel = copy.id; if (copy.hymnId) bindPreviewTo(copy);
+  render(); toast(`Duplicated ${itemLabel(it)}`, true);
+}
+function addType(kind) {
+  const s = svc(), target = s.items.find(i => i.id === state.sel), section = target ? target.section : 'closing';
+  const T = {
+    song: { type:'hymn', role:'Song', hymnId:null, verses:[] },
+    prayer: { type:'prayer', title:'Prayer', sub:'Not assigned', dur:2, slides:0 },
+    scripture: { type:'scripture', title:'Scripture Reading', sub:'Reference to come', dur:3, slides:'needs' },
+    lesson: { type:'sermon', title:'Lesson', sub:'Title to come', dur:25, slides:'needs' },
+    announce: { type:'spoken', title:'Announcements', sub:'Bro. Mark Ellis', dur:3, slides:1 },
+  }[kind];
+  snapshot();
+  const item = { id:uid(), section, ...T };
+  s.items.splice(target ? s.items.indexOf(target) + 1 : s.items.length, 0, item);
+  state.sel = item.id; state.preview.itemId = null;
+  render(); toast(`Added ${itemLabel(item).toLowerCase()}${target ? ' after ' + itemLabel(target) : ''}`, true);
+  if (kind === 'song') { setQuery(''); renderResults(); $('#q').focus(); }
+}
+function doUndo() {
+  if (!state.undo) return;
+  const t = SERVICES.find(x => x.id === state.undo.id); t.items = state.undo.items; state.serviceId = t.id; state.sel = state.undo.sel;
+  state.preview.itemId = null; state.undo = null;
+  const it = t.items.find(i => i.id === state.sel); if (it && it.hymnId) bindPreviewTo(it);
+  render(); $('#toast-host').innerHTML = '';
+}
+function openService(id) {
+  state.serviceId = id; state.sel = null; state.preview.itemId = null; state.menu = null; setQuery('');
+  const s = svc(), d = D(s.date); state.calY = d.getFullYear(); state.calM = d.getMonth();
+  const first = s.items.find(isEmptySlot); if (first) state.sel = first.id;
+}
+function startPresent(itemId) {
+  const dk = deck(svc()); if (!dk.length) return;
+  state.present = itemId ? Math.max(0, dk.findIndex(d => d.item.id === itemId)) : 0; renderPresenter();
+}
+
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-action]'); if (!el) return;
+  const a = el.dataset.action, s = svc(), win = $('#win'), id = el.dataset.id;
+  if (el.closest('.menu')) { state.menu = null; renderOverlay(); }
+  switch (a) {
+    case 'chrome': win.dataset.chrome = el.dataset.v; document.querySelectorAll('[data-action="chrome"]').forEach(b => b.setAttribute('aria-pressed', b === el)); break;
+    case 'apptheme': if (el.dataset.v) win.dataset.appTheme = el.dataset.v; else delete win.dataset.appTheme; document.querySelectorAll('[data-action="apptheme"]').forEach(b => b.setAttribute('aria-pressed', b === el)); break;
+    case 'inspect': { const on = el.getAttribute('aria-checked') !== 'true'; el.setAttribute('aria-checked', on); win.classList.toggle('inspect', on); break; }
+    case 'navtoggle': state.navOpen = !state.navOpen; renderNav(); break;
+    case 'nav': if (el.dataset.k !== 'planner') toast(`${el.dataset.tip} isn’t in this mockup yet. The Planner page is.`); break;
+    case 'calm': state.calM += +el.dataset.d; if (state.calM < 0) { state.calM = 11; state.calY--; } if (state.calM > 11) { state.calM = 0; state.calY++; } renderCalendar(); break;
+    case 'svc': openService(id); render(); break;
+    case 'selitem': selectItem(id); break;
+    case 'showslides': state.preview.tab = 'slides'; selectItem(id); break;
+    case 'del': e.stopPropagation(); removeItem(id); break;
+    case 'findslot': e.stopPropagation(); findSlot(id); break;
+    case 'nextslot': { const slot = orderedItems(s).find(isEmptySlot); if (slot) findSlot(slot.id); break; }
+    case 'remind': toast(`Reminder sent to ${s.people[0][1]}`); break;
+    case 'ibclose': state.dismissed.add(s.id); renderHead(); break;
+    case 'filt': state.f[el.dataset.k] = !state.f[el.dataset.k]; state.cursor = -1; renderFilters(); renderResults(); break;
+    case 'clearf': state.f = { pd:false, full:false, fresh:false, meter:'', key:'', topic:'' }; renderFilters(); renderResults(); break;
+    case 'pick': pickHymn(id); break;
+    case 'ptab': state.preview.tab = el.dataset.t; renderPreview(); break;
+    case 'slide': state.preview.slide = +el.dataset.i; renderPreview(); break;
+    case 'notes': state.notes = el.dataset.v; renderResults(); renderPreview(); break;
+    case 'verse': {
+      const v = +el.dataset.v, bi = boundItem();
+      if (bi) { bi.verses = toggleVerse(bi.verses, v); bindPreviewTo(bi); render(); }
+      else { state.preview.verses = toggleVerse(state.preview.verses, v); renderPreview(); }
+      break;
+    }
+    case 'add': { const p = state.preview; addHymn(p.hymnId, p.verses, p.key || H[p.hymnId].key, $('#after')?.value); break; }
+    case 'undo': doUndo(); break;
+    case 'toast': toast(el.dataset.msg); break;
+    case 'toastclose': $('#toast-host').innerHTML = ''; break;
+    case 'caption': toast('Window buttons are decoration in this mockup'); break;
+    case 'present': startPresent(el.dataset.item || id || null); break;
+    case 'present-close': state.present = null; renderPresenter(); break;
+    case 'step': state.present += +el.dataset.d; renderPresenter(); break;
+    case 'rowmenu': { e.stopPropagation(); selectItem(id, false); const btn = $(`#olist .li[data-item="${id}"] .li-more`); const [x, y] = anchorBelow(btn); openMenu(x - 200, y, rowMenuItems(svc().items.find(i => i.id === id))); break; }
+    case 'addmenu': { const [x, y] = anchorBelow($('#addbtn')); openMenu(x, y, ADD_MENU); break; }
+    case 'addtype': addType(id); break;
+    case 'mup': moveItem(id, -1); break;
+    case 'mdown': moveItem(id, 1); break;
+    case 'mdup': dupItem(id); break;
+    case 'closemenu': state.menu = null; renderOverlay(); break;
+    case 'dialog': state.dialog = { checked: new Set(TEAM.map((_, i) => i)) }; renderOverlay(); $('#overlay .dialog .accent')?.focus(); break;
+    case 'dlgchk': { const i = +el.dataset.i, c = state.dialog.checked; c.has(i) ? c.delete(i) : c.add(i); renderOverlay(); $(`#overlay [data-i="${i}"]`)?.focus(); break; }
+    case 'dlgsend': { const n = state.dialog.checked.size; state.dialog = null; renderOverlay(); toast(`Assignments sent to ${n} ${n === 1 ? 'person' : 'people'}`); break; }
+    case 'dlgclose': state.dialog = null; renderOverlay(); break;
+  }
+});
+function toggleVerse(list, v) { const out = list.includes(v) ? list.filter(x => x !== v) : [...list, v].sort((a, b) => a - b); return out.length ? out : list; }
+
+document.addEventListener('contextmenu', e => {
+  const row = e.target.closest('#olist .li'); if (!row) return;
+  e.preventDefault();
+  const id = row.dataset.item; selectItem(id);
+  const w = $('#win').getBoundingClientRect();
+  openMenu(e.clientX - w.left, e.clientY - w.top, rowMenuItems(svc().items.find(i => i.id === id)));
+});
+
+document.addEventListener('change', e => {
+  const t = e.target;
+  if (t.matches('.fsel')) { state.f[t.dataset.k] = t.value; renderFilters(); renderResults(); }
+  else if (t.id === 'sort') { state.sort = t.value; renderResults(); }
+  else if (t.id === 'after') { state.sel = t.value; renderOrder(); renderPreview(); }
+  else if (t.id === 'pkey') {
+    const bi = boundItem();
+    if (bi) { if (t.value === H[bi.hymnId].key) delete bi.key; else bi.key = t.value; render(); }
+    else { state.preview.key = t.value; renderPreview(); }
+  }
+});
+document.addEventListener('input', e => {
+  if (e.target.id === 'q' || e.target.id === 'gq') {
+    state.q = e.target.value; state.cursor = -1;
+    (e.target.id === 'q' ? $('#gq') : $('#q')).value = state.q;
+    renderResults();
+  }
+});
+
+document.addEventListener('keydown', e => {
+  const k = e.key, s = svc(), mod = e.metaKey || e.ctrlKey, tag = e.target.tagName;
+  if (state.present != null) {
+    if (k === 'Escape') { state.present = null; renderPresenter(); }
+    else if (['ArrowRight', ' ', 'PageDown'].includes(k)) { e.preventDefault(); state.present++; renderPresenter(); }
+    else if (['ArrowLeft', 'PageUp'].includes(k)) { e.preventDefault(); state.present--; renderPresenter(); }
+    return;
+  }
+  if (k === 'Escape' && (state.menu || state.dialog)) { state.menu = null; state.dialog = null; renderOverlay(); return; }
+  if (state.dialog) return;
+  if (state.menu && (k === 'ArrowDown' || k === 'ArrowUp')) {
+    e.preventDefault(); const items = [...document.querySelectorAll('#overlay .mi:not(:disabled)')], i = items.indexOf(document.activeElement);
+    items[(i + (k === 'ArrowDown' ? 1 : -1) + items.length) % items.length]?.focus(); return;
+  }
+  if (mod && ['k', 'e', 'f'].includes(k.toLowerCase())) { e.preventDefault(); $('#q').focus(); $('#q').select(); return; }
+  if (k === 'F5') { e.preventDefault(); startPresent(e.shiftKey ? state.sel : null); return; }
+  if (e.target.id === 'q' || e.target.id === 'gq') {
+    if (k === 'ArrowDown' || k === 'ArrowUp') {
+      e.preventDefault(); if (!lastResults.length) return;
+      state.cursor = Math.max(0, Math.min(lastResults.length - 1, state.cursor + (k === 'ArrowDown' ? 1 : -1)));
+      const id = lastResults[state.cursor], inItem = s.items.find(i => i.hymnId === id);
+      if (inItem) bindPreviewTo(inItem); else previewUnbound(id);
+      renderResults(); renderPreview(); $('#results .ri.cur')?.scrollIntoView({ block:'nearest' });
+    } else if (k === 'Enter') {
+      e.preventDefault(); const p = state.preview;
+      if (boundItem()) toast(`${H[p.hymnId].title} is already in this service`);
+      else addHymn(p.hymnId, p.verses, p.key || H[p.hymnId].key);
+    } else if (k === 'Escape') { setQuery(''); renderResults(); }
+    return;
+  }
+  if (/INPUT|SELECT|TEXTAREA/.test(tag)) return;
+  const onList = document.activeElement === $('#olist') || document.activeElement === document.body;
+  if (!onList) return;
+  if (mod && k.toLowerCase() === 'z') { e.preventDefault(); doUndo(); return; }
+  if (!state.sel) return;
+  if (mod && k.toLowerCase() === 'd') { e.preventDefault(); dupItem(state.sel); return; }
+  if (k === 'Delete') { e.preventDefault(); removeItem(state.sel); return; }
+  if (e.altKey && (k === 'ArrowUp' || k === 'ArrowDown')) { e.preventDefault(); moveItem(state.sel, k === 'ArrowUp' ? -1 : 1); return; }
+  if (!e.altKey && !mod && (k === 'ArrowUp' || k === 'ArrowDown')) {
+    e.preventDefault(); const list = orderedItems(s), i = list.findIndex(x => x.id === state.sel), nb = list[i + (k === 'ArrowUp' ? -1 : 1)];
+    if (nb) selectItem(nb.id);
+  }
+});
+
+/* drag and drop: reorder rows, drop results into the order */
+let drag = null;
+const clearDrop = () => document.querySelectorAll('.drop-before,.drop-after,.drop-fill').forEach(x => x.classList.remove('drop-before', 'drop-after', 'drop-fill'));
+document.addEventListener('dragstart', e => {
+  const row = e.target.closest?.('.li[data-item]'), res = e.target.closest?.('.ri[data-hymn]');
+  if (row) { drag = { kind:'item', id:row.dataset.item }; row.classList.add('dragging'); }
+  else if (res) drag = { kind:'hymn', id:res.dataset.hymn };
+  else return;
+  e.dataTransfer.effectAllowed = drag.kind === 'item' ? 'move' : 'copy';
+  e.dataTransfer.setData('text/plain', drag.id);
+});
+document.addEventListener('dragover', e => {
+  if (!drag) return;
+  const row = e.target.closest?.('#olist .li'); if (!row) return;
+  e.preventDefault(); clearDrop();
+  const it = svc().items.find(i => i.id === row.dataset.item);
+  if (drag.kind === 'hymn' && isEmptySlot(it)) { row.classList.add('drop-fill'); drag.target = { id:it.id, mode:'fill' }; return; }
+  const r = row.getBoundingClientRect(), after = e.clientY > r.top + r.height / 2;
+  row.classList.add(after ? 'drop-after' : 'drop-before'); drag.target = { id:it.id, mode: after ? 'after' : 'before' };
+});
+document.addEventListener('drop', e => {
+  if (!drag || !drag.target) return; e.preventDefault();
+  const s = svc(), tg = drag.target, target = s.items.find(i => i.id === tg.id);
+  clearDrop();
+  if (drag.kind === 'hymn') {
+    const h = H[drag.id], vs = defaultVerses(h);
+    if (tg.mode === 'fill') addHymn(h.id, vs, h.key, target.id);
+    else {
+      snapshot();
+      const item = { id:uid(), section:target.section, type:'hymn', role:'Song', hymnId:h.id, verses:vs };
+      s.items.splice(s.items.indexOf(target) + (tg.mode === 'after' ? 1 : 0), 0, item);
+      state.sel = item.id; bindPreviewTo(item); render(); toast(`Added ${h.title}`, true);
+    }
+  } else if (drag.id !== tg.id) {
+    snapshot();
+    const [moved] = s.items.splice(s.items.findIndex(i => i.id === drag.id), 1);
+    moved.section = target.section;
+    s.items.splice(s.items.indexOf(target) + (tg.mode === 'after' ? 1 : 0), 0, moved);
+    state.sel = moved.id; render(); toast(`Moved ${itemLabel(moved)}`, true);
+  }
+  drag = null;
+});
+document.addEventListener('dragend', () => { clearDrop(); document.querySelectorAll('.dragging').forEach(x => x.classList.remove('dragging')); drag = null; });
+
+/* ============================================================ boot */
+$('#tb-back').innerHTML = icon('back');
+$('#tb-app').innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M4 7l8-3 8 3-8 3z"/><path d="M12 10v10M8 20h8"/></svg>Lectern<span class="sub">Grace Street church of Christ</span>`;
+$('#gq-ico').innerHTML = icon('search');
+$('#q-ico').innerHTML = icon('search');
+$('#popout').innerHTML = icon('popout');
+$('#tb-sync').innerHTML = icon('cloud') + 'Synced';
+$('#caption').innerHTML = `<button data-action="caption" aria-label="Minimize">${icon('min')}</button><button data-action="caption" aria-label="Maximize">${icon('max')}</button><button class="close" data-action="caption" aria-label="Close">${icon('close')}</button>`;
+setQuery(state.q);
+render();
+</script>
+</body>
+</html>
