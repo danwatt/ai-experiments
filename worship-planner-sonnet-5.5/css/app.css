@@ -1,33 +1,4 @@
-/* Selah — desktop mockup styles */
-:root {
-  --bg: #f1eee6; --panel: #fffdf9; --panel2: #f8f5ed; --panel3: #efeadd;
-  --ink: #1c2233; --ink2: #464e63; --muted: #7a8296;
-  --line: #e5dfd0; --line2: #d3ccb9;
-  --accent: #2c4a8c; --accent-hi: #3a5cae; --accent-soft: #e5ebf7; --accent-ink: #ffffff;
-  --gold: #b0802a; --gold-soft: #f6ebd0;
-  --ok: #2b7654; --ok-soft: #dff0e6; --warn: #9a620d; --warn-soft: #fbedd1; --bad: #a3382f; --bad-soft: #f7e1de; --info: #3b5a9d; --info-soft: #e5ebf7;
-  --c-song: #2c4a8c; --c-prayer: #2a7f86; --c-scripture: #a8771a; --c-supper: #8c2f4c; --c-give: #3a7d3f; --c-sermon: #5d4a9a; --c-welcome: #6a7385; --c-custom: #6a7385;
-  --shadow: 0 1px 2px rgba(40,30,10,.06), 0 6px 18px rgba(40,30,10,.07);
-  --shadow-lg: 0 10px 40px rgba(20,16,6,.22);
-  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
-  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
-  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  --mark: #ffe9a8;
-  color-scheme: light;
-}
-:root[data-theme="dark"] {
-  --bg: #11141c; --panel: #191d28; --panel2: #1f2432; --panel3: #262c3d;
-  --ink: #e9ebf2; --ink2: #b8bece; --muted: #8790a6;
-  --line: #2a3145; --line2: #3a4360;
-  --accent: #8ea8e8; --accent-hi: #a9bdf1; --accent-soft: #232c48; --accent-ink: #0d1424;
-  --gold: #dcae55; --gold-soft: #3a3019;
-  --ok: #6fcf9f; --ok-soft: #1c3a2e; --warn: #e5b060; --warn-soft: #3b2f18; --bad: #ee8a80; --bad-soft: #401f1f; --info: #93acef; --info-soft: #232c48;
-  --c-song: #8ea8e8; --c-prayer: #5fc0c8; --c-scripture: #dcae55; --c-supper: #e58aa6; --c-give: #7fcf85; --c-sermon: #b5a2ee; --c-welcome: #9aa3b8; --c-custom: #9aa3b8;
-  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 18px rgba(0,0,0,.3);
-  --mark: #5a4a12;
-  color-scheme: dark;
-}
-
+/* Selah — desktop mockup styles (tokens in tokens.css) */
 * { box-sizing: border-box; }
 html, body { height: 100%; margin: 0; }
 body { font: 14px/1.4 var(--sans); color: var(--ink); background: var(--bg); -webkit-font-smoothing: antialiased; overflow: hidden; }
@@ -188,8 +159,8 @@ mark { background: var(--mark); color: inherit; border-radius: 2px; padding: 0 1
 .chip.on { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
 .filters { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .f-spacer { flex: 1; }
-.sel { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
-.sel select { height: 28px; border: 1px solid var(--line2); background: var(--panel); border-radius: 7px; padding: 0 6px; font-size: 12.5px; color: var(--ink); max-width: 130px; }
+.fsel { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
+.fsel select { height: 28px; border: 1px solid var(--line2); background: var(--panel); border-radius: 7px; padding: 0 6px; font-size: 12.5px; color: var(--ink); max-width: 130px; }
 .tog { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--ink2); cursor: pointer; user-select: none; }
 .tog input { accent-color: var(--accent); }
 .seg { display: inline-flex; border: 1px solid var(--line2); border-radius: 8px; overflow: hidden; background: var(--panel); }
@@ -224,7 +195,7 @@ mark { background: var(--mark); color: inherit; border-radius: 2px; padding: 0 1
 .add-mini { width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--line2); background: var(--panel); color: var(--accent); display: grid; place-items: center; }
 .add-mini:hover { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
 .in-svc { font-size: 10.5px; font-weight: 700; color: var(--ok); background: var(--ok-soft); border-radius: 99px; padding: 1px 7px; }
-.results.grid-view .res-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; }
+.results.grid-view .res-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
 .results.grid-view .res { grid-template-columns: 1fr; gap: 7px; align-items: start; border: 1px solid var(--line); background: var(--panel); margin: 0; }
 .results.grid-view .res.on { border-color: var(--accent); }
 .results.grid-view .res .side { display: none; }
@@ -355,3 +326,9 @@ button.tagc:hover { background: var(--accent-soft); color: var(--accent); }
   .crumbs, .brand-sub { display: none; }
 }
 
+
+.filters-more { padding: 8px 10px; background: var(--panel2); border: 1px solid var(--line); border-radius: 10px; }
+.lib-top { gap: 8px; padding-top: 12px; }
+.searchbar { height: 44px; }
+.res .mid { min-width: 0; }
+.res { overflow: hidden; }

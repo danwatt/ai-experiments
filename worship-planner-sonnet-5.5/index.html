@@ -7,6 +7,7 @@
 <script>
   try { const t = localStorage.getItem('selah-theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); document.documentElement.dataset.theme = t; } catch (e) { document.documentElement.dataset.theme = 'light'; }
 </script>
+<link rel="stylesheet" href="css/tokens.css">
 <link rel="stylesheet" href="css/app.css">
 </head>
 <body>
@@ -73,14 +74,9 @@
         </div>
         <div class="chips-row" id="topicChips"></div>
         <div class="filters">
-          <label class="sel"><span>Key</span><select id="fKey"></select></label>
-          <label class="sel"><span>Time</span><select id="fTime"></select></label>
-          <label class="sel"><span>Meter</span><select id="fMeter"></select></label>
-          <label class="sel"><span>Hymnal</span><select id="fHymnal"></select></label>
-          <label class="tog"><input type="checkbox" id="fPd"> Public domain</label>
-          <label class="tog"><input type="checkbox" id="fFresh"> Not sung in 8 wks</label>
+          <button class="btn sm" id="btnFilters" data-a="toggleFilters"><span data-i="sliders"></span> Filters</button>
           <div class="f-spacer"></div>
-          <label class="sel"><span>Sort</span>
+          <label class="fsel"><span>Sort</span>
             <select id="fSort">
               <option value="relevance">Relevance</option>
               <option value="title">Title A–Z</option>
@@ -91,6 +87,15 @@
           <div class="seg" id="viewSeg">
             <button data-view="list" title="List view"></button><button data-view="grid" title="Slide grid"></button>
           </div>
+        </div>
+        <div class="filters filters-more" id="filtersMore" hidden>
+          <label class="fsel"><span>Key</span><select id="fKey"></select></label>
+          <label class="fsel"><span>Time</span><select id="fTime"></select></label>
+          <label class="fsel"><span>Meter</span><select id="fMeter"></select></label>
+          <label class="fsel"><span>Hymnal</span><select id="fHymnal"></select></label>
+          <label class="tog"><input type="checkbox" id="fPd"> Public domain only</label>
+          <label class="tog"><input type="checkbox" id="fFresh"> Not sung in 8 wks</label>
+          <button class="btn sm ghost" data-a="resetFilters">Reset</button>
         </div>
       </div>
       <div class="lib-body">

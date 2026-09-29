@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Selah — Worship Planner (Mobile mockup)</title>
+<script>
+  try { const t = localStorage.getItem('selah-theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); document.documentElement.dataset.theme = t; } catch (e) { document.documentElement.dataset.theme = 'light'; }
+</script>
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/mobile.css">
+</head>
+<body>
+<div class="stage">
+  <aside class="note">
+    <div class="brand"><span class="logo"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v18M6 9h12"/><path d="M4 21h16" opacity=".5"/></svg></span><b>Selah</b><span>Mobile companion</span></div>
+    <h1>Plan on the go. Lead with confidence.</h1>
+    <p>The phone app carries everything about a hymn <em>except</em> the sheet-music slides: key, start pitch, meter, hymnal numbers, scripture, topics, and how recently the church sang it. Slides stay on the desktop, where they’re built and presented.</p>
+    <ul>
+      <li><b>Plan</b> — review and lightly edit the order of service.</li>
+      <li><b>Hymns</b> — search the metadata database; add to a slot.</li>
+      <li><b>Live</b> — song-leader view with start pitch and hymn number.</li>
+      <li><b>Me</b> — your assignments; accept or decline.</li>
+    </ul>
+    <div class="note-links"><a class="lnk" href="index.html">← Desktop app</a><button class="lnk" id="themeBtn">Toggle dark mode</button></div>
+  </aside>
+
+  <div class="phone-wrap" id="phoneWrap">
+    <div class="phone" id="phone">
+      <div class="screen">
+        <div class="status"><b>9:41</b><span class="island"></span><span class="sys" id="sysIcons"></span></div>
+        <div class="view" id="view"></div>
+        <nav class="tabbar" id="tabbar"></nav>
+        <div class="sheet-wrap" id="sheetWrap" hidden><div class="backdrop" data-a="closeSheet"></div><div class="sheet" id="sheet"></div></div>
+        <div class="mtoast" id="mtoast" hidden></div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="js/data.js"></script>
+<script src="js/core.js"></script>
+<script src="js/mobile.js"></script>
+</body>
+</html>

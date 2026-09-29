@@ -7,7 +7,7 @@ const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 const S = {
   services: SERVICES, cur: 's1', sel: null, tab: 'library',
   q: '', f: { topics: new Set(), key: '', time: '', meter: '', hymnal: '', pd: false, fresh: false },
-  sort: 'relevance', view: 'list', ctx: null, prev: null, verse: 0, checkOpen: false,
+  sort: 'relevance', view: 'list', ctx: null, filtersOpen: false, prev: null, verse: 0, checkOpen: false,
   slides: [], pi: 0
 };
 let lastResults = [];
@@ -156,6 +156,11 @@ function initFilters() {
   $('#fMeter').innerHTML = opt('', 'Any') + [...new Set(HYMNS.map(h => h.meter.split(' ')[0]))].sort().map(k => opt(k, k)).join('');
   $('#fHymnal').innerHTML = opt('', 'Any') + Object.entries(HYMNALS).map(([k, v]) => opt(k, k + ' — ' + v)).join('');
   $('#dbNote').textContent = `${HYMNS.length} hymns · slide database v2026.09`;
+}
+function renderFilterBar() {
+  const f = S.f, n = (f.key ? 1 : 0) + (f.time ? 1 : 0) + (f.meter ? 1 : 0) + (f.hymnal ? 1 : 0) + (f.pd ? 1 : 0) + (f.fresh ? 1 : 0);
+  $('#filtersMore').hidden = !S.filtersOpen;
+  $('#btnFilters').innerHTML = icon('sliders', 14) + ' Filters' + (n ? ` <span class="pill info">${n}</span>` : '') + icon(S.filtersOpen ? 'up' : 'down', 13);
 }
 function renderChips() {
   const counts = {}; HYMNS.forEach(h => h.topics.forEach(t => counts[t] = (counts[t] || 0) + 1));
@@ -474,6 +479,7 @@ function act(name, el, e) {
     case 'topicOnly': S.f.topics = new Set([d.t]); renderChips(); renderResults(); renderPreview(); $('#results').scrollTop = 0; break;
     case 'searchq': S.q = d.q; $('#q').value = d.q; renderResults(); renderPreview(); break;
     case 'resetFilters': resetFilters(); break;
+    case 'toggleFilters': S.filtersOpen = !S.filtersOpen; renderFilterBar(); break;
     case 'view': S.view = d.view; renderResults(); break;
     case 'verse': S.verse = +d.v; renderPreview(); break;
     case 'vnav': { const h = HYMN[S.prev]; S.verse = (S.verse + +d.d + h.sec.length) % h.sec.length; renderPreview(); break; }
@@ -513,7 +519,7 @@ function act(name, el, e) {
 function resetFilters() {
   S.f = { topics: new Set(), key: '', time: '', meter: '', hymnal: '', pd: false, fresh: false }; S.q = ''; S.ctx = null;
   $('#q').value = ''; ['fKey', 'fTime', 'fMeter', 'fHymnal'].forEach(id => $('#' + id).value = ''); $('#fPd').checked = false; $('#fFresh').checked = false;
-  renderChips(); refresh({ item: false });
+  renderChips(); renderFilterBar(); refresh({ item: false });
 }
 
 /* ------------------------------ Events ------------------------------ */
@@ -538,9 +544,9 @@ $('#q').addEventListener('keydown', e => {
   const n = Math.max(0, Math.min(lastResults.length - 1, i + (e.key === 'ArrowDown' ? 1 : -1)));
   if (lastResults[n]) { S.prev = lastResults[n].h.id; S.verse = 0; renderResults(); renderPreview(); $('.res.on')?.scrollIntoView({ block: 'nearest' }); }
 });
-[['fKey', 'key'], ['fTime', 'time'], ['fMeter', 'meter'], ['fHymnal', 'hymnal']].forEach(([id, k]) => $('#' + id).addEventListener('change', e => { S.f[k] = e.target.value; renderResults(); renderPreview(); }));
-$('#fPd').addEventListener('change', e => { S.f.pd = e.target.checked; renderResults(); renderPreview(); });
-$('#fFresh').addEventListener('change', e => { S.f.fresh = e.target.checked; renderResults(); renderPreview(); });
+[['fKey', 'key'], ['fTime', 'time'], ['fMeter', 'meter'], ['fHymnal', 'hymnal']].forEach(([id, k]) => $('#' + id).addEventListener('change', e => { S.f[k] = e.target.value; renderFilterBar(); renderResults(); renderPreview(); }));
+$('#fPd').addEventListener('change', e => { S.f.pd = e.target.checked; renderFilterBar(); renderResults(); renderPreview(); });
+$('#fFresh').addEventListener('change', e => { S.f.fresh = e.target.checked; renderFilterBar(); renderResults(); renderPreview(); });
 $('#fSort').addEventListener('change', e => { S.sort = e.target.value; renderResults(); });
 
 /* item form + title editing */
@@ -606,7 +612,7 @@ function init() {
   $$('#viewSeg button').forEach(b => b.innerHTML = icon(b.dataset.view === 'list' ? 'list' : 'grid', 15));
   $$('#viewSeg button').forEach(b => b.dataset.a = 'view');
   Object.entries({ btnPresent: 'present', btnExport: 'export', btnShare: 'share', btnTheme: 'theme', btnSync: 'sync', btnAddItem: 'addmenu' }).forEach(([id, a]) => { $('#' + id).dataset.a = a; });
-  initFilters(); renderChips();
+  initFilters(); renderChips(); renderFilterBar();
   S.tab = 'library'; refresh();
 }
 init();
