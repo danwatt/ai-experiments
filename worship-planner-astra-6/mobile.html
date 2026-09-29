@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f6f7fb" id="browser-theme">
+  <title>Gather — Mobile companion</title>
+  <link rel="stylesheet" href="mobile.css">
+</head>
+<body>
+  <aside class="desktop-context" aria-label="About the mobile concept">
+    <div class="context-brand"><span>g</span>Gather</div>
+    <span class="context-eyebrow">THE MOBILE COMPANION</span>
+    <h1>A little preparation.<br>A more present Sunday.</h1>
+    <p>Plan the order. Find the hymn.<br>Know what comes next.</p>
+    <div class="context-features"><button data-view="plan"><span>01</span><div><strong>Before the service</strong><small>Build the order and assign your people.</small></div></button><button data-view="hymns"><span>02</span><div><strong>The hymn, at a glance</strong><small>Search titles, keys, themes, and scripture.</small></div></button><button data-view="live"><span>03</span><div><strong>Be ready in the moment</strong><small>Follow the service and find your pitch.</small></div></button></div>
+    <div class="context-footer"><a href="fluent.html">← Desktop concept</a><span>Mobile concept · 03</span></div>
+  </aside>
+  <div class="mobile-app" id="mobile-app">
+    <header class="app-header" id="app-header"></header>
+    <main id="screen" tabindex="-1"></main>
+    <nav class="bottom-nav" aria-label="Main navigation"><button class="active" data-view="plan" aria-current="page"><span data-icon="calendar"></span><span>Plan</span></button><button data-view="hymns"><span data-icon="music"></span><span>Hymns</span></button><button data-view="live"><span data-icon="live"></span><span>Live</span></button></nav>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </div>
+  <dialog id="sheet" aria-labelledby="sheet-title"><div class="sheet-grabber" aria-hidden="true"></div><div id="sheet-content"></div></dialog>
+  <script src="mobile-data.js"></script>
+  <script src="mobile.js"></script>
+</body>
+</html>

@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Selah — Worship Planner (Fluent / Uno mockup)</title>
+<script>
+  try { const t = localStorage.getItem('selah-fluent-theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); document.documentElement.dataset.theme = t; } catch (e) { document.documentElement.dataset.theme = 'light'; }
+</script>
+<link rel="stylesheet" href="css/fluent.css">
+</head>
+<body>
+<div class="window" id="window">
+
+  <!-- ===== TitleBar (extends into window chrome) ===== -->
+  <header class="titlebar">
+    <div class="tb-left"><span class="app-ico" id="appIco"></span><span class="tb-title">Selah</span><span class="tb-sub">Worship Planner</span></div>
+    <div class="tb-center">
+      <div class="asb" role="search">
+        <input id="q" type="text" autocomplete="off" spellcheck="false" placeholder="Search hymns, lyrics, scripture, or hymnal #">
+        <button class="asb-btn" id="asbBtn" aria-label="Search"></button>
+      </div>
+    </div>
+    <div class="tb-right">
+      <a class="tb-link" href="../mobile.html">Mobile app</a>
+      <span class="caption-btns" aria-hidden="true"><i id="capMin"></i><i id="capMax"></i><i id="capClose" class="close"></i></span>
+    </div>
+  </header>
+
+  <div class="shell">
+    <!-- ===== NavigationView pane ===== -->
+    <nav class="nav" id="nav" aria-label="Services"></nav>
+
+    <!-- ===== Content ===== -->
+    <main class="content">
+      <div class="page-head">
+        <div class="ph-title" id="svcHead"></div>
+        <div class="cmdbar" role="toolbar" aria-label="Service commands">
+          <button class="appbar" id="btnAddItem"><span data-i="plus"></span>Add</button>
+          <button class="appbar" id="btnShare"><span data-i="share"></span>Share</button>
+          <button class="appbar" id="btnExport"><span data-i="download"></span>Export</button>
+          <span class="cmd-sep"></span>
+          <button class="appbar icon-only" id="btnTheme" title="Toggle light / dark" aria-label="Toggle theme"></button>
+          <button class="btn accent" id="btnPresent"><span data-i="present"></span>Present <kbd>F5</kbd></button>
+        </div>
+      </div>
+
+      <div class="page">
+        <!-- Order of service -->
+        <section class="card order-card" aria-label="Order of service">
+          <div class="card-h"><h2>Order of service</h2><span class="hint">Drag to reorder</span></div>
+          <div class="order-scroll" id="orderScroll"><div id="orderList" class="listview"></div></div>
+          <div class="check" id="checkDock"></div>
+        </section>
+
+        <!-- Workspace -->
+        <section class="card work-card" aria-label="Workspace">
+          <div class="selbar" role="tablist" id="tabs">
+            <button role="tab" data-tab="library" class="tab">Hymn library</button>
+            <button role="tab" data-tab="item" class="tab">Selected item</button>
+            <button role="tab" data-tab="deck" class="tab">Slide deck <span class="infobadge info" id="deckCount"></span></button>
+            <span class="grow"></span>
+            <span class="db-note" id="dbNote"></span>
+          </div>
+
+          <div class="pane" id="paneLibrary">
+            <div class="lib-top">
+              <div id="ctxBanner"></div>
+              <div class="lib-row">
+                <div class="chips-row" id="topicChips"></div>
+              </div>
+              <div class="lib-row">
+                <button class="btn" id="btnFilters" data-a="toggleFilters"></button>
+                <span class="grow"></span>
+                <label class="field-inline"><span>Sort by</span>
+                  <select id="fSort" class="combo">
+                    <option value="relevance">Relevance</option>
+                    <option value="title">Title A–Z</option>
+                    <option value="recent">Recently sung</option>
+                    <option value="stale">Longest since sung</option>
+                    <option value="count">Most sung (12 mo)</option>
+                  </select></label>
+                <div class="segmented" id="viewSeg"><button data-view="list" title="List view"></button><button data-view="grid" title="Slide grid"></button></div>
+              </div>
+              <div class="expander" id="filtersMore" hidden>
+                <label class="field"><span>Key</span><select id="fKey" class="combo"></select></label>
+                <label class="field"><span>Time signature</span><select id="fTime" class="combo"></select></label>
+                <label class="field"><span>Meter</span><select id="fMeter" class="combo"></select></label>
+                <label class="field"><span>Hymnal</span><select id="fHymnal" class="combo"></select></label>
+                <label class="switch"><input type="checkbox" id="fPd" role="switch"><i></i><span>Public domain only</span></label>
+                <label class="switch"><input type="checkbox" id="fFresh" role="switch"><i></i><span>Not sung in 8 weeks</span></label>
+                <button class="btn" data-a="resetFilters">Reset filters</button>
+              </div>
+            </div>
+            <div class="lib-body">
+              <div class="results" id="results"></div>
+              <div class="preview" id="preview"></div>
+            </div>
+          </div>
+          <div class="pane" id="paneItem" hidden></div>
+          <div class="pane" id="paneDeck" hidden></div>
+        </section>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- Presenter -->
+<div class="presenter" id="presenter" hidden>
+  <div class="pres-stage" id="presStage"></div>
+  <div class="pres-bar">
+    <div class="pres-info" id="presInfo"></div>
+    <div class="pres-ctl">
+      <button id="presPrev" aria-label="Previous slide"></button><span id="presCount"></span><button id="presNext" aria-label="Next slide"></button><button id="presClose" aria-label="Exit (Esc)"></button>
+    </div>
+  </div>
+</div>
+
+<div class="dialog-host" id="dialogHost" hidden></div>
+<div class="infobars" id="toasts" aria-live="polite"></div>
+<div class="flyout" id="menu" hidden></div>
+
+<script src="js/data.js"></script>
+<script src="js/core.js"></script>
+<script src="js/notation.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
