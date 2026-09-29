@@ -1,0 +1,29 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "hohmann-works",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8743",
+        "-d",
+        "hohmann-works"
+      ],
+      "port": 8743
+    },
+    {
+      "name": "worship-planner",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8765",
+        "-d",
+        "worship-planner"
+      ],
+      "port": 8765
+    }
+  ]
+}

@@ -1,0 +1,80 @@
+<meta charset="utf-8">
+<title>Hohmann Works</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="style.css">
+
+<div id="app">
+  <canvas id="view" aria-label="Orbital map. Click stations and orbits to build."></canvas>
+
+  <header id="hud">
+    <div class="brand">Hohmann Works</div>
+    <div class="readouts">
+      <div class="readout"><span class="lbl">Credits</span><span id="credits" class="val">0</span></div>
+      <div class="readout"><span class="lbl">Mission</span><span id="clock" class="val">T+ 00:00</span></div>
+      <div class="readout"><span class="lbl">In flight</span><span id="inflight" class="val">0</span></div>
+    </div>
+    <div class="warp" role="group" aria-label="Time warp">
+      <button id="pause" type="button" title="Pause (Space)">Pause</button>
+      <button type="button" data-warp="0">1×</button>
+      <button type="button" data-warp="1">2×</button>
+      <button type="button" data-warp="2">4×</button>
+      <button type="button" data-warp="3">8×</button>
+      <button type="button" data-warp="4">16×</button>
+    </div>
+    <button id="help" class="ghost" type="button" title="How orbits work">?</button>
+  </header>
+
+  <div id="side">
+    <section id="contract" class="card" aria-live="polite">
+      <div class="eyebrow">Hub contract <span id="c-num">1</span></div>
+      <div class="c-row">
+        <img id="c-glyph" alt="" width="36" height="36">
+        <div class="c-main">
+          <div id="c-item" class="c-item">Iron Ore</div>
+          <div class="c-count"><span id="c-prog">0</span> / <span id="c-n">12</span> delivered</div>
+        </div>
+        <div id="c-reward" class="c-reward">+150 cr</div>
+      </div>
+      <div class="bar"><i id="c-bar"></i></div>
+      <p id="c-brief" class="brief"></p>
+      <p id="c-unlock" class="unlock"></p>
+    </section>
+    <section id="inspector" class="card" hidden></section>
+  </div>
+
+  <div id="hint"></div>
+  <nav id="toolbar" aria-label="Build tools">
+    <button type="button" data-tool="select"><span class="k">1</span><span class="t">Select</span></button>
+    <button type="button" data-tool="miner"><span class="k">2</span><span class="t">Miner</span><span class="c">60</span></button>
+    <button type="button" data-tool="refinery"><span class="k">3</span><span class="t">Refinery</span><span class="c">90</span></button>
+    <button type="button" data-tool="assembler"><span class="k">4</span><span class="t">Assembler</span><span class="c">150</span></button>
+    <button type="button" data-tool="link"><span class="k">5</span><span class="t">Route</span></button>
+    <button type="button" data-tool="demolish"><span class="k">6</span><span class="t">Demolish</span></button>
+  </nav>
+
+  <div id="toasts" aria-live="polite"></div>
+
+  <div id="intro" role="dialog" aria-modal="true" aria-labelledby="intro-title">
+    <div class="dialog">
+      <div class="eyebrow">Orbital logistics</div>
+      <h1 id="intro-title">Hohmann Works</h1>
+      <p class="lede">Build a factory around a planet where nothing sits still and nothing travels in a straight line.</p>
+      <ul class="rules">
+        <li><b>Lower orbits are faster.</b> <span id="rule-periods"></span> Stations drift past each other all the time.</li>
+        <li><b>Cargo flies half an ellipse.</b> A route launches a pod on a Hohmann transfer. It arrives on the far side of the planet from where it left, a fixed number of seconds later.</li>
+        <li><b>Routes wait for a launch window.</b> A pod only launches when the receiver sits at the right lead angle, marked by the amber bracket. Far-apart orbits get windows often. Close orbits wait a long time.</li>
+        <li><b>Every launch burns fuel.</b> Bigger orbit changes cost more Δv, paid in credits. A pod that misses its catch keeps coasting on its ellipse and gets a few more chances.</li>
+      </ul>
+      <p class="controls">Drag to pan · scroll to zoom · keys 1–6 pick tools · Space pauses · [ and ] change time warp</p>
+      <div class="actions">
+        <button id="start" class="primary" type="button">Start</button>
+        <button id="reset" class="ghost" type="button">Restart from scratch</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="game.js"></script>
