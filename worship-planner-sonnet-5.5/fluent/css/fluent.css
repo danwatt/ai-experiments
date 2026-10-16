@@ -108,7 +108,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 button { cursor: default; }
 [hidden] { display: none !important; }
 h1, h2, h3, p { margin: 0; }
-.ic { flex: none; }
+.ic { flex: none; stroke-width: 1.6; } /* Fluent glyphs are lighter than the shared 1.8 default */
 .grow { flex: 1; }
 mark { background: color-mix(in srgb, var(--SystemFillColorCaution) 30%, transparent); color: inherit; border-radius: 2px; padding: 0 1px; }
 kbd { font: 600 11px var(--font); padding: 0 5px; border-radius: 3px; background: color-mix(in srgb, currentColor 14%, transparent); }

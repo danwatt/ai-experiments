@@ -4,9 +4,9 @@ This document specifies the **desktop planner UI** in `index.html` (the non-Flue
 It covers the layout, every element on screen, every interaction and the business rules behind them, plus a data model and API sketch that the UI needs.
 
 - Open the mockup with `index.html` (see `README.md`). Everything described below can be observed there.
-- The reference implementation is `js/app.js` (UI), `js/core.js` (search, pitch math, plan checks), `js/data.js` (sample data shapes), `js/notation.js` (placeholder slide art), `css/app.css` and `css/tokens.css` (styling).
+- The reference implementation is `js/planner.js` (state, mutations, interactions), `js/app.js` (markup for this skin), `js/core.js` (search, pitch math, plan checks), `js/data.js` (sample data shapes), `js/notation.js` (placeholder slide art), `css/app.css` and `css/tokens.css` (styling).
 - The read-only phone app is specified separately in `MOBILE-PLAN.md`. Its publish snapshot is produced from this app's data.
-- A Fluent/Uno-styled variant exists in `fluent/`. It has the same behavior and a different skin, and is not covered here.
+- A Fluent/Uno-styled variant exists in `fluent/`. It shares `js/planner.js` and the data, search and notation files, and supplies only its own markup (`fluent/js/app.js`) and styles. It is not covered here.
 
 **Treat the mockup as a behavior spec, not as code to port.** §12 lists shortcuts in the mockup that a real build shouldn't copy.
 

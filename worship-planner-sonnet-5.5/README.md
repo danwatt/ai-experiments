@@ -13,6 +13,7 @@ python3 -m http.server 5178
 
 - `index.html` — **desktop app** (cross-platform desktop target)
 - `fluent/index.html` — the **same desktop app restyled with Fluent** (Uno Platform / WinUI look). See `fluent/UNO-FLUENT-MAPPING.md` for the control-by-control mapping to XAML.
+  Both desktop versions share one controller (`js/planner.js`); each has a small skin file (`js/app.js`, `fluent/js/app.js`) with only its markup.
 - `mobile.html` — **mobile companion** (metadata only, no sheet-music slides)
 
 ## Desktop: what to try
