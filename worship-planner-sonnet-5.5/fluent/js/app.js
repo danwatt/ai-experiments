@@ -592,6 +592,13 @@ $('#orderScroll').addEventListener('drop', e => {
   else insertHymnAt(d.id, t ? t.id : null, t ? t.before : false);
 });
 
+/* Enter/Space on a focused order row or library result acts like a click, then keeps focus on it after re-render. */
+function activateFocused(el) {
+  const sel = el.matches('.row') ? `.row[data-id="${el.dataset.id}"]` : `.res[data-hymn="${el.dataset.hymn}"]`;
+  el.click();
+  if (document.activeElement === document.body || !document.activeElement) $(sel)?.focus();
+}
+
 /* keyboard */
 document.addEventListener('keydown', e => {
   if (!$('#dialogHost').hidden) { if (e.key === 'Escape') { $('#dialogHost').hidden = true; $('#dialogHost').innerHTML = ''; } return; }
@@ -602,7 +609,8 @@ document.addEventListener('keydown', e => {
     else if (e.key === 'Escape') $('#presenter').hidden = true;
     return;
   }
-  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); S.tab = 'library'; renderTabs(); q.focus(); q.select(); }
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('.row, .res')) { e.preventDefault(); activateFocused(e.target); }
+  else if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); S.tab = 'library'; renderTabs(); q.focus(); q.select(); }
   else if (e.key === 'F5') { e.preventDefault(); openPresenter(0); }
   else if (e.key === 'Escape') hideMenu();
   else if (e.key === '/' && !/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) { e.preventDefault(); S.tab = 'library'; renderTabs(); q.focus(); }

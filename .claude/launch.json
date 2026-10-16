@@ -24,6 +24,18 @@
         "worship-planner"
       ],
       "port": 8765
+    },
+    {
+      "name": "worship-planner-sonnet-5.5",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "5178",
+        "-d",
+        "worship-planner-sonnet-5.5"
+      ],
+      "port": 5178
     }
   ]
 }

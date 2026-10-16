@@ -188,6 +188,7 @@ const ITEM_TYPES = {
 };
 
 /* Plan checks shared by desktop + mobile. */
+const songKey = it => (it.shift ? shiftedKey(HYMN[it.hymn].key, it.shift) : HYMN[it.hymn].key);
 function planChecks(svc) {
   const out = [];
   svc.items.forEach(it => {
@@ -201,8 +202,10 @@ function planChecks(svc) {
   });
   const songs = svc.items.filter(i => i.type === 'song' && i.hymn);
   for (let i = 1; i < songs.length; i++) {
+    // Compare the keys the leader will actually sing, so transposing clears the warning.
+    const ka = songKey(songs[i - 1]), kb = songKey(songs[i]);
     const a = HYMN[songs[i - 1].hymn], b = HYMN[songs[i].hymn];
-    if (keyGap(a.key, b.key) >= 5) out.push({ level: 'info', id: songs[i].id, text: `Big pitch jump: ${a.title} (${a.key}) → ${b.title} (${b.key}).` });
+    if (keyGap(ka, kb) >= 5) out.push({ level: 'info', id: songs[i].id, text: `Big pitch jump: ${a.title} (${ka}) → ${b.title} (${kb}).` });
   }
   return out;
 }
