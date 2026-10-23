@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f6f7ef">
+  <meta name="description" content="A little practice. A lot of growth. Ten gentle math facts at a time, with private progress tracking.">
+  <title>Number Garden · A little practice, a lot of growth</title>
+  <style>
+    :root{--paper:#f6f7ef;--white:#fffef9;--ink:#243e35;--muted:#6d7a6e;--green:#315d47;--lime:#d9e8a0;--line:#dce1d3;--pink:#f1b9aa;--yellow:#f4d484;--soft:#eaf0df;--red:#a54435;--radius:25px}
+    *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:ui-rounded,"Avenir Next",Avenir,"Segoe UI",sans-serif;font-size:16px}button,input{font:inherit}button{cursor:pointer;color:inherit}button:disabled{cursor:default;opacity:.55}button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid #b86c41;outline-offset:5px}button{touch-action:manipulation}a{color:var(--green)}[hidden]{display:none!important}.shell{display:grid;grid-template-columns:230px 1fr;min-height:100vh}.sidebar{position:sticky;top:0;height:100vh;border-right:1px solid var(--line);padding:38px 25px 24px;display:flex;flex-direction:column;background:#f0f3e7}.brand{display:flex;align-items:center;gap:11px;text-decoration:none;font-size:21px;font-weight:800;line-height:1.1;letter-spacing:-.8px}.brand svg{width:41px;flex-shrink:0}.brand small{display:block;font-size:10px;letter-spacing:2.8px;font-weight:600;margin-top:5px}.nav{display:grid;gap:9px;margin-top:58px}.nav button{border:0;background:transparent;border-radius:13px;text-align:left;padding:15px 14px;display:flex;align-items:center;gap:12px;font-weight:650;font-size:14px}.nav button.active{background:var(--green);color:white}.nav svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.7}.sidebar-foot{margin-top:auto;font-size:11px;line-height:1.8;color:var(--muted)}.sidebar-foot .mini-plant{width:78px;display:block;margin:0 0 20px 9px}.local-label{display:flex;align-items:center;gap:7px}.local-label i{width:6px;height:6px;background:#6b8b51;border-radius:50%}.content{max-width:1180px;width:100%;margin:auto;padding:34px 52px 26px}.topbar{display:flex;justify-content:space-between;align-items:center;gap:16px;font-size:13px;color:var(--muted);margin-bottom:43px}.topbar strong{color:var(--ink);font-weight:650}.pill{border:1px solid var(--line);border-radius:30px;padding:9px 14px;display:inline-flex;align-items:center;gap:8px;white-space:nowrap;background:#fafbf5;font-size:12px}.pill svg{width:16px;height:16px}.eyebrow{text-transform:uppercase;font-size:10px;letter-spacing:2px;font-weight:750;color:var(--green)}h1{font-size:clamp(30px,3.5vw,45px);font-weight:750;line-height:1.13;letter-spacing:-1.7px;margin:12px 0 13px}h1 em{font-family:Georgia,serif;font-weight:500;color:#66834a}p{line-height:1.6}.intro{position:relative;margin-bottom:30px}.intro p{color:var(--muted);font-size:14px;margin:0}.hero-flower{position:absolute;width:110px;height:110px;right:20px;top:-14px;transform:rotate(10deg)}.workspace{display:grid;grid-template-columns:minmax(0,1fr) 232px;gap:22px}.main-card{border:1px solid var(--line);border-radius:var(--radius);background:var(--white);overflow:hidden;box-shadow:0 4px 0 #e8ebdf}.card-top{padding:21px 28px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;font-size:12px}.card-top .dot{width:7px;height:7px;border-radius:50%;background:#83a66b;display:inline-block;margin-right:7px}.round-label{font-size:10px;letter-spacing:1.3px;font-weight:700;text-transform:uppercase}.practice-body{padding:27px 32px 26px;text-align:center;min-height:395px}.starter-icon{width:100px;height:100px;margin:1px auto 8px}.practice-body h2{font-size:25px;letter-spacing:-.7px;margin:9px 0}.practice-body p{font-size:13px;color:var(--muted);margin:10px 0 22px}.segmented{display:flex;border:1px solid var(--line);padding:5px;gap:4px;border-radius:13px;margin:22px auto 18px;max-width:380px;background:var(--paper)}.segmented button{background:transparent;border:0;border-radius:9px;padding:11px 9px;flex:1;font-size:12px;font-weight:650}.segmented button.selected{background:var(--white);box-shadow:0 2px 5px #213a3110;color:var(--green)}.range-control{display:flex;align-items:center;justify-content:center;gap:10px;margin:0 0 23px;font-size:12px;color:var(--muted)}.range-control button{border:1px solid var(--line);border-radius:7px;background:transparent;padding:5px 9px;font-size:11px}.range-control button.selected{background:var(--soft);border-color:#8eaa70;color:var(--green)}.primary{border:0;border-radius:12px;background:var(--green);color:white;padding:15px 26px;font-weight:700;font-size:14px;min-height:49px}.primary:hover{background:#244b38}.primary .arrow{margin-left:22px}.secondary{border:1px solid var(--line);background:transparent;border-radius:10px;padding:11px 17px;font-size:12px;font-weight:650}.text-button{background:none;border:0;text-decoration:underline;text-underline-offset:4px;padding:9px;font-size:12px;color:var(--muted)}.start-note{font-size:10px!important;margin:15px 0 0!important}.side-stack{display:grid;align-content:start;gap:18px}.note-card{border:1px solid var(--line);border-radius:20px;padding:22px;background:#edf1df}.note-card h3{font-size:14px;letter-spacing:-.2px;margin:0 0 11px}.note-card p{font-size:12px;color:var(--muted);line-height:1.7;margin:0}.note-card .big-number{font-size:44px;letter-spacing:-2px;line-height:1.3;font-weight:650}.flower-count{display:flex;justify-content:space-between;align-items:center;margin:12px 0 5px}.flower-count svg{width:63px;height:63px}.note-card.peach{background:#f6e9de}.note-card.peach svg{width:27px;height:27px;margin-bottom:13px}.garden-strip{margin-top:24px;background:#edf1e3;border:1px solid var(--line);border-radius:19px;padding:19px 25px 12px}.strip-header{display:flex;align-items:center;justify-content:space-between;font-size:11px}.strip-header strong{font-weight:700}.strip-header span{color:var(--muted);font-size:10px}.sprouts{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;margin-top:16px}.sprout{display:flex;justify-content:center;align-items:flex-end;border-bottom:2px solid #d3dcc4;padding-bottom:5px;height:43px}.sprout svg{width:35px;height:35px}.sprout.grown svg{animation:pop .4s ease both}.sprout.waiting{opacity:.35}.page-footer{display:flex;justify-content:space-between;gap:12px;font-size:10px;color:var(--muted);margin-top:26px}.equation{display:flex;align-items:center;justify-content:center;gap:17px;margin:27px 0;font-size:clamp(40px,5vw,62px);font-weight:650;letter-spacing:-2px;font-variant-numeric:tabular-nums}.equation .operator{color:#8b9b79;font-weight:400}.answer-input{width:100px;height:95px;text-align:center;font-size:52px;font-weight:650;border:2px solid #acbf8c;border-radius:15px;background:#f4f7e9;color:var(--ink);outline:none;caret-color:var(--green);-moz-appearance:textfield}.answer-input:focus{border-color:var(--green);box-shadow:0 0 0 4px #dce8ca}.answer-input::-webkit-inner-spin-button{appearance:none}.feedback{min-height:35px;font-size:14px;line-height:1.5;color:var(--green);font-weight:650;margin-bottom:14px}.feedback.retry{color:#9b5b36}.hint{background:#f0f3e5;border-radius:11px;padding:12px;font-size:12px;line-height:1.7;margin:0 auto 16px;max-width:380px}.quiz-tools{display:flex;gap:8px;justify-content:center;align-items:center;margin-top:12px}.keyboard-note{font-size:10px!important;margin:11px 0 0!important}.keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;max-width:250px;margin:14px auto}.keypad button{background:var(--paper);border:1px solid var(--line);border-radius:8px;font-size:20px;padding:9px;min-height:44px}.summary-stats{display:flex;justify-content:center;gap:35px;margin:24px 0}.summary-stats strong{display:block;font-size:31px}.summary-stats span{font-size:11px;color:var(--muted)}.completion-flower{height:104px;width:104px;margin:auto;animation:pop .6s ease both}.wide-panel{background:var(--white);border:1px solid var(--line);border-radius:var(--radius);padding:28px}.garden-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(105px,1fr));gap:18px;margin-top:28px}.garden-tile{text-align:center;background:#f1f4e7;border-radius:16px;padding:17px 7px 13px}.garden-tile svg{width:70px;height:80px}.garden-tile small{display:block;font-size:10px;color:var(--muted);margin-top:7px}.empty{text-align:center;padding:30px 10px;color:var(--muted);font-size:14px}.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:26px 0}.stat{background:#edf1e3;border:1px solid var(--line);border-radius:16px;padding:17px}.stat strong{display:block;font-size:28px;letter-spacing:-1px}.stat span{font-size:11px;color:var(--muted)}.section-heading{font-size:17px;letter-spacing:-.3px;margin:30px 0 12px}.table-scroll{overflow:auto}table{border-collapse:collapse;width:100%;font-size:12px;text-align:left;white-space:nowrap}th{font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);font-weight:600}th,td{padding:13px 12px;border-bottom:1px solid var(--line)}td:first-child,th:first-child{padding-left:0}.fact-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}.fact-item{border:1px solid var(--line);border-radius:12px;padding:14px}.fact-item strong{display:block;font-size:19px}.fact-item small{font-size:10px;color:var(--muted);display:block;margin-top:6px;line-height:1.6}.parent-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:25px}.danger{color:var(--red);border-color:#d7b6ab}.small-copy{font-size:12px;color:var(--muted);line-height:1.7}.notice{padding:12px 16px;border:1px solid #d2a978;background:#fff0d5;border-radius:12px;font-size:12px;line-height:1.5;margin:0 0 20px}.pause-overlay{position:fixed;inset:0;background:#243e3566;display:grid;place-items:center;z-index:5;padding:20px;backdrop-filter:blur(5px)}.pause-dialog{background:var(--white);border-radius:25px;padding:36px;text-align:center;max-width:390px;width:100%;box-shadow:0 20px 80px #1233}.pause-dialog h2{font-size:28px;margin:10px 0}.pause-dialog p{font-size:13px;color:var(--muted)}.pause-dialog .primary{margin:12px 0}.pause-dialog .text-button{display:block;margin:auto}details{margin-top:20px}summary{cursor:pointer;font-size:12px;color:var(--green)}@keyframes pop{0%{transform:scale(.65) translateY(7px)}65%{transform:scale(1.1)}100%{transform:scale(1)}}
+    @media(min-width:1400px){.content{padding-top:40px;padding-bottom:40px}.practice-body{min-height:420px;padding-top:35px}.topbar{margin-bottom:50px}}
+    @media(max-width:1050px){.shell{grid-template-columns:190px 1fr}.sidebar{padding:30px 18px}.content{padding:30px}.workspace{grid-template-columns:minmax(0,1fr) 190px}.practice-body{padding:24px 18px}.hero-flower{right:0;width:83px}.intro{padding-right:65px}.equation{gap:10px}.answer-input{width:80px;height:85px;font-size:44px}.note-card{padding:19px}.brand{font-size:18px}.stats-grid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:790px){.shell{display:block}.sidebar{position:static;height:auto;padding:17px 22px;flex-direction:row;align-items:center;justify-content:space-between;border-right:0;border-bottom:1px solid var(--line);gap:15px}.brand{font-size:17px}.brand svg{width:32px}.brand small{font-size:8px;letter-spacing:2px}.nav{display:flex;margin:0;gap:4px}.nav button{padding:11px;gap:6px;font-size:11px}.nav svg{width:16px}.sidebar-foot{display:none}.content{max-width:740px;padding:25px}.topbar{margin-bottom:29px}.workspace{grid-template-columns:1fr 190px}h1{font-size:35px}.hero-flower{width:80px}.intro{margin-bottom:24px}.page-footer{margin-top:22px}}
+    @media(max-width:600px){.sidebar{padding:16px;flex-wrap:wrap}.brand small{display:none}.nav button{font-size:11px;padding:10px 9px}.nav button span{display:none}.nav button.active span{display:inline}.content{padding:23px 16px}.topbar{font-size:11px;margin-bottom:27px}.pill{font-size:10px;padding:7px 10px}h1{font-size:34px;letter-spacing:-1.2px}.intro{padding-right:45px}.intro p{font-size:12px;max-width:270px}.hero-flower{width:60px;right:0;top:0}.workspace{display:flex;flex-direction:column;gap:18px}.side-stack{grid-template-columns:1fr 1fr;gap:12px}.note-card{padding:17px}.note-card h3{font-size:12px}.note-card p{font-size:11px}.note-card .big-number{font-size:31px}.flower-count{margin-top:5px}.flower-count svg{width:45px;height:45px}.note-card.peach svg{display:none}.practice-body{min-height:375px;padding:22px 18px}.card-top{padding:18px 21px}.garden-strip{margin-top:18px;padding:17px 16px 10px}.sprouts{gap:3px}.sprout svg{width:27px}.strip-header span{font-size:9px}.page-footer{font-size:9px}.wide-panel{padding:20px}.stats-grid{gap:10px}.stat{padding:14px}.stat strong{font-size:25px}.equation{font-size:49px;gap:12px}.answer-input{width:83px;height:83px;font-size:46px}.quiz-tools{gap:3px}.quiz-tools button{font-size:11px}.range-control{font-size:11px}.summary-stats{gap:26px}.garden-grid{grid-template-columns:repeat(3,1fr);gap:10px}.garden-tile svg{width:55px}.starter-icon{width:87px;height:87px}}
+    .brand svg{height:41px}.content,.main-card,.wide-panel,.workspace{min-width:0}.sprouts{grid-template-columns:repeat(10,minmax(0,1fr))}.sprout svg{max-width:100%}
+    @media(max-width:790px){.brand svg{height:32px}}
+    @media(max-width:600px){.card-top{gap:12px}.card-top>span:first-child{flex:1}.round-label{font-size:9px;text-align:right;max-width:47%}.segmented{gap:2px}.segmented button{font-size:11px;padding:11px 6px}.topbar{align-items:flex-start}.topbar>span:first-child{flex:1}.brand{flex-shrink:0}.equation{font-size:clamp(34px,12vw,49px);gap:clamp(6px,2.5vw,12px)}.answer-input{width:clamp(64px,20vw,83px);font-size:clamp(34px,11vw,46px)}}
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;scroll-behavior:auto!important}}
+  </style>
+</head>
+<body>
+<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" aria-hidden="true" style="position:absolute;overflow:hidden"><defs>
+  <symbol id="sun" viewBox="0 0 64 64"><g stroke="#315d47" stroke-width="2.8" stroke-linecap="round"><path d="M32 3v7m0 44v7M3 32h7m44 0h7M11.5 11.5l5 5m31 31 5 5m0-41-5 5m-31 31-5 5"/></g><circle cx="32" cy="32" r="17" fill="#f4d484"/><path d="M25 35q7 8 14 0" stroke="#315d47" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="26" cy="28" r="1.5" fill="#315d47"/><circle cx="38" cy="28" r="1.5" fill="#315d47"/></symbol>
+  <symbol id="seedling" viewBox="0 0 100 100"><path d="M50 83V43" fill="none" stroke="#52764c" stroke-width="5" stroke-linecap="round"/><path d="M49 62C17 65 18 33 20 32c22-2 34 12 29 30" fill="#9dbd6c"/><path d="M51 49c-4-22 9-32 29-31 4 18-9 34-29 31" fill="#52764c"/><path d="M29 83h42" stroke="#c9d1b6" stroke-width="4" stroke-linecap="round"/><path d="m28 75 6 20h32l6-20Z" fill="#e5a88f"/><path d="M26 75h48v7H26z" fill="#ce8d76"/></symbol>
+  <symbol id="bud" viewBox="0 0 60 60"><path d="M30 55V30" stroke="#648254" stroke-width="3" stroke-linecap="round"/><path d="M30 45C12 45 12 30 14 29c13 0 19 9 16 16" fill="#a4bc76"/><path d="M31 36c0-14 10-20 21-18 0 13-9 21-21 18" fill="#75945d"/><path d="M18 57h24" stroke="#c6d1b0" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="flower" viewBox="0 0 100 120"><path d="M50 110V46" stroke="#52764c" stroke-width="5" stroke-linecap="round"/><path d="M49 91C19 91 19 66 20 65c20-1 32 10 29 26" fill="#9bb96f"/><path d="M52 77c-2-21 12-30 31-28 0 20-11 31-31 28" fill="#52764c"/><g fill="currentColor"><ellipse cx="50" cy="22" rx="14" ry="20"/><ellipse cx="50" cy="62" rx="14" ry="20"/><ellipse cx="30" cy="42" rx="20" ry="14"/><ellipse cx="70" cy="42" rx="20" ry="14"/><ellipse cx="36" cy="28" rx="13" ry="18" transform="rotate(-45 36 28)"/><ellipse cx="64" cy="28" rx="13" ry="18" transform="rotate(45 64 28)"/><ellipse cx="36" cy="56" rx="13" ry="18" transform="rotate(45 36 56)"/><ellipse cx="64" cy="56" rx="13" ry="18" transform="rotate(-45 64 56)"/></g><circle cx="50" cy="42" r="16" fill="#f4d484"/><circle cx="45" cy="40" r="1.5" fill="#315d47"/><circle cx="55" cy="40" r="1.5" fill="#315d47"/><path d="M45 47q5 5 10 0" stroke="#315d47" stroke-width="1.5" fill="none" stroke-linecap="round"/></symbol>
+</defs></svg>
+<div class="shell">
+  <aside class="sidebar">
+    <a class="brand" href="#practice" aria-label="Number Garden home"><svg aria-hidden="true"><use href="#sun"/></svg><span>number garden<small>GROW A LITTLE EVERY DAY</small></span></a>
+    <nav class="nav" aria-label="Main navigation">
+      <button data-page="practice" class="active" aria-current="page" aria-label="Let’s practice"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21V10m0 5C4 15 3 9 4 6c6-1 9 3 8 9Zm0-4c0-6 4-9 9-8 1 6-3 10-9 8Z"/></svg><span>Let’s practice</span></button>
+      <button data-page="garden" aria-label="My garden"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22v-9m0 5c-5 0-6-3-6-5 4 0 6 2 6 5Z"/><circle cx="12" cy="8" r="3"/><path d="M9 5C7-2 1 5 6 8c-6 4 1 10 4 5m5-8c2-7 8 0 3 3 6 4-1 10-4 5"/></svg><span>My garden</span></button>
+      <button data-page="parent" aria-label="For grown-ups"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10m8 10V4m8 16v-7M2 21h20"/></svg><span>For grown-ups</span></button>
+    </nav>
+    <div class="sidebar-foot"><svg class="mini-plant" viewBox="0 0 100 100" aria-hidden="true"><use href="#seedling"/></svg>A little practice.<br>A lot of growth.<br><br><span class="local-label"><i></i> Saved on this device</span></div>
+  </aside>
+  <main class="content">
+    <header class="topbar"><span><strong>A fresh chance to grow.</strong> You’ve got this.</span><span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M12 21V10m0 5c-7 0-8-5-8-8 6 0 9 3 8 8Zm0-4c0-5 4-8 8-8 1 5-2 9-8 8Z"/></svg>Little steps, big things</span></header>
+    <div id="storage-warning" class="notice" role="status" hidden>Progress can’t be saved in this browser right now. You can still play, and export today’s progress from “For grown-ups.”</div>
+    <section id="page-practice" aria-label="Practice">
+      <div class="intro"><div class="eyebrow">YOUR DAILY DOSE OF “I CAN DO THIS”</div><h1>Little facts.<br><em>Big possibilities.</em></h1><p>Plant a little confidence, one math fact at a time.</p><svg class="hero-flower" style="color:var(--pink)" viewBox="0 0 100 120" aria-hidden="true"><use href="#flower"/></svg></div>
+      <div class="workspace">
+        <div class="main-card">
+          <div class="card-top"><span><i class="dot"></i><span id="card-label">A little brain-growing time</span></span><span class="round-label" id="round-label">10 FACTS · ONE LITTLE GARDEN</span></div>
+          <div class="practice-body" id="start-panel">
+            <svg class="starter-icon" viewBox="0 0 100 100" aria-hidden="true"><use href="#seedling"/></svg><h2>Ready, set, grow!</h2><p>Ten little questions. Take your time.<br>Every try helps your brain grow.</p>
+            <div class="segmented" role="group" aria-label="Choose operation"><button data-mode="mixed" class="selected" aria-pressed="true">+ − Mix it up</button><button data-mode="add" aria-pressed="false">+ Addition</button><button data-mode="subtract" aria-pressed="false">− Subtraction</button></div>
+            <div class="range-control" role="group" aria-label="Choose fact range"><span>Numbers that add up to</span><button data-limit="10" aria-pressed="false">10</button><button data-limit="20" class="selected" aria-pressed="true">20</button></div>
+            <button class="primary" id="start-button">Let’s grow <span class="arrow" aria-hidden="true">↗</span></button><p class="start-note">No rush. No grades. Just a little practice.</p>
+          </div>
+          <div class="practice-body" id="quiz-panel" hidden>
+            <div class="eyebrow" id="question-caption">LET’S PLANT THE FIRST SEED</div>
+            <form id="answer-form" autocomplete="off"><div class="equation"><span id="operand-a"></span><span class="operator" id="operator"></span><span id="operand-b"></span><span class="operator">=</span><input class="answer-input" id="answer" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" aria-label="Your answer" aria-describedby="feedback"></div><div class="feedback" id="feedback" role="status" aria-live="polite"></div><div class="hint" id="hint" hidden></div><button class="primary" id="check-button" type="submit">Check my answer <span class="arrow" aria-hidden="true">↗</span></button></form>
+            <div class="quiz-tools"><button class="text-button" id="hint-button">A little hint</button><button class="text-button" id="reveal-button">Show me this one</button><button class="text-button" id="keypad-toggle" aria-expanded="false" aria-controls="keypad">Number pad</button></div>
+            <div class="keypad" id="keypad" aria-label="Answer number pad" hidden></div><p class="keyboard-note">Type your answer and press Enter <span aria-hidden="true">↵</span> <button class="text-button" id="pause-button" type="button">Pause</button></p>
+          </div>
+          <div class="practice-body" id="summary-panel" hidden><svg class="completion-flower" viewBox="0 0 100 120" style="color:var(--pink)" aria-hidden="true"><use href="#flower"/></svg><h2>A little practice. A new bloom!</h2><p id="summary-message"></p><div class="summary-stats"><div><strong>10</strong><span>facts practiced</span></div><div><strong id="summary-first"></strong><span>on the first try</span></div><div><strong>+1</strong><span>garden bloom</span></div></div><button class="primary" id="again-button">Grow another <span class="arrow" aria-hidden="true">↗</span></button><button class="text-button" id="view-garden-button">Visit my garden</button></div>
+        </div>
+        <aside class="side-stack"><div class="note-card"><div class="eyebrow" style="font-size:9px">LOOK WHAT YOU’RE GROWING</div><div class="flower-count"><span class="big-number" id="bloom-count">0</span><svg style="color:var(--pink)" viewBox="0 0 100 120" aria-hidden="true"><use href="#flower"/></svg></div><h3 id="bloom-label">blooms in your garden</h3><p>Every finished round grows a brand-new flower.</p></div><div class="note-card peach"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#sun"/></svg><h3>Mistakes help us grow.</h3><p>Getting stuck is part of learning. Try again, ask for a hint, or see how it works.</p></div></aside>
+      </div>
+      <div class="garden-strip"><div class="strip-header"><strong id="strip-title">Your next little garden</strong><span id="strip-count">One seed for each fact · 0 / 10</span></div><div class="sprouts" id="sprouts" aria-label="0 of 10 facts completed"></div></div>
+    </section>
+    <section id="page-garden" hidden aria-label="My garden"><div class="intro"><div class="eyebrow">ALL THOSE LITTLE TRIES ADD UP</div><h1>Look at you <em>grow.</em></h1><p>A flower for every ten facts. Each one is a little “I did it!”</p></div><div class="wide-panel"><div id="garden-message" class="small-copy"></div><div class="garden-grid" id="garden-grid"></div><button class="primary" id="garden-practice" style="margin-top:25px">Plant the next one ↗</button></div></section>
+    <section id="page-parent" hidden aria-label="For grown-ups"><div class="intro"><div class="eyebrow">A QUIET LOOK BEHIND THE SCENES</div><h1>Small steps. <em>Real progress.</em></h1><p>Timing stays here, so practice can stay pressure-free.</p></div><div class="wide-panel"><p class="small-copy" style="margin-top:0">Practice gently favors facts that need another try, including slower answers. Hints and revealed answers are recorded. All data stays in this browser.</p><div class="stats-grid" id="parent-stats"></div><h2 class="section-heading">A little more practice</h2><p class="small-copy">Facts with misses or hints appear first, followed by slower correct answers. First response times are shown below.</p><div class="fact-list" id="fact-list"></div><h2 class="section-heading">Recent rounds</h2><div class="table-scroll"><table><thead><tr><th>When</th><th>Practice</th><th>Facts</th><th>First try</th><th>Active time</th><th>Avg. response</th></tr></thead><tbody id="round-history"></tbody></table></div><details><summary>How timing and practice selection work</summary><p class="small-copy">A round has 10 unique facts. Up to six are drawn from previously practiced facts, with extra weight for misses, hints, and slower responses; the rest introduce new facts when available. Addition uses addends from 0 to 10 and the selected total limit. Subtraction uses the same fact families, so answers stay nonnegative and at most 10.</p><p class="small-copy">First-response time measures active thinking until the first answer, hint, or reveal. Active round time adds the time spent solving each fact, including retries. It excludes feedback, pauses, and time while the tab is hidden. First-try accuracy means a correct first answer without help. Round averages include revealed and helped facts; this is practice data, not an assessment. Recent rounds include partial rounds. The latest 200 rounds are retained; fact totals and bloom totals continue accumulating.</p></details><div class="parent-actions"><button class="secondary" id="export-button">Export progress (.json)</button><button class="secondary danger" id="reset-button">Reset all progress</button></div><div id="reset-confirm" class="notice" style="margin:16px 0 0" hidden><p style="margin-top:0">Erase all saved facts, rounds, and flowers from this browser? This cannot be undone. Export first if you want a backup.</p><button class="secondary danger" id="confirm-reset">Yes, erase progress</button> <button class="secondary" id="cancel-reset">Keep my garden</button></div><p class="small-copy" id="export-status" role="status"></p></div></section>
+    <footer class="page-footer"><span>Made for little minds doing big things.</span><span>Addition & subtraction · One fact at a time</span></footer>
+  </main>
+</div>
+<div class="pause-overlay" id="pause-overlay" hidden><section class="pause-dialog" role="dialog" aria-modal="true" aria-labelledby="pause-title"><svg style="width:65px;height:65px" viewBox="0 0 64 64" aria-hidden="true"><use href="#sun"/></svg><h2 id="pause-title">A little breather.</h2><p>Your garden can wait. Come back when you’re ready.</p><button class="primary" id="resume-button">Keep growing ↗</button><button class="text-button" id="leave-button">Finish later · back to start</button></section></div>
+<script>
+(() => {
+  'use strict';
+  const STORAGE_KEY = 'number-garden-v1';
+  const $ = id => document.getElementById(id);
+  const fresh = () => ({version:1, settings:{mode:'mixed', limit:20}, blooms:0, facts:{}, rounds:[]});
+  let db = fresh(), storageOK = true, round = null, question = null, phase = 'start', paused = false, lastTick = null, activeMs = 0, page = 'practice';
+  const colors = ['#efb3a5','#c1b8d8','#e6bd70','#a5bd81','#dca5b4','#9ebfbd'];
+  const captions = ['Let’s plant the first seed','One little step at a time','Your brain is growing','Keep that garden growing','You’re halfway to a bloom','Look at those little sprouts','A little practice adds up','Keep going, gardener','Your flower is almost here','One more seed to plant'];
+  const safeNumber = v => typeof v === 'number' && Number.isFinite(v) && v >= 0;
+  function validData(value) {
+    // Validate imported browser state before using it in selection or totals.
+    return value && value.version === 1 && safeNumber(value.blooms) && Number.isInteger(value.blooms) && value.facts && typeof value.facts === 'object' && !Array.isArray(value.facts) && Object.entries(value.facts).every(([key,f]) => /^(add|subtract):\d{1,2}:\d{1,2}$/.test(key) && f && ['seen','firstCorrect','responseTotalMs','solveTotalMs','helped','revealed','emaMs'].every(k => safeNumber(f[k]))) && Array.isArray(value.rounds) && value.rounds.every(r => r && typeof r.id === 'string' && typeof r.startedAt === 'string' && ['mixed','add','subtract'].includes(r.mode) && [10,20].includes(r.limit) && ['active','complete','partial'].includes(r.status) && Array.isArray(r.answers) && r.answers.length <= 10 && r.answers.every(a => a && typeof a.key === 'string' && safeNumber(a.responseMs) && safeNumber(a.solveMs) && typeof a.firstCorrect === 'boolean'));
+  }
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw !== null) {const parsed = JSON.parse(raw); if (!validData(parsed)) throw new Error('Invalid progress data'); db = parsed;}
+  } catch (error) {storageOK = false;}
+  if (!['mixed','add','subtract'].includes(db.settings?.mode) || ![10,20].includes(db.settings?.limit)) db.settings = {mode:'mixed',limit:20};
+  db.rounds.forEach(r => {if (r.status === 'active') r.status = 'partial';});
+  function save() {
+    if (!storageOK) return;
+    try {localStorage.setItem(STORAGE_KEY, JSON.stringify(db));}
+    catch (error) {storageOK = false; updateStorageNotice();}
+  }
+  function updateStorageNotice() {
+    $('storage-warning').hidden = storageOK;
+    document.querySelector('.local-label').lastChild.textContent = storageOK ? ' Saved on this device' : ' Progress is not saving';
+  }
+  const svg = (symbol, color='') => `<svg viewBox="0 0 ${symbol === 'flower' ? '100 120' : '60 60'}" aria-hidden="true"${color ? ` style="color:${color}"` : ''}><use href="#${symbol}"/></svg>`;
+  function factPool(mode,limit) {
+    const pool=[];
+    for(let a=0;a<=10;a++) for(let b=0;b<=10;b++) {
+      if(a+b>limit) continue;
+      if(mode !== 'subtract') pool.push({a,b,op:'add',answer:a+b,key:`add:${a}:${b}`});
+      if(mode !== 'add') pool.push({a:a+b,b,op:'subtract',answer:a,key:`subtract:${a+b}:${b}`});
+    }
+    return pool;
+  }
+  const weight = f => f ? 1 + 5*(1-f.firstCorrect/Math.max(1,f.seen)) + 2*f.helped/Math.max(1,f.seen) + Math.min(4,f.emaMs/5000) : 1;
+  function draw(list, count, weighted=false) {
+    const candidates=[...list], chosen=[];
+    while(candidates.length && chosen.length<count) {
+      const weights=candidates.map(f => weighted ? weight(db.facts[f.key]) : 1);
+      let pick=Math.random()*weights.reduce((a,b)=>a+b,0), index=weights.length-1;
+      for(let i=0;i<weights.length;i++) {pick-=weights[i]; if(pick<0){index=i;break;}}
+      chosen.push(candidates.splice(index,1)[0]);
+    }
+    return chosen;
+  }
+  function chooseFacts() {
+    const pool=factPool(db.settings.mode,db.settings.limit), seen=pool.filter(f=>db.facts[f.key]), unseen=pool.filter(f=>!db.facts[f.key]);
+    const review=draw(seen,Math.min(6,seen.length),true), newFacts=draw(unseen,10-review.length);
+    const chosen=[...review,...newFacts], keys=new Set(chosen.map(f=>f.key));
+    chosen.push(...draw(pool.filter(f=>!keys.has(f.key)),10-chosen.length,true));
+    return draw(chosen,10);
+  }
+  function tick() {
+    if(lastTick !== null) {activeMs += Math.max(0,performance.now()-lastTick); lastTick=null;}
+  }
+  function runClock() {if(phase==='asking' && !paused && !document.hidden && page==='practice') lastTick=performance.now();}
+  function elapsed() {return activeMs + (lastTick===null ? 0 : Math.max(0,performance.now()-lastTick));}
+  function firstInteraction() {if(question.firstResponseMs===null) question.firstResponseMs=Math.round(elapsed());}
+  function updateSettings() {
+    document.querySelectorAll('[data-mode]').forEach(b=>{const selected=b.dataset.mode===db.settings.mode;b.classList.toggle('selected',selected);b.setAttribute('aria-pressed',selected);});
+    document.querySelectorAll('[data-limit]').forEach(b=>{const selected=+b.dataset.limit===db.settings.limit;b.classList.toggle('selected',selected);b.setAttribute('aria-pressed',selected);});
+  }
+  function showPanel(name) {['start','quiz','summary'].forEach(n=>$(n+'-panel').hidden=n!==name);}
+  function renderStrip(count=0) {
+    $('sprouts').innerHTML=Array.from({length:10},(_,i)=>`<span class="sprout ${i<count?'grown':'waiting'}">${svg(i<count?'flower':'bud',colors[i%colors.length])}</span>`).join('');
+    $('sprouts').setAttribute('aria-label',`${count} of 10 facts completed`);
+    $('strip-count').textContent=`One seed for each fact · ${count} / 10`;
+    $('strip-title').textContent=count===10?'A whole little garden. You grew that!':count?'Your little garden is growing':'Your next little garden';
+  }
+  function updateBlooms() {$('bloom-count').textContent=db.blooms;$('bloom-label').textContent=db.blooms===1?'bloom in your garden':'blooms in your garden';}
+  function startRound() {
+    if(phase!=='start') return;
+    const questions=chooseFacts();
+    round={id:globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`,startedAt:new Date().toISOString(),mode:db.settings.mode,limit:db.settings.limit,status:'active',answers:[],questions};
+    db.rounds.push(round); db.rounds=db.rounds.slice(-200);save();
+    showPanel('quiz'); paused=false; renderStrip(); showQuestion();
+  }
+  function showQuestion() {
+    question={...round.questions[round.answers.length],attempts:0,firstResponseMs:null,hinted:false,revealed:false};
+    activeMs=0;lastTick=null;phase='asking';
+    $('operand-a').textContent=question.a;$('operand-b').textContent=question.b;$('operator').textContent=question.op==='add'?'+':'−';
+    $('answer').value='';$('answer').disabled=false;$('answer').removeAttribute('aria-invalid');
+    $('answer').setAttribute('aria-label',`${question.a} ${question.op==='add'?'plus':'minus'} ${question.b} equals? Your answer`);
+    $('question-caption').textContent=captions[round.answers.length];$('round-label').textContent=`FACT ${round.answers.length+1} OF 10`;
+    $('card-label').textContent=round.mode==='mixed'?'A little of both':round.mode==='add'?'Let’s add a little':'Let’s take a little away';
+    $('feedback').textContent='';$('feedback').className='feedback';$('hint').hidden=true;
+    $('check-button').innerHTML='Check my answer <span class="arrow" aria-hidden="true">↗</span>';
+    $('hint-button').disabled=false;$('reveal-button').disabled=false;runClock();
+    if(matchMedia('(min-width: 700px)').matches) $('answer').focus();
+  }
+  function recordAnswer() {
+    tick();phase='feedback';
+    const responseMs=question.firstResponseMs??Math.round(activeMs), firstCorrect=question.attempts===1 && !question.hinted && !question.revealed;
+    const result={key:question.key,a:question.a,b:question.b,op:question.op,answer:question.answer,attempts:question.attempts,firstCorrect,hinted:question.hinted,revealed:question.revealed,responseMs,solveMs:Math.round(activeMs)};
+    round.answers.push(result);
+    const f=db.facts[question.key] || {seen:0,firstCorrect:0,responseTotalMs:0,solveTotalMs:0,helped:0,revealed:0,emaMs:0};
+    f.emaMs=f.seen ? f.emaMs*.65+responseMs*.35 : responseMs;f.seen++;f.firstCorrect+=+firstCorrect;f.responseTotalMs+=responseMs;f.solveTotalMs+=result.solveMs;f.helped+=+question.hinted;f.revealed+=+question.revealed;f.lastAt=new Date().toISOString();db.facts[question.key]=f;
+    if(round.answers.length===10) {round.status='complete';round.completedAt=new Date().toISOString();db.blooms++;updateBlooms();}
+    save();renderStrip(round.answers.length);$('answer').disabled=true;$('hint-button').disabled=true;$('reveal-button').disabled=true;
+    $('check-button').innerHTML=round.answers.length===10?'See my new bloom <span class="arrow" aria-hidden="true">↗</span>':'Next little seed <span class="arrow" aria-hidden="true">↗</span>';
+    $('check-button').focus();
+  }
+  $('answer-form').addEventListener('submit',event=>{
+    event.preventDefault();if(paused || document.hidden || page!=='practice') return;
+    if(phase==='feedback') {if(round.answers.length===10) finishRound();else showQuestion();return;}
+    if(phase!=='asking') return;
+    const raw=$('answer').value.trim();
+    if(!/^\d{1,2}$/.test(raw)) {$('feedback').textContent='Pop a number in the box first.';$('answer').focus();return;}
+    firstInteraction();question.attempts++;
+    if(Number(raw)===question.answer) {
+      $('feedback').className='feedback';$('feedback').textContent=question.attempts===1&&!question.hinted?'You got it! A little seed is growing.':'You kept growing. Nice work!';recordAnswer();
+    } else {
+      $('feedback').className='feedback retry';$('feedback').textContent='Not quite yet. Take a breath and try again.';$('answer').setAttribute('aria-invalid','true');$('answer').select();$('answer').focus();
+    }
+  });
+  $('answer').addEventListener('input',()=>{$('answer').value=$('answer').value.replace(/[^0-9]/g,'').slice(0,2);$('answer').removeAttribute('aria-invalid');});
+  $('hint-button').addEventListener('click',()=>{
+    if(phase!=='asking'||paused)return;firstInteraction();question.hinted=true;
+    const {a,b,op}=question;let hint;
+    if(b===0) hint=op==='add'?`Adding zero leaves your number the same. Start with ${a}.`:`Taking away zero leaves your number the same. Start with ${a}.`;
+    else if(op==='add') {const start=Math.max(a,b),steps=Math.min(a,b);hint=`Start at ${start}. Count forward ${steps} ${steps===1?'step':'steps'}${steps ? ': '+Array.from({length:steps},(_,i)=>start+i+1).join(' → ') : ''}.`;}
+    else hint=`Start at ${a}. Count back ${b} ${b===1?'step':'steps'}: ${Array.from({length:b},(_,i)=>a-i-1).join(' → ')}.`;
+    $('hint').textContent=hint;$('hint').hidden=false;$('hint-button').disabled=true;$('feedback').textContent='A little help is how we learn.';
+  });
+  $('reveal-button').addEventListener('click',()=>{
+    if(phase!=='asking'||paused)return;firstInteraction();question.revealed=true;$('answer').value=question.answer;
+    $('feedback').className='feedback';$('feedback').textContent=`${question.a} ${question.op==='add'?'+':'−'} ${question.b} = ${question.answer}. Let’s remember this one together.`;recordAnswer();
+  });
+  function finishRound() {
+    phase='summary';showPanel('summary');$('round-label').textContent='TEN LITTLE SEEDS · ONE NEW BLOOM';$('card-label').textContent='Look what you grew';
+    const first=round.answers.filter(a=>a.firstCorrect).length;$('summary-first').textContent=first;
+    $('summary-message').textContent=first===10?'Ten facts, ten first tries. Your practice is taking root!':'You showed up, tried, and learned. That’s how confidence grows.';
+    $('again-button').focus();
+  }
+  function goStart() {
+    tick();if(round?.status==='active') {round.status='partial';save();}
+    round=null;question=null;phase='start';paused=false;lastTick=null;$('pause-overlay').hidden=true;showPanel('start');renderStrip();$('card-label').textContent='A little brain-growing time';$('round-label').textContent='10 FACTS · ONE LITTLE GARDEN';
+  }
+  function pause() {
+    if(!['asking','feedback'].includes(phase)||paused)return;tick();paused=true;$('pause-overlay').hidden=false;$('resume-button').focus();
+  }
+  function resume() {paused=false;$('pause-overlay').hidden=true;runClock();if(phase==='asking') $('answer').focus();else $('check-button').focus();}
+  function navigate(next) {
+    if(next===page)return;
+    if(['asking','feedback'].includes(phase)) {tick();paused=true;}
+    page=next;
+    ['practice','garden','parent'].forEach(p=>{$('page-'+p).hidden=p!==page;const b=document.querySelector(`[data-page="${p}"]`);b.classList.toggle('active',p===page);if(p===page)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
+    if(page==='garden') renderGarden();if(page==='parent')renderParent();
+    if(page==='practice'&&paused) {$('pause-overlay').hidden=false;$('resume-button').focus();}
+  }
+  function dateLabel(value) {const d=new Date(value);return Number.isNaN(d.getTime())?'Unknown date':d.toLocaleDateString(undefined,{month:'short',day:'numeric'});}
+  function duration(ms) {const s=Math.round(ms/1000);return s>=60?`${Math.floor(s/60)}m ${s%60}s`:`${s}s`;}
+  function seconds(ms) {return (ms/1000).toFixed(1)+'s';}
+  function renderGarden() {
+    const blooms=db.rounds.filter(r=>r.status==='complete').slice(-60).reverse();
+    $('garden-message').textContent=db.blooms?`${db.blooms} ${db.blooms===1?'bloom':'blooms'} grown. ${db.blooms*10} little facts practiced. Keep making room for good things.`:'Your first flower is waiting to grow. Finish a round of ten facts to plant it here.';
+    $('garden-grid').innerHTML=blooms.map((r,i)=>`<div class="garden-tile">${svg('flower',colors[(blooms.length-i-1)%colors.length])}<small>${dateLabel(r.completedAt||r.startedAt)}</small><small>10 facts · a little more confidence</small></div>`).join('');
+    if(db.blooms>blooms.length) {const note=document.createElement('p');note.className='small-copy';note.textContent='Showing your most recent '+blooms.length+' flowers. Every bloom still counts toward your total.';$('garden-grid').append(note);}
+  }
+  function renderParent() {
+    const facts=Object.entries(db.facts),total=facts.reduce((n,[,f])=>n+f.seen,0),correct=facts.reduce((n,[,f])=>n+f.firstCorrect,0),response=facts.reduce((n,[,f])=>n+f.responseTotalMs,0);
+    $('parent-stats').innerHTML=`<div class="stat"><strong>${db.blooms}</strong><span>completed rounds</span></div><div class="stat"><strong>${total}</strong><span>facts practiced</span></div><div class="stat"><strong>${total?Math.round(100*correct/total)+'%':'—'}</strong><span>correct first try, without help</span></div><div class="stat"><strong>${total?seconds(response/total):'—'}</strong><span>average first response</span></div>`;
+    $('fact-list').replaceChildren();
+    if(!facts.length) {$('fact-list').innerHTML='<p class="small-copy">After a little practice, individual facts will appear here.</p>';}
+    facts.sort((a,b)=>weight(b[1])-weight(a[1])).slice(0,8).forEach(([key,f])=>{
+      const [op,a,b]=key.split(':'),item=document.createElement('div');item.className='fact-item';const title=document.createElement('strong');title.textContent=`${a} ${op==='add'?'+':'−'} ${b}`;const detail=document.createElement('small');detail.textContent=`${Math.round(100*f.firstCorrect/f.seen)}% first try · ${seconds(f.emaMs)} recent response`;const tries=document.createElement('small');tries.textContent=`${f.seen} ${f.seen===1?'try':'tries'} · ${f.helped} hints · ${f.revealed} reveals`;item.append(title,detail,tries);$('fact-list').append(item);
+    });
+    $('round-history').replaceChildren();
+    db.rounds.slice(-20).reverse().forEach(r=>{
+      const n=r.answers.length,first=r.answers.filter(a=>a.firstCorrect).length,ms=r.answers.reduce((s,a)=>s+a.solveMs,0),responseMs=r.answers.reduce((s,a)=>s+a.responseMs,0),tr=document.createElement('tr');
+      [dateLabel(r.startedAt),`${r.mode==='mixed'?'Mixed':r.mode==='add'?'Addition':'Subtraction'} · up to ${r.limit}`,`${n}/10${r.status==='complete'?'':r.status==='active'?' · in progress':' · partial'}`,n?`${first}/${n}`:'—',duration(ms),n?seconds(responseMs/n):'—'].forEach(value=>{const td=document.createElement('td');td.textContent=value;tr.append(td);});$('round-history').append(tr);
+    });
+    if(!db.rounds.length) $('round-history').innerHTML='<tr><td colspan="6">Your first round will appear here.</td></tr>';
+  }
+  document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>{db.settings.mode=b.dataset.mode;save();updateSettings();}));
+  document.querySelectorAll('[data-limit]').forEach(b=>b.addEventListener('click',()=>{db.settings.limit=+b.dataset.limit;save();updateSettings();}));
+  document.querySelectorAll('[data-page]').forEach(b=>b.addEventListener('click',()=>navigate(b.dataset.page)));
+  document.querySelector('.brand').addEventListener('click',e=>{e.preventDefault();navigate('practice');});
+  $('start-button').addEventListener('click',startRound);$('again-button').addEventListener('click',goStart);$('view-garden-button').addEventListener('click',()=>navigate('garden'));
+  $('garden-practice').addEventListener('click',()=>navigate('practice'));
+  $('pause-button').addEventListener('click',pause);$('resume-button').addEventListener('click',resume);$('leave-button').addEventListener('click',goStart);
+  $('pause-overlay').addEventListener('keydown',event=>{if(event.key==='Tab'){const buttons=[$('resume-button'),$('leave-button')],i=buttons.indexOf(document.activeElement);event.preventDefault();buttons[(i+(event.shiftKey?-1:1)+buttons.length)%buttons.length].focus();}});
+  document.addEventListener('keydown',event=>{if(event.key==='Escape'&&page==='practice'&&!paused)pause();});
+  document.addEventListener('visibilitychange',()=>{if(document.hidden) {tick();if(page==='practice')pause();}});
+  window.addEventListener('pagehide',()=>{tick();save();});
+  $('keypad-toggle').addEventListener('click',()=>{const open=$('keypad').hidden;$('keypad').hidden=!open;$('keypad-toggle').setAttribute('aria-expanded',open);});
+  for(const key of ['1','2','3','4','5','6','7','8','9','Clear','0','⌫']) {
+    const button=document.createElement('button');button.type='button';button.textContent=key;if(key==='⌫')button.setAttribute('aria-label','Delete last digit');
+    button.addEventListener('click',()=>{if(phase!=='asking'||paused)return;const input=$('answer');if(key==='Clear')input.value='';else if(key==='⌫')input.value=input.value.slice(0,-1);else if(input.value.length<2)input.value+=key;input.removeAttribute('aria-invalid');});$('keypad').append(button);
+  }
+  $('export-button').addEventListener('click',()=>{
+    const blob=new Blob([JSON.stringify({...db,exportedAt:new Date().toISOString()},null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`number-garden-${new Date().toISOString().slice(0,10)}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),3000);$('export-status').textContent='Progress exported. Keep the JSON file as your backup.';
+  });
+  $('reset-button').addEventListener('click',()=>{$('reset-confirm').hidden=false;$('cancel-reset').focus();});
+  $('cancel-reset').addEventListener('click',()=>{$('reset-confirm').hidden=true;$('reset-button').focus();});
+  $('confirm-reset').addEventListener('click',()=>{
+    goStart();db=fresh();storageOK=true;save();updateStorageNotice();updateBlooms();updateSettings();renderParent();$('reset-confirm').hidden=true;$('export-status').textContent='Progress reset. A fresh garden is ready.';$('reset-button').focus();
+  });
+  // Another open copy must not overwrite this tab’s newer answers with stale data.
+  window.addEventListener('storage',event=>{if(event.key===STORAGE_KEY){storageOK=false;updateStorageNotice();$('storage-warning').textContent='Progress changed in another tab. This tab has stopped saving to avoid overwriting it. Export this tab’s progress if needed, then reload to continue with the latest saved garden.';}});
+  updateStorageNotice();updateSettings();renderStrip();updateBlooms();save();
+})();
+</script>
+</body>
+</html>
