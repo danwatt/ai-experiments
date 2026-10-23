@@ -36,6 +36,42 @@
         "worship-planner-sonnet-5.5"
       ],
       "port": 5178
+    },
+    {
+      "name": "tx-lege-report",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8790",
+        "-d",
+        "tx-lege/output"
+      ],
+      "port": 8790
+    },
+    {
+      "name": "emotion-tts",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8791",
+        "-d",
+        "voicebox-samples/emotion-tts/output"
+      ],
+      "port": 8791
+    },
+    {
+      "name": "fact-rocket",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8793",
+        "-d",
+        "fact-rocket"
+      ],
+      "port": 8793
     }
   ]
 }
