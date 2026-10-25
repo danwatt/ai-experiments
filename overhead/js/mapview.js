@@ -57,7 +57,11 @@ export class MapView {
       getCursor: ({ isHovering, isDragging }) => (isDragging ? "grabbing" : isHovering ? "pointer" : "grab"),
     });
     this.map.addControl(this.overlay);
-    this.map.on("style.load", () => this.applySky(true));
+    this.map.on("style.load", () => {
+      this.applySky(true);
+      this.syncBuildings();
+    });
+    this.buildings = { on: true, ex: 3 };
     this.wireContextMenu(onContextMenu);
     this.wireChaseControls();
     this.icons = buildIconAtlas();
@@ -84,6 +88,101 @@ export class MapView {
       down = null;
       if (moved < 5) open(e);
     });
+  }
+
+  // ---------------------------------------------------------------- 3D buildings
+  // OpenFreeMap's OpenMapTiles source carries OSM building footprints with heights
+  // (render_height) from zoom 13. In 3D they're extruded, using the same altitude
+  // exaggeration as the aircraft so a plane over the terminal stays above it.
+
+  setBuildings(on, exaggeration) {
+    this.buildings = { on, ex: exaggeration };
+    this.syncBuildings();
+  }
+
+  syncBuildings() {
+    const m = this.map, id = "overhead-buildings";
+    if (!m.isStyleLoaded() && !m.getSource("openmaptiles")) return;
+    const show = this.buildings.on && this.mode === "3d";
+    if (!m.getLayer(id)) {
+      if (!show || !m.getSource("openmaptiles")) return;
+      const firstLabel = m.getStyle().layers.find((l) => l.type === "symbol")?.id;
+      m.addLayer({
+        id, type: "fill-extrusion", source: "openmaptiles", "source-layer": "building", minzoom: 13,
+        filter: ["!=", ["get", "hide_3d"], true],
+        paint: { "fill-extrusion-opacity": 0.9 },
+      }, firstLabel);
+    }
+    const ex = this.buildings.ex;
+    m.setLayoutProperty(id, "visibility", show ? "visible" : "none");
+    m.setPaintProperty(id, "fill-extrusion-color", this.light ? "#c3c9d2" : "#2c3648");
+    m.setPaintProperty(id, "fill-extrusion-height", ["*", ["coalesce", ["get", "render_height"], 6], ex]);
+    m.setPaintProperty(id, "fill-extrusion-base", ["*", ["coalesce", ["get", "render_min_height"], 0], ex]);
+  }
+
+  /**
+   * Building footprints within radiusM of a point, for the spotter view. Heights only
+   * come with zoom-14 tiles, and a screen of those covers ~4 km, so the (hidden) map is
+   * stepped over a grid around the point, features read at each stop, and the camera
+   * put back. Returns [{ring: [[x, y] metres east/north], h, base, cx, cy, area}].
+   */
+  async collectBuildings(lat, lon, radiusM, toLocal, fromLocal) {
+    const m = this.map;
+    if (!m.getSource("openmaptiles")) {
+      // still loading (or switching) the basemap style
+      await new Promise((resolve) => {
+        const t = setTimeout(resolve, 15000);
+        m.once("style.load", () => { clearTimeout(t); resolve(); });
+      });
+      if (!m.getSource("openmaptiles")) return null;
+    }
+    const saved ={ center: m.getCenter(), zoom: m.getZoom(), pitch: m.getPitch(), bearing: m.getBearing() };
+    const step = 3500, n = Math.ceil(radiusM / step);
+    const feats = [];
+    let last = null;
+    for (let i = -n; i <= n; i++) {
+      for (let j = -n; j <= n; j++) {
+        if (Math.hypot(i, j) * step > radiusM + step) continue;
+        last = fromLocal(lat, lon, i * step, j * step);
+        m.jumpTo({ center: last, zoom: 14, pitch: 0, bearing: 0 });
+        await new Promise((resolve) => {
+          const done = () => { clearTimeout(t); resolve(); };
+          const t = setTimeout(done, 6000);
+          m.once("idle", done);
+        });
+        feats.push(...m.querySourceFeatures("openmaptiles", { sourceLayer: "building" }));
+      }
+    }
+    // put the camera back, unless something else has moved it meanwhile
+    const c = m.getCenter();
+    if (last && Math.abs(c.lng - last[0]) < 1e-6 && Math.abs(c.lat - last[1]) < 1e-6) m.jumpTo(saved);
+    const out = [], seen = new Set();
+    for (const f of feats) {
+      if (f.properties.hide_3d) continue;
+      const polys = f.geometry.type === "Polygon" ? [f.geometry.coordinates] : f.geometry.type === "MultiPolygon" ? f.geometry.coordinates : [];
+      for (const poly of polys) {
+        const outer = poly[0];
+        if (!outer || outer.length < 4) continue;
+        const key = outer.slice(0, 3).map((c) => c.map((v) => v.toFixed(6)).join()).join("|");
+        if (seen.has(key)) continue; // same footprint served by two tiles
+        seen.add(key);
+        const ring = outer.slice(0, -1).map(([x, y]) => toLocal(lat, lon, y, x));
+        let cx = 0, cy = 0, area = 0;
+        for (let i = 0; i < ring.length; i++) {
+          const [x1, y1] = ring[i], [x2, y2] = ring[(i + 1) % ring.length];
+          area += x1 * y2 - x2 * y1;
+          cx += x1; cy += y1;
+        }
+        cx /= ring.length; cy /= ring.length;
+        if (Math.hypot(cx, cy) > radiusM) continue;
+        // keep what you'd notice from a spotting spot: big footprints (terminals, hangars)
+        // and anything tall (towers); houses and sheds would only cost frame time
+        const h = f.properties.render_height ?? 6;
+        if (Math.abs(area / 2) < 1500 && h < 15) continue;
+        out.push({ ring, h: f.properties.render_height ?? 6, base: f.properties.render_min_height ?? 0, cx, cy, area: area / 2 });
+      }
+    }
+    return out;
   }
 
   setStyle(key) {
@@ -155,6 +254,7 @@ export class MapView {
   setMode(mode) {
     this.mode = mode;
     if (this.chase) this.setChaseInput();
+    this.syncBuildings();
     if (mode === "3d") {
       this.map.setMaxPitch(85);
       this.map.touchPitch.enable();

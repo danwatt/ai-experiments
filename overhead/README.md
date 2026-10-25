@@ -71,7 +71,11 @@ keep interpolating. Only a location rounded to ~1 km (2 decimals) is sent upstre
   hold the device (back of the device = where you look). Car interiors throw compasses off by
   10–30°, so **Align**: point the crosshair at a runway end you can see and tap its number.
   Runs in Live mode; eye height is assumed to be field elevation + 6 ft unless you set your
-  elevation in Settings.
+  elevation in Settings. **Watch from** picks the spot: your location, or a known spotting
+  place — Founders' Plaza at DFW is the default whenever it's inside the area you're receiving
+  (always, in the demo) — and the view starts facing the middle of the airport. Buildings
+  around the spot (big footprints and anything 15 m+, within 5 km) are drawn too, and hide
+  aircraft taxiing behind them.
 
 **Chase** (details card or `C`) rides along with the selected aircraft: in 2D the map stays
 centred on it, track-up; in 3D the camera sits behind and a little above, looking along its
@@ -120,6 +124,13 @@ count); helicopters and slow movers are ignored. Active runways turn green (land
 The **Runways in use** card shows each busy airport's flow ("DAL · NW flow ↓31R 31L ↑31L") and
 tells you when your location sits under an active approach or departure path, with roughly how
 high arrivals pass. Click an airport to fly there.
+
+## 3D buildings
+
+OSM building footprints and heights come with the OpenFreeMap basemap tiles (zoom 14). The 3D
+map extrudes them (using the same altitude exaggeration as the aircraft, so a plane over a
+terminal stays above it). The spotter view reads them from the same tiles: the hidden map is
+stepped over a grid around the spot to load them, then put back. Toggle in Settings → Layers.
 
 ## Sun, sky and heatmap
 

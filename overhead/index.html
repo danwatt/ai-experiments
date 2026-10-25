@@ -45,6 +45,7 @@
     <canvas id="sky" hidden></canvas>
     <canvas id="spot" hidden></canvas>
     <div id="spotUi" class="spot-ui" hidden>
+      <select id="spotFrom" title="Where you're watching from"></select>
       <button id="spotFovOut" title="Wider view">−</button>
       <span id="spotFov" title="Horizontal field of view">70°</span>
       <button id="spotFovIn" title="Zoom in (binoculars)">+</button>
@@ -195,6 +196,7 @@
           <label class="check"><input id="sAirports" type="checkbox" /> Airports &amp; runways, with runways in use</label>
           <label class="check"><input id="sGuides" type="checkbox" /> Approach and climb-out guide lines</label>
           <label class="check"><input id="sSun" type="checkbox" /> Sun lighting, sky and shadows (3D)</label>
+          <label class="check"><input id="sBuildings" type="checkbox" /> 3D buildings (3D map and spotter view)</label>
           <label class="field"><span>Traffic heatmap</span>
             <select id="sHeat">
               <option value="0">Off</option><option value="1">Last hour</option><option value="6">Last 6 hours</option>

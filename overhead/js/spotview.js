@@ -159,8 +159,18 @@ export class SpotView {
     // ---- airfield: runways in perspective, active ones tinted, approach / climb-out guides
     if (o.ap) this.drawAirfield(o, { camXY, cam, proj, onScreen, ink, day });
 
-    // ---- aircraft, far to near
-    const placed = [], offscreen = [];
+    // ---- buildings and aircraft, painted far to near so nearer things cover farther ones
+    const placed = [], offscreen = [], scene = [];
+    if (o.buildings) {
+      const sunVec = o.sun && o.sun.el > 0 ? [Math.sin(o.sun.az * D2R), Math.cos(o.sun.az * D2R)] : null;
+      for (const b of o.buildings) {
+        const dist = Math.hypot(b.cx, b.cy);
+        if (dist > 2000 && Math.abs(b.area) < 400) continue; // small, far: invisible anyway
+        const toward = camXY(b.cx, b.cy, o.groundFt);
+        if (toward[2] < -200) continue; // behind us
+        scene.push({ dist, draw: () => this.drawBuilding(b, o, { camXY, proj, day, sunVec, W, H }) });
+      }
+    }
     for (const d of items) {
       const c = cam(d.st.lat, d.st.lon, d.st.alt);
       const dist = Math.hypot(...c);
@@ -170,8 +180,9 @@ export class SpotView {
       }
       if (dist < 35e3 && (!d.st.ground || o.moves?.has(d.hex))) offscreen.push({ d, c, dist });
     }
-    placed.sort((a, b) => b.dist - a.dist);
-    for (const it of placed) this.drawAircraft(it, o, { cam, proj, f });
+    for (const it of placed) scene.push({ dist: it.dist, draw: () => this.drawAircraft(it, o, { cam, proj, f }) });
+    scene.sort((a, b) => b.dist - a.dist);
+    for (const s of scene) s.draw();
     const taken = this.drawEdgeArrows(offscreen, o, W, H, { cam, proj, day });
     this.drawCards(placed, o, W, H, ink, day, taken);
 
@@ -253,6 +264,54 @@ export class SpotView {
       if (!onScreen(p)) continue;
       label(g, a.iata || a.ident, p[0], Math.min(p[1] + 30, this.cv.clientHeight - 80), `rgba(${ink},0.8)`, day ? "rgba(255,255,255,.6)" : "rgba(0,0,0,.5)");
     }
+  }
+
+  /** Extruded footprint: visible walls far to near, shaded by the sun, then the roof if we're above it. */
+  drawBuilding(b, o, { camXY, proj, day, sunVec, W, H }) {
+    const g = this.g, n = b.ring.length;
+    const base = o.groundFt + b.base / M_PER_FT, top = o.groundFt + b.h / M_PER_FT;
+    const ccw = b.area > 0;
+    const walls = [];
+    for (let i = 0; i < n; i++) {
+      const [x1, y1] = b.ring[i], [x2, y2] = b.ring[(i + 1) % n];
+      let nx = y2 - y1, ny = -(x2 - x1); // outward for a counter-clockwise ring
+      if (!ccw) { nx = -nx; ny = -ny; }
+      const mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
+      if (nx * mx + ny * my >= 0) continue; // faces away from us
+      const len = Math.hypot(nx, ny) || 1;
+      walls.push({ x1, y1, x2, y2, nx: nx / len, ny: ny / len, d: Math.hypot(mx, my) });
+    }
+    walls.sort((a, c) => c.d - a.d);
+    const shade = (w) => {
+      const lit = sunVec ? Math.max(0, w.nx * sunVec[0] + w.ny * sunVec[1]) : 0.3;
+      return day ? `rgb(${Math.round(120 + 70 * lit)},${Math.round(126 + 70 * lit)},${Math.round(136 + 66 * lit)})`
+        : `rgb(${Math.round(34 + 18 * lit)},${Math.round(40 + 18 * lit)},${Math.round(52 + 20 * lit)})`;
+    };
+    g.lineWidth = 0.6;
+    g.strokeStyle = day ? "rgba(60,64,72,0.55)" : "rgba(120,140,170,0.35)";
+    let drew = false;
+    for (const w of walls) {
+      const quad = clipPolygon([camXY(w.x1, w.y1, base), camXY(w.x2, w.y2, base), camXY(w.x2, w.y2, top), camXY(w.x1, w.y1, top)]);
+      if (quad.length < 3) continue;
+      const pts = quad.map(proj);
+      if (pts.every(([x]) => x < 0) || pts.every(([x]) => x > W) || pts.every(([, y]) => y > H)) continue;
+      g.fillStyle = shade(w);
+      g.beginPath();
+      pts.forEach((p, i) => g[i ? "lineTo" : "moveTo"](...p));
+      g.closePath(); g.fill(); g.stroke();
+      drew = true;
+    }
+    if (o.observerFt > top) {
+      const roof = clipPolygon(b.ring.map(([x, y]) => camXY(x, y, top)));
+      if (roof.length >= 3) {
+        g.fillStyle = day ? "rgb(170,176,186)" : "rgb(44,52,66)";
+        g.beginPath();
+        roof.map(proj).forEach((p, i) => g[i ? "lineTo" : "moveTo"](...p));
+        g.closePath(); g.fill(); g.stroke();
+        drew = true;
+      }
+    }
+    return drew;
   }
 
   drawAircraft({ d, c, p, dist }, o, { cam, proj, f }) {

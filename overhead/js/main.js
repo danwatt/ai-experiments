@@ -7,7 +7,7 @@ import { MapView } from "./mapview.js";
 import { SkyView } from "./skyview.js";
 import { SpotView } from "./spotview.js";
 import { SIZE_CLASSES, OPERATOR_KINDS, airlineName, sizeLabel, operatorLabel } from "./classify.js";
-import { haversine, bearing as brg, elevationAngle, compassPoint, lerpAngle, angleDiff, toLocal, M_PER_NM, M_PER_FT } from "./geo.js";
+import { haversine, bearing as brg, elevationAngle, compassPoint, lerpAngle, angleDiff, toLocal, fromLocal, M_PER_NM, M_PER_FT } from "./geo.js";
 
 const $ = (id) => document.getElementById(id);
 
@@ -36,6 +36,8 @@ const DEFAULTS = {
   labels: "all",
   spotFov: 70,           // spotter view: horizontal field of view, degrees
   spotAlign: 0,          // spotter view: compass correction from the align step, degrees
+  spotFrom: null,        // spotter view: "home" or a SPOTS id; null = pick a default
+  buildings: true,
   trail: 120,            // seconds; 0 = off, -1 = everything kept
   trailSel: 300,         // selected aircraft; 0 = same as others
   trailFade: true,
@@ -154,6 +156,12 @@ const mapView = new MapView($("map"), {
 const skyView = new SkyView($("sky"), { onSelect: select });
 const spot = { pitch: 2 };   // spotter view look-up angle (not saved: depends on how you hold the device)
 let spotAp = null;           // the airport the spotter view is watching
+// Well-known places to watch from. The spotter view stands here instead of at home.
+const SPOTS = [
+  { id: "dfw-founders", name: "Founders' Plaza, DFW", lat: 32.91843, lon: -97.05867, airport: "KDFW" },
+];
+let spotBuildings = [];      // footprints and heights near the spotting position (local metres)
+let spotBuildingsKey = null;
 let spotMoves = new Map();   // hex -> movement at spotAp (arrival ETA, holding, rolling)
 const spotView = new SpotView($("spot"), {
   onSelect: select,
@@ -623,7 +631,8 @@ function drawFrame(nowMs) {
     };
     if (S.view === "spot") {
       spotView.render(items, {
-        home: S.home, observerFt: observerFt(), yaw: S.bearing, pitch: spot.pitch, fov: S.spotFov,
+        home: spotPos(), observerFt: observerFt(), groundFt: spotAp?.elevFt ?? 0,
+        buildings: S.buildings ? spotBuildings : null, yaw: S.bearing, pitch: spot.pitch, fov: S.spotFov,
         light: mapView.light, sun: S.sunLight ? sun : null, ap: S.airports ? apData : null,
         moves: spotMoves, spotAp, aligning: !$("spotAlignPanel").hidden, bottomInset: 70,
       });
@@ -852,11 +861,41 @@ async function loadAirports() {
   await runwayWatch.load(S.home.lat, S.home.lon, S.radius);
   pickSpotAirport();
   buildApData();
+  if (S.view === "spot" && spotNeedsFacing && !sensor.on) {
+    spotNeedsFacing = false;
+    faceSpotAirport();
+  }
+}
+let spotNeedsFacing = false; // entered the spotter view before airports had loaded
+let spotBuildingsBusy = false, spotBuildingsTries = { key: null, n: 0 };
+async function loadSpotBuildings() {
+  if (!S.buildings) { spotBuildings = []; spotBuildingsKey = null; return; }
+  const p = spotPos();
+  if (!p || spotBuildingsBusy) return;
+  const key = `${p.lat.toFixed(4)},${p.lon.toFixed(4)}`;
+  if (key === spotBuildingsKey) return;
+  if (key !== spotBuildingsTries.key) spotBuildingsTries = { key, n: 0 };
+  if (spotBuildingsTries.n++ >= 3) return; // nothing there, or tiles unavailable
+  spotBuildingsKey = key;
+  spotBuildingsBusy = true;
+  try {
+    const found = await mapView.collectBuildings(p.lat, p.lon, 5000, toLocal, fromLocal);
+    if (found?.length) spotBuildings = found;
+    else spotBuildingsKey = null; // basemap not ready or nothing loaded: try again shortly
+  } catch (e) {
+    console.warn("buildings unavailable:", e);
+    spotBuildingsKey = null;
+  }
+  spotBuildingsBusy = false;
 }
 // The spotter view watches the nearest real airport: large/medium within 15 km if
 // there is one, else the nearest field with runways.
 function pickSpotAirport() {
-  const dist = (a) => haversine(S.home.lat, S.home.lon, a.lat, a.lon);
+  const preset = spotPreset();
+  const fixed = preset && runwayWatch.airports.find((a) => a.ident === preset.airport);
+  if (fixed) { spotAp = fixed; return; }
+  const p = spotPos();
+  const dist = (a) => haversine(p.lat, p.lon, a.lat, a.lon);
   const withRunways = runwayWatch.airports.filter((a) => a.runways.length);
   const near = withRunways.filter((a) => dist(a) < 15e3);
   const big = near.filter((a) => a.size !== "small");
@@ -982,14 +1021,51 @@ function setView(v) {
   if (noMap) stopChase();
   if (sky) skyView.resize();
   else if (spotting) enterSpot(was !== "spot");
-  else mapView.setMode(v);
+  else {
+    mapView.setMode(v);
+    if (was === "spot") mapView.fit(); // the hidden map was moved around to read building tiles
+  }
   renderSpotStrip();
 }
 
 // ---------------------------------------------------------------- spotter view
 function observerFt() {
   // parked by the field: its elevation plus eye height is a good guess
-  return S.elevFt || (spotAp?.elevFt || 0) + 6;
+  return (!spotPreset() && S.elevFt) || (spotAp?.elevFt || 0) + 6;
+}
+function spotPreset() {
+  return SPOTS.find((s) => s.id === S.spotFrom) || null;
+}
+function spotPos() {
+  const p = spotPreset();
+  return p ? { lat: p.lat, lon: p.lon } : S.home;
+}
+// Default to a known spot when it's inside the area we're receiving, else stand at home.
+function defaultSpotFrom() {
+  if (S.spotFrom || !S.home) return;
+  const near = SPOTS.find((s) => haversine(S.home.lat, S.home.lon, s.lat, s.lon) < S.radius * M_PER_NM * 0.8);
+  S.spotFrom = near ? near.id : "home";
+}
+function setSpotFrom(id) {
+  S.spotFrom = id;
+  save();
+  pickSpotAirport();
+  faceSpotAirport();
+  loadSpotBuildings();
+  renderSpotFrom();
+}
+function faceSpotAirport() {
+  const p = spotPos();
+  if (spotAp && p) {
+    setBearing(brg(p.lat, p.lon, spotAp.lat, spotAp.lon));
+    spot.pitch = 1;
+  }
+}
+function renderSpotFrom() {
+  const sel = $("spotFrom");
+  sel.innerHTML = [`<option value="home">${DEMO ? "Demo centre" : "My location"}</option>`,
+    ...SPOTS.map((s) => `<option value="${s.id}">${esc(s.name)}</option>`)].join("");
+  sel.value = S.spotFrom || "home";
 }
 function enterSpot(fresh) {
   spotView.resize();
@@ -998,7 +1074,14 @@ function enterSpot(fresh) {
     setTime("live");
     toast("Spotter view runs live, without the smoothing delay");
   }
-  if (fresh && !sensor.on && spotAp) setBearing(brg(S.home.lat, S.home.lon, spotAp.lat, spotAp.lon));
+  defaultSpotFrom();
+  renderSpotFrom();
+  pickSpotAirport();
+  if (fresh && !sensor.on) {
+    if (spotAp) faceSpotAirport(); // look toward the middle of the field
+    else spotNeedsFacing = true;
+  }
+  loadSpotBuildings();
 }
 function setFov(v) {
   S.spotFov = Math.max(8, Math.min(100, v));
@@ -1030,7 +1113,8 @@ function openAlign() {
   if (!spotAp) return toast("No airport nearby to align with");
   const ends = [];
   for (const rw of spotAp.runways) for (const e of [rw.le, rw.he]) ends.push(e);
-  const rel = (e) => Math.abs(angleDiff(S.bearing, brg(S.home.lat, S.home.lon, e.lat, e.lon)));
+  const p = spotPos();
+  const rel = (e) => Math.abs(angleDiff(S.bearing, brg(p.lat, p.lon, e.lat, e.lon)));
   ends.sort((a, b) => rel(a) - rel(b));
   $("alignHelp").textContent = sensor.on
     ? `Point the crosshair at a runway end you can see at ${spotAp.iata || spotAp.ident}, then tap which one it is.`
@@ -1040,7 +1124,7 @@ function openAlign() {
     const b = ev.target.closest("[data-k]");
     if (!b) return;
     const e = ends[+b.dataset.k];
-    const target = brg(S.home.lat, S.home.lon, e.lat, e.lon);
+    const target = brg(p.lat, p.lon, e.lat, e.lon);
     if (sensor.on && sensor.pose) {
       S.spotAlign = angleDiff(sensor.pose.heading, target);
       save();
@@ -1113,6 +1197,7 @@ function openSettings() {
   $("sAirports").checked = S.airports;
   $("sGuides").checked = S.runwayGuides;
   $("sSun").checked = S.sunLight;
+  $("sBuildings").checked = S.buildings;
   $("sHeat").value = String(S.heat);
   $("sHeatBand").value = S.heatBand;
   $("sEx").value = S.exaggeration;
@@ -1158,6 +1243,12 @@ function wireSettings() {
   $("sAirports").onchange = (e) => { S.airports = e.target.checked; loadAirports(); renderFlow(); save(); };
   $("sGuides").onchange = (e) => { S.runwayGuides = e.target.checked; save(); };
   $("sSun").onchange = (e) => { S.sunLight = e.target.checked; updateSun(); save(); };
+  $("sBuildings").onchange = (e) => {
+    S.buildings = e.target.checked;
+    mapView.setBuildings(S.buildings, S.exaggeration);
+    loadSpotBuildings();
+    save();
+  };
   $("sHeat").onchange = (e) => { S.heat = +e.target.value; heatBins = null; loadHeat(); save(); };
   $("sHeatBand").onchange = (e) => { S.heatBand = e.target.value; loadHeat(); save(); };
   $("sColor").onchange = (e) => { S.colorBy = e.target.value; renderLegend(); save(); };
@@ -1167,7 +1258,12 @@ function wireSettings() {
   $("sTrailFade").onchange = (e) => { S.trailFade = e.target.checked; save(); };
   $("sRouteLines").onchange = (e) => { S.routeLines = e.target.value; save(); };
   $("sRouteLabels").onchange = (e) => { S.routeLabels = e.target.checked; save(); };
-  $("sEx").oninput = (e) => { S.exaggeration = +e.target.value; syncSettingLabels(); save(); };
+  $("sEx").oninput = (e) => {
+    S.exaggeration = +e.target.value;
+    mapView.setBuildings(S.buildings, S.exaggeration);
+    syncSettingLabels();
+    save();
+  };
   $("sIcon").oninput = (e) => { S.iconScale = +e.target.value; syncSettingLabels(); save(); };
 }
 function wireOnboard() {
@@ -1246,6 +1342,8 @@ window.addEventListener("resize", () => {
 $("spotFovOut").onclick = () => setFov(S.spotFov * 1.25);
 $("spotFovIn").onclick = () => setFov(S.spotFov / 1.25);
 $("spotAlign").onclick = openAlign;
+$("spotFrom").onchange = (e) => setSpotFrom(e.target.value);
+mapView.setBuildings(S.buildings, S.exaggeration);
 $("alignLeft").onclick = () => nudge(-1);
 $("alignRight").onclick = () => nudge(1);
 $("alignDone").onclick = () => ($("spotAlignPanel").hidden = true);
@@ -1253,6 +1351,7 @@ $("alignDone").onclick = () => ($("spotAlignPanel").hidden = true);
 syncHistory();
 updateSun();
 setInterval(() => {
+  if (S.view === "spot" && S.buildings && !spotBuildingsKey) loadSpotBuildings();
   renderChaseHud();
   updateRoutes();
   updateRunways();
@@ -1267,6 +1366,7 @@ requestAnimationFrame(frame);
 window.overhead = { // console debugging
   store, routes, runwayWatch, mapView, skyView, settings: S,
   get items() { return lastItems; },
+  get spotBuildings() { return spotBuildings; },
   get sun() { return sun; },
   set sun(v) { sun = v; applyStyle(); mapView.setSun(sun, S.sunLight); }, // preview lighting until the next 30 s update
 };

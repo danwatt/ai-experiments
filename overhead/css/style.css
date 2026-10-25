@@ -101,6 +101,7 @@ body[data-view="spot"] .corner-left { display: none; }
   background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 4px; }
 .spot-ui button { min-width: 30px; height: 28px; border-radius: 7px; border: 1px solid var(--line); background: none; font-weight: 700; }
 .spot-ui button.wide { padding: 0 10px; }
+.spot-ui select { width: auto; max-width: 170px; height: 28px; padding: 2px 6px; font-size: 12px; }
 .spot-ui span { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 12px; min-width: 34px; text-align: center; }
 .align-panel { position: absolute; top: 52px; left: 50%; transform: translateX(-50%); z-index: 5; width: min(420px, calc(100% - 24px));
   background: var(--panel-solid); border: 1px solid var(--warn); border-radius: 12px; padding: 10px 12px; box-shadow: var(--shadow);
