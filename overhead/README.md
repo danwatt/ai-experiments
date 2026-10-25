@@ -7,6 +7,19 @@ Live aircraft around you, in the browser: 2D map, tilted 3D map with altitude, a
 python3 overhead/server.py      # http://localhost:8795
 ```
 
+To use it from other devices (a phone or tablet at the airport fence, another computer):
+
+```bash
+python3 overhead/server.py --host 0.0.0.0 --https      # prints the LAN URLs to open
+```
+
+`--host 0.0.0.0` listens on every interface (plain `http://` works for viewing). Browsers only
+grant location and compass access to `https://` pages or localhost, so `--https` serves TLS with a
+self-signed certificate generated into `data/` for this machine's name and LAN addresses —
+accept the browser warning once. Bring your own with `--cert` / `--key` (e.g. from mkcert or
+Let's Encrypt) to skip the warning. Anyone who can reach the port can use the proxy, so it
+spends your IP's provider rate limits; keep it to networks you trust.
+
 No build step, no dependencies beyond Python 3 stdlib. MapLibre GL + deck.gl load from unpkg;
 basemap tiles from OpenFreeMap.
 

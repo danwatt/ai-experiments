@@ -197,6 +197,7 @@ function restartFeed() {
   updateDelayUi();
 }
 function useGeolocation() {
+  if (!window.isSecureContext) return toast(NEEDS_HTTPS("Location"));
   if (!navigator.geolocation) return toast("Geolocation not available in this browser");
   toast("Locating…");
   navigator.geolocation.getCurrentPosition(
@@ -353,7 +354,10 @@ function initDial() {
   $("rotSensor").hidden = !hasSensor;
   $("rotSensor").onclick = () => (sensor.on ? stopSensor() : startSensor());
 }
+// Browsers only expose location and motion sensors to https:// pages (and localhost).
+const NEEDS_HTTPS = (what) => `${what} needs https:// — run server.py with --https, or use localhost`;
 async function startSensor() {
+  if (!window.isSecureContext) return toast(NEEDS_HTTPS("Compass"));
   try {
     if (typeof DeviceOrientationEvent.requestPermission === "function") {
       const r = await DeviceOrientationEvent.requestPermission();

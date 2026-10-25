@@ -5,15 +5,25 @@ Serves the static front end and proxies open ADS-B data providers, which do not
 send CORS headers. Responses are normalized to one shape and cached briefly so
 many browser tabs share one upstream request (and respect provider rate limits).
 
-    python3 server.py [port]
+    python3 server.py [port]                       # this machine only (localhost)
+    python3 server.py --host 0.0.0.0               # reachable from your network
+    python3 server.py --host 0.0.0.0 --https       # ditto, with a self-signed certificate
+
+Browsers only allow location and compass access on https:// or localhost, so use
+--https when opening the app from a phone or tablet.
 
 Optional env for OpenSky (raises anonymous 400 credits/day to 4000):
     OPENSKY_CLIENT_ID, OPENSKY_CLIENT_SECRET
 """
 
+import argparse
+import ipaddress
 import json
 import math
 import os
+import socket
+import ssl
+import subprocess
 import sys
 import threading
 import time
@@ -359,7 +369,85 @@ class Handler(SimpleHTTPRequestHandler):
         return super().do_GET()
 
 
+class Server(ThreadingHTTPServer):
+    daemon_threads = True
+
+    def handle_error(self, request, client_address):
+        # Untrusted self-signed certificates, plain http to the https port and dropped
+        # connections are routine on a shared network; don't print a traceback for each.
+        err = sys.exc_info()[1]
+        if isinstance(err, (ssl.SSLError, ConnectionError, TimeoutError)):
+            return
+        super().handle_error(request, client_address)
+
+
+def lan_addresses():
+    """This machine's addresses other devices can reach (best effort, no packets sent)."""
+    found = set()
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+            s.connect(("192.0.2.1", 9))  # TEST-NET; connecting a UDP socket only picks a route
+            found.add(s.getsockname()[0])
+    except OSError:
+        pass
+    try:
+        for ip in socket.gethostbyname_ex(socket.gethostname())[2]:
+            found.add(ip)
+    except OSError:
+        pass
+    return sorted(ip for ip in found if not ipaddress.ip_address(ip).is_loopback)
+
+
+def self_signed(names, ips):
+    """Create (once) a self-signed certificate for this machine's names and addresses."""
+    cert, key = os.path.join(ROOT, "data", "selfsigned.crt"), os.path.join(ROOT, "data", "selfsigned.key")
+    want = sorted({f"DNS:{n}" for n in names} | {f"IP:{i}" for i in ips})
+    marker = cert + ".san"
+    if os.path.exists(cert) and os.path.exists(key) and os.path.exists(marker) and open(marker).read() == ",".join(want):
+        return cert, key
+    os.makedirs(os.path.dirname(cert), exist_ok=True)
+    subprocess.run(["openssl", "req", "-x509", "-newkey", "rsa:2048", "-nodes", "-days", "825",
+                    "-keyout", key, "-out", cert, "-subj", "/CN=Overhead (self-signed)",
+                    "-addext", "subjectAltName=" + ",".join(want)],
+                   check=True, capture_output=True)
+    os.chmod(key, 0o600)
+    with open(marker, "w") as f:
+        f.write(",".join(want))
+    return cert, key
+
+
+def main():
+    ap = argparse.ArgumentParser(description="Overhead backend: static app + ADS-B proxy.")
+    ap.add_argument("port", nargs="?", type=int, default=8795)
+    ap.add_argument("--host", default="127.0.0.1",
+                    help="address to listen on; 0.0.0.0 makes it reachable from your network (default: 127.0.0.1)")
+    ap.add_argument("--https", action="store_true", help="serve over TLS (self-signed unless --cert/--key are given)")
+    ap.add_argument("--cert", help="TLS certificate (PEM)")
+    ap.add_argument("--key", help="TLS private key (PEM)")
+    args = ap.parse_args()
+
+    httpd = Server((args.host, args.port), Handler)
+    scheme = "https" if args.https or args.cert else "http"
+    lan = lan_addresses() if args.host in ("0.0.0.0", "") else []
+    if scheme == "https":
+        cert, key = (args.cert, args.key) if args.cert else \
+            self_signed(["localhost", socket.gethostname()], ["127.0.0.1", *lan])
+        ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+        ctx.load_cert_chain(cert, key)
+        # handshake in the request thread, so one slow client can't stall accept()
+        httpd.socket = ctx.wrap_socket(httpd.socket, server_side=True, do_handshake_on_connect=False)
+
+    print(f"Overhead on {scheme}://localhost:{args.port}", flush=True)
+    for ip in lan:
+        print(f"           {scheme}://{ip}:{args.port}", flush=True)
+    if args.host not in ("127.0.0.1", "localhost", "::1"):
+        print("Reachable from other machines: anyone who can reach it can use the proxy through your IP.", flush=True)
+        if scheme == "http":
+            print("Phones and tablets need --https for location and compass.", flush=True)
+        elif not args.cert:
+            print("Self-signed certificate: browsers will warn once; accept it to continue.", flush=True)
+    httpd.serve_forever()
+
+
 if __name__ == "__main__":
-    port = int(sys.argv[1]) if len(sys.argv) > 1 else 8795
-    print(f"Overhead on http://localhost:{port}")
-    ThreadingHTTPServer(("127.0.0.1", port), Handler).serve_forever()
+    main()
