@@ -2,6 +2,7 @@
 // the horizon at the rim, turned so the top of the screen is the direction you
 // face. Not mirrored: something on your right when you face it is on the right.
 import { haversine, bearing, elevationAngle, compassPoint, pathToAirport, M_PER_FT } from "./geo.js";
+import { trailSpan } from "./store.js";
 
 const D2R = Math.PI / 180;
 
@@ -38,7 +39,7 @@ export class SkyView {
     return { dist: d, az, el };
   }
 
-  render(items, { home, bearing: facing, observerFt, light, labels, routeLines }) {
+  render(items, { home, bearing: facing, observerFt, light, labels, routeLines, trailFade, trailLen, trailLenSel, now }) {
     const { g, cv } = this;
     if (cv.width !== Math.round(cv.clientWidth * (window.devicePixelRatio || 1))) this.resize();
     const W = cv.width / this.dpr, H = cv.height / this.dpr;
@@ -128,17 +129,27 @@ export class SkyView {
       }
     }
 
-    for (const { d } of placed) {
-      if (!d.trail || d.trail.length < 2) continue;
-      g.strokeStyle = `rgba(${d.color.join(",")},${(d.selected ? 0.8 : 0.3) * d.alpha})`;
+    const withTrail = placed.filter(({ d }) => d.trail && d.trail.length > 1).map(({ d }) => d);
+    const span = {
+      false: trailSpan(withTrail.filter((d) => !d.selected), trailLen, now),
+      true: trailSpan(withTrail.filter((d) => d.selected), trailLenSel, now),
+    };
+    for (const d of withTrail) {
+      const base = (d.selected ? 0.8 : 0.3) * d.alpha, len = span[d.selected];
       g.lineWidth = d.selected ? 2 : 1.2;
-      g.beginPath();
-      d.trail.forEach(([lon, lat, alt], i) => {
+      g.lineCap = "round";
+      let prev = null;
+      for (const [lon, lat, alt, t] of d.trail) {
         const q = this.project(home, observerFt, lat, lon, alt);
-        const [x, y] = pt(q.az, q.el);
-        g[i ? "lineTo" : "moveTo"](x, y);
-      });
-      g.stroke();
+        const cur = pt(q.az, q.el);
+        if (prev) {
+          // per-segment alpha so the tail fades out
+          const fade = trailFade ? Math.max(0, 1 - (now - t) / len) : 1;
+          g.strokeStyle = `rgba(${d.color.join(",")},${base * fade})`;
+          g.beginPath(); g.moveTo(...prev); g.lineTo(...cur); g.stroke();
+        }
+        prev = cur;
+      }
     }
 
     // Greedy label placement: selected first, then highest in the sky.

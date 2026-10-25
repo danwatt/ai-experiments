@@ -237,6 +237,7 @@ fieldset { border: 1px solid var(--line); border-radius: 10px; display: flex; fl
 legend { font-weight: 700; padding: 0 4px; }
 .row { display: flex; gap: 8px; }
 .row > * { flex: 1; }
+.hint { color: var(--muted); font-size: 11px; margin: -4px 0 0; }
 .fine { color: var(--muted); font-size: 11px; padding: 0 14px 12px; margin: 0; }
 
 .onboard { position: fixed; inset: 0; z-index: 10; display: grid; place-items: center; background: rgba(5, 10, 20, 0.6); backdrop-filter: blur(4px); }

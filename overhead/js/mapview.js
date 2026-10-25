@@ -2,6 +2,7 @@
 /* global maplibregl, deck */
 import { circle, destination, pathToAirport, M_PER_NM, M_PER_FT, MS_PER_KT } from "./geo.js";
 import { jetMesh, lightMesh, heliMesh } from "./meshes.js";
+import { trailSpan } from "./store.js";
 
 const MESHES = { jet: jetMesh(), light: lightMesh(), rotor: heliMesh() };
 const MESH_FOR = { light: "light", rotor: "rotor" };
@@ -193,14 +194,30 @@ export class MapView {
       }),
     ];
 
+    // Trails. Faded ones use TripsLayer, which ramps alpha from the tail to the head;
+    // selected and other aircraft can have different lengths, hence two layers.
     const trails = items.filter((d) => d.trail && d.trail.length > 1);
-    layers.push(new deck.PathLayer({
-      id: "trails", data: trails,
-      getPath: (d) => d.trail.map((p) => [p[0], p[1], z(p[2])]),
-      getColor: (d) => [...d.color, Math.round((d.selected ? 230 : 120) * d.alpha)],
-      getWidth: (d) => (d.selected ? 3 : 1.5), widthUnits: "pixels", jointRounded: true, capRounded: true,
-      billboard: true, updateTriggers: { getPath: [is3d, ex] }, parameters: { depthTest: is3d },
-    }));
+    for (const sel of [false, true]) {
+      const data = trails.filter((d) => d.selected === sel);
+      if (!data.length) continue;
+      const common = {
+        id: `trails-${sel ? "selected" : "others"}`, data,
+        getPath: (d) => d.trail.map((p) => [p[0], p[1], z(p[2])]),
+        getColor: (d) => [...d.color, Math.round((sel ? 230 : 140) * d.alpha)],
+        getWidth: sel ? 3 : 1.5, widthUnits: "pixels", jointRounded: true, capRounded: true,
+        billboard: true, updateTriggers: { getPath: [is3d, ex] }, parameters: { depthTest: is3d },
+      };
+      if (opts.trailFade) {
+        layers.push(new deck.TripsLayer({
+          ...common, fadeTrail: true, currentTime: 0,
+          trailLength: trailSpan(data, sel ? opts.trailLenSel : opts.trailLen, opts.now),
+          // relative to render time so float32 keeps sub-second precision
+          getTimestamps: (d) => d.trail.map((p) => p[3] - opts.now),
+        }));
+      } else {
+        layers.push(new deck.PathLayer(common));
+      }
+    }
 
     // Dashed great-circle line from the aircraft to its (likely) destination,
     // descending to field elevation in 3D.

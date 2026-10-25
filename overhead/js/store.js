@@ -4,13 +4,13 @@
 import { classify } from "./classify.js";
 import { toLocal, fromLocal, lerpAngle, angleDiff, haversine, destination, MS_PER_KT } from "./geo.js";
 
-const KEEP_SECONDS = 15 * 60;   // history kept for trails / delay
 const DROP_AFTER = 75;          // seconds unseen before a track is removed
 const MAX_KT = 1400;            // reject position jumps faster than this (bad decodes)
 
 export class TrafficStore {
   constructor() {
     this.tracks = new Map();
+    this.keepSeconds = 15 * 60; // history kept for trails / delay; raised to fit trail settings
     this.offset = 0;            // serverTime - Date.now()/1000
     this.offsetReady = false;
     this.meta = null;           // last response metadata
@@ -97,10 +97,10 @@ export class TrafficStore {
         if (kt > MAX_KT && dt < 120) continue;
       }
       s.push({ t: a.posTime, lat: a.lat, lon: a.lon, alt: a.alt ?? 0, track: a.track, gs: a.gs, vrate: a.vrate || 0, ground: a.ground });
-      while (s.length > 2 && s[0].t < now - KEEP_SECONDS) s.shift();
+      while (s.length > 2 && s[0].t < now - this.keepSeconds) s.shift();
     }
     for (const [hex, tr] of this.tracks) {
-      if (tr.lastSeen < now - DROP_AFTER - KEEP_SECONDS / 10) this.tracks.delete(hex);
+      if (tr.lastSeen < now - DROP_AFTER - 90) this.tracks.delete(hex);
     }
   }
 
@@ -133,17 +133,23 @@ export class TrafficStore {
     return st;
   }
 
-  /** Points for a trail between T0 and T (inclusive of the live head). */
+  /** Trail points [lon, lat, altFt, t] from T0 up to the live head (inclusive). */
   trail(tr, T0, head) {
     const pts = [];
     for (const p of tr.samples) {
       if (p.t < T0) continue;
       if (p.t >= head.t) break;
-      pts.push([p.lon, p.lat, p.alt]);
+      pts.push([p.lon, p.lat, p.alt, p.t]);
     }
-    pts.push([head.lon, head.lat, head.alt]);
+    pts.push([head.lon, head.lat, head.alt, head.t]);
     return pts;
   }
+}
+
+/** Fade length: the configured trail, or the oldest point drawn when showing all history. */
+export function trailSpan(items, len, now) {
+  if (len) return len;
+  return Math.max(1, ...items.map((d) => now - d.trail[0][3]));
 }
 
 function velocity(p) {

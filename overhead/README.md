@@ -79,7 +79,7 @@ operator or airline.
 ## Keys
 
 `1` `2` `3` views · `L` live · `S` smooth · `Q`/`E` rotate · `N` north up · `H` recentre ·
-`F` filters · `Esc` deselect
+`F` filters · `T` cycle trail length · `Esc` deselect
 
 ## Files
 

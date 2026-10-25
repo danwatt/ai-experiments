@@ -144,9 +144,21 @@
           <label class="field"><span>Labels</span>
             <select id="sLabels"><option value="all">All aircraft</option><option value="selected">Selected only</option><option value="none">None</option></select>
           </label>
-          <label class="field"><span>Trails</span>
-            <select id="sTrail"><option value="0">Off</option><option value="30">30 s</option><option value="60">1 min</option><option value="120">2 min</option><option value="300">5 min</option><option value="600">10 min</option></select>
+          <label class="field"><span>Trail length</span>
+            <select id="sTrail">
+              <option value="0">Off</option><option value="15">15 s</option><option value="30">30 s</option><option value="60">1 min</option>
+              <option value="120">2 min</option><option value="300">5 min</option><option value="600">10 min</option>
+              <option value="1800">30 min</option><option value="-1">All history (up to 1 h)</option>
+            </select>
           </label>
+          <label class="field"><span>Selected aircraft trail</span>
+            <select id="sTrailSel">
+              <option value="0">Same as others</option><option value="60">1 min</option><option value="300">5 min</option>
+              <option value="900">15 min</option><option value="1800">30 min</option><option value="-1">All history (up to 1 h)</option>
+            </select>
+          </label>
+          <label class="check"><input id="sTrailFade" type="checkbox" /> Fade trails toward their tail</label>
+          <p class="hint">Trails start when this page starts receiving an aircraft. Press T to cycle length.</p>
           <label class="field"><span>Route lines to destination</span>
             <select id="sRouteLines"><option value="selected">Selected aircraft</option><option value="all">All aircraft with a likely route</option><option value="none">Off</option></select>
           </label>

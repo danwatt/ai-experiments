@@ -21,7 +21,9 @@ const DEFAULTS = {
   style: "dark",
   colorBy: "alt",
   labels: "all",
-  trail: 120,
+  trail: 120,            // seconds; 0 = off, -1 = everything kept
+  trailSel: 300,         // selected aircraft; 0 = same as others
+  trailFade: true,
   routeLines: "selected",
   routeLabels: true,
   exaggeration: 3,
@@ -475,7 +477,7 @@ function drawFrame(nowMs) {
       const route = shownRoute(tr.route);
       if (!passes(info, st, distNm, route) && tr.hex !== selected) continue;
       const isSel = tr.hex === selected;
-      const trailSec = isSel ? Math.max(S.trail, 300) : S.trail;
+      const trailSec = trailSeconds(isSel && S.trailSel ? S.trailSel : S.trail);
       items.push({
         hex: tr.hex, info, st, distNm, alpha,
         color: colorOf(info, st),
@@ -489,9 +491,12 @@ function drawFrame(nowMs) {
     }
     lastItems = items;
     lastTotal = total;
-    const opts = { exaggeration: S.exaggeration, iconScale: S.iconScale, labels: S.labels, routeLines: S.routeLines };
+    const opts = {
+      exaggeration: S.exaggeration, iconScale: S.iconScale, labels: S.labels, routeLines: S.routeLines,
+      trailFade: S.trailFade, now: T, ...trailLengths(),
+    };
     if (S.view === "sky") {
-      skyView.render(items, { home: S.home, bearing: S.bearing, observerFt: S.elevFt || 0, light: S.style === "light" || S.style === "liberty", labels: S.labels, routeLines: S.routeLines });
+      skyView.render(items, { home: S.home, bearing: S.bearing, observerFt: S.elevFt || 0, light: S.style === "light" || S.style === "liberty", labels: S.labels, routeLines: S.routeLines, trailFade: S.trailFade, now: T, ...trailLengths() });
     } else {
       mapView.render(items, opts);
       if (following && selected) {
@@ -502,6 +507,31 @@ function drawFrame(nowMs) {
   }
 }
 let lastTotal = 0;
+
+const TRAIL_ALL = 3600; // "All": everything kept, capped at an hour of history
+const TRAIL_STEPS = [0, 15, 30, 60, 120, 300, 600, 1800, -1];
+function trailSeconds(v) {
+  return v < 0 ? TRAIL_ALL : v;
+}
+// Fade lengths for the views; null means "all history" (fade over what is drawn).
+function trailLengths() {
+  const sel = S.trailSel || S.trail;
+  return { trailLen: S.trail < 0 ? null : S.trail, trailLenSel: sel < 0 ? null : sel };
+}
+function trailLabel(v) {
+  return v === 0 ? "off" : v < 0 ? "all history" : v < 60 ? `${v} s` : `${v / 60} min`;
+}
+// Keep enough position history for the longest trail (and the smooth-mode delay).
+function syncHistory() {
+  store.keepSeconds = Math.max(15 * 60, trailSeconds(S.trail), trailSeconds(S.trailSel), currentDelay() + 120);
+}
+function cycleTrail() {
+  const i = TRAIL_STEPS.indexOf(S.trail);
+  S.trail = TRAIL_STEPS[(i + 1) % TRAIL_STEPS.length];
+  syncHistory();
+  save();
+  toast(`Trails: ${trailLabel(S.trail)}`);
+}
 
 // Live mode: positions jump when a fresh fix corrects the dead reckoning.
 // Ease toward the target instead (≈0.3 s), snapping on large errors.
@@ -737,6 +767,8 @@ function openSettings() {
   $("sColor").value = S.colorBy;
   $("sLabels").value = S.labels;
   $("sTrail").value = String(S.trail);
+  $("sTrailSel").value = String(S.trailSel);
+  $("sTrailFade").checked = S.trailFade;
   $("sRouteLines").value = S.routeLines;
   $("sRouteLabels").checked = S.routeLabels;
   $("sEx").value = S.exaggeration;
@@ -779,7 +811,9 @@ function wireSettings() {
   $("sStyle").onchange = (e) => { S.style = e.target.value; mapView.setStyle(S.style); save(); };
   $("sColor").onchange = (e) => { S.colorBy = e.target.value; renderLegend(); save(); };
   $("sLabels").onchange = (e) => { S.labels = e.target.value; save(); };
-  $("sTrail").onchange = (e) => { S.trail = +e.target.value; save(); };
+  $("sTrail").onchange = (e) => { S.trail = +e.target.value; syncHistory(); save(); };
+  $("sTrailSel").onchange = (e) => { S.trailSel = +e.target.value; syncHistory(); save(); };
+  $("sTrailFade").onchange = (e) => { S.trailFade = e.target.checked; save(); };
   $("sRouteLines").onchange = (e) => { S.routeLines = e.target.value; save(); };
   $("sRouteLabels").onchange = (e) => { S.routeLabels = e.target.checked; save(); };
   $("sEx").oninput = (e) => { S.exaggeration = +e.target.value; syncSettingLabels(); save(); };
@@ -807,6 +841,7 @@ function wireKeys() {
     else if (k === "e") { stopSensor(); setBearing(S.bearing + 15, { animate: true }); }
     else if (k === "n") { stopSensor(); setBearing(0, { animate: true }); }
     else if (k === "f") toggle("filters", "btnFilters");
+    else if (k === "t") cycleTrail();
     else if (k === "h") recenter();
     else if (k === "escape") {
       if (!$("ctxMenu").hidden) closeContextMenu();
@@ -833,6 +868,7 @@ if (S.home) setHome(S.home.lat, S.home.lon);
 else $("onboard").hidden = false;
 window.addEventListener("resize", () => S.view === "sky" && skyView.resize());
 
+syncHistory();
 setInterval(() => {
   updateRoutes();
   renderList();
