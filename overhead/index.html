@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Overhead</title>
+  <meta name="theme-color" content="#0a1220" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.js"></script>
+  <script src="https://unpkg.com/deck.gl@9.2.11/dist.min.js"></script>
+</head>
+<body>
+  <header id="topbar">
+    <div class="brand"><span class="brand-mark"></span>Overhead</div>
+    <div class="seg" id="viewSeg" role="tablist" aria-label="View">
+      <button data-view="2d" title="Top-down map (1)">2D</button>
+      <button data-view="3d" title="Tilted 3D map — right-drag or two fingers to orbit (2)">3D</button>
+      <button data-view="sky" title="Sky dome: what is above you (3)">Sky</button>
+    </div>
+    <div class="seg" id="timeSeg" aria-label="Timing">
+      <button data-time="live" title="Latest positions, dead-reckoned between updates (L)">Live</button>
+      <button data-time="smooth" title="Replay a few seconds behind, interpolating between real fixes (S)">Smooth</button>
+    </div>
+    <label id="delayCtl" class="delay" title="How far behind real time the smooth view runs">
+      <input id="delay" type="range" min="3" max="60" step="1" />
+      <span id="delayVal">–</span>
+      <button id="delayAuto" class="mini" title="Use recommended delay for this provider">auto</button>
+    </label>
+    <div class="spacer"></div>
+    <div id="status" class="status"><span class="dot"></span><span id="statusText">Starting…</span></div>
+    <button id="btnFilters" class="tb" title="Filters (F)">Filters<span id="filterBadge" class="badge" hidden></span></button>
+    <button id="btnList" class="tb" title="Aircraft list">List</button>
+    <button id="btnSettings" class="tb icon" title="Settings" aria-label="Settings">
+      <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M19.4 13a7.6 7.6 0 0 0 0-2l2-1.6-2-3.4-2.4 1a7.4 7.4 0 0 0-1.7-1L15 3.5h-4l-.4 2.5a7.4 7.4 0 0 0-1.7 1l-2.4-1-2 3.4 2 1.6a7.6 7.6 0 0 0 0 2l-2 1.6 2 3.4 2.4-1c.5.4 1.1.7 1.7 1l.4 2.5h4l.4-2.5c.6-.3 1.2-.6 1.7-1l2.4 1 2-3.4-2-1.6ZM13 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7Z" transform="translate(-1 0)"/></svg>
+    </button>
+  </header>
+
+  <main id="stage">
+    <div id="map"></div>
+    <canvas id="sky" hidden></canvas>
+
+    <aside id="filters" class="panel left" hidden>
+      <div class="panel-head"><h2>Filters</h2><span id="shownCount" class="muted"></span><button class="x" data-close="filters" aria-label="Close">×</button></div>
+      <div class="panel-body">
+        <label class="field"><span>Search</span><input id="fSearch" type="search" placeholder="Callsign, reg, hex, type…" autocomplete="off" /></label>
+        <div class="field">
+          <span>Altitude <em id="altVal" class="muted"></em></span>
+          <div class="dual" id="altRange">
+            <input id="fAltMin" type="range" min="0" max="45000" step="500" />
+            <input id="fAltMax" type="range" min="0" max="45000" step="500" />
+          </div>
+          <label class="check"><input id="fGround" type="checkbox" /> Include aircraft on the ground</label>
+        </div>
+        <div class="field"><span>Size</span><div id="fSize" class="chips"></div></div>
+        <div class="field"><span>Operator</span><div id="fKind" class="chips"></div></div>
+        <div class="field"><span>Vertical</span><div id="fVert" class="chips"></div></div>
+        <div class="field">
+          <span>Airline <em class="muted">(none selected = all)</em></span>
+          <div id="fAirline" class="chips scroll"></div>
+        </div>
+        <label class="field"><span>Aircraft type</span><input id="fType" type="text" placeholder="e.g. B738, A32, B77 (comma separated)" autocomplete="off" /></label>
+        <label class="field"><span>Airport <em class="muted">(origin or destination)</em></span><input id="fAirport" type="text" placeholder="DFW · >DAL arriving · <AUS departing" autocomplete="off" /></label>
+        <label class="field"><span>Min speed <em id="spdVal" class="muted"></em></span><input id="fSpeed" type="range" min="0" max="500" step="10" /></label>
+        <label class="field"><span>Max distance <em id="distVal" class="muted"></em></span><input id="fDist" type="range" min="1" max="250" step="1" /></label>
+        <label class="check"><input id="fMil" type="checkbox" /> Only military / interesting (dbFlags)</label>
+        <button id="fReset" class="btn wide">Reset filters</button>
+      </div>
+    </aside>
+
+    <aside id="list" class="panel right" hidden>
+      <div class="panel-head"><h2>Aircraft</h2><span id="listCount" class="muted"></span><button class="x" data-close="list" aria-label="Close">×</button></div>
+      <div class="list-head"><span>Flight</span><span>Type</span><span class="r">Alt ft</span><span class="r">nm</span></div>
+      <div id="listBody" class="list-body"></div>
+    </aside>
+
+    <section id="details" class="card" hidden></section>
+
+    <div id="legend" class="legend"></div>
+
+    <div id="compass" class="compass">
+      <svg id="dial" viewBox="-50 -50 100 100" width="96" height="96" aria-label="Rotate view">
+        <circle r="47" class="dial-bg" />
+        <g id="dialRot"></g>
+        <path d="M0,-48 L-5,-40 L5,-40 Z" class="dial-facing" />
+        <text id="dialText" y="4" text-anchor="middle" class="dial-text">0°</text>
+        <text id="dialSub" y="15" text-anchor="middle" class="dial-sub">N</text>
+      </svg>
+      <div class="compass-btns">
+        <button id="rotL" title="Rotate left (Q)" aria-label="Rotate left">⟲</button>
+        <button id="rotN" title="North up (N)">N</button>
+        <button id="rotR" title="Rotate right (E)" aria-label="Rotate right">⟳</button>
+        <button id="rotHome" title="Recenter on my location (H) — or right-click the map" aria-label="Recenter on my location">⌖</button>
+        <button id="rotSensor" title="Follow device compass" hidden>◉</button>
+      </div>
+    </div>
+
+    <div id="ctxMenu" class="ctx" role="menu" hidden></div>
+    <div id="toast" class="toast" hidden></div>
+  </main>
+
+  <dialog id="settings">
+    <form method="dialog">
+      <div class="panel-head"><h2>Settings</h2><button class="x" value="close" aria-label="Close">×</button></div>
+      <div class="settings-grid">
+        <fieldset>
+          <legend>Your location</legend>
+          <div class="row">
+            <button type="button" id="sGeo" class="btn">Use my location</button>
+            <button type="button" id="sPick" class="btn">Pick on map</button>
+          </div>
+          <div class="row">
+            <label class="field"><span>Latitude</span><input id="sLat" type="number" step="0.0001" /></label>
+            <label class="field"><span>Longitude</span><input id="sLon" type="number" step="0.0001" /></label>
+          </div>
+          <label class="field"><span>Your elevation (ft MSL) — for sky angles</span><input id="sElev" type="number" step="10" /></label>
+        </fieldset>
+        <fieldset>
+          <legend>Data</legend>
+          <label class="field"><span>Provider</span>
+            <select id="sProvider">
+              <option value="adsbfi">adsb.fi — open data, ~1 s updates, registry details</option>
+              <option value="adsblol">adsb.lol — ODbL open data, 5 s polls (anon: 500 req/day)</option>
+              <option value="opensky">OpenSky Network — 10–15 s updates, daily quota</option>
+            </select>
+          </label>
+          <label class="field"><span>Radius</span>
+            <select id="sRadius">
+              <option>10</option><option>25</option><option>40</option><option>60</option><option>100</option><option>150</option><option>250</option>
+            </select>
+          </label>
+          <label class="check"><input id="sExtrap" type="checkbox" /> Live: dead-reckon between updates</label>
+        </fieldset>
+        <fieldset>
+          <legend>Display</legend>
+          <label class="field"><span>Map style</span>
+            <select id="sStyle"><option value="dark">Dark</option><option value="fiord">Fiord</option><option value="light">Light</option><option value="liberty">Liberty</option></select>
+          </label>
+          <label class="field"><span>Color aircraft by</span>
+            <select id="sColor"><option value="alt">Altitude</option><option value="size">Size</option><option value="kind">Operator</option><option value="airline">Airline</option></select>
+          </label>
+          <label class="field"><span>Labels</span>
+            <select id="sLabels"><option value="all">All aircraft</option><option value="selected">Selected only</option><option value="none">None</option></select>
+          </label>
+          <label class="field"><span>Trails</span>
+            <select id="sTrail"><option value="0">Off</option><option value="30">30 s</option><option value="60">1 min</option><option value="120">2 min</option><option value="300">5 min</option><option value="600">10 min</option></select>
+          </label>
+          <label class="field"><span>Route lines to destination</span>
+            <select id="sRouteLines"><option value="selected">Selected aircraft</option><option value="all">All aircraft with a likely route</option><option value="none">Off</option></select>
+          </label>
+          <label class="check"><input id="sRouteLabels" type="checkbox" /> Show route (SFO→DFW) in labels</label>
+          <label class="field"><span>3D altitude exaggeration <em id="exVal" class="muted"></em></span><input id="sEx" type="range" min="1" max="8" step="0.5" /></label>
+          <label class="field"><span>Aircraft size <em id="iconVal" class="muted"></em></span><input id="sIcon" type="range" min="0.6" max="2" step="0.1" /></label>
+        </fieldset>
+      </div>
+      <p class="fine">Positions from community ADS-B/MLAT receivers via the selected provider. adsb.lol data is © adsb.lol contributors, ODbL 1.0. Not for navigation.</p>
+    </form>
+  </dialog>
+
+  <div id="onboard" class="onboard" hidden>
+    <div class="onboard-card">
+      <div class="brand big"><span class="brand-mark"></span>Overhead</div>
+      <p>See the aircraft around you — live, smoothed, in 2D, 3D, or as a sky dome turned to match the way you face.</p>
+      <button id="oGeo" class="btn primary wide">Use my location</button>
+      <button id="oPick" class="btn wide">Pick a spot on the map</button>
+      <div class="row">
+        <input id="oLat" type="number" step="0.0001" placeholder="Latitude" />
+        <input id="oLon" type="number" step="0.0001" placeholder="Longitude" />
+        <button id="oGo" class="btn">Go</button>
+      </div>
+      <p class="fine">Your location stays in this browser; only a rounded point is sent to the local server to ask the data provider for nearby traffic.</p>
+    </div>
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
