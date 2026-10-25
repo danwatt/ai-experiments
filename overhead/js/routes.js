@@ -2,6 +2,7 @@
 // databases), then checked against what the aircraft is actually doing. Flight
 // numbers are reused across legs and days, so the database answer is a guess.
 import { haversine, bearing, angleDiff, R_EARTH } from "./geo.js";
+import { api } from "./api.js";
 
 const RETRY_ERROR_MS = 5 * 60e3;
 const BATCH = 25;
@@ -31,8 +32,7 @@ export class RouteBook {
     }
     this.busy = true;
     try {
-      const res = await fetch(`/api/routes?callsigns=${encodeURIComponent(batch.join(","))}`);
-      const body = await res.json();
+      const body = await api.routes(batch);
       for (const cs of batch) this.entries.set(cs, { ...(body.routes?.[cs] || { status: "error" }), at: Date.now() });
     } catch {
       for (const cs of batch) this.entries.set(cs, { status: "error", at: Date.now() });

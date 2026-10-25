@@ -10,6 +10,24 @@ python3 overhead/server.py      # http://localhost:8795
 No build step, no dependencies beyond Python 3 stdlib. MapLibre GL + deck.gl load from unpkg;
 basemap tiles from OpenFreeMap.
 
+## Demo mode (no backend)
+
+When the page can't reach `server.py` — e.g. on GitHub Pages, where every experiment folder is
+published as static files — or the URL has `?demo`, it replays `demo/traffic.json`: a recorded
+sample of real traffic, looped against the clock. Interpolation, trails, routes, runways in use,
+sun lighting (at the recording's time of day) and the heatmap all work from the recording. The
+location and data source are fixed; demo settings are stored separately from live ones.
+
+Re-record (needs network; polls the provider directly, no server needed):
+
+```bash
+python3 overhead/tools/record_demo.py --minutes 15                 # Dallas–Fort Worth
+python3 overhead/tools/record_demo.py --lat 51.47 --lon -0.45 --name "London Heathrow"
+```
+
+The recording leaves out aircraft flagged for limited display (LADD) or privacy addresses (PIA),
+and stores no owner names.
+
 ## Why a backend?
 
 None of the open ADS-B APIs send CORS headers, so `server.py` proxies them. It also
@@ -123,6 +141,8 @@ operator or airline.
 - `server.py` — static server, `/api/aircraft` proxy, `/api/routes`, `/api/airports`, `/api/heat`
 - `airports.py` — OurAirports download, parse and nearby lookup
 - `heat.py` — traffic density recorder (SQLite)
+- `tools/record_demo.py` — records `demo/traffic.json` for demo mode
+- `js/api.js` — backend calls, or replay of the demo recording
 - `js/store.js` — polling, per-aircraft history, interpolation / dead reckoning
 - `js/mapview.js` — MapLibre + deck.gl layers (icons, meshes, trails, runways, heatmap, lighting)
 - `js/skyview.js` — canvas sky dome

@@ -84,6 +84,8 @@ def norm_readsb(ac, now):
         "year": clean(ac.get("year")),
         "cat": clean(ac.get("category")),
         "mil": bool((ac.get("dbFlags") or 0) & 1),
+        # owner asked for limited display (LADD) or uses a privacy address (PIA)
+        "limited": bool((ac.get("dbFlags") or 0) & 0b1100),
         "lat": lat,
         "lon": lon,
         "alt": 0 if ground else (alt if isinstance(alt, (int, float)) else ac.get("alt_geom")),

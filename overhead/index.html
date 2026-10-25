@@ -30,6 +30,7 @@
       <button id="delayAuto" class="mini" title="Use recommended delay for this provider">auto</button>
     </label>
     <div class="spacer"></div>
+    <button id="demoBadge" class="demo-badge" hidden>Demo</button>
     <div id="status" class="status"><span class="dot"></span><span id="statusText">Starting…</span></div>
     <button id="btnFilters" class="tb" title="Filters (F)">Filters<span id="filterBadge" class="badge" hidden></span></button>
     <button id="btnList" class="tb" title="Aircraft list">List</button>
@@ -108,6 +109,7 @@
   <dialog id="settings">
     <form method="dialog">
       <div class="panel-head"><h2>Settings</h2><button class="x" value="close" aria-label="Close">×</button></div>
+      <p id="demoNote" class="demo-note" hidden></p>
       <div class="settings-grid">
         <fieldset>
           <legend>Your location</legend>

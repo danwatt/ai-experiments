@@ -2,13 +2,23 @@ import { TrafficStore } from "./store.js";
 import { RouteBook, assessRoute, shownRoute, routeText, apCode } from "./routes.js";
 import { RunwayWatch } from "./runways.js";
 import { sunPosition } from "./sun.js";
+import { api, connect } from "./api.js";
 import { MapView } from "./mapview.js";
 import { SkyView } from "./skyview.js";
 import { SIZE_CLASSES, OPERATOR_KINDS, airlineName, sizeLabel, operatorLabel } from "./classify.js";
 import { haversine, bearing as brg, elevationAngle, compassPoint, lerpAngle, angleDiff, toLocal, M_PER_NM, M_PER_FT } from "./geo.js";
 
 const $ = (id) => document.getElementById(id);
-const LS_KEY = "overhead.v1";
+
+// Live data via server.py, or (no backend / ?demo) a recorded sample replayed in a loop.
+let DEMO = null;
+try {
+  DEMO = await connect();
+} catch (e) {
+  console.error(e);
+}
+// demo settings are kept apart so trying the demo never moves your real home location
+const LS_KEY = DEMO ? "overhead.demo.v1" : "overhead.v1";
 
 // ---------------------------------------------------------------- settings
 const DEFAULTS = {
@@ -52,6 +62,10 @@ function load() {
   }
 }
 const S = load();
+if (DEMO) {
+  S.home = { lat: DEMO.lat, lon: DEMO.lon };
+  S.radius = DEMO.radius;
+}
 let saveTimer;
 function save() {
   clearTimeout(saveTimer);
@@ -156,6 +170,7 @@ function setHome(lat, lon, fly = true) {
 function restartFeed() {
   if (!S.home) return;
   store.configure({ provider: S.provider, lat: S.home.lat, lon: S.home.lon, radius: S.radius });
+  for (const body of api.history(120)) store.ingest(body); // demo: start with trails already drawn
   updateDelayUi();
 }
 function useGeolocation() {
@@ -236,7 +251,7 @@ function openContextMenu({ lngLat, clientX, clientY }) {
     const b = brg(S.home.lat, S.home.lon, lngLat.lat, lngLat.lng);
     items.push([`Face this way (${Math.round(b)}° ${compassPoint(b)})`, "", () => { stopSensor(); setBearing(b, { animate: true }); }]);
   }
-  items.push(["Set my location here", "", () => setHome(lngLat.lat, lngLat.lng)]);
+  if (!DEMO) items.push(["Set my location here", "", () => setHome(lngLat.lat, lngLat.lng)]);
   const m = $("ctxMenu");
   m.innerHTML = items.map(([label, key], i) =>
     `<button role="menuitem" data-i="${i}"><span>${esc(label)}</span>${key ? `<kbd>${key}</kbd>` : ""}</button>`).join("");
@@ -850,7 +865,7 @@ $("flow").addEventListener("click", (e) => {
 // ---------------------------------------------------------------- sun & sky, heatmap
 function updateSun() {
   if (!S.home) return;
-  sun = sunPosition(Date.now(), S.home.lat, S.home.lon);
+  sun = sunPosition(api.clock(), S.home.lat, S.home.lon); // demo: the recording's time of day
   applyStyle();
   mapView.setSun(sun, S.sunLight);
   const g = $("dialSun");
@@ -868,11 +883,11 @@ async function loadHeat() {
   clearTimeout(heatTimer);
   if (!S.heat || !S.home) { heatBins = null; return; }
   try {
-    const q = new URLSearchParams({ lat: S.home.lat.toFixed(3), lon: S.home.lon.toFixed(3), radius: S.radius,
+    const body = await api.heat({ lat: S.home.lat.toFixed(3), lon: S.home.lon.toFixed(3), radius: S.radius,
       hours: S.heat < 0 ? 0 : S.heat, bands: HEAT_BANDS[S.heatBand] || HEAT_BANDS.all });
-    const body = await (await fetch(`/api/heat?${q}`)).json();
     heatBins = body.bins || null;
-    if (body.recordingSince && S.heat) {
+    if (DEMO) $("heatNote").textContent = "Demo: traffic density from the recorded sample.";
+    else if (body.recordingSince && S.heat) {
       const hrs = (Date.now() / 1000 - body.recordingSince) / 3600;
       $("heatNote").textContent = `Recording since ${new Date(body.recordingSince * 1000).toLocaleString()} (${hrs < 1 ? `${Math.round(hrs * 60)} min` : `${hrs.toFixed(1)} h`}) while this server runs.`;
     }
@@ -1044,6 +1059,24 @@ function wireKeys() {
   });
 }
 
+// ---------------------------------------------------------------- demo
+function setupDemo() {
+  const when = new Date(DEMO.start * 1000).toLocaleString([], {
+    weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit",
+  });
+  const mins = Math.round(DEMO.duration / 60);
+  const text = `Demo: replaying ${mins} minutes of traffic recorded around ${DEMO.name} on ${when} ` +
+    `(${DEMO.provider}, looping). Run server.py for live data where you are.`;
+  const badge = $("demoBadge");
+  badge.hidden = false;
+  badge.title = text;
+  badge.onclick = () => openSettings();
+  $("demoNote").hidden = false;
+  $("demoNote").textContent = text;
+  // location and data source are fixed by the recording
+  for (const id of ["sGeo", "sPick", "sLat", "sLon", "sProvider", "sRadius"]) $(id).disabled = true;
+}
+
 // ---------------------------------------------------------------- boot
 buildDial();
 initDial();
@@ -1057,6 +1090,7 @@ renderLegend();
 setView(S.view);
 setTime(S.time);
 setBearing(S.bearing);
+if (DEMO) setupDemo();
 if (S.home) setHome(S.home.lat, S.home.lon);
 else $("onboard").hidden = false;
 window.addEventListener("resize", () => S.view === "sky" && skyView.resize());

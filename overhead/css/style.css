@@ -76,6 +76,12 @@ button { cursor: pointer; }
 .tb[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
 .tb.icon { padding: 5px 7px; }
 .badge { background: var(--accent); color: var(--accent-ink); border-radius: 10px; font-size: 10px; padding: 0 6px; font-weight: 700; }
+.demo-badge {
+  border: 1px solid var(--warn); color: var(--warn); background: rgba(255, 179, 92, 0.1); border-radius: 999px;
+  padding: 2px 10px; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+}
+.demo-note { margin: 12px 12px 0; padding: 8px 10px; border: 1px solid var(--warn); border-radius: 8px; color: var(--text); font-size: 12px; background: rgba(255, 179, 92, 0.08); }
+input:disabled, select:disabled { opacity: 0.5; }
 .status { display: inline-flex; align-items: center; gap: 7px; color: var(--muted); font-size: 12px; white-space: nowrap; min-width: 0; flex: 0 1 auto; }
 .status #statusText { overflow: hidden; text-overflow: ellipsis; }
 .status .dot { flex: none; }

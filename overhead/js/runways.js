@@ -3,6 +3,7 @@
 // 3° path, count as arrivals; aircraft climbing out past the far end, aligned
 // with the runway, count as departures.
 import { haversine, toLocal, fromLocal, angleDiff, compassPoint, M_PER_NM } from "./geo.js";
+import { api } from "./api.js";
 
 const WINDOW = 20 * 60;          // seconds of events that make a runway "active"
 const KEEP = 30 * 60;
@@ -24,9 +25,7 @@ export class RunwayWatch {
     if (key === this.key) return;
     this.key = key;
     try {
-      const res = await fetch(`/api/airports?lat=${lat.toFixed(3)}&lon=${lon.toFixed(3)}&radius=${radiusNm}`);
-      const body = await res.json();
-      if (!res.ok) throw new Error(body.error || res.status);
+      const body = await api.airports({ lat: lat.toFixed(3), lon: lon.toFixed(3), radius: radiusNm });
       this.setAirports(body.airports || []);
     } catch (e) {
       this.key = null; // retry on next call

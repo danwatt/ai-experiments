@@ -2,6 +2,7 @@
 // aircraft, and answers "where was aircraft X at time T?" with smooth
 // interpolation (delayed mode) or dead reckoning (live mode).
 import { classify } from "./classify.js";
+import { api } from "./api.js";
 import { toLocal, fromLocal, lerpAngle, angleDiff, haversine, destination, MS_PER_KT } from "./geo.js";
 
 const DROP_AFTER = 75;          // seconds unseen before a track is removed
@@ -46,9 +47,7 @@ export class TrafficStore {
     const { provider, lat, lon, radius } = this.cfg;
     let delay = this.interval;
     try {
-      const q = new URLSearchParams({ provider, lat: lat.toFixed(2), lon: lon.toFixed(2), radius: Math.round(radius) });
-      const res = await fetch(`/api/aircraft?${q}`, { cache: "no-store" });
-      const body = await res.json();
+      const body = await api.aircraft({ provider, lat: lat.toFixed(2), lon: lon.toFixed(2), radius: Math.round(radius) });
       if (gen !== this._gen) return;
       if (body.aircraft?.length || body.ok) this.ingest(body);
       this.error = body.ok ? null : body.error || "Upstream error";
@@ -68,6 +67,11 @@ export class TrafficStore {
 
   ingest(body) {
     const now = body.now;
+    // A demo recording that wrapped around: aircraft jump back to where they started.
+    if (body.loop != null && body.loop !== this.loop) {
+      this.loop = body.loop;
+      this.tracks.clear();
+    }
     // Clock offset: server snapshot time vs our receipt time, lightly smoothed.
     // Stale (cached-after-error) bodies carry an old `now`, so skip those.
     const est = now - Date.now() / 1000;
