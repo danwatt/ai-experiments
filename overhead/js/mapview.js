@@ -1,6 +1,7 @@
 // 2D / 3D map: MapLibre basemap with deck.gl layers drawn on top.
 /* global maplibregl, deck */
-import { circle, destination, pathToAirport, M_PER_NM, M_PER_FT, MS_PER_KT } from "./geo.js";
+import { circle, destination, pathToAirport, fromLocal, M_PER_NM, M_PER_FT, MS_PER_KT } from "./geo.js";
+import { sunLook } from "./sun.js";
 import { jetMesh, lightMesh, heliMesh } from "./meshes.js";
 import { trailSpan } from "./store.js";
 
@@ -8,6 +9,9 @@ const MESHES = { jet: jetMesh(), light: lightMesh(), rotor: heliMesh() };
 const MESH_FOR = { light: "light", rotor: "rotor" };
 const MESH_SCALE = { heavy: 1.35, large: 1, small: 0.8, fast: 0.75, light: 0.7, rotor: 0.75, other: 0.7 };
 const ICON_FOR = { heavy: "heavy", large: "jet", small: "jet", fast: "fast", light: "light", rotor: "rotor", other: "other" };
+const HEAT_COLORS = [[40, 30, 110], [40, 80, 190], [30, 160, 225], [70, 215, 170], [235, 220, 80], [255, 250, 235]];
+const D2R = Math.PI / 180;
+const GUIDE_COLORS = { arr: [80, 230, 150], dep: [92, 200, 255] }; // arrivals / departures
 const ICON_PX = { heavy: 36, large: 30, small: 24, fast: 24, light: 22, rotor: 26, other: 18 };
 
 export const STYLES = {
@@ -52,6 +56,7 @@ export class MapView {
       getCursor: ({ isHovering, isDragging }) => (isDragging ? "grabbing" : isHovering ? "pointer" : "grab"),
     });
     this.map.addControl(this.overlay);
+    this.map.on("style.load", () => this.applySky(true));
     this.wireContextMenu(onContextMenu);
     this.icons = buildIconAtlas();
     this.dash = new deck.PathStyleExtension({ dash: true });
@@ -84,6 +89,39 @@ export class MapView {
     if (this.styleKey || key !== "dark") this.map.setStyle(STYLES[key] || STYLES.dark);
     this.styleKey = key;
     this.light = key === "light" || key === "liberty";
+  }
+
+  /** Sun-driven lighting for 3D meshes and the sky/fog seen when the map is tilted. */
+  setSun(sun, enabled) {
+    const key = `${enabled}|${Math.round(sun.el * 2)}|${Math.round(sun.az)}|${this.light}`;
+    if (key === this._sunKey) return;
+    this._sunKey = key;
+    this.sun = enabled ? sun : null;
+    this.look = enabled ? sunLook(sun.el, !this.light) : null;
+    const l = this.look;
+    // light travels from the sun toward the ground (x east, y north, z up)
+    const az = sun.az * D2R, el = sun.el * D2R;
+    const direction = [-Math.sin(az) * Math.cos(el), -Math.cos(az) * Math.cos(el), -Math.sin(el)];
+    this.overlay.setProps({
+      effects: l ? [new deck.LightingEffect({
+        ambient: new deck.AmbientLight({ color: l.ambientColor, intensity: l.ambient }),
+        sun: new deck.DirectionalLight({ direction, color: l.sunColor, intensity: l.sun }),
+      })] : [],
+    });
+    this.applySky();
+  }
+
+  applySky(styleJustLoaded = false) {
+    if (!this.map.setSky || (!styleJustLoaded && !this.map.isStyleLoaded())) return;
+    const l = this.look;
+    try {
+      this.map.setSky(l ? {
+        "sky-color": l.sky, "horizon-color": l.horizon, "fog-color": l.fog,
+        "sky-horizon-blend": 0.6, "horizon-fog-blend": 0.6, "fog-ground-blend": 0.85, "atmosphere-blend": 0,
+      } : undefined);
+    } catch (e) {
+      console.warn("sky not supported:", e);
+    }
   }
 
   setHome(lat, lon, radiusNm, fly = true) {
@@ -133,6 +171,40 @@ export class MapView {
 
   follow(lat, lon) {
     this.map.setCenter([lon, lat]);
+  }
+
+  /** Runways (coloured when in use), approach / climb-out guides, airport and runway-end labels. */
+  airportLayers(layers, ap, zoom, z, textColor) {
+    const base = this.light ? [70, 82, 100, 190] : [175, 188, 208, 170];
+    layers.push(new deck.PathLayer({
+      id: "runways", data: ap.runways, getPath: (r) => r.path, getWidth: (r) => r.widthM,
+      widthUnits: "meters", widthMinPixels: 2.5, capRounded: false,
+      getColor: (r) => (r.active ? [...GUIDE_COLORS[r.active], 235] : base),
+      updateTriggers: { getColor: [ap.version, this.light] }, parameters: { depthTest: false },
+    }));
+    if (ap.guides.length) {
+      layers.push(new deck.PathLayer({
+        id: "runway-guides", data: ap.guides, getPath: (g) => g.path.map(([lon, lat, alt]) => [lon, lat, z(alt)]),
+        getColor: (g) => [...GUIDE_COLORS[g.kind], 200], getWidth: 2, widthUnits: "pixels",
+        getDashArray: [8, 6], dashJustified: true, extensions: [this.dash], parameters: { depthTest: false },
+      }));
+    }
+    const labels = ap.airports.filter((a) => a.size === "large" || (a.size === "medium" && zoom >= 7.5) || zoom >= 10);
+    layers.push(new deck.TextLayer({
+      id: "airport-labels", data: labels, getPosition: (a) => [a.lon, a.lat], getText: (a) => a.iata || a.ident,
+      getSize: (a) => (a.size === "large" ? 13 : 11), fontWeight: 700, fontFamily: "JetBrains Mono, ui-monospace, monospace",
+      getColor: (a) => (a.active ? [80, 230, 150, 240] : textColor), getPixelOffset: [0, 18],
+      background: true, getBackgroundColor: this.light ? [255, 255, 255, 170] : [10, 16, 28, 150], backgroundPadding: [3, 1],
+      updateTriggers: { getColor: [ap.version, this.light] }, parameters: { depthTest: false },
+    }));
+    if (zoom >= 11.5) {
+      layers.push(new deck.TextLayer({
+        id: "runway-ends", data: ap.ends, getPosition: (e) => [e.lon, e.lat], getText: (e) => e.ident,
+        getSize: 10, fontWeight: 600, fontFamily: "JetBrains Mono, ui-monospace, monospace", getColor: textColor,
+        background: true, getBackgroundColor: this.light ? [255, 255, 255, 190] : [10, 16, 28, 170], backgroundPadding: [2, 1],
+        parameters: { depthTest: false },
+      }));
+    }
   }
 
   /** Greedy screen-space placement: selected first, then nearest to home. */
@@ -196,6 +268,18 @@ export class MapView {
 
     // Trails. Faded ones use TripsLayer, which ramps alpha from the tail to the head;
     // selected and other aircraft can have different lengths, hence two layers.
+    const zoom = this.map.getZoom();
+    const mpp = (40075016.686 * Math.cos(this.home.lat * D2R)) / (512 * 2 ** zoom);
+    if (opts.heat?.length) {
+      // radius follows the ~550 m grid cell so corridors stay continuous at any zoom
+      layers.unshift(new deck.HeatmapLayer({
+        id: "heat", data: opts.heat, getPosition: (b) => [b[0], b[1]], getWeight: (b) => Math.sqrt(b[2]),
+        radiusPixels: Math.max(12, Math.min(70, (550 / mpp) * 1.7)), intensity: 1.3, threshold: 0.03,
+        opacity: 0.7, colorRange: HEAT_COLORS, aggregation: "SUM",
+      }));
+    }
+    if (opts.ap) this.airportLayers(layers, opts.ap, zoom, z, textColor);
+
     const trails = items.filter((d) => d.trail && d.trail.length > 1);
     for (const sel of [false, true]) {
       const data = trails.filter((d) => d.selected === sel);
@@ -253,13 +337,34 @@ export class MapView {
         getSourcePosition: (d) => [d.st.lon, d.st.lat, 0], getTargetPosition: (d) => [d.st.lon, d.st.lat, z(d.st.alt)],
         getColor: (d) => [...d.color, Math.round((d.selected ? 160 : 55) * d.alpha)], getWidth: 1,
       }));
-      layers.push(new deck.ScatterplotLayer({
-        id: "shadows", data: airborne, getPosition: (d) => [d.st.lon, d.st.lat, 0],
-        getRadius: 2.5, radiusUnits: "pixels", getFillColor: (d) => [...d.color, Math.round(110 * d.alpha)],
-      }));
-      const zoom = this.map.getZoom(), lat = this.home.lat;
-      const mpp = (40075016.686 * Math.cos((lat * Math.PI) / 180)) / (512 * 2 ** zoom);
       const sizeScale = mpp * 34 * opts.iconScale;
+      const sun = this.sun && this.sun.el > 3 ? this.sun : null;
+      if (sun) {
+        // Shadow lands away from the sun, further when the sun is low or the aircraft high
+        // (using the drawn, exaggerated height so it matches the scene).
+        const cot = 1 / Math.tan(sun.el * D2R), sx = -Math.sin(sun.az * D2R), sy = -Math.cos(sun.az * D2R);
+        const shadowAt = (d) => {
+          const off = z(d.st.alt) * cot;
+          return [...fromLocal(d.st.lat, d.st.lon, sx * off, sy * off), 1];
+        };
+        for (const kind of ["jet", "light", "rotor"]) {
+          const data = airborne.filter((d) => (MESH_FOR[d.info.size] || "jet") === kind && z(d.st.alt) * cot < 60e3);
+          layers.push(new deck.SimpleMeshLayer({
+            id: `shadow-${kind}`, data, mesh: MESHES[kind], sizeScale,
+            getPosition: shadowAt, getOrientation: (d) => [0, 90 - d.st.heading, 0],
+            getScale: (d) => { const s = MESH_SCALE[d.info.size] || 1; return [s, s, 0.02]; },
+            // fainter for high aircraft, whose real shadows are diffuse
+            getColor: (d) => [0, 0, 0, Math.round(120 * d.alpha * Math.max(0.15, 1 - d.st.alt / 20000))],
+            material: { ambient: 1, diffuse: 0, shininess: 0, specularColor: [0, 0, 0] },
+            updateTriggers: { getPosition: [ex, sun.el, sun.az] },
+          }));
+        }
+      } else {
+        layers.push(new deck.ScatterplotLayer({
+          id: "shadows", data: airborne, getPosition: (d) => [d.st.lon, d.st.lat, 0],
+          getRadius: 2.5, radiusUnits: "pixels", getFillColor: (d) => [...d.color, Math.round(110 * d.alpha)],
+        }));
+      }
       for (const kind of ["jet", "light", "rotor"]) {
         const data = items.filter((d) => (MESH_FOR[d.info.size] || "jet") === kind);
         layers.push(new deck.SimpleMeshLayer({
@@ -305,6 +410,7 @@ export class MapView {
     this.overlay.setProps({ layers });
   }
 }
+
 
 function orientation(st) {
   const v = Math.max(20, (st.gs || 0) * MS_PER_KT);

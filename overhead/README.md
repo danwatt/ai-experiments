@@ -67,6 +67,37 @@ card with progress, and as a dashed great-circle line to the destination (descen
 elevation in 3D, across your sky in Sky view). Settings: route lines for selected / all / off,
 route in labels on/off.
 
+## Airports, runways in use
+
+Airports and runways come from [OurAirports](https://ourairports.com/data/) (public domain),
+downloaded once into `data/` and refreshed monthly. Runways are drawn to scale; at higher zoom
+runway-end numbers appear.
+
+Which runways are in use is inferred from live traffic over the last 20 minutes:
+
+- **arrival** — aligned with a runway (±20°), on its extended centreline within 10 nm, at or
+  below roughly a 3° glide path and not climbing;
+- **departure** — aligned, past the far end of the runway, climbing.
+
+Each aircraft counts once per pass, on its best-aligned runway (so parallels don't double
+count); helicopters and slow movers are ignored. Active runways turn green (landing) or blue
+(taking off), with dashed guides for the final approach (sloping at 3° in 3D) and the climb-out.
+The **Runways in use** card shows each busy airport's flow ("DAL · NW flow ↓31R 31L ↑31L") and
+tells you when your location sits under an active approach or departure path, with roughly how
+high arrivals pass. Click an airport to fly there.
+
+## Sun, sky and heatmap
+
+- **Sun lighting (3D)** — the sun's real position lights the aircraft meshes (warm and low at
+  golden hour, off at night), aircraft cast shadows on the ground away from the sun, and the
+  tilted view gets a matching sky and horizon. The compass dial shows a sun marker.
+- **Map style "Auto"** — light basemap from just before sunrise to just after sunset, dark at night.
+- **Sky view** — the dome takes the sky's colour for the time of day and shows the sun.
+- **Traffic heatmap** — `server.py` counts every fresh position into a ~500 m grid in
+  `data/heat.sqlite` (by altitude band and 10-minute slot) whenever it is polling. Show the last
+  hour, 6 h, 24 h, 7 days or everything, filtered to ground (taxiways), below 10,000 ft
+  (approach/departure corridors) or en route.
+
 ## Filters
 
 Search (callsign/reg/hex/type/owner/squawk), altitude range, include-ground, size class
@@ -83,10 +114,15 @@ operator or airline.
 
 ## Files
 
-- `server.py` — static server + `/api/aircraft` proxy
+- `server.py` — static server, `/api/aircraft` proxy, `/api/routes`, `/api/airports`, `/api/heat`
+- `airports.py` — OurAirports download, parse and nearby lookup
+- `heat.py` — traffic density recorder (SQLite)
 - `js/store.js` — polling, per-aircraft history, interpolation / dead reckoning
-- `js/mapview.js` — MapLibre + deck.gl layers (2D icons, 3D meshes, trails, labels)
+- `js/mapview.js` — MapLibre + deck.gl layers (icons, meshes, trails, runways, heatmap, lighting)
 - `js/skyview.js` — canvas sky dome
 - `js/meshes.js` — procedural aircraft meshes
 - `js/classify.js` — size class, operator kind, airline names
+- `js/routes.js` — origin/destination lookup and plausibility grading
+- `js/runways.js` — runway-in-use detection, approach/departure guides
+- `js/sun.js` — solar position and time-of-day lighting/sky colours
 - `js/main.js` — UI, filters, render loop

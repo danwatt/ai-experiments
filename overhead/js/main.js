@@ -1,5 +1,7 @@
 import { TrafficStore } from "./store.js";
 import { RouteBook, assessRoute, shownRoute, routeText, apCode } from "./routes.js";
+import { RunwayWatch } from "./runways.js";
+import { sunPosition } from "./sun.js";
 import { MapView } from "./mapview.js";
 import { SkyView } from "./skyview.js";
 import { SIZE_CLASSES, OPERATOR_KINDS, airlineName, sizeLabel, operatorLabel } from "./classify.js";
@@ -18,12 +20,17 @@ const DEFAULTS = {
   time: "smooth",
   delay: null,           // null = auto
   extrap: true,
-  style: "dark",
+  style: "auto",          // "auto" follows the sun: light by day, dark at night
   colorBy: "alt",
   labels: "all",
   trail: 120,            // seconds; 0 = off, -1 = everything kept
   trailSel: 300,         // selected aircraft; 0 = same as others
   trailFade: true,
+  airports: true,
+  runwayGuides: true,
+  sunLight: true,
+  heat: 0,               // heatmap window in hours; 0 = off, -1 = everything recorded
+  heatBand: "all",
   routeLines: "selected",
   routeLabels: true,
   exaggeration: 3,
@@ -95,6 +102,11 @@ const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "
 // ---------------------------------------------------------------- core objects
 const store = new TrafficStore();
 const routes = new RouteBook();
+const runwayWatch = new RunwayWatch();
+let apData = null;        // airports / runways / guides for the map
+let runwayActivity = [];
+let heatBins = null;
+let sun = { az: 0, el: 90 };
 let selected = null;
 let following = false;
 let picking = false;
@@ -120,7 +132,6 @@ const mapView = new MapView($("map"), {
   },
 });
 const skyView = new SkyView($("sky"), { onSelect: select });
-mapView.setStyle(S.style);
 
 store.onUpdate = () => {
   updateStatus();
@@ -135,6 +146,9 @@ function setHome(lat, lon, fly = true) {
   $("sLon").value = S.home.lon;
   mapView.setHome(S.home.lat, S.home.lon, S.radius, fly);
   restartFeed();
+  updateSun();
+  loadAirports();
+  loadHeat();
 }
 function restartFeed() {
   if (!S.home) return;
@@ -223,6 +237,8 @@ function buildDial() {
     html += `<line class="dial-tick${major ? " major" : ""}" x1="${s * r1}" y1="${c * r1}" x2="${s * r2}" y2="${c * r2}"/>`;
     if (major) html += `<text class="dial-lbl${a === 0 ? " n" : ""}" x="${s * 31}" y="${c * 31 + 3}" text-anchor="middle" transform="rotate(${a} ${s * 31} ${c * 31})">${"NESW"[a / 90]}</text>`;
   }
+  // sun marker rides with the dial; updateSun() places it
+  html += `<g id="dialSun"><title>Sun</title><circle cy="-40" r="4.2" class="dial-sun"/></g>`;
   g.innerHTML = html;
 }
 function initDial() {
@@ -494,9 +510,11 @@ function drawFrame(nowMs) {
     const opts = {
       exaggeration: S.exaggeration, iconScale: S.iconScale, labels: S.labels, routeLines: S.routeLines,
       trailFade: S.trailFade, now: T, ...trailLengths(),
+      ap: S.airports && apData ? { ...apData, guides: S.runwayGuides ? apData.guides : [] } : null,
+      heat: S.heat ? heatBins : null,
     };
     if (S.view === "sky") {
-      skyView.render(items, { home: S.home, bearing: S.bearing, observerFt: S.elevFt || 0, light: S.style === "light" || S.style === "liberty", labels: S.labels, routeLines: S.routeLines, trailFade: S.trailFade, now: T, ...trailLengths() });
+      skyView.render(items, { home: S.home, bearing: S.bearing, observerFt: S.elevFt || 0, light: mapView.light, sun: S.sunLight ? sun : null, labels: S.labels, routeLines: S.routeLines, trailFade: S.trailFade, now: T, ...trailLengths() });
     } else {
       mapView.render(items, opts);
       if (following && selected) {
@@ -704,6 +722,110 @@ function select(hex, fly = false) {
   }
 }
 
+// ---------------------------------------------------------------- airports, runways in use
+async function loadAirports() {
+  if (!S.airports || !S.home) return;
+  await runwayWatch.load(S.home.lat, S.home.lon, S.radius);
+  buildApData();
+}
+function buildApData() {
+  const active = new Map(); // `${ap}|${ident}` -> "arr" | "dep"
+  for (const a of runwayActivity) {
+    for (const r of a.dep) active.set(`${a.ap.ident}|${r.ident}`, "dep");
+    for (const r of a.arr) active.set(`${a.ap.ident}|${r.ident}`, "arr"); // landing wins the colour
+  }
+  const runways = [], ends = [];
+  for (const ap of runwayWatch.airports) {
+    for (const rw of ap.runways) {
+      const kind = active.get(`${ap.ident}|${rw.le.ident}`) || active.get(`${ap.ident}|${rw.he.ident}`);
+      runways.push({ path: [[rw.le.lon, rw.le.lat], [rw.he.lon, rw.he.lat]], widthM: (rw.widthFt || 100) * M_PER_FT, active: kind || null });
+      ends.push({ lon: rw.le.lon, lat: rw.le.lat, ident: rw.le.ident }, { lon: rw.he.lon, lat: rw.he.lat, ident: rw.he.ident });
+    }
+  }
+  const busy = new Set(runwayActivity.map((a) => a.ap.ident));
+  apData = {
+    airports: runwayWatch.airports.map((a) => ({ ...a, active: busy.has(a.ident) })),
+    runways, ends, guides: runwayWatch.guides(runwayActivity),
+    version: (apData?.version || 0) + 1,
+  };
+}
+function updateRunways() {
+  if (!S.airports || !runwayWatch.ends.length) return;
+  const now = store.serverNow(), states = [];
+  for (const tr of store.tracks.values()) {
+    const st = store.stateAt(tr, now, 10);
+    if (st && now - tr.samples[tr.samples.length - 1].t < 30) states.push({ ...st, hex: tr.hex, rotor: tr.info.size === "rotor" });
+  }
+  runwayWatch.update(states, now);
+  runwayActivity = runwayWatch.activity(now);
+  buildApData();
+  renderFlow();
+}
+function renderFlow() {
+  const el = $("flow");
+  if (!S.airports || !S.home || !runwayWatch.airports.length) { el.hidden = true; return; }
+  el.hidden = false;
+  const act = runwayActivity.slice(0, 3);
+  if (!act.length) {
+    el.innerHTML = `<div class="flow-title">Runways in use</div><div class="muted">Watching arrivals and departures…</div>`;
+    return;
+  }
+  const over = runwayWatch.overhead(S.home, runwayActivity);
+  const code = (ap) => esc(ap.iata || ap.ident);
+  el.innerHTML = `<div class="flow-title">Runways in use <span class="muted">· last 20 min</span></div>
+    ${act.map((a) => `<button class="flow-ap" data-ap="${esc(a.ap.ident)}" title="${esc(a.ap.name)}">
+      <b>${code(a.ap)}</b><span class="muted">${esc(a.flow)}</span>
+      ${a.arr.length ? `<span class="arr" title="Landing">↓ ${a.arr.map((r) => esc(r.ident)).join(" ")}</span>` : ""}
+      ${a.dep.length ? `<span class="dep" title="Taking off">↑ ${a.dep.map((r) => esc(r.ident)).join(" ")}</span>` : ""}
+    </button>`).join("")}
+    ${over ? `<div class="flow-home">${over.kind === "arrival"
+      ? `You're under the ${code(over.ap)} ${esc(over.ident)} approach: ${over.outNm.toFixed(1)} nm out, arrivals pass ~${fmtNum(over.aglFt)} ft above.`
+      : `You're under the ${code(over.ap)} ${esc(over.ident)} departure path, ${over.outNm.toFixed(1)} nm past the runway.`}</div>` : ""}`;
+}
+$("flow").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-ap]");
+  const ap = b && runwayWatch.airports.find((a) => a.ident === b.dataset.ap);
+  if (!ap) return;
+  if (S.view === "sky") setView("2d");
+  following = false;
+  mapView.map.flyTo({ center: [ap.lon, ap.lat], zoom: 12, duration: 1200 });
+});
+
+// ---------------------------------------------------------------- sun & sky, heatmap
+function updateSun() {
+  if (!S.home) return;
+  sun = sunPosition(Date.now(), S.home.lat, S.home.lon);
+  applyStyle();
+  mapView.setSun(sun, S.sunLight);
+  const g = $("dialSun");
+  g.setAttribute("transform", `rotate(${sun.az})`);
+  g.style.opacity = sun.el > 0 ? 1 : sun.el > -6 ? 0.45 : 0;
+  g.querySelector("title").textContent = `Sun ${Math.round(sun.az)}° ${compassPoint(sun.az)}, ${Math.round(sun.el)}° ${sun.el >= 0 ? "up" : "below horizon"}`;
+}
+function applyStyle() {
+  // auto: light map from just before sunrise to just after sunset
+  mapView.setStyle(S.style === "auto" ? (sun.el > -4 ? "light" : "dark") : S.style);
+}
+const HEAT_BANDS = { all: "0,1,2,3,4", ground: "0", approach: "1,2", high: "3,4" };
+let heatTimer;
+async function loadHeat() {
+  clearTimeout(heatTimer);
+  if (!S.heat || !S.home) { heatBins = null; return; }
+  try {
+    const q = new URLSearchParams({ lat: S.home.lat.toFixed(3), lon: S.home.lon.toFixed(3), radius: S.radius,
+      hours: S.heat < 0 ? 0 : S.heat, bands: HEAT_BANDS[S.heatBand] || HEAT_BANDS.all });
+    const body = await (await fetch(`/api/heat?${q}`)).json();
+    heatBins = body.bins || null;
+    if (body.recordingSince && S.heat) {
+      const hrs = (Date.now() / 1000 - body.recordingSince) / 3600;
+      $("heatNote").textContent = `Recording since ${new Date(body.recordingSince * 1000).toLocaleString()} (${hrs < 1 ? `${Math.round(hrs * 60)} min` : `${hrs.toFixed(1)} h`}) while this server runs.`;
+    }
+  } catch (e) {
+    console.warn("heatmap unavailable:", e);
+  }
+  heatTimer = setTimeout(loadHeat, 60e3);
+}
+
 // ---------------------------------------------------------------- top bar & settings
 function setView(v) {
   S.view = v;
@@ -771,6 +893,11 @@ function openSettings() {
   $("sTrailFade").checked = S.trailFade;
   $("sRouteLines").value = S.routeLines;
   $("sRouteLabels").checked = S.routeLabels;
+  $("sAirports").checked = S.airports;
+  $("sGuides").checked = S.runwayGuides;
+  $("sSun").checked = S.sunLight;
+  $("sHeat").value = String(S.heat);
+  $("sHeatBand").value = S.heatBand;
   $("sEx").value = S.exaggeration;
   $("sIcon").value = S.iconScale;
   syncSettingLabels();
@@ -803,12 +930,19 @@ function wireSettings() {
     if (wasAll || F.distMax > S.radius) F.distMax = S.radius;
     save();
     if (S.home) mapView.setHome(S.home.lat, S.home.lon, S.radius);
+    loadAirports();
+    loadHeat();
     syncFilterLabels();
     $("fDist").value = F.distMax;
     restartFeed();
   };
   $("sExtrap").onchange = (e) => { S.extrap = e.target.checked; save(); };
-  $("sStyle").onchange = (e) => { S.style = e.target.value; mapView.setStyle(S.style); save(); };
+  $("sStyle").onchange = (e) => { S.style = e.target.value; applyStyle(); save(); };
+  $("sAirports").onchange = (e) => { S.airports = e.target.checked; loadAirports(); renderFlow(); save(); };
+  $("sGuides").onchange = (e) => { S.runwayGuides = e.target.checked; save(); };
+  $("sSun").onchange = (e) => { S.sunLight = e.target.checked; updateSun(); save(); };
+  $("sHeat").onchange = (e) => { S.heat = +e.target.value; heatBins = null; loadHeat(); save(); };
+  $("sHeatBand").onchange = (e) => { S.heatBand = e.target.value; loadHeat(); save(); };
   $("sColor").onchange = (e) => { S.colorBy = e.target.value; renderLegend(); save(); };
   $("sLabels").onchange = (e) => { S.labels = e.target.value; save(); };
   $("sTrail").onchange = (e) => { S.trail = +e.target.value; syncHistory(); save(); };
@@ -869,13 +1003,21 @@ else $("onboard").hidden = false;
 window.addEventListener("resize", () => S.view === "sky" && skyView.resize());
 
 syncHistory();
+updateSun();
 setInterval(() => {
   updateRoutes();
+  updateRunways();
   renderList();
   renderDetails();
   renderAirlineChips();
   updateStatus();
   if (S.delay == null) updateDelayUi();
 }, 1000);
+setInterval(updateSun, 30e3);
 requestAnimationFrame(frame);
-window.overhead = { store, routes, mapView, skyView, settings: S, get items() { return lastItems; } }; // console debugging
+window.overhead = { // console debugging
+  store, routes, runwayWatch, mapView, skyView, settings: S,
+  get items() { return lastItems; },
+  get sun() { return sun; },
+  set sun(v) { sun = v; applyStyle(); mapView.setSun(sun, S.sunLight); }, // preview lighting until the next 30 s update
+};

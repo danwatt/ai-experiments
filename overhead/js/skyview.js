@@ -3,6 +3,7 @@
 // face. Not mirrored: something on your right when you face it is on the right.
 import { haversine, bearing, elevationAngle, compassPoint, pathToAirport, M_PER_FT } from "./geo.js";
 import { trailSpan } from "./store.js";
+import { sunLook } from "./sun.js";
 
 const D2R = Math.PI / 180;
 
@@ -39,7 +40,7 @@ export class SkyView {
     return { dist: d, az, el };
   }
 
-  render(items, { home, bearing: facing, observerFt, light, labels, routeLines, trailFade, trailLen, trailLenSel, now }) {
+  render(items, { home, bearing: facing, observerFt, light, sun, labels, routeLines, trailFade, trailLen, trailLenSel, now }) {
     const { g, cv } = this;
     if (cv.width !== Math.round(cv.clientWidth * (window.devicePixelRatio || 1))) this.resize();
     const W = cv.width / this.dpr, H = cv.height / this.dpr;
@@ -56,12 +57,23 @@ export class SkyView {
     };
 
     const sky = g.createRadialGradient(cx, cy, 0, cx, cy, R);
-    if (light) { sky.addColorStop(0, "#bcd6f5"); sky.addColorStop(1, "#eef4fb"); }
+    if (sun) {
+      // the dome takes the real sky colour: zenith → horizon
+      const look = sunLook(sun.el, !light);
+      sky.addColorStop(0, look.sky); sky.addColorStop(1, look.horizon);
+    } else if (light) { sky.addColorStop(0, "#bcd6f5"); sky.addColorStop(1, "#eef4fb"); }
     else { sky.addColorStop(0, "#07101f"); sky.addColorStop(0.8, "#0d1d36"); sky.addColorStop(1, "#1b2f4d"); }
     g.fillStyle = sky;
     g.beginPath(); g.arc(cx, cy, R, 0, Math.PI * 2); g.fill();
 
-    const ink = light ? "20,40,70" : "170,200,240";
+    // Text inside the dome follows the dome's brightness; the rim sits on the (dark) page.
+    const domeLight = sun ? sun.el > 0 : light;
+    const ink = domeLight ? "20,40,70" : "170,200,240", rimInk = "170,200,240";
+    const halo = domeLight ? "rgba(255,255,255,.75)" : "rgba(4,8,16,.7)";
+    const label = (text, x, y) => {
+      g.lineWidth = 3; g.lineJoin = "round"; g.strokeStyle = halo;
+      g.strokeText(text, x, y); g.fillText(text, x, y);
+    };
     g.lineWidth = 1;
     for (const el of [0, 2, 5, 10, 20, 35, 60]) {
       g.strokeStyle = `rgba(${ink},${el === 0 ? 0.6 : 0.18})`;
@@ -79,18 +91,29 @@ export class SkyView {
     for (let az = 0; az < 360; az += 10) {
       const major = az % 45 === 0;
       const [x1, y1] = pt(az, 0), [x2, y2] = pt(az, major ? -2.5 : -1.2);
-      g.strokeStyle = `rgba(${ink},${major ? 0.8 : 0.35})`;
+      g.strokeStyle = `rgba(${rimInk},${major ? 0.8 : 0.35})`;
       g.beginPath(); g.moveTo(x1, y1); g.lineTo(x2, y2); g.stroke();
       if (major) {
         const [lx, ly] = pt(az, -4), r0 = Math.hypot(lx - cx, ly - cy), k = (r0 + 12) / r0;
         const lxx = cx + (lx - cx) * k, lyy = cy + (ly - cy) * k;
-        g.fillStyle = az === 0 ? "#ff7a5a" : `rgba(${ink},0.95)`;
+        g.fillStyle = az === 0 ? "#ff7a5a" : `rgba(${rimInk},0.95)`;
         g.font = `${az % 90 === 0 ? 700 : 500} ${az % 90 === 0 ? 15 : 12}px Inter, system-ui, sans-serif`;
         g.fillText(compassPoint(az), lxx, lyy);
       }
     }
+    if (sun && sun.el > -4) {
+      const [x, y] = pt(sun.az, sun.el), up = sun.el > 0;
+      const glow = g.createRadialGradient(x, y, 0, x, y, 30);
+      glow.addColorStop(0, up ? "rgba(255,226,140,0.95)" : "rgba(255,150,100,0.6)");
+      glow.addColorStop(1, "rgba(255,200,100,0)");
+      g.fillStyle = glow;
+      g.beginPath(); g.arc(x, y, 30, 0, Math.PI * 2); g.fill();
+      g.fillStyle = up ? "#ffd86b" : "#ff9a6b";
+      g.beginPath(); g.arc(x, y, 7, 0, Math.PI * 2); g.fill();
+    }
+
     // facing marker
-    g.fillStyle = light ? "#1c6fd1" : "#5cc8ff";
+    g.fillStyle = "#5cc8ff";
     g.beginPath(); g.moveTo(cx, cy - R - 2); g.lineTo(cx - 7, cy - R - 14); g.lineTo(cx + 7, cy - R - 14); g.fill();
     g.fillStyle = `rgba(${ink},0.35)`;
     g.font = "11px Inter, system-ui, sans-serif";
@@ -123,9 +146,9 @@ export class SkyView {
       g.restore();
       if (last && d.selected) {
         g.font = "700 11px JetBrains Mono, ui-monospace, monospace";
-        g.fillStyle = light ? "#0b1830" : "#eaf2ff";
+        g.fillStyle = domeLight ? "#0b1830" : "#eaf2ff";
         g.textAlign = "center";
-        g.fillText(`→ ${d.route.dest.iata || d.route.dest.icao}`, last[0], last[1] - 9);
+        label(`→ ${d.route.dest.iata || d.route.dest.icao}`, last[0], last[1] - 9);
       }
     }
 
@@ -176,7 +199,7 @@ export class SkyView {
       g.rotate((d.st.heading - facing) * D2R);
       g.globalAlpha = d.alpha * (below ? 0.4 : 1);
       g.fillStyle = d.selected ? "#fff" : `rgb(${d.color.join(",")})`;
-      g.strokeStyle = light ? "rgba(255,255,255,.9)" : "rgba(0,0,0,.6)";
+      g.strokeStyle = domeLight ? "rgba(255,255,255,.9)" : "rgba(0,0,0,.6)";
       g.lineWidth = 1;
       g.beginPath();
       g.moveTo(0, -size * 1.4); g.lineTo(size, size); g.lineTo(0, size * 0.45); g.lineTo(-size, size); g.closePath();
@@ -190,11 +213,11 @@ export class SkyView {
         g.globalAlpha = d.alpha * (below ? 0.5 : 1);
         g.font = "600 11px Inter, system-ui, sans-serif";
         g.textAlign = "left";
-        g.fillStyle = light ? "#0b1830" : "#eaf2ff";
-        g.fillText(d.name, x + 12, y - 6);
+        g.fillStyle = domeLight ? "#0b1830" : "#eaf2ff";
+        label(d.name, x + 12, y - 6);
         g.font = "10px Inter, system-ui, sans-serif";
-        g.fillStyle = light ? "rgba(11,24,48,.7)" : "rgba(220,232,255,.7)";
-        g.fillText(`${Math.round(el)}° up · ${d.altText}`, x + 12, y + 7);
+        g.fillStyle = domeLight ? "rgba(11,24,48,.8)" : "rgba(220,232,255,.8)";
+        label(`${Math.round(el)}° up · ${d.altText}`, x + 12, y + 7);
         g.globalAlpha = 1;
       }
       this.hits.push({ x, y, hex: d.hex });

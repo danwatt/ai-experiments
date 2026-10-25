@@ -23,6 +23,9 @@ import urllib.request
 from concurrent.futures import ThreadPoolExecutor
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 
+import airports
+from heat import Heat
+
 ROOT = os.path.dirname(os.path.abspath(__file__))
 UA = "overhead-experiment/0.1 (personal, non-commercial)"
 KT_PER_MS = 1.943844
@@ -46,6 +49,7 @@ _cache_lock = threading.Lock()
 _key_locks = {}
 _token = {"value": None, "exp": 0.0}
 _backoff = {}  # provider -> {"until": epoch, "step": seconds}
+HEAT = Heat(os.path.join(ROOT, "data", "heat.sqlite"))
 
 
 def fetch_json(url, headers=None, data=None, timeout=12):
@@ -187,6 +191,10 @@ def get_aircraft(provider, lat, lon, radius):
                     "authenticated": provider == "opensky" and bool(_token["value"]), "aircraft": ac}
             _cache[key] = {"fetched": time.time(), "body": body}
             _backoff.pop(provider, None)
+            try:
+                HEAT.record(ac)
+            except Exception as e:  # history is a nice-to-have; never break the feed
+                print("heat record failed:", e, file=sys.stderr)
             return body
         except urllib.error.HTTPError as e:
             err = f"{cfg['name']} returned HTTP {e.code}"
@@ -310,8 +318,24 @@ class Handler(SimpleHTTPRequestHandler):
 
     def do_GET(self):
         url = urllib.parse.urlparse(self.path)
+        if url.path.startswith("/data/"):  # downloaded CSVs and the history database stay private
+            return self.send_error(404)
         if url.path == "/api/providers":
             return self.send_json({k: {kk: vv for kk, vv in v.items()} for k, v in PROVIDERS.items()})
+        if url.path in ("/api/airports", "/api/heat"):
+            q = urllib.parse.parse_qs(url.query)
+            try:
+                lat, lon = float(q["lat"][0]), float(q["lon"][0])
+                radius = max(5.0, min(250.0, float(q.get("radius", ["40"])[0])))
+                if url.path == "/api/airports":
+                    return self.send_json({"airports": airports.near(lat, lon, radius, UA)})
+                hours = float(q.get("hours", ["24"])[0])  # 0 = all time
+                bands = [int(b) for b in q.get("bands", ["0,1,2,3,4"])[0].split(",") if b.strip().isdigit()]
+                return self.send_json(HEAT.query(lat, lon, radius, hours, bands))
+            except (KeyError, ValueError, IndexError):
+                return self.send_json({"error": "bad parameters"}, 400)
+            except Exception as e:  # e.g. OurAirports download failed with no cached copy
+                return self.send_json({"error": str(e)}, 502)
         if url.path == "/api/routes":
             q = urllib.parse.parse_qs(url.query)
             raw = (q.get("callsigns") or [""])[0].upper().split(",")
