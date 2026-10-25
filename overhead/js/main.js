@@ -109,6 +109,9 @@ let heatBins = null;
 let sun = { az: 0, el: 90 };
 let selected = null;
 let following = false;
+let chasing = false;
+let chaseLost = 0;
+let cardHidden = false; // while chasing, × hides the card instead of deselecting
 let picking = false;
 let lastItems = [];
 
@@ -182,14 +185,52 @@ function endPicking() {
 
 function recenter() {
   following = false;
+  stopChase();
   mapView.fit();
+}
+
+// ---------------------------------------------------------------- chase
+function startChase() {
+  if (!selected) return toast("Select an aircraft to chase");
+  if (S.view === "sky") setView("3d");
+  const it = lastItems.find((d) => d.hex === selected);
+  following = false;
+  chasing = true;
+  chaseLost = 0;
+  cardHidden = true; // clear the view; the HUD's Info button brings it back
+  mapView.startChase(it?.st || {});
+  renderChaseHud();
+  renderDetails();
+}
+function stopChase() {
+  if (!chasing) return;
+  chasing = false;
+  cardHidden = false;
+  mapView.stopChase();
+  renderChaseHud();
+  renderDetails();
+}
+function renderChaseHud() {
+  const hud = $("chaseHud");
+  const d = chasing && lastItems.find((x) => x.hex === selected);
+  if (!d) { hud.hidden = true; return; }
+  hud.hidden = false;
+  const st = d.st, i = d.info;
+  const hint = S.view === "3d" ? "drag to orbit · scroll for distance" : "drag to turn · scroll to zoom";
+  hud.innerHTML = `<b>Chasing ${esc(i.flight || i.reg || d.hex.toUpperCase())}</b>
+    <span class="mono">${fmtAlt(st)}${st.ground ? "" : " ft"} · ${fmtNum(st.gs)} kt · ${Math.round(st.heading) % 360}°</span>
+    <span class="muted">${hint}</span>
+    <button class="mini" id="chaseInfo" aria-pressed="${!cardHidden}">Info</button>
+    <button class="mini" id="chaseStop">Stop · Esc</button>`;
+  $("chaseStop").onclick = stopChase;
+  $("chaseInfo").onclick = () => { cardHidden = !cardHidden; renderDetails(); renderChaseHud(); };
 }
 
 // ---------------------------------------------------------------- map context menu
 function openContextMenu({ lngLat, clientX, clientY }) {
   const items = [
     ["Recenter on my location", "H", recenter],
-    ["Center map here", "", () => { following = false; mapView.map.easeTo({ center: lngLat, duration: 500 }); }],
+    ["Center map here", "", () => { following = false; stopChase(); mapView.map.easeTo({ center: lngLat, duration: 500 }); }],
   ];
   if (S.home) {
     const b = brg(S.home.lat, S.home.lon, lngLat.lat, lngLat.lng);
@@ -220,6 +261,11 @@ mapView.map.on("movestart", closeContextMenu);
 // ---------------------------------------------------------------- bearing / compass
 const sensor = { on: false, heading: null };
 function setBearing(b, { fromMap = false, animate = false } = {}) {
+  if (chasing && !fromMap) {
+    // the chase camera owns the bearing; turning the dial orbits around the aircraft instead
+    mapView.chase.rel = ((mapView.chase.rel + angleDiff(S.bearing, b) + 540) % 360) - 180;
+    return;
+  }
   S.bearing = ((b % 360) + 360) % 360;
   if (!fromMap) mapView.setBearing(S.bearing, animate);
   $("dialRot").setAttribute("transform", `rotate(${-S.bearing})`);
@@ -516,8 +562,13 @@ function drawFrame(nowMs) {
     if (S.view === "sky") {
       skyView.render(items, { home: S.home, bearing: S.bearing, observerFt: S.elevFt || 0, light: mapView.light, sun: S.sunLight ? sun : null, labels: S.labels, routeLines: S.routeLines, trailFade: S.trailFade, now: T, ...trailLengths() });
     } else {
-      mapView.render(items, opts);
-      if (following && selected) {
+      if (chasing) {
+        const it = items.find((d) => d.selected);
+        if (it) { chaseLost = 0; mapView.chaseCamera(it.st, S.exaggeration * M_PER_FT, dtSec); }
+        else if ((chaseLost += dtSec) > 5) { stopChase(); toast("Lost the aircraft — chase ended"); }
+      }
+      mapView.render(items, { ...opts, chasing });
+      if (following && !chasing && selected) {
         const it = items.find((d) => d.selected);
         if (it) mapView.follow(it.st.lat, it.st.lon);
       }
@@ -609,7 +660,7 @@ function renderDetails() {
   const card = $("details");
   const d = lastItems.find((x) => x.selected);
   const tr = selected && store.tracks.get(selected);
-  if (!selected || !tr) { card.hidden = true; return; }
+  if (!selected || !tr || (chasing && cardHidden)) { card.hidden = true; return; }
   card.hidden = false;
   const i = tr.info, st = d?.st || store.stateAt(tr, store.serverNow(), 0);
   const distM = haversine(S.home.lat, S.home.lon, st.lat, st.lon);
@@ -651,11 +702,15 @@ function renderDetails() {
       ${cell("Last fix", `${Math.max(0, age).toFixed(0)}s ago`)}
     </div>
     <div class="actions">
-      <button class="btn" id="dFollow" aria-pressed="${following}">${following ? "Following" : "Follow"}</button>
+      <button class="btn" id="dChase" aria-pressed="${chasing}" title="Ride along: above it in 2D, behind it in 3D (C)">${chasing ? "Stop chase" : "Chase"}</button>
+      <button class="btn" id="dFollow" aria-pressed="${following}" ${chasing ? "disabled" : ""}>${following ? "Following" : "Follow"}</button>
       ${links}
     </div>`;
-  $("dClose").onclick = () => select(null);
+  $("dClose").onclick = () => {
+    if (chasing) { cardHidden = true; renderDetails(); renderChaseHud(); } else select(null);
+  };
   $("dFollow").onclick = () => { following = !following; renderDetails(); };
+  $("dChase").onclick = () => (chasing ? stopChase() : startChase());
 }
 
 function routeBlock(r, entry) {
@@ -713,6 +768,7 @@ function renderLegend() {
 
 function select(hex, fly = false) {
   if (hex !== selected) following = false;
+  if (!hex) stopChase(); // selecting another aircraft while chasing switches to it
   selected = hex;
   renderDetails();
   renderList();
@@ -836,6 +892,7 @@ function setView(v) {
   $("map").style.visibility = sky ? "hidden" : "visible";
   $("rotHome").hidden = sky;
   closeContextMenu();
+  if (sky) stopChase();
   if (sky) skyView.resize();
   else mapView.setMode(v);
 }
@@ -976,9 +1033,11 @@ function wireKeys() {
     else if (k === "n") { stopSensor(); setBearing(0, { animate: true }); }
     else if (k === "f") toggle("filters", "btnFilters");
     else if (k === "t") cycleTrail();
+    else if (k === "c") (chasing ? stopChase() : startChase());
     else if (k === "h") recenter();
     else if (k === "escape") {
       if (!$("ctxMenu").hidden) closeContextMenu();
+      else if (chasing) stopChase();
       else if (picking) endPicking();
       else select(null);
     }
@@ -1005,6 +1064,7 @@ window.addEventListener("resize", () => S.view === "sky" && skyView.resize());
 syncHistory();
 updateSun();
 setInterval(() => {
+  renderChaseHud();
   updateRoutes();
   updateRunways();
   renderList();

@@ -44,6 +44,12 @@ keep interpolating. Only a location rounded to ~1 km (2 decimals) is sent upstre
   right when you face that way is on the right. Elevation corrects for earth curvature and
   your elevation (Settings).
 
+**Chase** (details card or `C`) rides along with the selected aircraft: in 2D the map stays
+centred on it, track-up; in 3D the camera sits behind and a little above, looking along its
+track, with the heading smoothed so turns pan rather than snap. Drag to orbit around it (and,
+in 3D, tilt), scroll to change distance, Esc to stop. In 3D chase the meshes switch to true
+perspective, with a minimum size so distant traffic stays visible.
+
 **Recentre** with ⌖ under the compass, `H`, or right-click the map (long-press on touch) for a
 menu: recentre on your location, centre here, face toward this point, or set your location here.
 
@@ -110,7 +116,7 @@ operator or airline.
 ## Keys
 
 `1` `2` `3` views · `L` live · `S` smooth · `Q`/`E` rotate · `N` north up · `H` recentre ·
-`F` filters · `T` cycle trail length · `Esc` deselect
+`F` filters · `C` chase selected · `T` cycle trail length · `Esc` deselect
 
 ## Files
 

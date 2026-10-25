@@ -1,6 +1,6 @@
 // 2D / 3D map: MapLibre basemap with deck.gl layers drawn on top.
 /* global maplibregl, deck */
-import { circle, destination, pathToAirport, fromLocal, M_PER_NM, M_PER_FT, MS_PER_KT } from "./geo.js";
+import { circle, destination, pathToAirport, fromLocal, toLocal, lerpAngle, M_PER_NM, M_PER_FT, MS_PER_KT } from "./geo.js";
 import { sunLook } from "./sun.js";
 import { jetMesh, lightMesh, heliMesh } from "./meshes.js";
 import { trailSpan } from "./store.js";
@@ -39,8 +39,9 @@ export class MapView {
     this.map.touchPitch.disable();
     this.map.on("rotate", () => onBearing(((this.map.getBearing() % 360) + 360) % 360));
     this.map.on("click", (e) => {
-      // deck handles picks first; this fires for clicks on empty map too
-      if (!this._picked) this.onMapClick?.(e.lngLat);
+      // deck handles picks first; this fires for clicks on empty map too. While chasing,
+      // drags orbit the camera and end in a click, so empty-map clicks are ignored.
+      if (!this._picked && !this.chase) this.onMapClick?.(e.lngLat);
       this._picked = false;
     });
     this.overlay = new deck.MapboxOverlay({
@@ -58,6 +59,7 @@ export class MapView {
     this.map.addControl(this.overlay);
     this.map.on("style.load", () => this.applySky(true));
     this.wireContextMenu(onContextMenu);
+    this.wireChaseControls();
     this.icons = buildIconAtlas();
     this.dash = new deck.PathStyleExtension({ dash: true });
   }
@@ -152,6 +154,7 @@ export class MapView {
 
   setMode(mode) {
     this.mode = mode;
+    if (this.chase) this.setChaseInput();
     if (mode === "3d") {
       this.map.setMaxPitch(85);
       this.map.touchPitch.enable();
@@ -173,8 +176,96 @@ export class MapView {
     this.map.setCenter([lon, lat]);
   }
 
+  // ---------------------------------------------------------------- chase camera
+  // 2D: centred over the aircraft, track-up. 3D: behind and a little above it,
+  // looking along its track. The camera is driven every frame, so the map's own
+  // pan/rotate gestures are swapped for chase gestures while it runs.
+
+  startChase(st) {
+    this.chase = {
+      bearing: st.heading ?? this.map.getBearing(),
+      rel: 0,        // orbit offset from straight behind, degrees
+      alpha: 12,     // look-down angle below horizontal (3D), degrees
+      dist: 260,     // camera to aircraft, drawn metres (3D)
+    };
+    if (this.mode === "2d" && this.map.getZoom() < 10.5) this.map.jumpTo({ zoom: 11.5 });
+    this.setChaseInput();
+  }
+
+  stopChase() {
+    if (!this.chase) return;
+    this.chase = null;
+    this.setChaseInput();
+  }
+
+  setChaseInput() {
+    const m = this.map, on = !!this.chase;
+    for (const h of [m.dragPan, m.dragRotate, m.keyboard, m.doubleClickZoom]) on ? h.disable() : h.enable();
+    // 2D keeps wheel / pinch zoom; 3D uses its own wheel (camera distance)
+    if (on && this.mode === "3d") { m.scrollZoom.disable(); m.touchZoomRotate.disable(); }
+    else { m.scrollZoom.enable(); m.touchZoomRotate.enable(); }
+    if (on) m.touchZoomRotate.disableRotation(); else m.touchZoomRotate.enableRotation();
+  }
+
+  wireChaseControls() {
+    const cc = this.map.getCanvasContainer();
+    let drag = null;
+    cc.addEventListener("pointerdown", (e) => {
+      if (!this.chase) return;
+      drag = { x: e.clientX, y: e.clientY };
+    });
+    window.addEventListener("pointermove", (e) => {
+      if (!this.chase || !drag) return;
+      const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+      drag = { x: e.clientX, y: e.clientY };
+      this.chase.rel = (this.chase.rel - dx * 0.35 + 540) % 360 - 180; // orbit around the aircraft
+      if (this.mode === "3d") this.chase.alpha = Math.max(5, Math.min(70, this.chase.alpha + dy * 0.15));
+    });
+    window.addEventListener("pointerup", () => (drag = null));
+    cc.addEventListener("wheel", (e) => {
+      if (!this.chase || this.mode !== "3d") return;
+      e.preventDefault();
+      this.chase.dist = Math.max(40, Math.min(30000, this.chase.dist * 1.15 ** Math.sign(e.deltaY)));
+    }, { passive: false });
+  }
+
+  /** Move the camera for this frame. st: aircraft state; ex: drawn metres per foot of altitude. */
+  chaseCamera(st, ex, dt) {
+    const c = this.chase;
+    // Smooth the heading so turns pan rather than snap.
+    c.bearing = lerpAngle(c.bearing, st.heading ?? c.bearing, 1 - Math.exp(-dt / 0.6));
+    const bearing = (c.bearing + c.rel + 360) % 360;
+    if (this.mode !== "3d") {
+      this.map.jumpTo({ center: [st.lon, st.lat], bearing, pitch: 0 });
+      return;
+    }
+    // MapLibre's camera looks at a point on the ground. Put that point far enough
+    // ahead that the line of sight passes through the aircraft, then pull back so
+    // the camera sits `dist` behind it.
+    const a = c.alpha * D2R, H = Math.max(0, st.alt) * ex, b = bearing * D2R;
+    const ahead = H / Math.tan(a);
+    const [lon, lat] = fromLocal(st.lat, st.lon, Math.sin(b) * ahead, Math.cos(b) * ahead);
+    // deck.gl clips anything nearer than ~1/15 of the camera-to-centre distance, which
+    // grows with altitude here, so high aircraft are chased from further back (the mesh
+    // is scaled with the distance, so it keeps the same size on screen).
+    const dist = Math.max(c.dist, (0.09 * H) / Math.sin(a) + 30);
+    c.effDist = dist;
+    const toCenter = dist + H / Math.sin(a);
+    const vh = this.map.getCanvas().clientHeight;
+    const mpp = toCenter / (1.5 * vh); // MapLibre's default 36.87° fov puts the camera 1.5 × height from centre
+    const zoom = Math.log2((40075016.686 * Math.cos(lat * D2R)) / (512 * mpp));
+    this.map.jumpTo({ center: [lon, lat], zoom, bearing, pitch: 90 - c.alpha });
+    const back = dist * Math.cos(a);
+    const [camLon, camLat] = fromLocal(st.lat, st.lon, -Math.sin(b) * back, -Math.cos(b) * back);
+    c.cam = {
+      lon: camLon, lat: camLat, h: H + dist * Math.sin(a), focal: 1.5 * vh, toCenter,
+      dir: [Math.sin(b) * Math.cos(a), Math.cos(b) * Math.cos(a), -Math.sin(a)], // view direction (east, north, up)
+      near: 0.08 * toCenter, // a little beyond deck.gl's near plane
+    };
+  }
+
   /** Runways (coloured when in use), approach / climb-out guides, airport and runway-end labels. */
-  airportLayers(layers, ap, zoom, z, textColor) {
+  airportLayers(layers, ap, zoom, z, textColor, clip) {
     const base = this.light ? [70, 82, 100, 190] : [175, 188, 208, 170];
     layers.push(new deck.PathLayer({
       id: "runways", data: ap.runways, getPath: (r) => r.path, getWidth: (r) => r.widthM,
@@ -184,7 +275,7 @@ export class MapView {
     }));
     if (ap.guides.length) {
       layers.push(new deck.PathLayer({
-        id: "runway-guides", data: ap.guides, getPath: (g) => g.path.map(([lon, lat, alt]) => [lon, lat, z(alt)]),
+        id: "runway-guides", data: ap.guides, getPath: (g) => clip(g.path.map(([lon, lat, alt]) => [lon, lat, z(alt)])),
         getColor: (g) => [...GUIDE_COLORS[g.kind], 200], getWidth: 2, widthUnits: "pixels",
         getDashArray: [8, 6], dashJustified: true, extensions: [this.dash], parameters: { depthTest: false },
       }));
@@ -241,6 +332,16 @@ export class MapView {
     const is3d = this.mode === "3d";
     const ex = opts.exaggeration * M_PER_FT;
     const z = (altFt) => (is3d ? Math.max(0, altFt) * ex : 0);
+    // deck.gl pixel sizes are exact only at the map centre's depth; the 3D chase camera
+    // looks at a point far beyond the aircraft, so rescale pixel sizes by each object's depth.
+    const chaseCam = is3d ? this.chase?.cam : null;
+    const camDist = (d) => {
+      const [x, y] = toLocal(chaseCam.lat, chaseCam.lon, d.st.lat, d.st.lon);
+      return Math.hypot(x, y, z(d.st.alt) - chaseCam.h);
+    };
+    const px = chaseCam ? (d) => Math.max(0.05, Math.min(4, camDist(d) / chaseCam.toCenter)) : () => 1;
+    // Lines that pass behind the chase camera get mirrored into the sky; cut them at the near plane.
+    const clip = chaseCam ? (path) => clipToFront(path, chaseCam) : (path) => path;
     const ringColor = this.light ? [30, 60, 100, 110] : [140, 190, 255, 70];
     const textColor = this.light ? [20, 40, 70, 230] : [210, 225, 245, 230];
     const layers = [
@@ -266,8 +367,6 @@ export class MapView {
       }),
     ];
 
-    // Trails. Faded ones use TripsLayer, which ramps alpha from the tail to the head;
-    // selected and other aircraft can have different lengths, hence two layers.
     const zoom = this.map.getZoom();
     const mpp = (40075016.686 * Math.cos(this.home.lat * D2R)) / (512 * 2 ** zoom);
     if (opts.heat?.length) {
@@ -278,17 +377,27 @@ export class MapView {
         opacity: 0.7, colorRange: HEAT_COLORS, aggregation: "SUM",
       }));
     }
-    if (opts.ap) this.airportLayers(layers, opts.ap, zoom, z, textColor);
+    if (opts.ap) this.airportLayers(layers, opts.ap, zoom, z, textColor, clip);
 
-    const trails = items.filter((d) => d.trail && d.trail.length > 1);
+    // Trails. Faded ones use TripsLayer, which ramps alpha from the tail to the head;
+    // selected and other aircraft can have different lengths, hence two layers.
+    // Points are [lon, lat, z, t]; clipping keeps t so timestamps stay paired with vertices.
+    const trails = items
+      .filter((d) => d.trail && d.trail.length > 1)
+      .map((d) => ({ ...d, path: clip(d.trail.map((p) => [p[0], p[1], z(p[2]), p[3]])) }))
+      .filter((d) => d.path.length > 1);
     for (const sel of [false, true]) {
       const data = trails.filter((d) => d.selected === sel);
       if (!data.length) continue;
       const common = {
         id: `trails-${sel ? "selected" : "others"}`, data,
-        getPath: (d) => d.trail.map((p) => [p[0], p[1], z(p[2])]),
+        getPath: (d) => d.path.map((p) => [p[0], p[1], p[2]]),
         getColor: (d) => [...d.color, Math.round((sel ? 230 : 140) * d.alpha)],
-        getWidth: sel ? 3 : 1.5, widthUnits: "pixels", jointRounded: true, capRounded: true,
+        // in chase the trail runs back toward the lens, so use metres and let perspective taper it
+        ...(chaseCam
+          ? { getWidth: (sel ? 3 : 1.5) * (this.chase.effDist / chaseCam.focal), widthUnits: "meters", widthMinPixels: 1 }
+          : { getWidth: sel ? 3 : 1.5, widthUnits: "pixels" }),
+        jointRounded: true, capRounded: true,
         billboard: true, updateTriggers: { getPath: [is3d, ex] }, parameters: { depthTest: is3d },
       };
       if (opts.trailFade) {
@@ -296,7 +405,7 @@ export class MapView {
           ...common, fadeTrail: true, currentTime: 0,
           trailLength: trailSpan(data, sel ? opts.trailLenSel : opts.trailLen, opts.now),
           // relative to render time so float32 keeps sub-second precision
-          getTimestamps: (d) => d.trail.map((p) => p[3] - opts.now),
+          getTimestamps: (d) => d.path.map((p) => p[3] - opts.now),
         }));
       } else {
         layers.push(new deck.PathLayer(common));
@@ -310,9 +419,9 @@ export class MapView {
     if (routed.length) {
       layers.push(new deck.PathLayer({
         id: "routes", data: routed,
-        getPath: (d) => pathToAirport(d.st, d.route.dest).map(([lon, lat, alt]) => [lon, lat, z(alt)]),
+        getPath: (d) => clip(pathToAirport(d.st, d.route.dest).map(([lon, lat, alt]) => [lon, lat, z(alt)])),
         getColor: (d) => [...d.color, Math.round((d.selected ? 220 : 90) * d.alpha)],
-        getWidth: (d) => (d.selected ? 2 : 1.2), widthUnits: "pixels",
+        getWidth: (d) => (d.selected ? 2 : 1.2) * px(d), widthUnits: "pixels",
         getDashArray: [6, 5], dashJustified: true, extensions: [this.dash],
         parameters: { depthTest: false },
       }));
@@ -333,11 +442,28 @@ export class MapView {
     if (is3d) {
       const airborne = items.filter((d) => !d.st.ground && d.st.alt > 0);
       layers.push(new deck.LineLayer({
-        id: "stalks", data: airborne,
+        // Screen-space lines this close to the chase camera render far too wide, and the
+        // chased aircraft's own drop line says nothing from behind it, so leave it out.
+        id: "stalks", data: chaseCam ? airborne.filter((d) => !d.selected) : airborne,
         getSourcePosition: (d) => [d.st.lon, d.st.lat, 0], getTargetPosition: (d) => [d.st.lon, d.st.lat, z(d.st.alt)],
         getColor: (d) => [...d.color, Math.round((d.selected ? 160 : 55) * d.alpha)], getWidth: 1,
       }));
-      const sizeScale = mpp * 34 * opts.iconScale;
+      let sizeScale = mpp * 34 * opts.iconScale;
+      let scaleOf = (d) => MESH_SCALE[d.info.size] || 1;
+      const cam = this.chase?.cam;
+      if (cam) {
+        // Chase: one real-world scale so perspective reads naturally (the chased
+        // aircraft spans roughly a sixth of the screen), but never let others shrink below ~14 px.
+        sizeScale = 0.18 * this.chase.effDist * opts.iconScale;
+        const minPx = 14 * opts.iconScale;
+        scaleOf = (d) => {
+          const base = MESH_SCALE[d.info.size] || 1;
+          if (d.selected) return base;
+          const [x, y] = toLocal(cam.lat, cam.lon, d.st.lat, d.st.lon);
+          const dist = Math.hypot(x, y, z(d.st.alt) - cam.h);
+          return Math.max(base, (minPx * dist) / cam.focal / sizeScale);
+        };
+      }
       const sun = this.sun && this.sun.el > 3 ? this.sun : null;
       if (sun) {
         // Shadow lands away from the sun, further when the sun is low or the aircraft high
@@ -352,7 +478,7 @@ export class MapView {
           layers.push(new deck.SimpleMeshLayer({
             id: `shadow-${kind}`, data, mesh: MESHES[kind], sizeScale,
             getPosition: shadowAt, getOrientation: (d) => [0, 90 - d.st.heading, 0],
-            getScale: (d) => { const s = MESH_SCALE[d.info.size] || 1; return [s, s, 0.02]; },
+            getScale: (d) => { const s = scaleOf(d); return [s, s, 0.02]; },
             // fainter for high aircraft, whose real shadows are diffuse
             getColor: (d) => [0, 0, 0, Math.round(120 * d.alpha * Math.max(0.15, 1 - d.st.alt / 20000))],
             material: { ambient: 1, diffuse: 0, shininess: 0, specularColor: [0, 0, 0] },
@@ -370,9 +496,9 @@ export class MapView {
         layers.push(new deck.SimpleMeshLayer({
           id: `mesh-${kind}`, data, mesh: MESHES[kind], sizeScale, pickable: true,
           getPosition: (d) => [d.st.lon, d.st.lat, z(d.st.alt)],
-          getColor: (d) => (d.selected ? [255, 255, 255, 255] : [...d.color, Math.round(255 * d.alpha)]),
+          getColor: (d) => (d.selected && !cam ? [255, 255, 255, 255] : [...d.color, Math.round(255 * d.alpha)]),
           getOrientation: (d) => orientation(d.st),
-          getScale: (d) => { const s = MESH_SCALE[d.info.size] || 1; return [s, s, s]; },
+          getScale: (d) => { const s = scaleOf(d); return [s, s, s]; },
           material: { ambient: 0.45, diffuse: 0.65, shininess: 24, specularColor: [80, 80, 80] },
           updateTriggers: { getPosition: [ex] },
         }));
@@ -390,7 +516,7 @@ export class MapView {
 
     const sel = items.filter((d) => d.selected);
     layers.push(new deck.ScatterplotLayer({
-      id: "selected", data: sel, getPosition: (d) => [d.st.lon, d.st.lat, z(d.st.alt)], billboard: true,
+      id: "selected", data: opts.chasing ? [] : sel, // no ring around the aircraft you're riding with getPosition: (d) => [d.st.lon, d.st.lat, z(d.st.alt)], billboard: true,
       getRadius: 22 * opts.iconScale, radiusUnits: "pixels", stroked: true, filled: false,
       getLineColor: [255, 255, 255, 220], getLineWidth: 2, lineWidthUnits: "pixels",
       parameters: { depthTest: false },
@@ -400,9 +526,9 @@ export class MapView {
       const lab = opts.labels === "all" ? this.declutter(items, z, opts.iconScale) : sel;
       layers.push(new deck.TextLayer({
         id: "labels", data: lab, getPosition: (d) => [d.st.lon, d.st.lat, z(d.st.alt)],
-        getText: (d) => d.label, getSize: 11, lineHeight: 1.15, fontFamily: "Inter, system-ui, sans-serif",
+        getText: (d) => d.label, getSize: (d) => 11 * px(d), lineHeight: 1.15, fontFamily: "Inter, system-ui, sans-serif",
         getColor: (d) => (this.light ? [15, 25, 45, Math.round(240 * d.alpha)] : [235, 242, 255, Math.round(235 * d.alpha)]),
-        getTextAnchor: "start", getAlignmentBaseline: "center", getPixelOffset: [16 * opts.iconScale, 0],
+        getTextAnchor: "start", getAlignmentBaseline: "center", getPixelOffset: (d) => [16 * opts.iconScale * px(d), 0],
         background: true, getBackgroundColor: this.light ? [255, 255, 255, 170] : [10, 16, 28, 150],
         backgroundPadding: [3, 1], parameters: { depthTest: false }, characterSet: "auto",
       }));
@@ -411,6 +537,33 @@ export class MapView {
   }
 }
 
+
+/**
+ * Keep the part of a path [lon, lat, zMetres, ...extra] in front of the camera's near
+ * plane: the longest visible run, with crossing points interpolated.
+ */
+function clipToFront(path, cam) {
+  const depth = (p) => {
+    const [x, y] = toLocal(cam.lat, cam.lon, p[1], p[0]);
+    return x * cam.dir[0] + y * cam.dir[1] + (p[2] - cam.h) * cam.dir[2] - cam.near;
+  };
+  const ds = path.map(depth);
+  if (ds.every((d) => d > 0)) return path;
+  const lerp = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
+  let best = [], run = [];
+  for (let i = 0; i < path.length; i++) {
+    if (ds[i] > 0) {
+      if (!run.length && i > 0) run.push(lerp(path[i - 1], path[i], ds[i - 1] / (ds[i - 1] - ds[i])));
+      run.push(path[i]);
+    } else if (run.length) {
+      run.push(lerp(path[i - 1], path[i], ds[i - 1] / (ds[i - 1] - ds[i])));
+      if (run.length > best.length) best = run;
+      run = [];
+    }
+  }
+  if (run.length > best.length) best = run;
+  return best.length > 1 ? best : [];
+}
 
 function orientation(st) {
   const v = Math.max(20, (st.gs || 0) * MS_PER_KT);
