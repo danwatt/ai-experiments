@@ -568,33 +568,6 @@ export class MapView {
           return Math.max(base, (minPx * dist) / cam.focal / sizeScale);
         };
       }
-      const sun = this.sun && this.sun.el > 3 ? this.sun : null;
-      if (sun) {
-        // Shadow lands away from the sun, further when the sun is low or the aircraft high
-        // (using the drawn, exaggerated height so it matches the scene).
-        const cot = 1 / Math.tan(sun.el * D2R), sx = -Math.sin(sun.az * D2R), sy = -Math.cos(sun.az * D2R);
-        const shadowAt = (d) => {
-          const off = z(d.st.alt) * cot;
-          return [...fromLocal(d.st.lat, d.st.lon, sx * off, sy * off), 1];
-        };
-        for (const kind of ["jet", "light", "rotor"]) {
-          const data = airborne.filter((d) => (MESH_FOR[d.info.size] || "jet") === kind && z(d.st.alt) * cot < 60e3);
-          layers.push(new deck.SimpleMeshLayer({
-            id: `shadow-${kind}`, data, mesh: MESHES[kind], sizeScale,
-            getPosition: shadowAt, getOrientation: (d) => [0, 90 - d.st.heading, 0],
-            getScale: (d) => { const s = scaleOf(d); return [s, s, 0.02]; },
-            // fainter for high aircraft, whose real shadows are diffuse
-            getColor: (d) => [0, 0, 0, Math.round(120 * d.alpha * Math.max(0.15, 1 - d.st.alt / 20000))],
-            material: { ambient: 1, diffuse: 0, shininess: 0, specularColor: [0, 0, 0] },
-            updateTriggers: { getPosition: [ex, sun.el, sun.az] },
-          }));
-        }
-      } else {
-        layers.push(new deck.ScatterplotLayer({
-          id: "shadows", data: airborne, getPosition: (d) => [d.st.lon, d.st.lat, 0],
-          getRadius: 2.5, radiusUnits: "pixels", getFillColor: (d) => [...d.color, Math.round(110 * d.alpha)],
-        }));
-      }
       for (const kind of ["jet", "light", "rotor"]) {
         const data = items.filter((d) => (MESH_FOR[d.info.size] || "jet") === kind);
         layers.push(new deck.SimpleMeshLayer({

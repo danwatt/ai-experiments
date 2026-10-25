@@ -55,7 +55,7 @@ keep interpolating. Only a location rounded to ~1 km (2 decimals) is sent upstre
 
 - **2D** — top-down, icons by size class (light, jet, heavy, high-performance, rotorcraft).
 - **3D** — procedural low-poly meshes at altitude (exaggeration adjustable), pitched for
-  climb/descent and banked from turn rate, with drop lines and ground shadows. Right-drag
+  climb/descent and banked from turn rate, with drop lines to the ground. Right-drag
   or two fingers to orbit/tilt.
 - **Sky** — polar plot: centre is straight up, rim is the horizon (square-root elevation
   scale, since most traffic is within 10° of the horizon). Not mirrored: an aircraft on your
@@ -135,8 +135,7 @@ stepped over a grid around the spot to load them, then put back. Toggle in Setti
 ## Sun, sky and heatmap
 
 - **Sun lighting (3D)** — the sun's real position lights the aircraft meshes (warm and low at
-  golden hour, off at night), aircraft cast shadows on the ground away from the sun, and the
-  tilted view gets a matching sky and horizon. The compass dial shows a sun marker.
+  golden hour, off at night), and the tilted view gets a matching sky and horizon. The compass dial shows a sun marker.
 - **Map style "Auto"** — light basemap from just before sunrise to just after sunset, dark at night.
 - **Sky view** — the dome takes the sky's colour for the time of day and shows the sun.
 - **Traffic heatmap** — `server.py` counts every fresh position into a ~500 m grid in
