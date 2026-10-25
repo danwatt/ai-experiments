@@ -5,6 +5,7 @@ import { sunPosition } from "./sun.js";
 import { api, connect } from "./api.js";
 import { MapView } from "./mapview.js";
 import { SkyView } from "./skyview.js";
+import { SpotView } from "./spotview.js";
 import { SIZE_CLASSES, OPERATOR_KINDS, airlineName, sizeLabel, operatorLabel } from "./classify.js";
 import { haversine, bearing as brg, elevationAngle, compassPoint, lerpAngle, angleDiff, toLocal, M_PER_NM, M_PER_FT } from "./geo.js";
 
@@ -33,6 +34,8 @@ const DEFAULTS = {
   style: "auto",          // "auto" follows the sun: light by day, dark at night
   colorBy: "alt",
   labels: "all",
+  spotFov: 70,           // spotter view: horizontal field of view, degrees
+  spotAlign: 0,          // spotter view: compass correction from the align step, degrees
   trail: 120,            // seconds; 0 = off, -1 = everything kept
   trailSel: 300,         // selected aircraft; 0 = same as others
   trailFade: true,
@@ -149,6 +152,18 @@ const mapView = new MapView($("map"), {
   },
 });
 const skyView = new SkyView($("sky"), { onSelect: select });
+const spot = { pitch: 2 };   // spotter view look-up angle (not saved: depends on how you hold the device)
+let spotAp = null;           // the airport the spotter view is watching
+let spotMoves = new Map();   // hex -> movement at spotAp (arrival ETA, holding, rolling)
+const spotView = new SpotView($("spot"), {
+  onSelect: select,
+  onLook: (dYaw, dPitch) => {
+    stopSensor();
+    setBearing(S.bearing + dYaw);
+    spot.pitch = Math.max(-20, Math.min(70, spot.pitch + dPitch));
+  },
+  onZoom: (k) => setFov(S.spotFov * k),
+});
 
 store.onUpdate = () => {
   updateStatus();
@@ -274,7 +289,7 @@ document.addEventListener("pointerdown", (e) => { if (!e.target.closest("#ctxMen
 mapView.map.on("movestart", closeContextMenu);
 
 // ---------------------------------------------------------------- bearing / compass
-const sensor = { on: false, heading: null };
+const sensor = { on: false, heading: null, pose: null, iosOffset: null };
 function setBearing(b, { fromMap = false, animate = false } = {}) {
   if (chasing && !fromMap) {
     // the chase camera owns the bearing; turning the dial orbits around the aircraft instead
@@ -357,6 +372,35 @@ function onOrient(e) {
   if (h == null) return;
   h = (h + (screen.orientation?.angle || 0)) % 360;
   sensor.heading = sensor.heading == null ? h : lerpAngle(sensor.heading, h, 0.25);
+  updatePose(e);
+}
+
+// Spotter view: which way the back of the device points (where you look through
+// it) and how far up, from the full orientation rather than the flat-compass heading.
+// W3C: R = Rz(alpha)·Rx(beta)·Ry(gamma), earth frame x east / y north / z up.
+function updatePose(e) {
+  if (e.alpha == null || e.beta == null || e.gamma == null) return;
+  const D = Math.PI / 180, a = e.alpha * D, b = e.beta * D, gm = e.gamma * D;
+  const back = [
+    -Math.cos(a) * Math.sin(gm) - Math.sin(a) * Math.sin(b) * Math.cos(gm),
+    -Math.sin(a) * Math.sin(gm) + Math.cos(a) * Math.sin(b) * Math.cos(gm),
+    -Math.cos(b) * Math.cos(gm),
+  ];
+  let heading = ((Math.atan2(back[0], back[1]) / D) + 360) % 360;
+  const pitch = Math.asin(Math.max(-1, Math.min(1, back[2]))) / D;
+  if (e.webkitCompassHeading != null) {
+    // iOS: alpha isn't north-referenced. Tie it to the compass: held upright the compass
+    // heading follows the back of the device, held flat it follows the top edge.
+    const top = ((Math.atan2(-Math.sin(a) * Math.cos(b), Math.cos(a) * Math.cos(b)) / D) + 360) % 360;
+    const off = angleDiff(Math.abs(e.beta) > 45 ? heading : top, e.webkitCompassHeading);
+    sensor.iosOffset = sensor.iosOffset == null ? off : sensor.iosOffset + angleDiff(sensor.iosOffset, off) * 0.05;
+    heading = (heading + sensor.iosOffset + 360) % 360;
+  } else if (!e.absolute) {
+    return; // relative alpha with no compass to anchor it
+  }
+  sensor.pose = sensor.pose
+    ? { heading: lerpAngle(sensor.pose.heading, heading, 0.2), pitch: sensor.pose.pitch + (pitch - sensor.pose.pitch) * 0.2 }
+    : { heading, pitch };
 }
 
 // ---------------------------------------------------------------- filters UI
@@ -531,7 +575,10 @@ function frame(nowMs) {
 function drawFrame(nowMs) {
   const dtSec = Math.min(0.5, (nowMs - lastFrame) / 1000);
   lastFrame = nowMs;
-  if (sensor.on && sensor.heading != null) setBearing(sensor.heading);
+  if (sensor.on && S.view === "spot" && sensor.pose) {
+    setBearing(sensor.pose.heading + S.spotAlign);
+    spot.pitch = sensor.pose.pitch;
+  } else if (sensor.on && sensor.heading != null) setBearing(sensor.heading);
   if (S.home && store.offsetReady) {
     const now = store.serverNow();
     const live = S.time === "live";
@@ -574,7 +621,13 @@ function drawFrame(nowMs) {
       ap: S.airports && apData ? { ...apData, guides: S.runwayGuides ? apData.guides : [] } : null,
       heat: S.heat ? heatBins : null,
     };
-    if (S.view === "sky") {
+    if (S.view === "spot") {
+      spotView.render(items, {
+        home: S.home, observerFt: observerFt(), yaw: S.bearing, pitch: spot.pitch, fov: S.spotFov,
+        light: mapView.light, sun: S.sunLight ? sun : null, ap: S.airports ? apData : null,
+        moves: spotMoves, spotAp, aligning: !$("spotAlignPanel").hidden, bottomInset: 70,
+      });
+    } else if (S.view === "sky") {
       skyView.render(items, { home: S.home, bearing: S.bearing, observerFt: S.elevFt || 0, light: mapView.light, sun: S.sunLight ? sun : null, labels: S.labels, routeLines: S.routeLines, trailFade: S.trailFade, now: T, ...trailLengths() });
     } else {
       if (chasing) {
@@ -797,7 +850,17 @@ function select(hex, fly = false) {
 async function loadAirports() {
   if (!S.airports || !S.home) return;
   await runwayWatch.load(S.home.lat, S.home.lon, S.radius);
+  pickSpotAirport();
   buildApData();
+}
+// The spotter view watches the nearest real airport: large/medium within 15 km if
+// there is one, else the nearest field with runways.
+function pickSpotAirport() {
+  const dist = (a) => haversine(S.home.lat, S.home.lon, a.lat, a.lon);
+  const withRunways = runwayWatch.airports.filter((a) => a.runways.length);
+  const near = withRunways.filter((a) => dist(a) < 15e3);
+  const big = near.filter((a) => a.size !== "small");
+  spotAp = (big.length ? big : near.length ? near : withRunways).sort((a, b) => dist(a) - dist(b))[0] || null;
 }
 function buildApData() {
   const active = new Map(); // `${ap}|${ident}` -> "arr" | "dep"
@@ -809,8 +872,10 @@ function buildApData() {
   for (const ap of runwayWatch.airports) {
     for (const rw of ap.runways) {
       const kind = active.get(`${ap.ident}|${rw.le.ident}`) || active.get(`${ap.ident}|${rw.he.ident}`);
-      runways.push({ path: [[rw.le.lon, rw.le.lat], [rw.he.lon, rw.he.lat]], widthM: (rw.widthFt || 100) * M_PER_FT, active: kind || null });
-      ends.push({ lon: rw.le.lon, lat: rw.le.lat, ident: rw.le.ident }, { lon: rw.he.lon, lat: rw.he.lat, ident: rw.he.ident });
+      const elevFt = rw.le.elevFt ?? ap.elevFt ?? 0;
+      runways.push({ path: [[rw.le.lon, rw.le.lat], [rw.he.lon, rw.he.lat]], widthM: (rw.widthFt || 100) * M_PER_FT, active: kind || null, elevFt });
+      ends.push({ lon: rw.le.lon, lat: rw.le.lat, ident: rw.le.ident, elevFt: rw.le.elevFt ?? elevFt },
+        { lon: rw.he.lon, lat: rw.he.lat, ident: rw.he.ident, elevFt: rw.he.elevFt ?? elevFt });
     }
   }
   const busy = new Set(runwayActivity.map((a) => a.ap.ident));
@@ -831,6 +896,8 @@ function updateRunways() {
   runwayActivity = runwayWatch.activity(now);
   buildApData();
   renderFlow();
+  spotMoves = S.view === "spot" && spotAp ? new Map(runwayWatch.movements(states, spotAp.ident).map((m) => [m.hex, m])) : new Map();
+  renderSpotStrip();
 }
 function renderFlow() {
   const el = $("flow");
@@ -899,17 +966,95 @@ async function loadHeat() {
 
 // ---------------------------------------------------------------- top bar & settings
 function setView(v) {
+  const was = S.view;
   S.view = v;
   save();
   for (const b of $("viewSeg").querySelectorAll("button")) b.setAttribute("aria-pressed", b.dataset.view === v);
-  const sky = v === "sky";
+  document.body.dataset.view = v;
+  const sky = v === "sky", spotting = v === "spot", noMap = sky || spotting;
   $("sky").hidden = !sky;
-  $("map").style.visibility = sky ? "hidden" : "visible";
-  $("rotHome").hidden = sky;
+  $("spot").hidden = !spotting;
+  $("spotUi").hidden = !spotting;
+  if (!spotting) $("spotAlignPanel").hidden = true;
+  $("map").style.visibility = noMap ? "hidden" : "visible";
+  $("rotHome").hidden = noMap;
   closeContextMenu();
-  if (sky) stopChase();
+  if (noMap) stopChase();
   if (sky) skyView.resize();
+  else if (spotting) enterSpot(was !== "spot");
   else mapView.setMode(v);
+  renderSpotStrip();
+}
+
+// ---------------------------------------------------------------- spotter view
+function observerFt() {
+  // parked by the field: its elevation plus eye height is a good guess
+  return S.elevFt || (spotAp?.elevFt || 0) + 6;
+}
+function enterSpot(fresh) {
+  spotView.resize();
+  $("spotFov").textContent = `${Math.round(S.spotFov)}°`;
+  if (S.time !== "live") {
+    setTime("live");
+    toast("Spotter view runs live, without the smoothing delay");
+  }
+  if (fresh && !sensor.on && spotAp) setBearing(brg(S.home.lat, S.home.lon, spotAp.lat, spotAp.lon));
+}
+function setFov(v) {
+  S.spotFov = Math.max(8, Math.min(100, v));
+  $("spotFov").textContent = `${Math.round(S.spotFov)}°`;
+  save();
+}
+function renderSpotStrip() {
+  const el = $("spotStrip");
+  if (S.view !== "spot") { el.hidden = true; return; }
+  el.hidden = false;
+  const name = spotAp ? esc(spotAp.iata || spotAp.ident) : null;
+  const clock = (s) => { s = Math.max(0, Math.round(s)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`; };
+  const chips = [...spotMoves.values()].slice(0, 8).map((m) => {
+    const i = store.tracks.get(m.hex)?.info || {};
+    const what = m.kind === "arr" ? (m.state === "landing" ? "landing" : clock(m.eta)) : m.state;
+    return `<button class="move ${m.kind}" data-hex="${m.hex}">${m.kind === "arr" ? "↓" : "↑"} ${esc(i.flight || i.reg || m.hex.toUpperCase())}
+      <b>${esc(m.ident)}</b> <span>${esc(what)}</span></button>`;
+  }).join("");
+  el.innerHTML = `<span class="strip-title">${name ? `Next at ${name}` : "No airport nearby"}</span>
+    ${chips || `<span class="muted">Watching for arrivals and departures…</span>`}`;
+}
+$("spotStrip").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-hex]");
+  if (b) select(b.dataset.hex);
+});
+function openAlign() {
+  const panel = $("spotAlignPanel");
+  if (!panel.hidden) { panel.hidden = true; return; }
+  if (!spotAp) return toast("No airport nearby to align with");
+  const ends = [];
+  for (const rw of spotAp.runways) for (const e of [rw.le, rw.he]) ends.push(e);
+  const rel = (e) => Math.abs(angleDiff(S.bearing, brg(S.home.lat, S.home.lon, e.lat, e.lon)));
+  ends.sort((a, b) => rel(a) - rel(b));
+  $("alignHelp").textContent = sensor.on
+    ? `Point the crosshair at a runway end you can see at ${spotAp.iata || spotAp.ident}, then tap which one it is.`
+    : `Tap a runway end at ${spotAp.iata || spotAp.ident} to face it. Turn on the compass (◉) to align the device.`;
+  $("alignEnds").innerHTML = ends.map((e, k) => `<button class="chip" data-k="${k}">${esc(e.ident)}</button>`).join("");
+  $("alignEnds").onclick = (ev) => {
+    const b = ev.target.closest("[data-k]");
+    if (!b) return;
+    const e = ends[+b.dataset.k];
+    const target = brg(S.home.lat, S.home.lon, e.lat, e.lon);
+    if (sensor.on && sensor.pose) {
+      S.spotAlign = angleDiff(sensor.pose.heading, target);
+      save();
+      toast(`Aligned on ${e.ident} (${S.spotAlign >= 0 ? "+" : ""}${S.spotAlign.toFixed(1)}°)`);
+      panel.hidden = true;
+    } else {
+      setBearing(target);
+      spot.pitch = 0;
+    }
+  };
+  panel.hidden = false;
+}
+function nudge(deg) {
+  if (sensor.on) { S.spotAlign += deg; save(); } else setBearing(S.bearing + deg);
 }
 function setTime(t) {
   S.time = t;
@@ -1041,6 +1186,7 @@ function wireKeys() {
     if (k === "1") setView("2d");
     else if (k === "2") setView("3d");
     else if (k === "3") setView("sky");
+    else if (k === "4") setView("spot");
     else if (k === "l") setTime("live");
     else if (k === "s") setTime("smooth");
     else if (k === "q") { stopSensor(); setBearing(S.bearing - 15, { animate: true }); }
@@ -1093,7 +1239,16 @@ setBearing(S.bearing);
 if (DEMO) setupDemo();
 if (S.home) setHome(S.home.lat, S.home.lon);
 else $("onboard").hidden = false;
-window.addEventListener("resize", () => S.view === "sky" && skyView.resize());
+window.addEventListener("resize", () => {
+  if (S.view === "sky") skyView.resize();
+  if (S.view === "spot") spotView.resize();
+});
+$("spotFovOut").onclick = () => setFov(S.spotFov * 1.25);
+$("spotFovIn").onclick = () => setFov(S.spotFov / 1.25);
+$("spotAlign").onclick = openAlign;
+$("alignLeft").onclick = () => nudge(-1);
+$("alignRight").onclick = () => nudge(1);
+$("alignDone").onclick = () => ($("spotAlignPanel").hidden = true);
 
 syncHistory();
 updateSun();

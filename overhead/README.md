@@ -61,6 +61,17 @@ keep interpolating. Only a location rounded to ~1 km (2 decimals) is sent upstre
   scale, since most traffic is within 10° of the horizon). Not mirrored: an aircraft on your
   right when you face that way is on the right. Elevation corrects for earth curvature and
   your elevation (Settings).
+- **Spot** — spotter view for when you're parked by an airfield: the tablet is a window. A
+  pinhole camera at your location, pointed where you face, draws the runways in perspective
+  (active ones tinted), approach and climb-out guides, and each aircraft where it really is,
+  sized by distance, with a card for what it's doing ("Lands 17C in 0:48", "Holding 17R").
+  Arrows at the edges show traffic just out of view and when it will come in. A strip along
+  the bottom lists the next movements at the nearest airport. Drag to look around, scroll or
+  − / + to zoom (down to binocular-narrow); on a phone or tablet tap ◉ and it follows how you
+  hold the device (back of the device = where you look). Car interiors throw compasses off by
+  10–30°, so **Align**: point the crosshair at a runway end you can see and tap its number.
+  Runs in Live mode; eye height is assumed to be field elevation + 6 ft unless you set your
+  elevation in Settings.
 
 **Chase** (details card or `C`) rides along with the selected aircraft: in 2D the map stays
 centred on it, track-up; in 3D the camera sits behind and a little above, looking along its
@@ -133,7 +144,7 @@ operator or airline.
 
 ## Keys
 
-`1` `2` `3` views · `L` live · `S` smooth · `Q`/`E` rotate · `N` north up · `H` recentre ·
+`1` `2` `3` `4` views · `L` live · `S` smooth · `Q`/`E` rotate · `N` north up · `H` recentre ·
 `F` filters · `C` chase selected · `T` cycle trail length · `Esc` deselect
 
 ## Files
@@ -146,6 +157,7 @@ operator or airline.
 - `js/store.js` — polling, per-aircraft history, interpolation / dead reckoning
 - `js/mapview.js` — MapLibre + deck.gl layers (icons, meshes, trails, runways, heatmap, lighting)
 - `js/skyview.js` — canvas sky dome
+- `js/spotview.js` — spotter view (perspective canvas, cards, edge arrows)
 - `js/meshes.js` — procedural aircraft meshes
 - `js/classify.js` — size class, operator kind, airline names
 - `js/routes.js` — origin/destination lookup and plausibility grading

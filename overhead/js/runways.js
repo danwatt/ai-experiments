@@ -2,7 +2,7 @@
 // traffic: aircraft lined up on an extended centreline, descending on roughly a
 // 3° path, count as arrivals; aircraft climbing out past the far end, aligned
 // with the runway, count as departures.
-import { haversine, toLocal, fromLocal, angleDiff, compassPoint, M_PER_NM } from "./geo.js";
+import { haversine, toLocal, fromLocal, angleDiff, compassPoint, M_PER_NM, MS_PER_KT } from "./geo.js";
 import { api } from "./api.js";
 
 const WINDOW = 20 * 60;          // seconds of events that make a runway "active"
@@ -121,6 +121,44 @@ export class RunwayWatch {
       }
     }
     return best;
+  }
+
+  /**
+   * What's about to happen at one airport, for the spotter view: aircraft lined up
+   * on final (with seconds to the threshold) and departures holding, lined up or
+   * rolling. Looser than the runway-in-use test so arrivals show up while still
+   * ~20 nm out. Returns [{hex, kind: "arr"|"dep", ident, end, eta, state}].
+   */
+  movements(states, apIdent) {
+    const ends = this.ends.filter((e) => e.ap.ident === apIdent);
+    const out = [];
+    for (const st of states) {
+      let best = null;
+      for (const e of ends) {
+        if (Math.abs(e.lat - st.lat) > 0.4) continue;
+        const { d, xt } = alongCross(e, st.lat, st.lon);
+        const gs = st.gs || 0;
+        const aligned = st.heading != null && Math.abs(angleDiff(st.heading, e.hdg)) < (st.ground ? 25 : 30);
+        if (!st.ground) {
+          if (st.rotor || !aligned || d < -40e3 || d > 200) continue;
+          if (Math.abs(xt) > 1500 + 0.05 * Math.abs(d)) continue;
+          if (st.alt - e.elevFt > GLIDE_FT_PER_M * Math.abs(d) * 2 + 1500 || (st.vrate || 0) > 500) continue;
+          const eta = Math.max(0, -d / Math.max(30, (gs || 140) * MS_PER_KT));
+          const state = d > -300 ? "landing" : "final"; // over the threshold or just past it
+          if (!best || Math.abs(xt) < best.xt) best = { kind: "arr", end: e, ident: e.ident, eta, xt: Math.abs(xt), state };
+        } else {
+          const onRunway = d > -60 && d < e.lengthM && Math.abs(xt) < 45;
+          if (gs > 40 && onRunway && aligned) {
+            best = { kind: "dep", end: e, ident: e.ident, eta: 0, state: "rolling" };
+          } else if (!best && gs < 25 && haversine(e.lat, e.lon, st.lat, st.lon) < 400) {
+            best = { kind: "dep", end: e, ident: e.ident, eta: null, state: onRunway && aligned ? "lined up" : "holding" };
+          }
+        }
+      }
+      if (best) out.push({ ...best, hex: st.hex });
+    }
+    const rank = (m) => (m.kind === "dep" ? (m.state === "rolling" ? -1 : m.state === "lined up" ? 30 : 200) : m.eta);
+    return out.sort((a, b) => rank(a) - rank(b));
   }
 
   /** Dashed guide lines: final approach (sloping up at 3°) and initial climb-out. */

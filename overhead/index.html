@@ -19,6 +19,7 @@
       <button data-view="2d" title="Top-down map (1)">2D</button>
       <button data-view="3d" title="Tilted 3D map — right-drag or two fingers to orbit (2)">3D</button>
       <button data-view="sky" title="Sky dome: what is above you (3)">Sky</button>
+      <button data-view="spot" title="Spotter: what's in front of you at the field, held up like a window (4)">Spot</button>
     </div>
     <div class="seg" id="timeSeg" aria-label="Timing">
       <button data-time="live" title="Latest positions, dead-reckoned between updates (L)">Live</button>
@@ -42,6 +43,23 @@
   <main id="stage">
     <div id="map"></div>
     <canvas id="sky" hidden></canvas>
+    <canvas id="spot" hidden></canvas>
+    <div id="spotUi" class="spot-ui" hidden>
+      <button id="spotFovOut" title="Wider view">−</button>
+      <span id="spotFov" title="Horizontal field of view">70°</span>
+      <button id="spotFovIn" title="Zoom in (binoculars)">+</button>
+      <button id="spotAlign" class="wide" title="Line the view up with a runway end you can see">Align</button>
+    </div>
+    <div id="spotAlignPanel" class="align-panel" hidden>
+      <p id="alignHelp"></p>
+      <div id="alignEnds" class="chips"></div>
+      <div class="row">
+        <button id="alignLeft" class="btn">◀ 1°</button>
+        <button id="alignRight" class="btn">1° ▶</button>
+        <button id="alignDone" class="btn">Done</button>
+      </div>
+    </div>
+    <div id="spotStrip" class="spot-strip" hidden></div>
 
     <aside id="filters" class="panel left" hidden>
       <div class="panel-head"><h2>Filters</h2><span id="shownCount" class="muted"></span><button class="x" data-close="filters" aria-label="Close">×</button></div>
