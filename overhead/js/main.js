@@ -880,6 +880,7 @@ async function loadSpotBuildings() {
   spotBuildingsBusy = true;
   try {
     const found = await mapView.collectBuildings(p.lat, p.lon, 5000, toLocal, fromLocal);
+    mapView.setBearing(S.bearing); // the sweep put the hidden map back to its old heading
     if (found?.length) spotBuildings = found;
     else spotBuildingsKey = null; // basemap not ready or nothing loaded: try again shortly
   } catch (e) {

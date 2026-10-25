@@ -37,7 +37,9 @@ export class MapView {
       fadeDuration: 0,
     });
     this.map.touchPitch.disable();
-    this.map.on("rotate", () => onBearing(((this.map.getBearing() % 360) + 360) % 360));
+    this.map.on("rotate", () => {
+      if (!this.sweeping) onBearing(((this.map.getBearing() % 360) + 360) % 360);
+    });
     this.map.on("click", (e) => {
       // deck handles picks first; this fires for clicks on empty map too. While chasing,
       // drags orbit the camera and end in a click, so empty-map clicks are ignored.
@@ -140,11 +142,12 @@ export class MapView {
     const step = 3500, n = Math.ceil(radiusM / step);
     const feats = [];
     let last = null;
+    this.sweeping = true; // these camera moves are ours: don't report them as the user turning
     for (let i = -n; i <= n; i++) {
       for (let j = -n; j <= n; j++) {
         if (Math.hypot(i, j) * step > radiusM + step) continue;
         last = fromLocal(lat, lon, i * step, j * step);
-        m.jumpTo({ center: last, zoom: 14, pitch: 0, bearing: 0 });
+        m.jumpTo({ center: last, zoom: 14, pitch: 0, bearing: saved.bearing });
         await new Promise((resolve) => {
           const done = () => { clearTimeout(t); resolve(); };
           const t = setTimeout(done, 6000);
@@ -156,6 +159,7 @@ export class MapView {
     // put the camera back, unless something else has moved it meanwhile
     const c = m.getCenter();
     if (last && Math.abs(c.lng - last[0]) < 1e-6 && Math.abs(c.lat - last[1]) < 1e-6) m.jumpTo(saved);
+    this.sweeping = false;
     const out = [], seen = new Set();
     for (const f of feats) {
       if (f.properties.hide_3d) continue;
