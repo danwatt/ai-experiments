@@ -77,34 +77,44 @@ button:focus-visible{outline:4px solid var(--gold);outline-offset:3px}
 .streak{height:30px;line-height:30px;text-align:center;font-weight:900;color:var(--gold);margin:8px 0 6px;font-size:18px}
 .streak.hot{animation:pop .35s}
 .cardwrap{perspective:900px;display:flex;justify-content:center;position:relative}
-.card{width:100%;max-width:520px;background:var(--card);color:var(--ink);border-radius:28px;padding:30px 18px 24px;
+/* fixed height (sized for the stacked layout) covers every card state, so the keypad never moves */
+.card{--vf:clamp(46px,min(12vw,9vh),80px);height:calc(var(--vf)*3.27 + 84px);display:flex;flex-direction:column;justify-content:center;overflow:hidden;
+  container-type:inline-size;width:100%;max-width:520px;background:var(--card);color:var(--ink);border-radius:28px;padding:30px 18px 24px;
   box-shadow:0 10px 0 #cbc4ad,0 20px 40px rgba(0,0,0,.35);text-align:center;position:relative;transition:box-shadow .2s}
 .card.flip{animation:flipIn .32s ease-out}
 .card.shake{animation:shake .4s}
 .card.right{box-shadow:0 10px 0 #2ba873,0 0 0 6px var(--good),0 20px 40px rgba(0,0,0,.35)}
 .tag{position:absolute;top:10px;left:50%;transform:translateX(-50%);font-size:13px;font-weight:900;padding:4px 12px;border-radius:999px;background:#ffeeb8;color:#8a5a00;white-space:nowrap}
 .tag.comeback{background:#dfe3ff;color:#3a45b8}
+.tag.miss{background:#ffe0dc;color:#c0392b}
 .tag:empty{display:none}
-.problem{font-size:clamp(52px,15vw,92px);font-weight:900;display:flex;justify-content:center;align-items:center;gap:.2em;line-height:1.1;font-variant-numeric:tabular-nums}
+.problem{flex:1 1 auto;min-height:0;font-size:min(92px,13.5cqi);font-weight:900;display:flex;justify-content:center;align-items:center;gap:.2em;line-height:1.1;font-variant-numeric:tabular-nums}
 .problem .op{color:var(--accent)}
 .ans{min-width:1.6em;padding:0 .12em;border-radius:16px;background:#eef0ff;color:var(--accent);border-bottom:6px solid #c9ceff}
+/* stacked "column" layout: ones digits line up on the right, answer under the bar */
+.problem.vertical{display:grid;grid-template-columns:auto auto;justify-content:center;align-content:center;gap:0;font-size:var(--vf);line-height:1.05}
+.problem.vertical #pA{grid-area:1/2;text-align:right;padding-right:.12em}
+.problem.vertical #pOp{grid-area:2/1;padding-right:.3em;border-bottom:6px solid var(--ink)}
+.problem.vertical #pB{grid-area:2/2;text-align:right;padding-right:.12em;border-bottom:6px solid var(--ink)}
+.problem.vertical .eq{display:none}
+.problem.vertical .ans{grid-area:3/1/4/3;justify-self:end;text-align:right;margin-top:.12em}
 .ans.empty{color:#9aa1e0;animation:blink 1.2s infinite}
 .card.right .ans{background:#d9fbe9;color:#18935e;border-color:#8be8bd}
 .card.oops .ans{background:#ffe4e1;color:#d2463f;border-color:#ffb9b0}
-.help{margin-top:14px;border-top:2px dashed #e6e1cf;padding-top:12px}
-.help .msg{font-size:24px;font-weight:900;color:#d2463f}
-.help .msg span{color:var(--ink)}
-.help .tip{font-size:17px;font-weight:700;color:#4b5078;margin-top:8px;line-height:1.35}
-.help .now{font-size:15px;font-weight:800;color:#18935e;margin-top:8px}
-.frames{display:flex;gap:10px;justify-content:center;margin-top:10px;flex-wrap:wrap}
-.frame{display:grid;grid-template-columns:repeat(5,20px);gap:4px;padding:6px;border-radius:10px;background:#f1eee2}
-.dot{width:20px;height:20px;border-radius:50%;border:2px dashed #d8d2bd}
+.card .ans.ghost{color:#c3c8ec}
+/* wrong answer: shrink the problem to one line and fit the hint into the same card */
+.card.helpmode .problem{flex:none;font-size:clamp(30px,10cqi,56px);margin-top:12px}
+.help{--dot:clamp(16px,4.5cqi,26px);margin-top:4px}
+.help .tip{font-size:clamp(15px,3.6cqi,19px);font-weight:700;color:#4b5078;margin-top:8px;line-height:1.3}
+.frames{display:flex;gap:10px;justify-content:center;margin-top:8px}
+.frame{display:grid;grid-template-columns:repeat(5,var(--dot));gap:4px;padding:6px;border-radius:10px;background:#f1eee2}
+.dot{width:var(--dot);height:var(--dot);border-radius:50%;border:2px dashed #d8d2bd}
 .dot.a{background:var(--accent);border:0}
 .dot.b{background:var(--orange);border:0}
 .dot.x{background:#ffd9cc;border:0;position:relative}
 .dot.x::after{content:"✕";position:absolute;inset:0;display:grid;place-items:center;color:#d2463f;font-weight:900;font-size:13px}
 .pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:420px;width:100%;margin:22px auto 0}
-.pad button{height:clamp(54px,9vh,70px);border-radius:18px;background:rgba(255,255,255,.13);border:1px solid var(--glass-line);font-size:30px;font-weight:900;box-shadow:0 5px 0 rgba(0,0,0,.35)}
+.pad button{height:clamp(54px,8vh,70px);border-radius:18px;background:rgba(255,255,255,.13);border:1px solid var(--glass-line);font-size:30px;font-weight:900;box-shadow:0 5px 0 rgba(0,0,0,.35)}
 .pad button:active,.pad button.down{transform:translateY(4px);box-shadow:0 1px 0 rgba(0,0,0,.35)}
 .pad .ok{background:var(--good);color:#06301f;box-shadow:0 5px 0 #1f9864}
 .pad .del{font-size:24px}
@@ -235,14 +245,12 @@ td.num,th.num{text-align:right}
       <div class="card" id="card">
         <div class="tag" id="cardTag"></div>
         <div class="problem" aria-live="polite">
-          <span id="pA"></span><span class="op" id="pOp"></span><span id="pB"></span><span>=</span><span class="ans empty" id="ans">?</span>
+          <span id="pA"></span><span class="op" id="pOp"></span><span id="pB"></span><span class="eq">=</span><span class="ans empty" id="ans">?</span>
         </div>
         <div class="help" id="help" hidden aria-live="polite">
-          <div class="msg" id="helpMsg"></div>
-          <div class="frames" id="frames"></div>
+                    <div class="frames" id="frames"></div>
           <div class="tip" id="tip"></div>
-          <div class="now" id="helpNow"></div>
-        </div>
+                  </div>
       </div>
     </div>
     <div class="pad" id="pad"></div>
@@ -580,6 +588,8 @@ function next() {
   $('#pA').textContent = f.a;
   $('#pOp').textContent = f.op === '+' ? '+' : '−';
   $('#pB').textContent = f.b;
+  c.vertical = Math.random() < 0.5;
+  $('.problem').classList.toggle('vertical', c.vertical);
   const tag = $('#cardTag');
   tag.className = 'tag' + (c.retry ? ' comeback' : '');
   tag.textContent = c.retry ? '🔁 Comeback card!' : (!S.facts[f.k] ? '✨ New fact' : '');
@@ -593,8 +603,10 @@ function next() {
 
 function renderAns() {
   const a = $('#ans');
-  a.textContent = G.input || '?';
-  a.classList.toggle('empty', !G.input);
+  const ghost = G.phase === 'fix' && !G.input;  // show the right answer faintly to copy
+  a.textContent = G.input || (ghost ? G.cur.f.ans : '?');
+  a.classList.toggle('empty', !G.input && !ghost);
+  a.classList.toggle('ghost', ghost);
 }
 function renderFuel() {
   $('#fuel').innerHTML = G.cells.map((c, i) =>
@@ -634,7 +646,8 @@ function submit() {
       G.queue.splice(Math.min(3, G.queue.length), 0, {f, retry: true});  // see it again soon
     }
     tone([247, 196], {type: 'triangle', gap: 0.14, dur: 0.2, vol: 0.12});
-    card.classList.remove('shake', 'flip'); void card.offsetWidth; card.classList.add('shake', 'oops');
+    $('.problem').classList.remove('vertical');
+    card.classList.remove('shake', 'flip'); void card.offsetWidth; card.classList.add('shake', 'oops', 'helpmode');
     showHelp(f, v);
     G.input = ''; renderAns();
     return;
@@ -648,7 +661,7 @@ function submit() {
 function complete(firstMs, ok, stars) {
   const c = G.cur, total = elapsed(), card = $('#card');
   G.ms += total;
-  G.items.push({k: c.f.k, ms: Math.round(firstMs), total: Math.round(total), ok, retry: c.retry});
+  G.items.push({k: c.f.k, ms: Math.round(firstMs), total: Math.round(total), ok, retry: c.retry, vertical: c.vertical});
   if (!c.retry) {
     G.cells[G.done++] = ok ? 'gold' : 'silver';
     if (ok) G.firstTry++;
@@ -678,11 +691,11 @@ function burst(text) {
 }
 
 function showHelp(f, wrong) {
-  const opc = f.op === '+' ? '+' : '−';
-  $('#helpMsg').innerHTML = `Not ${wrong}. <span>${f.a} ${opc} ${f.b} = ${f.ans}</span>`;
+  const tag = $('#cardTag');
+  tag.className = 'tag miss';
+  tag.textContent = `Not ${wrong} · Type ${f.ans} to keep flying`;
   $('#frames').innerHTML = framesHtml(f);
   $('#tip').textContent = tip(f);
-  $('#helpNow').textContent = `Type ${f.ans} and press ✓ to keep flying.`;
   $('#help').hidden = false;
 }
 
