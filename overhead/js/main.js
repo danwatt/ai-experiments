@@ -1020,7 +1020,7 @@ function setView(v) {
   closeContextMenu();
   if (noMap) stopChase();
   if (sky) skyView.resize();
-  else if (spotting) enterSpot(was !== "spot");
+  else if (spotting) enterSpot(was !== "spot" || !spotEntered); // opening the page counts as fresh
   else {
     mapView.setMode(v);
     if (was === "spot") mapView.fit(); // the hidden map was moved around to read building tiles
@@ -1067,7 +1067,9 @@ function renderSpotFrom() {
     ...SPOTS.map((s) => `<option value="${s.id}">${esc(s.name)}</option>`)].join("");
   sel.value = S.spotFrom || "home";
 }
+let spotEntered = false;
 function enterSpot(fresh) {
+  spotEntered = true;
   spotView.resize();
   $("spotFov").textContent = `${Math.round(S.spotFov)}°`;
   if (S.time !== "live") {
