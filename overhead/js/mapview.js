@@ -197,8 +197,8 @@ export class MapView {
   }
 
   /** Sun-driven lighting for 3D meshes and the sky/fog seen when the map is tilted. */
-  setSun(sun, enabled) {
-    const key = `${enabled}|${Math.round(sun.el * 2)}|${Math.round(sun.az)}|${this.light}`;
+  setSun(sun, enabled, keepBright = true) {
+    const key = `${enabled}|${keepBright}|${Math.round(sun.el * 2)}|${Math.round(sun.az)}|${this.light}`;
     if (key === this._sunKey) return;
     this._sunKey = key;
     this.sun = enabled ? sun : null;
@@ -207,12 +207,20 @@ export class MapView {
     // light travels from the sun toward the ground (x east, y north, z up)
     const az = sun.az * D2R, el = sun.el * D2R;
     const direction = [-Math.sin(az) * Math.cos(el), -Math.cos(az) * Math.cos(el), -Math.sin(el)];
-    this.overlay.setProps({
-      effects: l ? [new deck.LightingEffect({
-        ambient: new deck.AmbientLight({ color: l.ambientColor, intensity: l.ambient }),
-        sun: new deck.DirectionalLight({ direction, color: l.sunColor, intensity: l.sun }),
-      })] : [],
-    });
+    const lights = l && {
+      ambient: new deck.AmbientLight({ color: l.ambientColor, intensity: l.ambient }),
+      sun: new deck.DirectionalLight({ direction, color: l.sunColor, intensity: l.sun }),
+    };
+    if (l && keepBright && l.sun < 1.2) {
+      // Night and dusk: keep aircraft readable instead of realistic. Neutral ambient plus a
+      // soft light from above that fades out as the real sun takes over.
+      const dark = 1 - l.sun / 1.2;
+      lights.ambient = new deck.AmbientLight({
+        color: l.ambientColor.map((c) => Math.round(c + (255 - c) * dark)), intensity: Math.max(l.ambient, 1.1),
+      });
+      lights.fill = new deck.DirectionalLight({ direction: [0.25, 0.35, -1], color: [255, 255, 255], intensity: 0.9 * dark });
+    }
+    this.overlay.setProps({ effects: lights ? [new deck.LightingEffect(lights)] : [] });
     this.applySky();
   }
 

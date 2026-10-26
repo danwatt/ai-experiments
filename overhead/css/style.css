@@ -154,14 +154,7 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
 .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
 .btn.wide { width: 100%; }
 
-/* dual range: two overlaid sliders */
-.dual { position: relative; height: 22px; }
-.dual input { position: absolute; inset: 0; pointer-events: none; background: none; -webkit-appearance: none; appearance: none; }
-.dual input::-webkit-slider-thumb { pointer-events: auto; -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--accent); border: 2px solid var(--panel-solid); cursor: pointer; }
-.dual input::-moz-range-thumb { pointer-events: auto; width: 14px; height: 14px; border-radius: 50%; background: var(--accent); border: 2px solid var(--panel-solid); cursor: pointer; }
-.dual input::-webkit-slider-runnable-track { height: 4px; background: transparent; }
-.dual::before { content: ""; position: absolute; left: 0; right: 0; top: 9px; height: 4px; border-radius: 2px; background: var(--line-strong); }
-.dual .fill { position: absolute; top: 9px; height: 4px; background: var(--accent); border-radius: 2px; }
+.fl { display: flex; flex-direction: column; gap: 3px; font-size: 11px; min-width: 0; }
 
 /* list */
 .list-head, .row-ac { display: grid; grid-template-columns: 1.3fr 0.9fr 0.8fr 0.5fr; gap: 6px; padding: 5px 12px; align-items: center; }

@@ -44,6 +44,7 @@ const DEFAULTS = {
   airports: true,
   runwayGuides: true,
   sunLight: true,
+  brightNight: true,     // 3D: don't let night lighting darken the aircraft
   heat: 0,               // heatmap window in hours; 0 = off, -1 = everything recorded
   heatBand: "all",
   routeLines: "selected",
@@ -442,22 +443,41 @@ function buildFilterUi() {
   $("fSearch").value = F.search;
   $("fType").value = F.types;
   $("fAirport").value = F.airport;
-  $("fAltMin").value = F.altMin;
-  $("fAltMax").value = F.altMax;
+  buildAltitudeUi();
   $("fGround").checked = F.ground;
   $("fSpeed").value = F.speedMin;
   $("fDist").value = F.distMax;
   $("fMil").checked = F.mil;
   syncFilterLabels();
 }
+// Flight-level filter: dropdowns (reliable on touch screens, unlike a two-thumb slider)
+// with quick presets. 45,000 ft as the upper bound means "no limit".
+const ALT_STEPS = [0, 1000, 2000, 3000, 5000, 7000, 10000, 14000, 18000, 24000, 29000, 33000, 37000, 41000, 45000];
+const ALT_PRESETS = [
+  { label: "All", lo: 0, hi: 45000 },
+  { label: "Below FL100", lo: 0, hi: 10000 },
+  { label: "FL100–FL240", lo: 10000, hi: 24000 },
+  { label: "FL240 and up", lo: 24000, hi: 45000 },
+];
+const altName = (ft, upper) => (ft === 0 ? "Surface" : upper && ft >= 45000 ? "No limit"
+  : ft >= 18000 ? `FL${String(ft / 100).padStart(3, "0")}` : `${fmtNum(ft)} ft`);
+const snapAlt = (ft) => ALT_STEPS.reduce((a, b) => (Math.abs(b - ft) < Math.abs(a - ft) ? b : a));
+function buildAltitudeUi() {
+  F.altMin = snapAlt(F.altMin); // older saves used a 500 ft slider
+  F.altMax = snapAlt(F.altMax);
+  $("fAltMin").innerHTML = ALT_STEPS.slice(0, -1).map((ft) => `<option value="${ft}">${altName(ft)}</option>`).join("");
+  $("fAltMax").innerHTML = ALT_STEPS.slice(1).map((ft) => `<option value="${ft}">${altName(ft, true)}</option>`).join("");
+  $("fAltMin").value = F.altMin;
+  $("fAltMax").value = F.altMax;
+  $("fAltPresets").innerHTML = ALT_PRESETS.map((p, k) => `<button class="chip" data-k="${k}">${p.label}</button>`).join("");
+}
 function syncFilterLabels() {
   const lo = Math.min(F.altMin, F.altMax), hi = Math.max(F.altMin, F.altMax);
-  $("altVal").textContent = `${fmtNum(lo)} – ${hi >= 45000 ? "45,000+" : fmtNum(hi)} ft`;
-  const dual = $("altRange");
-  let fill = dual.querySelector(".fill");
-  if (!fill) { fill = document.createElement("div"); fill.className = "fill"; dual.prepend(fill); }
-  fill.style.left = `${(lo / 45000) * 100}%`;
-  fill.style.width = `${((hi - lo) / 45000) * 100}%`;
+  $("altVal").textContent = hi >= 45000 ? (lo ? `${altName(lo)} and up` : "all") : `${altName(lo)} – ${altName(hi)}`;
+  for (const b of $("fAltPresets").querySelectorAll("[data-k]")) {
+    const p = ALT_PRESETS[+b.dataset.k];
+    b.setAttribute("aria-pressed", p.lo === lo && p.hi === hi);
+  }
   $("spdVal").textContent = F.speedMin ? `≥ ${F.speedMin} kt` : "any";
   $("fDist").max = S.radius;
   $("distVal").textContent = F.distMax >= S.radius ? "whole radius" : `${F.distMax} nm`;
@@ -486,8 +506,18 @@ function wireFilterInputs() {
   $("fSearch").oninput = (e) => { F.search = e.target.value; filtersChanged(); };
   $("fType").oninput = (e) => { F.types = e.target.value; filtersChanged(); };
   $("fAirport").oninput = (e) => { F.airport = e.target.value; filtersChanged(); };
-  $("fAltMin").oninput = (e) => { F.altMin = +e.target.value; filtersChanged(); };
-  $("fAltMax").oninput = (e) => { F.altMax = +e.target.value; filtersChanged(); };
+  const setAlt = (lo, hi) => {
+    [F.altMin, F.altMax] = lo <= hi ? [lo, hi] : [hi, lo];
+    $("fAltMin").value = F.altMin;
+    $("fAltMax").value = F.altMax;
+    filtersChanged();
+  };
+  $("fAltMin").onchange = (e) => setAlt(+e.target.value, F.altMax);
+  $("fAltMax").onchange = (e) => setAlt(F.altMin, +e.target.value);
+  $("fAltPresets").onclick = (e) => {
+    const b = e.target.closest("[data-k]");
+    if (b) setAlt(ALT_PRESETS[+b.dataset.k].lo, ALT_PRESETS[+b.dataset.k].hi);
+  };
   $("fGround").onchange = (e) => { F.ground = e.target.checked; filtersChanged(); };
   $("fSpeed").oninput = (e) => { F.speedMin = +e.target.value; filtersChanged(); };
   $("fDist").oninput = (e) => { F.distMax = +e.target.value; filtersChanged(); };
@@ -978,7 +1008,7 @@ function updateSun() {
   if (!S.home) return;
   sun = sunPosition(api.clock(), S.home.lat, S.home.lon); // demo: the recording's time of day
   applyStyle();
-  mapView.setSun(sun, S.sunLight);
+  mapView.setSun(sun, S.sunLight, S.brightNight);
   const g = $("dialSun");
   g.setAttribute("transform", `rotate(${sun.az})`);
   g.style.opacity = sun.el > 0 ? 1 : sun.el > -6 ? 0.45 : 0;
@@ -1204,6 +1234,7 @@ function openSettings() {
   $("sAirports").checked = S.airports;
   $("sGuides").checked = S.runwayGuides;
   $("sSun").checked = S.sunLight;
+  $("sBrightNight").checked = S.brightNight;
   $("sBuildings").checked = S.buildings;
   $("sHeat").value = String(S.heat);
   $("sHeatBand").value = S.heatBand;
@@ -1250,6 +1281,7 @@ function wireSettings() {
   $("sAirports").onchange = (e) => { S.airports = e.target.checked; loadAirports(); renderFlow(); save(); };
   $("sGuides").onchange = (e) => { S.runwayGuides = e.target.checked; save(); };
   $("sSun").onchange = (e) => { S.sunLight = e.target.checked; updateSun(); save(); };
+  $("sBrightNight").onchange = (e) => { S.brightNight = e.target.checked; updateSun(); save(); };
   $("sBuildings").onchange = (e) => {
     S.buildings = e.target.checked;
     mapView.setBuildings(S.buildings, S.exaggeration);
@@ -1375,5 +1407,5 @@ window.overhead = { // console debugging
   get items() { return lastItems; },
   get spotBuildings() { return spotBuildings; },
   get sun() { return sun; },
-  set sun(v) { sun = v; applyStyle(); mapView.setSun(sun, S.sunLight); }, // preview lighting until the next 30 s update
+  set sun(v) { sun = v; applyStyle(); mapView.setSun(sun, S.sunLight, S.brightNight); }, // preview lighting until the next 30 s update
 };

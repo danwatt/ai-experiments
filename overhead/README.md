@@ -148,7 +148,9 @@ stepped over a grid around the spot to load them, then put back. Toggle in Setti
 ## Sun, sky and heatmap
 
 - **Sun lighting (3D)** — the sun's real position lights the aircraft meshes (warm and low at
-  golden hour, off at night), and the tilted view gets a matching sky and horizon. The compass dial shows a sun marker.
+  golden hour, off at night), and the tilted view gets a matching sky and horizon. "Keep
+  aircraft bright at night" (on by default) swaps realistic night lighting for a neutral fill
+  so the aircraft stay easy to see. The compass dial shows a sun marker.
 - **Map style "Auto"** — light basemap from just before sunrise to just after sunset, dark at night.
 - **Sky view** — the dome takes the sky's colour for the time of day and shows the sun.
 - **Traffic heatmap** — `server.py` counts every fresh position into a ~500 m grid in
@@ -158,7 +160,8 @@ stepped over a grid around the spot to load them, then put back. Toggle in Setti
 
 ## Filters
 
-Search (callsign/reg/hex/type/owner/squawk), altitude range, include-ground, size class
+Search (callsign/reg/hex/type/owner/squawk), flight level (from / to, with presets such as
+"Below FL100" or "FL240 and up"), include-ground, size class
 (ADS-B emitter category, falling back to type designator), operator kind (airline, cargo,
 charter/fractional, private/GA, military/gov, no callsign), climbing/level/descending,
 airline (from ICAO callsign prefix; chips show what is in range), type prefix list

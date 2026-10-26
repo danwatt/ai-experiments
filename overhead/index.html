@@ -67,11 +67,12 @@
       <div class="panel-body">
         <label class="field"><span>Search</span><input id="fSearch" type="search" placeholder="Callsign, reg, hex, type…" autocomplete="off" /></label>
         <div class="field">
-          <span>Altitude <em id="altVal" class="muted"></em></span>
-          <div class="dual" id="altRange">
-            <input id="fAltMin" type="range" min="0" max="45000" step="500" />
-            <input id="fAltMax" type="range" min="0" max="45000" step="500" />
+          <span>Flight level <em id="altVal" class="muted"></em></span>
+          <div class="row">
+            <label class="fl"><span class="muted">From</span><select id="fAltMin"></select></label>
+            <label class="fl"><span class="muted">To</span><select id="fAltMax"></select></label>
           </div>
+          <div id="fAltPresets" class="chips"></div>
           <label class="check"><input id="fGround" type="checkbox" /> Include aircraft on the ground</label>
         </div>
         <div class="field"><span>Size</span><div id="fSize" class="chips"></div></div>
@@ -137,10 +138,10 @@
             <button type="button" id="sPick" class="btn">Pick on map</button>
           </div>
           <div class="row">
-            <label class="field"><span>Latitude</span><input id="sLat" type="number" step="0.0001" /></label>
-            <label class="field"><span>Longitude</span><input id="sLon" type="number" step="0.0001" /></label>
+            <label class="field"><span>Latitude</span><input id="sLat" type="number" step="any" /></label>
+            <label class="field"><span>Longitude</span><input id="sLon" type="number" step="any" /></label>
           </div>
-          <label class="field"><span>Your elevation (ft MSL) — for sky angles</span><input id="sElev" type="number" step="10" /></label>
+          <label class="field"><span>Your elevation (ft MSL) — for sky angles</span><input id="sElev" type="number" step="any" inputmode="decimal" /></label>
         </fieldset>
         <fieldset>
           <legend>Data</legend>
@@ -196,6 +197,7 @@
           <label class="check"><input id="sAirports" type="checkbox" /> Airports &amp; runways, with runways in use</label>
           <label class="check"><input id="sGuides" type="checkbox" /> Approach and climb-out guide lines</label>
           <label class="check"><input id="sSun" type="checkbox" /> Sun lighting and sky (3D)</label>
+          <label class="check"><input id="sBrightNight" type="checkbox" /> Keep aircraft bright at night (3D)</label>
           <label class="check"><input id="sBuildings" type="checkbox" /> 3D buildings (3D map and spotter view)</label>
           <label class="field"><span>Traffic heatmap</span>
             <select id="sHeat">
@@ -223,8 +225,8 @@
       <button id="oGeo" class="btn primary wide">Use my location</button>
       <button id="oPick" class="btn wide">Pick a spot on the map</button>
       <div class="row">
-        <input id="oLat" type="number" step="0.0001" placeholder="Latitude" />
-        <input id="oLon" type="number" step="0.0001" placeholder="Longitude" />
+        <input id="oLat" type="number" step="any" placeholder="Latitude" />
+        <input id="oLon" type="number" step="any" placeholder="Longitude" />
         <button id="oGo" class="btn">Go</button>
       </div>
       <p class="fine">Your location stays in this browser; only a rounded point is sent to the local server to ask the data provider for nearby traffic.</p>
