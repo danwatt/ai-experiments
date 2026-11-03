@@ -3,8 +3,8 @@
 - **Model:** claude-opus-5-5
 - **Effort:** high
 - **Session(s):** 540952f4-8304-48e4-9ec2-8c013e57d96c
-- **Tokens:** input 88, output 33207, cache read 4878439, cache write 105203
-- **Cost (tokscale estimate):** $2.48
+- **Tokens:** input 186, output 82758, cache read 14015333, cache write 193096
+- **Cost (tokscale estimate):** $6
 
 ## You
 
@@ -132,3 +132,174 @@ The original frames, without blur, are saved in `/private/tmp/claude-501/-Users-
 ## You
 
 Add and commit
+
+## Claude
+
+Checking transcript screenshots for unblurred signs before commit.
+
+![screenshot 32](prompt-assets/032.jpg)
+
+![screenshot 33](prompt-assets/033.jpg)
+
+Staged clean: only garden-map hunks, hexahedron work left unstaged. Committing.
+
+Committed on `master` as `3b748d7`. Not pushed.
+
+What's in it:
+- **Map page:** `garden-map/` with the page and 39 frame thumbnails. Both yard signs are blurred in the thumbnails.
+- **Landing page:** a new "Video & vision" section in `index.html` with a Garden Map card and a link to its prompt page.
+- **`prompt.md`:** written along with 31 screenshots from this session. Ten of those showed a sign clearly, so I blurred or rebuilt them from the blurred frames. In the transcript I changed the school and company names to "school yard sign" and "second yard sign".
+- **`.claude/launch.json`:** the `garden-map` server entry.
+
+I left two things out of the commit because they belong to other work: the Hexahedron card and launch entry, and the Sixfold edits. They're still uncommitted in your working tree.
+
+If you re-run `scripts/prompt-md.sh garden-map`, it brings back the unblurred screenshots and the sign names. You'd need to blur and redact them again before committing.
+
+## You
+
+I've added several HEIC images that are close-ups of several plants. Use them for better identification. We don't need to copy those into this directory. `1.HEIC` would be the plant identified as plant number 1
+
+## Claude
+
+*(Close-up photos of plants 1, 3, 4, 5 and 11 omitted.)*
+
+Page updated, renders fine. Aligning plant 13 with plant 4, since they look like the same plant.
+
+I found five close-ups in `~/Downloads`: `1`, `3`, `4`, `5` and `11`. I converted them to JPEG in the scratchpad to view them, so nothing was copied into the repo. Here's what they changed:
+
+| # | Was | Now | Confidence |
+|---|---|---|---|
+| 1 | Esperanza | **Tropical Milkweed 'Silky Gold'** (*Asclepias curassavica*). The starry gold flowers with a crown in the middle and the smooth, narrow paired leaves make it a milkweed, not Esperanza. | high |
+| 3 | Fine-leaf mound | **Autumn Sage** (*Salvia greggii*). Small rounded leaves and magenta two-lipped tube flowers. | high |
+| 4 | Fine-leaf mound | **Mexican Heather** (*Cuphea hyssopifolia*). Sprays of tiny narrow leaves; no flowers in the photo, so this rests on the leaves alone. | medium |
+| 5 | Small herb clump | **Spike Speedwell** (*Veronica spicata*, maybe 'Red Fox'). Short, fuzzy hot-pink spikes; many are spent and brown. | medium |
+| 11 | Young blue salvia | **Violet Sage** (*Salvia nemorosa*, maybe 'May Night'). Deep indigo, dense spikes. It's a different plant from the big pale-blue salvia patches. | medium |
+
+I also changed plant 13 to Mexican Heather, because in the video it looks like plant 4. Plant 10 may be the same violet sage as 11, but there's no close-up of it, so I left it alone.
+
+Without close-ups, the shakiest IDs left are:
+- **6 and 7:** coral honeysuckle or autumn sage.
+- **9 and 12:** the gray-green mounds.
+- **10:** the young blue salvia.
+
+## You
+
+There was a plant that was missed. Its along the fence, behind number 18. It too is a Tropical Milkweed. Its barely visible in the frame at 31 seconds.
+
+## Claude
+
+![screenshot 39](prompt-assets/039.jpg)
+
+![screenshot 40](prompt-assets/040.png)
+
+I added the second Tropical Milkweed 'Silky Gold' to the map as **plant 21**. It's about 40 ft along, against the fence and behind crape myrtle 18. In the 31-second frame, only some thin, narrow leaves show between the crape myrtle and the salvia, which is why I missed it the first time.
+
+I put it at the end of the list instead of in left-to-right order, so plants 1–20 keep their numbers and your close-up file names still match. It shows on the map and in the table. Clicking it opens the 31-second frame.
+
+## You
+
+Lets re-number the plants based on their distance from the left side of the fence.
+
+## Claude
+
+Numbering correct. Six thumbnails failed on load (connection resets from local server); reloading to check.
+
+The plants are now numbered 1–21 by distance from the left side of the fence. The map circles, the table and the notes all use the new numbers.
+
+These plants got new numbers; all the others kept theirs:
+
+| Plant | Was | Now |
+|---|---|---|
+| Spike Speedwell | 5 | 3 |
+| Autumn Sage | 3 | 4 |
+| Mexican Heather | 4 | 5 |
+| Second milkweed | 21 | 19 |
+| Salvia patch | 19 | 20 |
+| Last magnolia | 20 | 21 |
+
+I fixed the one note that pointed to a changed number: plant 13 now says it matches plant 5.
+
+Your close-up files (`1`, `3`, `4`, `5`, `11.HEIC`) still use the old numbers. 3, 4 and 5 now mean speedwell, autumn sage and heather, in that order.
+
+On one page load, six video thumbnails didn't show. Each one loads fine when requested on its own, so the local Python test server most likely dropped some of the many images requested at once. The page itself is fine.
+
+## You
+
+Help me start planning for next year. Lets add a tab that shows a new map, filling out the garden with more perennial plants. Propose plants that I either already have, or would be good for North Texas and are not too water hungry. Show me where they should go, and how much coverage they will have.
+
+## Claude
+
+![screenshot 41](prompt-assets/041.jpg)
+
+Plan tab renders: coverage goes from 39% today to 72% with the plan. Checking the Now tab and dark mode.
+
+![screenshot 42](prompt-assets/042.png)
+
+I added a **Next year plan** tab. Open it with the tab button or by adding `#plan` to the page's address. It shows the bed at next summer's size, with your current plants faded under their Now-tab numbers and the proposed plants in solid colors marked with letters A–M.
+
+**Coverage.** This counts how much of the planting bed has plants over it, not counting the river rock or the stepping-stone path:
+
+| | Ground covered |
+|---|---|
+| Today | 39% |
+| Next summer, current plants grown in | 46% |
+| Next summer, with the plan | 72% |
+
+The tree canopies (crape myrtles) and the hanging mandevilla aren't counted, because they shade the bed but don't cover the ground.
+
+**Proposed plants (22 plants, 13 kinds, about 115 sq ft of new coverage):**
+- **Along the back fence:**
+  - Gulf Muhly ×2 behind the middle crape myrtle, for pink plumes in fall.
+  - Flame Acanthus by the gate, for hummingbirds.
+  - One more Coral Honeysuckle on the fence, a repeat of what you already have.
+- **Middle of the bed:**
+  - Rock Rose ×2. It handles the light shade under the crape myrtles.
+  - Gaura.
+  - Purple Coneflower ×2 in front of the middle magnolia.
+- **Front edge by the lawn:**
+  - Blackfoot Daisy ×4.
+  - Zexmenia ×2.
+  - Pink Skullcap ×3.
+  - Gregg's Mistflower.
+  - Aromatic Aster, for late-fall purple flowers.
+  - Lantana 'New Gold' by the river rock.
+- **For monarchs:** Butterfly Weed, a native milkweed that comes back every year, placed next to your tropical milkweed (19).
+
+Water use is low or very low for all of them except coneflower, which is low to moderate. They all need weekly water the first summer.
+
+Click any letter or table row to see why that plant fits, its height, bloom season and how much ground it covers. Click a numbered plant to see its expected size next year and any care note.
+
+**Care notes for what you already have** are at the bottom of the tab:
+- Cut the tropical milkweed back in fall.
+- Mexican heather can die back in a hard freeze, so mulch it.
+- The speedwell likes more water than the rest of the bed.
+- The mandevilla needs to come inside for winter.
+
+One assumption: the plan treats the bed as full sun, based on the shadows in the video. If parts of it get afternoon shade, the plant choices there would change.
+
+## You
+
+Lets add links to all of the plants to some place that I can see what they look like
+
+## Claude
+
+Rate-limited. Retrying slower for the rest.
+
+![screenshot 43](prompt-assets/043.png)
+
+Every plant on both tabs now has links that open in a new tab:
+
+- **Photos:** a Google Images search on the plant's scientific name, plus the variety name when there is one (for example *Asclepias curassavica 'Silky Gold'*).
+- **Wikipedia:** the article for the species. I checked that each article exists.
+
+The links are under each plant's name in the tables and in the detail panel when you click a plant.
+
+Exceptions:
+- **Pink Skullcap** has no Wikipedia article, so it only gets Photos.
+- **Gray-green mounds (9, 12):** these are still unidentified, so their links go to lavender, the best guess.
+- **Blue salvia 'Mystic Spires'** links to *Salvia farinacea*, one of its parent species.
+- **Lantana 'New Gold'** links to the common lantana article, since the variety has no article of its own.
+
+## You
+
+Lets commit and push

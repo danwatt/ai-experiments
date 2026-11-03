@@ -66,6 +66,9 @@ svg { display: block; width: 100%; height: auto; }
 .detail img { width: 100%; max-height: 420px; object-fit: cover; border-radius: 6px; display: block; }
 .detail h2 { font-size: 18px; margin: 10px 0 2px; }
 .sci { font-style: italic; color: var(--muted); margin: 0 0 8px; }
+td .sci { margin-bottom: 2px; }
+.links { font-size: 13px; }
+.links a { color: var(--accent); }
 .meta { font-size: 13px; color: var(--muted); }
 .conf { display: inline-block; font-size: 12px; padding: 1px 8px; border-radius: 10px; border: 1px solid var(--line); margin-left: 6px; }
 .conf.high { color: var(--accent); border-color: var(--accent); }
@@ -78,11 +81,37 @@ tbody tr:hover, tbody tr.sel { background: color-mix(in srgb, var(--accent) 12%,
 .dot { display: inline-block; width: 18px; height: 18px; border-radius: 50%; color: #fff; font-size: 11px; font-weight: 700; text-align: center; line-height: 18px; }
 .notes { font-size: 13px; color: var(--muted); margin-top: 20px; }
 .notes li { margin-bottom: 4px; }
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); margin: 0 0 18px; }
+.tabs button { font: inherit; font-weight: 600; color: var(--muted); background: none; border: 0; border-bottom: 3px solid transparent; padding: 8px 14px; cursor: pointer; }
+.tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+@media (max-width: 640px) { .stats { grid-template-columns: 1fr; } }
+.stat .big { font-size: 28px; font-weight: 700; line-height: 1.1; }
+.stat .bar { height: 6px; border-radius: 3px; background: var(--line); margin-top: 8px; overflow: hidden; }
+.stat .bar span { display: block; height: 100%; background: var(--accent); }
+.plant.old circle { opacity: .42; }
+.plant.old text { fill: var(--ink); }
+.plant.canopy circle { fill: none; stroke: var(--muted); stroke-width: .07; stroke-dasharray: .3 .2; opacity: 1; }
+.plant.canopy text { fill: var(--muted); font-size: .5px; }
+.plant.canopy.sel circle, .plant.canopy:hover circle { stroke: var(--ink); stroke-width: .12; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 13px; color: var(--muted); margin-top: 8px; }
+.legend i { display: inline-block; width: 14px; height: 14px; border-radius: 50%; vertical-align: -2px; margin-right: 6px; }
+.facts { display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; font-size: 14px; margin: 8px 0; }
+.facts dt { color: var(--muted); }
+.facts dd { margin: 0; }
+.swatch { width: 100%; height: 10px; border-radius: 5px; }
+h3 { font-size: 16px; margin: 24px 0 0; }
 </style>
 </head>
 <body>
 <main>
   <h1>Back Yard Garden Map</h1>
+  <nav class="tabs" role="tablist">
+    <button role="tab" data-tab="now" aria-selected="true">Now</button>
+    <button role="tab" data-tab="plan" aria-selected="false">Next year plan</button>
+  </nav>
+
+  <section id="tab-now">
   <p class="sub">Plants identified from a 39-second walking video along the 50 ft back fence. Positions are estimated from timestamps assuming a steady pace (about 1.3 ft per second). Click a plant, a row, or a video frame.</p>
 
   <div class="scroller">
@@ -108,6 +137,33 @@ tbody tr:hover, tbody tr.sel { background: color-mix(in srgb, var(--accent) 12%,
     <li>Expect ±2 ft of error on position. The walk was not perfectly steady and the camera angle shifts.</li>
     <li>"Low" confidence plants are young or seen only from a distance. A close-up photo of a leaf and flower would confirm them.</li>
   </ul>
+  </section>
+
+  <section id="tab-plan" hidden>
+    <p class="sub">A fuller bed for next year using perennials you already grow plus North Texas natives and Texas-adapted plants that get by on little water once established. Circles show each plant's expected spread by the end of next summer; most perennials reach full size in their second season. Assumes the bed gets full sun, as the video suggests.</p>
+    <div class="stats" id="stats"></div>
+    <div class="scroller">
+      <div class="mapwrap">
+        <svg id="planmap" viewBox="-1 -2.2 52 12.6" role="img" aria-label="Top-down plan for next year"></svg>
+        <div class="legend">
+          <span><i style="background:var(--accent)"></i>New plant (letter = species)</span>
+          <span><i style="background:var(--herb);opacity:.5"></i>Plant you have (number from the Now tab)</span>
+          <span><i style="border:1.5px dashed var(--muted)"></i>Tree canopy: shades the bed, doesn't cover the ground</span>
+        </div>
+      </div>
+    </div>
+    <div class="cols">
+      <div class="card">
+        <table>
+          <thead><tr><th></th><th>New plant</th><th>Qty</th><th>Spread</th><th>Covers</th><th>Water</th></tr></thead>
+          <tbody id="planrows"></tbody>
+        </table>
+      </div>
+      <div class="card detail" id="plandetail"></div>
+    </div>
+    <h3>Care notes for what you have</h3>
+    <ul class="notes" id="care"></ul>
+  </section>
 </main>
 
 <script>
@@ -161,12 +217,26 @@ const PLANTS = [
 
 const COLORS = { magnolia: "--magnolia", crape: "--crape", salvia: "--salvia", shrub: "--shrub", herb: "--herb", vine: "--vine", yellow: "--yellow", sage: "--vine", speedwell: "--crape" };
 const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+
+// Wikipedia article per species, keyed by the first two words of `sci`; "" means no article
+const WIKI = {
+  "possibly lavender": "Lavandula", "Salvia 'Mystic": "Salvia_farinacea", "Mandevilla sp.": "Mandevilla",
+  "Lantana ×": "Lantana_camara", "Scutellaria suffrutescens": "",
+};
+const PHOTO_QUERY = { "possibly lavender": "lavender plant", "Mandevilla sp.": "red mandevilla plant" };
+function plantLinks(sci) {
+  const key = sci.split(" ").slice(0, 2).join(" ");
+  const wiki = key in WIKI ? WIKI[key] : key.replace(" ", "_");
+  const q = PHOTO_QUERY[key] ?? sci.replace(/\s*\(.*?\)/g, "") + " plant";
+  const photos = `<a href="https://www.google.com/search?tbm=isch&q=${encodeURIComponent(q)}" target="_blank" rel="noopener">Photos</a>`;
+  return `<span class="links">${photos}${wiki ? ` · <a href="https://en.wikipedia.org/wiki/${wiki}" target="_blank" rel="noopener">Wikipedia</a>` : ""}</span>`;
+}
 const frameFor = t => `frames/${String(Math.min(38, Math.max(0, Math.round(t)))).padStart(2, "0")}.jpg`;
 const NS = "http://www.w3.org/2000/svg";
 const el = (tag, attrs, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); parent && parent.appendChild(e); return e; };
 
-const svg = document.getElementById("map");
-function drawBase() {
+const nowSvg = document.getElementById("map");
+function drawBase(svg) {
   // lawn, bed
   el("rect", { x: -1, y: DEPTH, width: 52, height: 3, fill: "var(--lawn)" }, svg);
   el("rect", { x: 0, y: 0, width: WIDTH, height: DEPTH, fill: "var(--mulch)", opacity: .55 }, svg);
@@ -209,7 +279,7 @@ function drawPlants() {
   const order = PLANTS.map((p, i) => i).sort((a, b) => PLANTS[b].d - PLANTS[a].d);
   for (const i of order) {
     const p = PLANTS[i];
-    const g = el("g", { class: "plant", tabindex: 0 }, svg);
+    const g = el("g", { class: "plant", tabindex: 0 }, nowSvg);
     el("circle", { cx: p.x, cy: p.y, r: p.d / 2, fill: `var(${COLORS[p.kind]})` }, g);
     const tx = el("text", { x: p.x, y: p.y }, g); tx.textContent = i + 1;
     el("title", {}, g).textContent = `${i + 1}. ${p.name}`;
@@ -224,7 +294,7 @@ function drawTable() {
   PLANTS.forEach((p, i) => {
     const tr = document.createElement("tr");
     tr.innerHTML = `<td><span class="dot" style="background:var(${COLORS[p.kind]})">${i + 1}</span></td>
-      <td><strong>${p.name}</strong><div class="sci">${p.sci}</div></td>
+      <td><strong>${p.name}</strong><div class="sci">${p.sci}</div>${plantLinks(p.sci)}</td>
       <td>${p.x.toFixed(0)} ft along<br><span class="meta">${p.y.toFixed(0)} ft from fence</span></td>
       <td><span class="conf ${p.conf}">${p.conf}</span></td>`;
     tr.addEventListener("click", () => select(i));
@@ -253,6 +323,7 @@ function select(i) {
   detail.innerHTML = `<img src="${frameFor(p.t)}" alt="Video frame showing ${p.name}">
     <h2>${i + 1}. ${p.name}<span class="conf ${p.conf}">${p.conf}</span></h2>
     <p class="sci">${p.sci}</p>
+    <p>${plantLinks(p.sci)}</p>
     <p>${p.note}</p>
     <p class="meta">About ${p.x.toFixed(0)} ft from the left fence, ${p.y.toFixed(0)} ft out from the iron fence, roughly ${p.d} ft across. Seen at ${p.t}s in the video.</p>`;
 }
@@ -266,7 +337,164 @@ function showFrame(s) {
     <h2>Frame at ${s}s</h2><p class="meta">About ${ft.toFixed(0)} ft along the fence. Nearest plants:</p><p>${near}</p>`;
 }
 
-drawBase(); drawPlants(); drawTable(); drawStrip(); select(1);
+drawBase(nowSvg); drawPlants(); drawTable(); drawStrip(); select(1);
+
+// ---- Next year plan ----
+
+// expected spread (ft) by the end of next summer for plants already in the bed, keyed by plant number
+const NEXT_SPREAD = { 1: 3, 2: 5, 3: 1.5, 4: 3, 5: 2.5, 6: 1.5, 7: 1.5, 8: 6.5, 9: 2, 10: 2, 11: 2, 12: 2, 13: 2.5, 14: 5, 16: 6, 18: 6, 19: 2.5, 21: 5 };
+// trees shade the bed but are limbed up, and the mandevilla hangs in a pot, so none of them cover ground
+const CANOPY = new Set([8, 16, 17, 18]);
+const CARE = {
+  "1, 19": "Tropical milkweed: cut stems back to about 6 in. in late fall so monarchs don't linger and to clear the OE parasite. It's root-hardy in a mild winter; the native butterfly weed (L) is the hardier backup.",
+  "5, 13": "Mexican heather is only root-hardy to about 20°F. Mulch the crowns before the first hard freeze and expect to replace one after a cold winter.",
+  "3": "Spike speedwell wants more water than the rest of the bed. If it struggles in July, swap it for pink skullcap (I).",
+  "4": "Autumn sage: shear by a third in late winter and again lightly in midsummer to keep it dense.",
+  "15, 20": "Blue salvia masses: cut back by a third in early July for a second flush. Divide in spring if they start crowding the magnolias.",
+  "17": "Mandevilla is tropical. Bring the pot into a garage or bright room below 50°F, or treat it as an annual.",
+};
+
+// spread: mature width (ft); at: [x, y] positions in feet, same frame as the Now map
+const NEW_PLANTS = [
+  { id: "A", name: "Gulf Muhly", sci: "Muhlenbergia capillaris", color: "#b8508f", spread: 3, height: "3 ft", water: "Low", bloom: "Sep–Nov, pink plumes",
+    why: "Native grass that turns into a pink haze in fall when most of the bed is winding down. Fills the empty fence line behind the middle crape myrtle.", at: [[29.3, 1.4], [32.4, 1.4]] },
+  { id: "B", name: "Flame Acanthus", sci: "Anisacanthus quadrifidus var. wrightii", color: "#d0602a", spread: 3, height: "3–4 ft", water: "Very low", bloom: "Jul–Oct, orange tubes",
+    why: "Tough Texas native that blooms through the August heat. Hummingbirds work it all fall. Anchors the gate side of the path.", at: [[37.6, 1.9]] },
+  { id: "C", name: "Rock Rose", sci: "Pavonia lasiopetala", color: "#d8648a", spread: 3, height: "3 ft", water: "Low", bloom: "Apr–Nov, pink",
+    why: "Small native shrub with hibiscus-like pink flowers most of the year. Takes the light shade under the crape myrtles.", at: [[11.8, 3.7], [30.8, 4.2]] },
+  { id: "D", name: "Purple Coneflower", sci: "Echinacea purpurea", color: "#8f4d93", spread: 2, height: "2–3 ft", water: "Low–moderate", bloom: "May–Jul, purple-pink",
+    why: "Classic pollinator plant; goldfinches eat the seed heads if you leave them. Fills the front gap below the middle magnolia.", at: [[19.5, 5.7], [21.7, 5.8]] },
+  { id: "E", name: "Gaura (Whirling Butterflies)", sci: "Oenothera lindheimeri", color: "#7b7598", spread: 2.5, height: "2–3 ft", water: "Low", bloom: "Apr–Oct, white to pink",
+    why: "Airy native with flowers that float above the foliage. Its deep taproot makes it very drought tolerant.", at: [[37.6, 4.6]] },
+  { id: "F", name: "Gregg's Mistflower", sci: "Conoclinium greggii", color: "#6b83c6", spread: 2.5, height: "1.5–2 ft", water: "Low", bloom: "Mar–Nov, lavender",
+    why: "Butterfly magnet, especially queens and monarchs, so it pairs well with the milkweed. Spreads slowly by roots to fill gaps.", at: [[9.8, 5.7]] },
+  { id: "G", name: "Blackfoot Daisy", sci: "Melampodium leucanthum", color: "#55796d", spread: 1.5, height: "1 ft", water: "Very low", bloom: "Mar–Nov, white",
+    why: "Low, neat edging plant covered in small white daisies. Needs good drainage; overwatering kills it faster than drought.", at: [[3.2, 5.6], [14.0, 6.2], [29.6, 6.1], [37.2, 6.3]] },
+  { id: "H", name: "Zexmenia", sci: "Wedelia acapulcensis var. hispida", color: "#bf8410", spread: 2, height: "1.5–2 ft", water: "Very low", bloom: "May–Nov, orange-yellow",
+    why: "Native daisy that blooms through the summer with almost no water. Good front-edge filler next to the lawn.", at: [[16.0, 6.1], [32.2, 6.0]] },
+  { id: "I", name: "Pink Skullcap", sci: "Scutellaria suffrutescens", color: "#ad467c", spread: 1.3, height: "1 ft", water: "Low", bloom: "May–Oct, pink",
+    why: "Tidy little evergreen mound of rose-pink flowers for the very front edge.", at: [[5.6, 6.3], [17.6, 6.3], [43.5, 6.3]] },
+  { id: "J", name: "Aromatic Aster", sci: "Symphyotrichum oblongifolium", color: "#6a52b0", spread: 2, height: "2 ft", water: "Low", bloom: "Oct–Nov, purple",
+    why: "Covers itself in purple daisies in late fall, a key late nectar source for migrating monarchs. Pinch back in June to keep it compact.", at: [[12.0, 5.9]] },
+  { id: "K", name: "Lantana 'New Gold'", sci: "Lantana × hybrida 'New Gold'", color: "#a8900e", spread: 2.5, height: "1.5–2 ft", water: "Very low", bloom: "May–frost, gold",
+    why: "Texas Superstar plant. Sterile, so it blooms nonstop without seeding. Takes the reflected heat by the river rock.", at: [[45.6, 5.8]] },
+  { id: "L", name: "Butterfly Weed", sci: "Asclepias tuberosa", color: "#de7a1c", spread: 1.5, height: "1.5–2 ft", water: "Very low", bloom: "May–Sep, orange",
+    why: "Native, fully hardy milkweed. Another monarch host near milkweed 19 that comes back every year, even after a cold winter.", at: [[39.4, 6.1]] },
+  { id: "M", name: "Coral Honeysuckle", sci: "Lonicera sempervirens", color: "#c3433a", spread: 1.5, height: "vine, 8–12 ft along fence", water: "Low", bloom: "Mar–Jun and fall, red",
+    why: "Repeat of plants 6 and 7. Train it along the fence behind the last salvia; the footprint is small but it screens the fence and feeds hummingbirds.", at: [[42.6, 0.4]] },
+];
+
+const planSvg = document.getElementById("planmap");
+const area = d => Math.PI * (d / 2) ** 2;
+
+// share of the plantable bed (river rock and stepping-stone path excluded) under at least one circle
+function coverage(circles) {
+  let inBed = 0, covered = 0;
+  for (let x = 0.05; x < WIDTH; x += 0.1) for (let y = 0.05; y < DEPTH; y += 0.1) {
+    const rockL = 2.6 - 2.0 * (y / DEPTH), rockR = 45.8 + 2.6 * (y / DEPTH);
+    if (x < rockL || x > rockR || (x > 33.8 && x < 36.0)) continue;
+    inBed++;
+    if (circles.some(c => (x - c.x) ** 2 + (y - c.y) ** 2 < (c.d / 2) ** 2)) covered++;
+  }
+  return covered / inBed;
+}
+
+function drawStats() {
+  const groundNow = PLANTS.filter((p, i) => !CANOPY.has(i + 1));
+  const groundNext = groundNow.map(p => ({ ...p, d: NEXT_SPREAD[PLANTS.indexOf(p) + 1] ?? p.d }));
+  const added = NEW_PLANTS.flatMap(s => s.at.map(([x, y]) => ({ x, y, d: s.spread })));
+  const count = added.length;
+  const tiles = [
+    ["Ground covered today", coverage(groundNow), "Measured from the video."],
+    ["Next summer, as is", coverage(groundNext), "What you have, grown in."],
+    ["Next summer, with plan", coverage(groundNext.concat(added)), `${count} new plants, ${NEW_PLANTS.length} kinds.`],
+  ];
+  document.getElementById("stats").innerHTML = tiles.map(([label, v, sub]) =>
+    `<div class="card stat"><div class="meta">${label}</div><div class="big">${Math.round(v * 100)}%</div>
+     <div class="bar"><span style="width:${(v * 100).toFixed(1)}%"></span></div><div class="meta" style="margin-top:6px">${sub}</div></div>`).join("");
+}
+
+const planGroups = [];
+function drawPlan() {
+  drawBase(planSvg);
+  const items = [];
+  PLANTS.forEach((p, i) => items.push({ n: i + 1, x: p.x, y: p.y, d: NEXT_SPREAD[i + 1] ?? p.d, fill: `var(${COLORS[p.kind]})`,
+    cls: CANOPY.has(i + 1) && p.kind !== "vine" ? "canopy" : "old", label: i + 1, key: `old-${i + 1}` }));
+  NEW_PLANTS.forEach(s => s.at.forEach(([x, y]) => items.push({ x, y, d: s.spread, fill: s.color, cls: "", label: s.id, key: s.id, name: s.name })));
+  items.sort((a, b) => b.d - a.d);
+  for (const it of items) {
+    const g = el("g", { class: `plant ${it.cls}`, tabindex: 0, "data-key": it.key }, planSvg);
+    el("circle", { cx: it.x, cy: it.y, r: it.d / 2, fill: it.fill }, g);
+    el("text", { x: it.x, y: it.cls === "canopy" ? it.y - it.d / 2 + .45 : it.y }, g).textContent = it.label;
+    el("title", {}, g).textContent = it.name ? `${it.label}. ${it.name}` : `${it.label}. ${PLANTS[it.n - 1].name}`;
+    g.addEventListener("click", () => planSelect(it.key));
+    g.addEventListener("keydown", e => { if (e.key === "Enter") planSelect(it.key); });
+    planGroups.push(g);
+  }
+}
+
+const planRows = document.getElementById("planrows");
+function drawPlanTable() {
+  for (const s of NEW_PLANTS) {
+    const tr = document.createElement("tr");
+    tr.dataset.key = s.id;
+    tr.innerHTML = `<td><span class="dot" style="background:${s.color}">${s.id}</span></td>
+      <td><strong>${s.name}</strong><div class="sci">${s.sci}</div>${plantLinks(s.sci)}</td>
+      <td>${s.at.length}</td>
+      <td>${s.spread} ft</td>
+      <td>${Math.round(area(s.spread) * s.at.length)} sq ft</td>
+      <td>${s.water}</td>`;
+    tr.addEventListener("click", () => planSelect(s.id));
+    planRows.appendChild(tr);
+  }
+  const total = NEW_PLANTS.reduce((t, s) => t + area(s.spread) * s.at.length, 0);
+  const tr = document.createElement("tr");
+  tr.style.cursor = "default";
+  tr.innerHTML = `<td></td><td><strong>Total</strong></td><td>${NEW_PLANTS.reduce((t, s) => t + s.at.length, 0)}</td><td></td><td><strong>${Math.round(total)} sq ft</strong></td><td></td>`;
+  planRows.appendChild(tr);
+  document.getElementById("care").innerHTML = Object.entries(CARE).map(([n, t]) => `<li><strong>${n}:</strong> ${t}</li>`).join("");
+}
+
+const planDetail = document.getElementById("plandetail");
+function planSelect(key) {
+  planGroups.forEach(g => g.classList.toggle("sel", g.dataset.key === key));
+  [...planRows.children].forEach(r => r.classList.toggle("sel", r.dataset.key === key));
+  if (key.startsWith("old-")) {
+    const n = +key.slice(4), p = PLANTS[n - 1];
+    const care = Object.entries(CARE).find(([k]) => k.split(", ").map(Number).includes(n));
+    planDetail.innerHTML = `<img src="${frameFor(p.t)}" alt="Video frame showing ${p.name}">
+      <h2>${n}. ${p.name}</h2><p class="sci">${p.sci}</p><p>${plantLinks(p.sci)}</p>
+      <p class="meta">Already in the bed. Expected spread next summer: about ${NEXT_SPREAD[n] ?? p.d} ft${CANOPY.has(n) ? " (canopy overhead, not ground cover)" : ""}.</p>
+      ${care ? `<p>${care[1]}</p>` : ""}`;
+    return;
+  }
+  const s = NEW_PLANTS.find(s => s.id === key);
+  planDetail.innerHTML = `<div class="swatch" style="background:${s.color}"></div>
+    <h2>${s.id}. ${s.name}</h2><p class="sci">${s.sci}</p>
+    <p>${plantLinks(s.sci)}</p>
+    <p>${s.why}</p>
+    <dl class="facts">
+      <dt>Plant</dt><dd>${s.at.length} at ${s.at.map(([x]) => Math.round(x) + " ft").join(", ")}</dd>
+      <dt>Spread</dt><dd>${s.spread} ft across, about ${Math.round(area(s.spread))} sq ft each</dd>
+      <dt>Height</dt><dd>${s.height}</dd>
+      <dt>Water</dt><dd>${s.water} once established; water weekly the first summer</dd>
+      <dt>Bloom</dt><dd>${s.bloom}</dd>
+    </dl>`;
+}
+
+drawStats(); drawPlan(); drawPlanTable(); planSelect("A");
+
+// tabs; #plan in the URL opens the plan
+function showTab(name) {
+  document.querySelectorAll(".tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === name));
+  document.getElementById("tab-now").hidden = name !== "now";
+  document.getElementById("tab-plan").hidden = name !== "plan";
+}
+document.querySelectorAll(".tabs button").forEach(b => b.addEventListener("click", () => {
+  showTab(b.dataset.tab);
+  history.replaceState(null, "", b.dataset.tab === "plan" ? "#plan" : location.pathname);
+}));
+showTab(location.hash === "#plan" ? "plan" : "now");
 </script>
 </body>
 </html>
