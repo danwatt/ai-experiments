@@ -1,0 +1,1153 @@
+<title>Hex 2048</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=VT323&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one column; the DOS screen in a bezel is the hero, the hex pad sits under it, source at the foot. */
+:root {
+  --bg: #e6e3db;
+  --surface: #f3f1eb;
+  --ink: #2a2722;
+  --muted: #6b655b;
+  --line: #cdc7ba;
+  --accent: #9c770c;
+  --gold: #edc22e;
+  --bezel: #2b2925;
+  --bezel-ink: #bdb6a8;
+  --code-bg: #f3f1eb;
+  --display: "VT323", "Courier New", monospace;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #171613; --surface: #211f1b; --ink: #ece7dc; --muted: #a29b8e; --line: #38352f;
+    --accent: #edc22e; --gold: #edc22e; --bezel: #0c0b09; --bezel-ink: #8d8679; --code-bg: #1d1b18;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #171613; --surface: #211f1b; --ink: #ece7dc; --muted: #a29b8e; --line: #38352f;
+  --accent: #edc22e; --gold: #edc22e; --bezel: #0c0b09; --bezel-ink: #8d8679; --code-bg: #1d1b18;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 15px;
+  line-height: 1.55;
+}
+.wrap {
+  max-width: 980px;
+  margin: 0 auto;
+  padding-block: 28px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid;
+  gap: 28px;
+}
+header { display: grid; gap: 6px; }
+h1 {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(44px, 9vw, 72px);
+  line-height: .9;
+  margin: 0;
+  letter-spacing: .02em;
+  text-wrap: balance;
+}
+h1 span { color: var(--accent); }
+.lede { margin: 0; color: var(--muted); max-width: 62ch; }
+.lede b { color: var(--ink); font-weight: 600; }
+
+.bezel {
+  background: var(--bezel);
+  border-radius: 14px;
+  padding: clamp(10px, 2.4vw, 22px);
+  box-shadow: 0 1px 0 rgba(255,255,255,.06) inset, 0 18px 40px -24px rgba(0,0,0,.55);
+}
+.screen {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  max-width: 100%;
+  background: #000;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.screen:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+.status {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  gap: 6px;
+  text-align: center;
+  font-family: var(--display);
+  font-size: clamp(20px, 4vw, 30px);
+  color: #c9c2b2;
+  background: #000;
+  padding: 16px;
+}
+.status small { font-family: var(--body); font-size: 13px; color: #8d8679; }
+.status.err { color: #f2a07b; }
+.bezel-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+  font-family: var(--display);
+  font-size: 18px;
+  color: var(--bezel-ink);
+  letter-spacing: .06em;
+}
+.led { display: inline-flex; align-items: center; gap: 8px; }
+.led::before {
+  content: ""; width: 8px; height: 8px; border-radius: 50%;
+  background: #4a463e;
+}
+.led.on::before { background: #7ee08a; box-shadow: 0 0 8px #7ee08a; }
+
+.play {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 28px;
+  align-items: center;
+}
+.pad {
+  --h: 54px;
+  --w: calc(var(--h) * 1.1547);
+  position: relative;
+  width: calc(var(--w) * 2.5);
+  height: calc(var(--h) * 3);
+}
+.pad button, .pad .core {
+  position: absolute;
+  width: var(--w);
+  height: var(--h);
+  clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%);
+  border: 0;
+  display: grid;
+  place-items: center;
+  font-family: var(--display);
+  font-size: 26px;
+  line-height: 1;
+}
+.pad button {
+  background: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+  transition: background .12s, color .12s;
+}
+.pad button:hover { background: var(--line); }
+.pad button:active, .pad button.hit { background: var(--gold); color: #2a2722; }
+.pad button:focus-visible { background: var(--gold); color: #2a2722; outline: none; }
+.pad .core { background: var(--line); }
+/* flat-top hex neighbours: centre at (1.25w, 1.5h) */
+.pad .core   { left: calc(var(--w) * .75); top: var(--h); }
+.pad [data-k="w"] { left: calc(var(--w) * .75); top: 0; }
+.pad [data-k="s"] { left: calc(var(--w) * .75); top: calc(var(--h) * 2); }
+.pad [data-k="q"] { left: 0; top: calc(var(--h) * .5); }
+.pad [data-k="a"] { left: 0; top: calc(var(--h) * 1.5); }
+.pad [data-k="e"] { left: calc(var(--w) * 1.5); top: calc(var(--h) * .5); }
+.pad [data-k="d"] { left: calc(var(--w) * 1.5); top: calc(var(--h) * 1.5); }
+
+.howto { display: grid; gap: 12px; min-width: 0; }
+.howto h2, .src h2 {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  color: var(--muted);
+}
+.howto p { margin: 0; max-width: 60ch; }
+kbd {
+  font-family: var(--mono);
+  font-size: 12.5px;
+  padding: 1px 6px;
+  border: 1px solid var(--line);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  background: var(--surface);
+}
+.actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.btn {
+  font: 500 14px/1 var(--body);
+  padding: 10px 16px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+}
+.btn:hover { border-color: var(--muted); }
+.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.btn.primary { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+
+.facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.facts div { background: var(--surface); padding: 12px 14px; display: grid; gap: 2px; }
+.facts dt { font-size: 12px; color: var(--muted); }
+.facts dd { margin: 0; font-family: var(--display); font-size: 28px; line-height: 1; font-variant-numeric: tabular-nums; }
+
+.src { display: grid; gap: 10px; min-width: 0; }
+.src-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+details summary { cursor: pointer; color: var(--muted); font-size: 14px; }
+details summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+pre {
+  margin: 10px 0 0;
+  max-height: 560px;
+  overflow: auto;
+  background: var(--code-bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px 16px;
+  font: 12.5px/1.5 var(--mono);
+  tab-size: 8;
+}
+pre .c { color: var(--muted); }
+pre .l { color: var(--accent); }
+
+@media (max-width: 640px) {
+  .play { grid-template-columns: 1fr; justify-items: center; }
+  .howto { justify-items: start; width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) { .pad button { transition: none; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>HEX <span>2048</span></h1>
+    <p class="lede">2048 on a 19-cell hexagonal board, written in <b>16-bit x86 assembly</b>, assembled with NASM into a <b>2,869-byte DOS .COM file</b>, and running here in DOSBox compiled to WebAssembly.</p>
+  </header>
+
+  <div class="bezel">
+    <div class="screen" id="screen" tabindex="0" aria-label="Game screen. Use Q W E A S D to move.">
+      <canvas id="cv" width="320" height="200"></canvas>
+      <div class="status" id="status">BOOTING DOSBOX…<small>Loading the emulator (about 1.5 MB)</small></div>
+    </div>
+    <div class="bezel-foot">
+      <span class="led" id="led">C:\HEX2048.COM</span>
+      <span>VGA MODE 13H · 320×200×256</span>
+    </div>
+  </div>
+
+  <section class="play">
+    <div class="pad" aria-label="Move pad">
+      <div class="core" aria-hidden="true"></div>
+      <button type="button" id="k-w" data-k="w" aria-label="Move up">W</button>
+      <button type="button" id="k-e" data-k="e" aria-label="Move up-right">E</button>
+      <button type="button" id="k-d" data-k="d" aria-label="Move down-right">D</button>
+      <button type="button" id="k-s" data-k="s" aria-label="Move down">S</button>
+      <button type="button" id="k-a" data-k="a" aria-label="Move down-left">A</button>
+      <button type="button" id="k-q" data-k="q" aria-label="Move up-left">Q</button>
+    </div>
+    <div class="howto">
+      <h2>How to play</h2>
+      <p>Hexes have six neighbours, so tiles slide six ways. Use <kbd>Q</kbd> <kbd>W</kbd> <kbd>E</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> as laid out on the pad, or the numpad <kbd>7</kbd> <kbd>8</kbd> <kbd>9</kbd> <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd>. Matching tiles merge. Reach 2048, then keep going.</p>
+      <div class="actions">
+        <button type="button" class="btn primary" id="newgame">New game (R)</button>
+        <button type="button" class="btn" id="reboot">Reboot DOS</button>
+      </div>
+    </div>
+  </section>
+
+  <dl class="facts">
+    <div><dt>Executable</dt><dd>2,869 B</dd></div>
+    <div><dt>Source lines</dt><dd>727</dd></div>
+    <div><dt>Board cells</dt><dd>19</dd></div>
+    <div><dt>Move directions</dt><dd>6</dd></div>
+  </dl>
+
+  <section class="src">
+    <div class="src-head">
+      <h2>Source · hex2048.asm</h2>
+      <button type="button" class="btn" id="copy">Copy source</button>
+    </div>
+    <details id="srcbox">
+      <summary>Show the assembly (build with <code>nasm -f bin hex2048.asm -o HEX2048.COM</code>)</summary>
+      <pre id="code"><span class="c">; HEX 2048 -- 2048 on a 19-cell hexagonal board</span>
+<span class="c">; DOS .COM, VGA mode 13h (320x200x256), 386+</span>
+<span class="c">; Build: nasm -f bin hex2048.asm -o HEX2048.COM</span>
+<span class="c">;</span>
+<span class="c">; Controls (flat-top hexes, so tiles slide in 6 directions):</span>
+<span class="c">;        W            8</span>
+<span class="c">;     Q     E      7     9</span>
+<span class="c">;     A     D      1     3</span>
+<span class="c">;        S            2</span>
+<span class="c">;   (numpad works too: Home/Up/PgUp/End/Down/PgDn)</span>
+<span class="c">;   R = new game, Esc = quit</span>
+
+cpu 386
+bits 16
+org 100h
+
+NCELLS      equ 19
+COL_BG      equ 1
+COL_BOARD   equ 2
+COL_EMPTY   equ 3
+COL_DARK    equ 4
+COL_LIGHT   equ 5
+COL_ACCENT  equ 6
+COL_TILE    equ 32          <span class="c">; tile colour = COL_TILE + exponent</span>
+MAXEXP      equ 20
+
+<span class="l">start:</span>
+    <span class="c">; copy the BIOS 8x8 font (chars 0-127) into our own buffer</span>
+    mov ax, 1130h
+    mov bh, 03h
+    int 10h                 <span class="c">; ES:BP -&gt; font</span>
+    push ds
+    push es
+    pop ds
+    mov si, bp
+    push cs
+    pop es
+    mov di, fontbuf
+    mov cx, 1024
+    rep movsb
+    pop ds
+
+    mov ax, 0013h           <span class="c">; 320x200x256</span>
+    int 10h
+
+    <span class="c">; back buffer lives in the 64K segment after ours</span>
+    mov ax, cs
+    add ax, 1000h
+    mov [bufseg], ax
+
+    call set_palette
+
+    xor ah, ah              <span class="c">; seed RNG from the BIOS tick count</span>
+    int 1Ah
+    mov [seed], dx
+    mov [seed+2], cx
+
+<span class="l">new_game:</span>
+    push cs
+    pop es
+    mov di, board
+    mov cx, NCELLS
+    xor al, al
+    rep stosb
+    mov dword [score], 0
+    mov byte [won], 0
+    mov byte [over], 0
+    call spawn
+    call spawn
+
+<span class="l">main_loop:</span>
+    call render
+<span class="l">.getkey:</span>
+    xor ah, ah
+    int 16h                 <span class="c">; AL = ascii, AH = scancode</span>
+    cmp al, 27
+    je quit
+    cmp al, &#x27;A&#x27;
+    jb .nocase
+    cmp al, &#x27;Z&#x27;
+    ja .nocase
+    add al, 20h
+<span class="l">.nocase:</span>
+    cmp al, &#x27;r&#x27;
+    je new_game
+    cmp byte [over], 0
+    jne .getkey
+
+    <span class="c">; map key -&gt; direction 0..5</span>
+    mov si, keymap
+<span class="l">.km:</span>
+    mov cx, [si]            <span class="c">; cl = ascii, ch = scancode</span>
+    cmp cx, 0FFFFh
+    je .getkey
+    add si, 3
+    test al, al             <span class="c">; extended key? match on scancode</span>
+    jz .scan
+    cmp al, 0E0h
+    je .scan
+    cmp al, cl
+    jne .km
+    jmp .got
+<span class="l">.scan:</span>
+    cmp ah, ch
+    jne .km
+<span class="l">.got:</span>
+    movzx bx, byte [si-1]
+    call do_move
+    cmp byte [moved], 0
+    je .getkey
+    call spawn
+    call check_over
+    jmp main_loop
+
+<span class="l">quit:</span>
+    mov ax, 0003h
+    int 10h
+    ret
+
+<span class="c">; ---------------------------------------------------------------</span>
+<span class="c">; do_move: BX = direction. Slides/merges every line, sets [moved]</span>
+<span class="c">; ---------------------------------------------------------------</span>
+<span class="l">do_move:</span>
+    mov byte [moved], 0
+    imul si, bx, 25
+    add si, lines
+    mov byte [linecnt], 5
+<span class="l">.line:</span>
+    <span class="c">; gather the non-empty tiles of this line, front first</span>
+    xor di, di
+    xor cx, cx
+<span class="l">.g:</span>
+    mov bx, cx
+    mov al, [si+bx]
+    cmp al, 0FFh
+    je .gdone
+    movzx bx, al
+    mov al, [board+bx]
+    test al, al
+    jz .gnext
+    mov [tmp_in+di], al
+    inc di
+<span class="l">.gnext:</span>
+    inc cx
+    cmp cx, 5
+    jb .g
+<span class="l">.gdone:</span>
+    <span class="c">; merge equal neighbours (each tile merges at most once)</span>
+    xor bx, bx              <span class="c">; read index</span>
+    xor dx, dx              <span class="c">; write count</span>
+<span class="l">.m:</span>
+    cmp bx, di
+    jae .mdone
+    mov al, [tmp_in+bx]
+    inc bx
+    cmp bx, di
+    jae .store
+    cmp al, [tmp_in+bx]
+    jne .store
+    inc bx
+    inc al
+    call add_score
+    cmp al, 11              <span class="c">; 2^11 = 2048</span>
+    jb .store
+    cmp byte [won], 0
+    jne .store
+    mov byte [won], 1
+<span class="l">.store:</span>
+    push bx
+    mov bx, dx
+    mov [tmp_out+bx], al
+    pop bx
+    inc dx
+    jmp .m
+<span class="l">.mdone:</span>
+    <span class="c">; write the line back, padding with empties</span>
+    xor cx, cx
+<span class="l">.w:</span>
+    mov bx, cx
+    mov al, [si+bx]
+    cmp al, 0FFh
+    je .wdone
+    xor ah, ah
+    cmp cx, dx
+    jae .z
+    mov ah, [tmp_out+bx]
+<span class="l">.z:</span>
+    movzx bx, al
+    cmp [board+bx], ah
+    je .same
+    mov [board+bx], ah
+    mov byte [moved], 1
+<span class="l">.same:</span>
+    inc cx
+    cmp cx, 5
+    jb .w
+<span class="l">.wdone:</span>
+    add si, 5
+    dec byte [linecnt]
+    jnz .line
+    ret
+
+<span class="c">; AL = exponent of new tile; score += 2^AL</span>
+<span class="l">add_score:</span>
+    push eax
+    push cx
+    mov cl, al
+    mov eax, 1
+    shl eax, cl
+    add eax, [score]
+    mov [score], eax
+    cmp eax, [best]
+    jbe .x
+    mov [best], eax
+<span class="l">.x:</span>
+    pop cx
+    pop eax
+    ret
+
+<span class="c">; ---------------------------------------------------------------</span>
+<span class="c">; spawn: put a 2 (90%) or 4 (10%) on a random empty cell</span>
+<span class="c">; ---------------------------------------------------------------</span>
+<span class="l">spawn:</span>
+    xor cx, cx
+    xor bx, bx
+<span class="l">.c:</span>
+    cmp byte [board+bx], 0
+    jne .cn
+    inc cx
+<span class="l">.cn:</span>
+    inc bx
+    cmp bx, NCELLS
+    jb .c
+    jcxz .ret
+    call rand
+    xor dx, dx
+    div cx                  <span class="c">; DX = which empty cell</span>
+    xor bx, bx
+<span class="l">.f:</span>
+    cmp byte [board+bx], 0
+    jne .fn
+    test dx, dx
+    jz .found
+    dec dx
+<span class="l">.fn:</span>
+    inc bx
+    jmp .f
+<span class="l">.found:</span>
+    push bx
+    call rand
+    xor dx, dx
+    mov cx, 10
+    div cx
+    pop bx
+    mov al, 1
+    test dx, dx
+    jnz .s
+    mov al, 2
+<span class="l">.s:</span>
+    mov [board+bx], al
+<span class="l">.ret:</span>
+    ret
+
+<span class="c">; 32-bit LCG, returns 16 random bits in AX</span>
+<span class="l">rand:</span>
+    mov eax, [seed]
+    imul eax, eax, 1103515245
+    add eax, 12345
+    mov [seed], eax
+    shr eax, 16
+    ret
+
+<span class="c">; ---------------------------------------------------------------</span>
+<span class="c">; check_over: sets [over] if no empty cell and no equal neighbours</span>
+<span class="c">; ---------------------------------------------------------------</span>
+<span class="l">check_over:</span>
+    xor bx, bx
+<span class="l">.e:</span>
+    cmp byte [board+bx], 0
+    je .no
+    inc bx
+    cmp bx, NCELLS
+    jb .e
+    mov si, lines           <span class="c">; dirs 0,1,2 cover all three axes</span>
+    mov dx, 15
+<span class="l">.l:</span>
+    mov di, si              <span class="c">; DI walks the line</span>
+<span class="l">.p:</span>
+    mov ah, [di+1]
+    cmp ah, 0FFh
+    je .ln
+    movzx bx, byte [di]
+    mov al, [board+bx]
+    movzx bx, ah
+    cmp al, [board+bx]
+    je .no
+    inc di
+    lea bx, [si+4]
+    cmp di, bx
+    jb .p
+<span class="l">.ln:</span>
+    add si, 5
+    dec dx
+    jnz .l
+    mov byte [over], 1
+<span class="l">.no:</span>
+    ret
+
+<span class="c">; ---------------------------------------------------------------</span>
+<span class="c">; render: draw everything to the back buffer, then blit on vsync</span>
+<span class="c">; ---------------------------------------------------------------</span>
+<span class="l">render:</span>
+    mov es, [bufseg]
+    xor di, di
+    mov eax, COL_BG * 01010101h
+    mov cx, 16000
+    rep stosd
+
+    <span class="c">; board backing</span>
+    xor bp, bp
+<span class="l">.bk:</span>
+    mov ax, [cell_x+bp]
+    mov dx, [cell_y+bp]
+    mov si, hex_big
+    mov bl, COL_BOARD
+    call draw_hex
+    add bp, 2
+    cmp bp, NCELLS*2
+    jb .bk
+
+    <span class="c">; tiles</span>
+    xor bp, bp
+<span class="l">.tl:</span>
+    mov bx, bp
+    shr bx, 1
+    movzx bx, byte [board+bx]
+    mov ax, [cell_x+bp]
+    mov dx, [cell_y+bp]
+    mov si, hex_tile
+    push bx
+    test bx, bx
+    mov bl, COL_EMPTY
+    jz .col
+    pop bx
+    push bx
+    cmp bx, MAXEXP
+    jbe .ok
+    mov bx, MAXEXP
+<span class="l">.ok:</span>
+    add bl, COL_TILE
+<span class="l">.col:</span>
+    call draw_hex
+    pop bx
+    test bx, bx
+    jz .tnext
+    <span class="c">; label, centred</span>
+    cmp bx, MAXEXP
+    jbe .ok2
+    mov bx, MAXEXP
+<span class="l">.ok2:</span>
+    mov cx, ax              <span class="c">; cx = centre x</span>
+    mov al, COL_DARK
+    cmp bx, 3
+    jb .tc
+    mov al, COL_LIGHT
+<span class="l">.tc:</span>
+    shl bx, 1
+    mov si, [labels+bx]
+    mov bl, al
+    call strlen             <span class="c">; AX = length</span>
+    shl ax, 2
+    sub cx, ax
+    sub dx, 4
+    mov byte [scale], 1
+    call draw_str
+<span class="l">.tnext:</span>
+    add bp, 2
+    cmp bp, NCELLS*2
+    jb .tl
+
+    <span class="c">; ---- left panel ----</span>
+    mov byte [scale], 2
+    mov bl, COL_DARK
+    mov cx, 8
+    mov dx, 8
+    mov si, s_title1
+    call draw_str
+    mov dx, 26
+    mov bl, COL_TILE+11
+    mov si, s_title2
+    call draw_str
+
+    mov byte [scale], 1
+    mov bl, COL_BOARD
+    mov dx, 52
+    mov si, s_score
+    call draw_str
+    mov eax, [score]
+    call utoa
+    mov byte [scale], 2
+    mov bl, COL_DARK
+    mov dx, 62
+    call draw_str
+
+    mov byte [scale], 1
+    mov bl, COL_BOARD
+    mov dx, 86
+    mov si, s_best
+    call draw_str
+    mov eax, [best]
+    call utoa
+    mov bl, COL_DARK
+    mov dx, 96
+    call draw_str
+
+    mov bl, COL_ACCENT
+    mov dx, 106+4
+    mov si, s_over
+    cmp byte [over], 0
+    jne .msg
+    mov si, s_win
+    cmp byte [won], 0
+    je .nomsg
+<span class="l">.msg:</span>
+    call draw_str
+<span class="l">.nomsg:</span>
+
+    <span class="c">; control compass</span>
+    mov ax, 44
+    mov dx, 144
+    mov si, hex_icon
+    mov bl, COL_BOARD
+    call draw_hex
+    mov bl, COL_DARK
+    mov si, compass
+<span class="l">.cp:</span>
+    lodsb
+    test al, al
+    jz .cpd
+    movzx cx, byte [si]
+    movzx dx, byte [si+1]
+    add si, 2
+    call draw_char
+    jmp .cp
+<span class="l">.cpd:</span>
+    mov bl, COL_BOARD
+    mov cx, 8
+    mov dx, 174
+    mov si, s_keys1
+    call draw_str
+    mov dx, 186
+    mov si, s_keys2
+    call draw_str
+
+    <span class="c">; wait for vertical retrace, then copy to VRAM</span>
+    mov dx, 3DAh
+<span class="l">.v1:</span>
+    in al, dx
+    test al, 8
+    jnz .v1
+<span class="l">.v2:</span>
+    in al, dx
+    test al, 8
+    jz .v2
+    push ds
+    mov ds, [bufseg]
+    mov ax, 0A000h
+    mov es, ax
+    xor si, si
+    xor di, di
+    mov cx, 16000
+    rep movsd
+    pop ds
+    ret
+
+<span class="c">; draw_hex: AX = centre x, DX = centre y, SI = half-width table, BL = colour</span>
+<span class="l">draw_hex:</span>
+    pusha
+    movzx cx, byte [si]
+    inc si
+    sub dx, cx
+    shl cx, 1
+    inc cx
+<span class="l">.row:</span>
+    push cx
+    movzx cx, byte [si]
+    inc si
+    mov di, dx
+    imul di, di, 320
+    add di, ax
+    sub di, cx
+    shl cx, 1
+    inc cx
+    push ax
+    mov al, bl
+    rep stosb
+    pop ax
+    inc dx
+    pop cx
+    loop .row
+    popa
+    ret
+
+<span class="c">; draw_char: AL = char, CX = x, DX = y, BL = colour, [scale]</span>
+<span class="l">draw_char:</span>
+    pusha
+    movzx si, al
+    shl si, 3
+    add si, fontbuf
+    mov di, dx
+    imul di, di, 320
+    add di, cx
+    mov dh, 8
+<span class="l">.row:</span>
+    mov ah, [si]
+    inc si
+    mov dl, [scale]
+<span class="l">.srow:</span>
+    push di
+    mov bh, ah
+    mov ch, 8
+<span class="l">.bit:</span>
+    mov cl, [scale]
+    shl bh, 1
+    jnc .skip
+<span class="l">.px:</span>
+    mov [es:di], bl
+    inc di
+    dec cl
+    jnz .px
+    jmp .nb
+<span class="l">.skip:</span>
+    inc di
+    dec cl
+    jnz .skip
+<span class="l">.nb:</span>
+    dec ch
+    jnz .bit
+    pop di
+    add di, 320
+    dec dl
+    jnz .srow
+    dec dh
+    jnz .row
+    popa
+    ret
+
+<span class="c">; draw_str: SI = asciiz, CX = x, DX = y, BL = colour</span>
+<span class="l">draw_str:</span>
+    pusha
+<span class="l">.n:</span>
+    lodsb
+    test al, al
+    jz .d
+    call draw_char
+    movzx ax, byte [scale]
+    shl ax, 3
+    add cx, ax
+    jmp .n
+<span class="l">.d:</span>
+    popa
+    ret
+
+<span class="c">; strlen: SI = asciiz -&gt; AX</span>
+<span class="l">strlen:</span>
+    push si
+    xor ax, ax
+<span class="l">.l:</span>
+    cmp byte [si], 0
+    je .d
+    inc si
+    inc ax
+    jmp .l
+<span class="l">.d:</span>
+    pop si
+    ret
+
+<span class="c">; utoa: EAX -&gt; SI = decimal asciiz</span>
+<span class="l">utoa:</span>
+    push ebx
+    push edx
+    push di
+    mov di, numbuf_end
+    mov ebx, 10
+<span class="l">.l:</span>
+    xor edx, edx
+    div ebx
+    add dl, &#x27;0&#x27;
+    dec di
+    mov [di], dl
+    test eax, eax
+    jnz .l
+    mov si, di
+    pop di
+    pop edx
+    pop ebx
+    ret
+
+<span class="l">set_palette:</span>
+    mov si, palette
+<span class="l">.n:</span>
+    lodsb
+    cmp al, 0FFh
+    je .d
+    mov dx, 3C8h
+    out dx, al
+    inc dx
+    mov cx, 3
+<span class="l">.c:</span>
+    lodsb
+    shr al, 2               <span class="c">; 8-bit -&gt; 6-bit DAC</span>
+    out dx, al
+    loop .c
+    jmp .n
+<span class="l">.d:</span>
+    ret
+
+<span class="c">; ---------------------------------------------------------------</span>
+<span class="c">; data</span>
+<span class="c">; ---------------------------------------------------------------</span>
+<span class="c">; ascii, scancode, direction   (0=N 1=NE 2=SE 3=S 4=SW 5=NW)</span>
+<span class="l">keymap:</span>
+    db &#x27;w&#x27;,48h,0,  &#x27;e&#x27;,49h,1,  &#x27;d&#x27;,51h,2,  &#x27;s&#x27;,50h,3,  &#x27;a&#x27;,4Fh,4,  &#x27;q&#x27;,47h,5
+    db &#x27;8&#x27;,0,0,    &#x27;9&#x27;,0,1,    &#x27;3&#x27;,0,2,    &#x27;2&#x27;,0,3,    &#x27;1&#x27;,0,4,    &#x27;7&#x27;,0,5
+    dw 0FFFFh
+
+<span class="c">; index, r, g, b</span>
+<span class="l">palette:</span>
+    db COL_BG,     250,248,239
+    db COL_BOARD,  187,173,160
+    db COL_EMPTY,  214,205,196
+    db COL_DARK,   119,110,101
+    db COL_LIGHT,  249,246,242
+    db COL_ACCENT, 230, 90, 50
+    db COL_TILE+1, 238,228,218
+    db COL_TILE+2, 237,224,200
+    db COL_TILE+3, 242,177,121
+    db COL_TILE+4, 245,149, 99
+    db COL_TILE+5, 246,124, 95
+    db COL_TILE+6, 246, 94, 59
+    db COL_TILE+7, 237,207,114
+    db COL_TILE+8, 237,204, 97
+    db COL_TILE+9, 237,200, 80
+    db COL_TILE+10,237,197, 63
+    db COL_TILE+11,237,194, 46
+    db COL_TILE+12, 94,218,146
+    db COL_TILE+13, 60,180,120
+    db COL_TILE+14, 64,150,220
+    db COL_TILE+15, 40,110,200
+    db COL_TILE+16,140, 90,210
+    db COL_TILE+17,110, 50,180
+    db COL_TILE+18, 60, 58, 50
+    db COL_TILE+19, 40, 38, 32
+    db COL_TILE+20, 20, 20, 20
+    db 0FFh
+
+<span class="l">labels:</span>
+    dw 0, l1,l2,l3,l4,l5,l6,l7,l8,l9,l10,l11,l12,l13,l14,l15,l16,l17,l18,l19,l20
+l1  db &quot;2&quot;,0
+l2  db &quot;4&quot;,0
+l3  db &quot;8&quot;,0
+l4  db &quot;16&quot;,0
+l5  db &quot;32&quot;,0
+l6  db &quot;64&quot;,0
+l7  db &quot;128&quot;,0
+l8  db &quot;256&quot;,0
+l9  db &quot;512&quot;,0
+l10 db &quot;1024&quot;,0
+l11 db &quot;2048&quot;,0
+l12 db &quot;4096&quot;,0
+l13 db &quot;8192&quot;,0
+l14 db &quot;16K&quot;,0
+l15 db &quot;32K&quot;,0
+l16 db &quot;65K&quot;,0
+l17 db &quot;131K&quot;,0
+l18 db &quot;262K&quot;,0
+l19 db &quot;524K&quot;,0
+l20 db &quot;1M&quot;,0
+
+s_title1 db &quot;HEX&quot;,0
+s_title2 db &quot;2048&quot;,0
+s_score  db &quot;SCORE&quot;,0
+s_best   db &quot;BEST&quot;,0
+s_over   db &quot;GAME OVER&quot;,0
+s_win    db &quot;2048! :)&quot;,0
+s_keys1  db &quot;R  NEW GAME&quot;,0
+s_keys2  db &quot;ESC  QUIT&quot;,0
+
+<span class="c">; char, x, y  (around the little hex at 44,144)</span>
+<span class="l">compass:</span>
+    db &#x27;W&#x27;,40,122, &#x27;Q&#x27;,22,130, &#x27;E&#x27;,58,130
+    db &#x27;A&#x27;,22,150, &#x27;D&#x27;,58,150, &#x27;S&#x27;,40,158
+    db 0
+
+<span class="c">; ---- generated geometry (gen.py) ----</span>
+<span class="c">; cells in reading order, centres in screen pixels</span>
+<span class="l">cell_x:</span> dw 210,178,242,147,210,273,178,242,147,210,273,178,242,147,210,273,178,242,210
+<span class="l">cell_y:</span> dw 27,45,45,64,64,64,82,82,100,100,100,118,118,136,136,136,155,155,173
+<span class="c">; lines[dir][5][5]: cell indices, front (toward move) first, FFh pad</span>
+<span class="l">lines:</span>
+    db 3,8,13,255,255, 1,6,11,16,255, 0,4,9,14,18, 2,7,12,17,255, 5,10,15,255,255     <span class="c">; N</span>
+    db 0,1,3,255,255, 2,4,6,8,255, 5,7,9,11,13, 10,12,14,16,255, 15,17,18,255,255     <span class="c">; NE</span>
+    db 5,2,0,255,255, 10,7,4,1,255, 15,12,9,6,3, 17,14,11,8,255, 18,16,13,255,255     <span class="c">; SE</span>
+    db 13,8,3,255,255, 16,11,6,1,255, 18,14,9,4,0, 17,12,7,2,255, 15,10,5,255,255     <span class="c">; S</span>
+    db 3,1,0,255,255, 8,6,4,2,255, 13,11,9,7,5, 16,14,12,10,255, 18,17,15,255,255     <span class="c">; SW</span>
+    db 0,2,5,255,255, 1,4,7,10,255, 3,6,9,12,15, 8,11,14,17,255, 13,16,18,255,255     <span class="c">; NW</span>
+<span class="c">; flat-top hex half-widths: first byte = half height, then one per scanline</span>
+<span class="l">hex_big:</span>  db 19, 11,12,12,13,13,14,14,15,16,16,17,17,18,19,19,20,20,21,21,22,21,21,20,20,19,19,18,17,17,16,16,15,14,14,13,13,12,12,11
+<span class="l">hex_tile:</span> db 16, 10,10,11,11,12,13,13,14,14,15,16,16,17,17,18,18,19,18,18,17,17,16,16,15,14,14,13,13,12,11,11,10,10
+<span class="l">hex_icon:</span> db 6, 5,5,6,6,7,7,8,7,7,6,6,5,5
+
+<span class="c">; ---- variables ----</span>
+best    dd 0
+seed    dd 0
+score   dd 0
+bufseg  dw 0
+moved   db 0
+won     db 0
+over    db 0
+linecnt db 0
+scale   db 1
+board   times NCELLS db 0
+tmp_in  times 5 db 0
+tmp_out times 5 db 0
+numbuf  times 11 db 0
+numbuf_end db 0
+fontbuf times 1024 db 0
+</pre>
+    </details>
+  </section>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/js-dos@8.5.3/dist/emulators/emulators.js"></script>
+<script>
+const COM_B64 = "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AAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==";
+const DOSBOX_CONF = `[sdl]
+autolock=false
+[dosbox]
+machine=svga_s3
+memsize=4
+[cpu]
+core=normal
+cputype=386
+cycles=fixed 12000
+[mixer]
+nosound=true
+[autoexec]
+@echo off
+mount c .
+c:
+cls
+HEX2048.COM
+`;
+
+// js-dos key codes (GLFW numbering)
+const KBD = { KeyQ:81, KeyW:87, KeyE:69, KeyA:65, KeyS:83, KeyD:68, KeyR:82,
+  ArrowUp:265, ArrowDown:264, Home:268, End:269, PageUp:266, PageDown:267,
+  Numpad7:55, Numpad8:56, Numpad9:57, Numpad1:49, Numpad2:50, Numpad3:51,
+  Digit7:55, Digit8:56, Digit9:57, Digit1:49, Digit2:50, Digit3:51 };
+
+const cv = document.getElementById("cv");
+const ctx = cv.getContext("2d");
+const statusEl = document.getElementById("status");
+const led = document.getElementById("led");
+let ci = null, img = null, booting = false;
+
+function bytes() {
+  const s = atob(COM_B64), u = new Uint8Array(s.length);
+  for (let i = 0; i < s.length; i++) u[i] = s.charCodeAt(i);
+  return u;
+}
+function showStatus(text, sub, err) {
+  statusEl.hidden = false;
+  statusEl.classList.toggle("err", !!err);
+  statusEl.innerHTML = "";
+  statusEl.append(text);
+  if (sub) { const s = document.createElement("small"); s.textContent = sub; statusEl.append(s); }
+}
+
+async function boot() {
+  if (booting) return;
+  booting = true;
+  led.classList.remove("on");
+  showStatus("BOOTING DOSBOX…", "Loading the emulator (about 1.5 MB)");
+  try {
+    if (ci) { try { await ci.exit(); } catch (e) {} ci = null; }
+    if (!window.emulators) throw new Error("The emulator script did not load.");
+    emulators.pathPrefix = new URL(".", location.href).href;
+    ci = await emulators.dosboxWorker([
+      { path: "HEX2048.COM", contents: bytes() },
+      DOSBOX_CONF
+    ]);
+    const ev = ci.events();
+    ev.onFrameSize((w, h) => { cv.width = w; cv.height = h; img = null; });
+    ev.onFrame((rgb, rgba) => {
+      const w = cv.width, h = cv.height;
+      if (!img || img.width !== w || img.height !== h) img = ctx.createImageData(w, h);
+      const d = img.data;
+      if (rgba) d.set(rgba.subarray(0, d.length));
+      else if (rgb) {
+        for (let i = 0, j = 0; j < d.length; i += 3, j += 4) {
+          d[j] = rgb[i]; d[j+1] = rgb[i+1]; d[j+2] = rgb[i+2]; d[j+3] = 255;
+        }
+      } else return;
+      ctx.putImageData(img, 0, 0);
+      if (!statusEl.hidden) { statusEl.hidden = true; led.classList.add("on"); }
+    });
+    cv.width = ci.width() || 320; cv.height = ci.height() || 200;
+  } catch (e) {
+    console.error(e);
+    showStatus("DOSBOX FAILED TO START", String(e && e.message || e) + " Try Reboot DOS, or a recent Chrome, Firefox or Safari.", true);
+  } finally {
+    booting = false;
+  }
+}
+
+function tap(code) { if (ci) ci.simulateKeyPress(code); }
+
+const held = new Set();
+document.addEventListener("keydown", e => {
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
+  const code = KBD[e.code];
+  if (code === undefined || !ci) return;
+  e.preventDefault();
+  if (e.repeat || held.has(e.code)) return;
+  held.add(e.code);
+  ci.sendKeyEvent(code, true);
+  const b = document.querySelector(`.pad [data-k="${e.code.replace("Key","").toLowerCase()}"]`);
+  if (b) b.classList.add("hit");
+});
+document.addEventListener("keyup", e => {
+  const code = KBD[e.code];
+  if (!held.has(e.code)) return;
+  held.delete(e.code);
+  if (ci) ci.sendKeyEvent(code, false);
+  const b = document.querySelector(`.pad [data-k="${e.code.replace("Key","").toLowerCase()}"]`);
+  if (b) b.classList.remove("hit");
+});
+window.addEventListener("blur", () => {
+  for (const c of held) if (ci) ci.sendKeyEvent(KBD[c], false);
+  held.clear();
+  document.querySelectorAll(".pad .hit").forEach(b => b.classList.remove("hit"));
+});
+
+document.querySelectorAll(".pad button").forEach(b =>
+  b.addEventListener("click", () => tap(KBD["Key" + b.dataset.k.toUpperCase()])));
+document.getElementById("newgame").addEventListener("click", () => tap(KBD.KeyR));
+document.getElementById("reboot").addEventListener("click", boot);
+document.getElementById("screen").addEventListener("pointerdown", e => e.currentTarget.focus());
+
+document.getElementById("copy").addEventListener("click", async e => {
+  const btn = e.currentTarget, text = document.getElementById("code").textContent;
+  try {
+    await navigator.clipboard.writeText(text);
+    btn.textContent = "Copied";
+  } catch (err) {
+    const box = document.getElementById("srcbox");
+    box.open = true;
+    const r = document.createRange(); r.selectNodeContents(document.getElementById("code"));
+    const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+    btn.textContent = "Selected, press Ctrl+C";
+  }
+  setTimeout(() => (btn.textContent = "Copy source"), 2000);
+});
+
+boot();
+</script>

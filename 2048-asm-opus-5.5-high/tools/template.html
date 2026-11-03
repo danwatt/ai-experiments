@@ -1,0 +1,426 @@
+<title>Hex 2048</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=VT323&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one column; the DOS screen in a bezel is the hero, the hex pad sits under it, source at the foot. */
+:root {
+  --bg: #e6e3db;
+  --surface: #f3f1eb;
+  --ink: #2a2722;
+  --muted: #6b655b;
+  --line: #cdc7ba;
+  --accent: #9c770c;
+  --gold: #edc22e;
+  --bezel: #2b2925;
+  --bezel-ink: #bdb6a8;
+  --code-bg: #f3f1eb;
+  --display: "VT323", "Courier New", monospace;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #171613; --surface: #211f1b; --ink: #ece7dc; --muted: #a29b8e; --line: #38352f;
+    --accent: #edc22e; --gold: #edc22e; --bezel: #0c0b09; --bezel-ink: #8d8679; --code-bg: #1d1b18;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #171613; --surface: #211f1b; --ink: #ece7dc; --muted: #a29b8e; --line: #38352f;
+  --accent: #edc22e; --gold: #edc22e; --bezel: #0c0b09; --bezel-ink: #8d8679; --code-bg: #1d1b18;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 15px;
+  line-height: 1.55;
+}
+.wrap {
+  max-width: 980px;
+  margin: 0 auto;
+  padding-block: 28px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid;
+  gap: 28px;
+}
+header { display: grid; gap: 6px; }
+h1 {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(44px, 9vw, 72px);
+  line-height: .9;
+  margin: 0;
+  letter-spacing: .02em;
+  text-wrap: balance;
+}
+h1 span { color: var(--accent); }
+.lede { margin: 0; color: var(--muted); max-width: 62ch; }
+.lede b { color: var(--ink); font-weight: 600; }
+
+.bezel {
+  background: var(--bezel);
+  border-radius: 14px;
+  padding: clamp(10px, 2.4vw, 22px);
+  box-shadow: 0 1px 0 rgba(255,255,255,.06) inset, 0 18px 40px -24px rgba(0,0,0,.55);
+}
+.screen {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  max-width: 100%;
+  background: #000;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.screen:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+.status {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  gap: 6px;
+  text-align: center;
+  font-family: var(--display);
+  font-size: clamp(20px, 4vw, 30px);
+  color: #c9c2b2;
+  background: #000;
+  padding: 16px;
+}
+.status small { font-family: var(--body); font-size: 13px; color: #8d8679; }
+.status.err { color: #f2a07b; }
+.bezel-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+  font-family: var(--display);
+  font-size: 18px;
+  color: var(--bezel-ink);
+  letter-spacing: .06em;
+}
+.led { display: inline-flex; align-items: center; gap: 8px; }
+.led::before {
+  content: ""; width: 8px; height: 8px; border-radius: 50%;
+  background: #4a463e;
+}
+.led.on::before { background: #7ee08a; box-shadow: 0 0 8px #7ee08a; }
+
+.play {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 28px;
+  align-items: center;
+}
+.pad {
+  --h: 54px;
+  --w: calc(var(--h) * 1.1547);
+  position: relative;
+  width: calc(var(--w) * 2.5);
+  height: calc(var(--h) * 3);
+}
+.pad button, .pad .core {
+  position: absolute;
+  width: var(--w);
+  height: var(--h);
+  clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%);
+  border: 0;
+  display: grid;
+  place-items: center;
+  font-family: var(--display);
+  font-size: 26px;
+  line-height: 1;
+}
+.pad button {
+  background: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+  transition: background .12s, color .12s;
+}
+.pad button:hover { background: var(--line); }
+.pad button:active, .pad button.hit { background: var(--gold); color: #2a2722; }
+.pad button:focus-visible { background: var(--gold); color: #2a2722; outline: none; }
+.pad .core { background: var(--line); }
+/* flat-top hex neighbours: centre at (1.25w, 1.5h) */
+.pad .core   { left: calc(var(--w) * .75); top: var(--h); }
+.pad [data-k="w"] { left: calc(var(--w) * .75); top: 0; }
+.pad [data-k="s"] { left: calc(var(--w) * .75); top: calc(var(--h) * 2); }
+.pad [data-k="q"] { left: 0; top: calc(var(--h) * .5); }
+.pad [data-k="a"] { left: 0; top: calc(var(--h) * 1.5); }
+.pad [data-k="e"] { left: calc(var(--w) * 1.5); top: calc(var(--h) * .5); }
+.pad [data-k="d"] { left: calc(var(--w) * 1.5); top: calc(var(--h) * 1.5); }
+
+.howto { display: grid; gap: 12px; min-width: 0; }
+.howto h2, .src h2 {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  color: var(--muted);
+}
+.howto p { margin: 0; max-width: 60ch; }
+kbd {
+  font-family: var(--mono);
+  font-size: 12.5px;
+  padding: 1px 6px;
+  border: 1px solid var(--line);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  background: var(--surface);
+}
+.actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.btn {
+  font: 500 14px/1 var(--body);
+  padding: 10px 16px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+}
+.btn:hover { border-color: var(--muted); }
+.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.btn.primary { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+
+.facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.facts div { background: var(--surface); padding: 12px 14px; display: grid; gap: 2px; }
+.facts dt { font-size: 12px; color: var(--muted); }
+.facts dd { margin: 0; font-family: var(--display); font-size: 28px; line-height: 1; font-variant-numeric: tabular-nums; }
+
+.src { display: grid; gap: 10px; min-width: 0; }
+.src-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+details summary { cursor: pointer; color: var(--muted); font-size: 14px; }
+details summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+pre {
+  margin: 10px 0 0;
+  max-height: 560px;
+  overflow: auto;
+  background: var(--code-bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px 16px;
+  font: 12.5px/1.5 var(--mono);
+  tab-size: 8;
+}
+pre .c { color: var(--muted); }
+pre .l { color: var(--accent); }
+
+@media (max-width: 640px) {
+  .play { grid-template-columns: 1fr; justify-items: center; }
+  .howto { justify-items: start; width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) { .pad button { transition: none; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>HEX <span>2048</span></h1>
+    <p class="lede">2048 on a 19-cell hexagonal board, written in <b>16-bit x86 assembly</b>, assembled with NASM into a <b>__BYTES__-byte DOS .COM file</b>, and running here in DOSBox compiled to WebAssembly.</p>
+  </header>
+
+  <div class="bezel">
+    <div class="screen" id="screen" tabindex="0" aria-label="Game screen. Use Q W E A S D to move.">
+      <canvas id="cv" width="320" height="200"></canvas>
+      <div class="status" id="status">BOOTING DOSBOX…<small>Loading the emulator (about 1.5 MB)</small></div>
+    </div>
+    <div class="bezel-foot">
+      <span class="led" id="led">C:\HEX2048.COM</span>
+      <span>VGA MODE 13H · 320×200×256</span>
+    </div>
+  </div>
+
+  <section class="play">
+    <div class="pad" aria-label="Move pad">
+      <div class="core" aria-hidden="true"></div>
+      <button type="button" id="k-w" data-k="w" aria-label="Move up">W</button>
+      <button type="button" id="k-e" data-k="e" aria-label="Move up-right">E</button>
+      <button type="button" id="k-d" data-k="d" aria-label="Move down-right">D</button>
+      <button type="button" id="k-s" data-k="s" aria-label="Move down">S</button>
+      <button type="button" id="k-a" data-k="a" aria-label="Move down-left">A</button>
+      <button type="button" id="k-q" data-k="q" aria-label="Move up-left">Q</button>
+    </div>
+    <div class="howto">
+      <h2>How to play</h2>
+      <p>Hexes have six neighbours, so tiles slide six ways. Use <kbd>Q</kbd> <kbd>W</kbd> <kbd>E</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> as laid out on the pad, or the numpad <kbd>7</kbd> <kbd>8</kbd> <kbd>9</kbd> <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd>. Matching tiles merge. Reach 2048, then keep going.</p>
+      <div class="actions">
+        <button type="button" class="btn primary" id="newgame">New game (R)</button>
+        <button type="button" class="btn" id="reboot">Reboot DOS</button>
+      </div>
+    </div>
+  </section>
+
+  <dl class="facts">
+    <div><dt>Executable</dt><dd>__BYTES__ B</dd></div>
+    <div><dt>Source lines</dt><dd>__LINES__</dd></div>
+    <div><dt>Board cells</dt><dd>19</dd></div>
+    <div><dt>Move directions</dt><dd>6</dd></div>
+  </dl>
+
+  <section class="src">
+    <div class="src-head">
+      <h2>Source · hex2048.asm</h2>
+      <button type="button" class="btn" id="copy">Copy source</button>
+    </div>
+    <details id="srcbox">
+      <summary>Show the assembly (build with <code>nasm -f bin hex2048.asm -o HEX2048.COM</code>)</summary>
+      <pre id="code">__SOURCE__</pre>
+    </details>
+  </section>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/js-dos@8.5.3/dist/emulators/emulators.js"></script>
+<script>
+const COM_B64 = "__COM__";
+const DOSBOX_CONF = `[sdl]
+autolock=false
+[dosbox]
+machine=svga_s3
+memsize=4
+[cpu]
+core=normal
+cputype=386
+cycles=fixed 12000
+[mixer]
+nosound=true
+[autoexec]
+@echo off
+mount c .
+c:
+cls
+HEX2048.COM
+`;
+
+// js-dos key codes (GLFW numbering)
+const KBD = { KeyQ:81, KeyW:87, KeyE:69, KeyA:65, KeyS:83, KeyD:68, KeyR:82,
+  ArrowUp:265, ArrowDown:264, Home:268, End:269, PageUp:266, PageDown:267,
+  Numpad7:55, Numpad8:56, Numpad9:57, Numpad1:49, Numpad2:50, Numpad3:51,
+  Digit7:55, Digit8:56, Digit9:57, Digit1:49, Digit2:50, Digit3:51 };
+
+const cv = document.getElementById("cv");
+const ctx = cv.getContext("2d");
+const statusEl = document.getElementById("status");
+const led = document.getElementById("led");
+let ci = null, img = null, booting = false;
+
+function bytes() {
+  const s = atob(COM_B64), u = new Uint8Array(s.length);
+  for (let i = 0; i < s.length; i++) u[i] = s.charCodeAt(i);
+  return u;
+}
+function showStatus(text, sub, err) {
+  statusEl.hidden = false;
+  statusEl.classList.toggle("err", !!err);
+  statusEl.innerHTML = "";
+  statusEl.append(text);
+  if (sub) { const s = document.createElement("small"); s.textContent = sub; statusEl.append(s); }
+}
+
+async function boot() {
+  if (booting) return;
+  booting = true;
+  led.classList.remove("on");
+  showStatus("BOOTING DOSBOX…", "Loading the emulator (about 1.5 MB)");
+  try {
+    if (ci) { try { await ci.exit(); } catch (e) {} ci = null; }
+    if (!window.emulators) throw new Error("The emulator script did not load.");
+    emulators.pathPrefix = new URL(".", location.href).href;
+    ci = await emulators.dosboxWorker([
+      { path: "HEX2048.COM", contents: bytes() },
+      DOSBOX_CONF
+    ]);
+    const ev = ci.events();
+    ev.onFrameSize((w, h) => { cv.width = w; cv.height = h; img = null; });
+    ev.onFrame((rgb, rgba) => {
+      const w = cv.width, h = cv.height;
+      if (!img || img.width !== w || img.height !== h) img = ctx.createImageData(w, h);
+      const d = img.data;
+      if (rgba) d.set(rgba.subarray(0, d.length));
+      else if (rgb) {
+        for (let i = 0, j = 0; j < d.length; i += 3, j += 4) {
+          d[j] = rgb[i]; d[j+1] = rgb[i+1]; d[j+2] = rgb[i+2]; d[j+3] = 255;
+        }
+      } else return;
+      ctx.putImageData(img, 0, 0);
+      if (!statusEl.hidden) { statusEl.hidden = true; led.classList.add("on"); }
+    });
+    cv.width = ci.width() || 320; cv.height = ci.height() || 200;
+  } catch (e) {
+    console.error(e);
+    showStatus("DOSBOX FAILED TO START", String(e && e.message || e) + " Try Reboot DOS, or a recent Chrome, Firefox or Safari.", true);
+  } finally {
+    booting = false;
+  }
+}
+
+function tap(code) { if (ci) ci.simulateKeyPress(code); }
+
+const held = new Set();
+document.addEventListener("keydown", e => {
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
+  const code = KBD[e.code];
+  if (code === undefined || !ci) return;
+  e.preventDefault();
+  if (e.repeat || held.has(e.code)) return;
+  held.add(e.code);
+  ci.sendKeyEvent(code, true);
+  const b = document.querySelector(`.pad [data-k="${e.code.replace("Key","").toLowerCase()}"]`);
+  if (b) b.classList.add("hit");
+});
+document.addEventListener("keyup", e => {
+  const code = KBD[e.code];
+  if (!held.has(e.code)) return;
+  held.delete(e.code);
+  if (ci) ci.sendKeyEvent(code, false);
+  const b = document.querySelector(`.pad [data-k="${e.code.replace("Key","").toLowerCase()}"]`);
+  if (b) b.classList.remove("hit");
+});
+window.addEventListener("blur", () => {
+  for (const c of held) if (ci) ci.sendKeyEvent(KBD[c], false);
+  held.clear();
+  document.querySelectorAll(".pad .hit").forEach(b => b.classList.remove("hit"));
+});
+
+document.querySelectorAll(".pad button").forEach(b =>
+  b.addEventListener("click", () => tap(KBD["Key" + b.dataset.k.toUpperCase()])));
+document.getElementById("newgame").addEventListener("click", () => tap(KBD.KeyR));
+document.getElementById("reboot").addEventListener("click", boot);
+document.getElementById("screen").addEventListener("pointerdown", e => e.currentTarget.focus());
+
+document.getElementById("copy").addEventListener("click", async e => {
+  const btn = e.currentTarget, text = document.getElementById("code").textContent;
+  try {
+    await navigator.clipboard.writeText(text);
+    btn.textContent = "Copied";
+  } catch (err) {
+    const box = document.getElementById("srcbox");
+    box.open = true;
+    const r = document.createRange(); r.selectNodeContents(document.getElementById("code"));
+    const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+    btn.textContent = "Selected, press Ctrl+C";
+  }
+  setTimeout(() => (btn.textContent = "Copy source"), 2000);
+});
+
+boot();
+</script>
