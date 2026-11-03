@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Voicebox Voice Samples</title>
+<style>
+:root { --bg:#f7f7f5; --card:#fff; --fg:#1d1d1b; --muted:#6b6b66; --line:#e3e3df; --accent:#3b5bdb; --err:#c92a2a; }
+@media (prefers-color-scheme: dark) {
+  :root { --bg:#161615; --card:#1f1f1d; --fg:#ececea; --muted:#9a9a94; --line:#2e2e2b; --accent:#7f9cf5; --err:#ff8787; }
+}
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--fg); font:15px/1.5 system-ui,-apple-system,sans-serif; }
+main { max-width:1100px; margin:0 auto; padding:32px 16px 64px; }
+h1 { margin:0 0 4px; font-size:26px; }
+.sentence { color:var(--muted); margin:0 0 20px; font-style:italic; }
+.controls { display:flex; gap:8px; margin-bottom:28px; flex-wrap:wrap; }
+button { font:inherit; padding:6px 14px; border-radius:8px; border:1px solid var(--line); background:var(--card); color:var(--fg); cursor:pointer; }
+button:hover { border-color:var(--accent); }
+section { margin-bottom:32px; }
+h2 { font-size:14px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); border-bottom:1px solid var(--line); padding-bottom:6px; }
+h2 small { font-weight:400; }
+.grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:12px; }
+.card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px; }
+.card.playing { border-color:var(--accent); box-shadow:0 0 0 1px var(--accent); }
+.head { display:flex; justify-content:space-between; align-items:baseline; gap:8px; margin-bottom:8px; }
+h3 { margin:0; font-size:17px; }
+.meta { color:var(--muted); font-size:12px; text-align:right; }
+.play { display:flex; align-items:center; gap:8px; }
+audio { width:100%; height:36px; }
+.dl { font-size:12px; color:var(--accent); text-decoration:none; }
+.err { color:var(--err); margin:0; font-size:13px; }
+</style></head>
+<body><main>
+<h1>Voicebox Voice Samples</h1>
+<p class="sentence">“The quick brown fox jumps over the lazy dog. Honestly, I wasn&#x27;t expecting the results to sound this natural — what do you think?”</p>
+<div class="controls"><button id="all">▶ Play all in sequence</button><button id="stop">■ Stop</button></div>
+<section><h2>kokoro <small>11</small></h2><div class="grid"><div class="card"><div class="head"><h3>Adam</h3><span class="meta">preset · am_adam · 8.1s</span></div><div class="play"><audio controls preload="none" src="adam.mp3"></audio><a class="dl" href="adam.mp3" download>MP3</a></div></div><div class="card"><div class="head"><h3>Alloy</h3><span class="meta">preset · af_alloy · 8.0s</span></div><div class="play"><audio controls preload="none" src="alloy.mp3"></audio><a class="dl" href="alloy.mp3" download>MP3</a></div></div><div class="card"><div class="head"><h3>Aoede</h3><span class="meta">preset · af_aoede · 8.2s</span></div><div class="play"><audio controls preload="none" src="aoede.mp3"></audio><a class="dl" href="aoede.mp3" download>MP3</a></div></div><div class="card"><div class="head"><h3>Bella</h3><span class="meta">preset · af_bella · 8.9s</span></div><div class="play"><audio controls preload="none" src="bella.mp3"></audio><a class="dl" href="bella.mp3" download>MP3</a></div></div><div class="card"><div class="head"><h3>Dora</h3><span class="meta">preset · ef_dora · 7.7s</span></div><div class="play"><audio controls preload="none" src="dora.mp3"></audio><a class="dl" href="dora.mp3" download>MP3</a></div></div><div class="card"><div class="head"><h3>Echo</h3><span class="meta">preset · am_echo · 7.9s</span></div><div class="play"><audio controls preload="none" src="echo.mp3"></audio><a class="dl" href="echo.mp3" download>MP3</a></div></div><div class="card"><div class="head"><h3>Heart</h3><span class="meta">preset · af_heart · 8.3s</span></div><div class="play"><audio controls preload="none" src="heart.mp3"></audio><a class="dl" href="heart.mp3" download>MP3</a></div></div><div class="card"><div class="head"><h3>Jessica</h3><span class="meta">preset · af_jessica · 7.4s</span></div><div class="play"><audio controls preload="none" src="jessica.mp3"></audio><a class="dl" href="jessica.mp3" download>MP3</a></div></div><div class="card"><div class="head"><h3>Kore</h3><span class="meta">preset · af_jessica · 7.4s</span></div><div class="play"><audio controls preload="none" src="kore.mp3"></audio><a class="dl" href="kore.mp3" download>MP3</a></div></div><div class="card"><div class="head"><h3>Nova</h3><span class="meta">preset · af_nova · 7.8s</span></div><div class="play"><audio controls preload="none" src="nova.mp3"></audio><a class="dl" href="nova.mp3" download>MP3</a></div></div><div class="card"><div class="head"><h3>Santa</h3><span class="meta">preset · pm_santa · 7.6s</span></div><div class="play"><audio controls preload="none" src="santa.mp3"></audio><a class="dl" href="santa.mp3" download>MP3</a></div></div></div></section><section><h2>qwen <small>1</small></h2><div class="grid"><div class="card"><div class="head"><h3>DR Live</h3><span class="meta">cloned · 6.5s</span></div><div class="play"><audio controls preload="none" src="dr-live.mp3"></audio><a class="dl" href="dr-live.mp3" download>MP3</a></div></div></div></section><section><h2>qwen_custom_voice <small>1</small></h2><div class="grid"><div class="card"><div class="head"><h3>Ryan</h3><span class="meta">preset · Ryan · 22.7s</span></div><div class="play"><audio controls preload="none" src="ryan.mp3"></audio><a class="dl" href="ryan.mp3" download>MP3</a></div></div></div></section>
+</main>
+<script>
+const players = [...document.querySelectorAll('audio')];
+let queue = [];
+players.forEach(a => {
+  a.addEventListener('play', () => {
+    players.forEach(o => { if (o !== a) o.pause(); });
+    document.querySelectorAll('.card').forEach(c => c.classList.remove('playing'));
+    a.closest('.card').classList.add('playing');
+  });
+  a.addEventListener('ended', () => {
+    a.closest('.card').classList.remove('playing');
+    const next = queue.shift();
+    if (next) next.play();
+  });
+});
+document.getElementById('all').onclick = () => { queue = players.slice(1); players[0]?.play(); };
+document.getElementById('stop').onclick = () => { queue = []; players.forEach(a => a.pause()); };
+</script>
+</body></html>
