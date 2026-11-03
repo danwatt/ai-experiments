@@ -1,6 +1,8 @@
 # ai-experiments
 
-Each top-level directory is a standalone demo.
+Each demo is a standalone directory. Games live under `games/`; other demos are top-level.
+
+`index.html` at the repo root is the hand-maintained landing page: add a card there for every new demo (with a `prompt.html` link when it has a `prompt.md`). The Pages build (`.github/workflows/pages.yml`) copies the repo and renders `prompt.md`/`README.md` to `.html` via `scripts/render-md.sh`.
 
 ## When finishing a demo: write `prompt.md`
 

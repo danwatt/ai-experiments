@@ -14,6 +14,7 @@
     article h3 { margin: 0; font-size: 1.15rem; }
     article p { margin-bottom: 0; font-size: 0.9rem; }
     article small { display: block; margin-top: 0.75rem; }
+    article small a { position: relative; z-index: 1; }
     article a.stretched::after { content: ""; position: absolute; inset: 0; }
     article { position: relative; }
     .grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
@@ -30,26 +31,27 @@
       <h2>Hex 2048 variants</h2>
       <p>Same prompt, different models and effort levels.</p>
       <div class="grid">
-        <article><header><h3><a class="stretched" href="2048-opus-5.5-max/">Opus 5.5 · max</a></h3></header><p>Hex 2048, highest effort.</p></article>
-        <article><header><h3><a class="stretched" href="2048-opus-5.5-high/">Opus 5.5 · high</a></h3></header><p>Hex 2048.</p></article>
-        <article><header><h3><a class="stretched" href="2048-sonnet-5.5-high/">Sonnet 5.5 · high</a></h3></header><p>Hex 2048.</p></article>
-        <article><header><h3><a class="stretched" href="2048-haiku-5.5-high/">Haiku 5.5 · high</a></h3></header><p>Hex 2048.</p></article>
-        <article><header><h3><a class="stretched" href="2048-astra-6-medium/">Astra 6 · medium</a></h3></header><p>Hex / 2048.</p></article>
-        <article><header><h3><a class="stretched" href="2048-sol-6.1-medium/">Sol 6.1 · medium</a></h3></header><p>HEX / 2048.</p></article>
-        <article><header><h3><a class="stretched" href="hex2048-3d/">Hex 2048 · 3D</a></h3></header><p>Hexagonal board rendered with Three.js.</p></article>
-        <article><header><h3><a class="stretched" href="2048-qbas-opus-5.5-high/2048-qbasic.bas">Hex 2048 · QBasic</a></h3></header><p>Source for QBJS (qbjs.org).</p><small>.bas source</small></article>
-        <article><header><h3><a class="stretched" href="2048-asm-opus-5.5-high/">Hex 2048 · x86 assembly</a></h3></header><p>A 2.8 KB DOS .COM in VGA mode 13h, running in DOSBox (js-dos).</p></article>
+        <article><header><h3><a class="stretched" href="games/2048-opus-5.5-max/">Opus 5.5 · max</a></h3></header><p>Hex 2048, highest effort.</p></article>
+        <article><header><h3><a class="stretched" href="games/2048-opus-5.5-high/">Opus 5.5 · high</a></h3></header><p>Hex 2048.</p></article>
+        <article><header><h3><a class="stretched" href="games/2048-sonnet-5.5-high/">Sonnet 5.5 · high</a></h3></header><p>Hex 2048.</p></article>
+        <article><header><h3><a class="stretched" href="games/2048-haiku-5.5-high/">Haiku 5.5 · high</a></h3></header><p>Hex 2048.</p></article>
+        <article><header><h3><a class="stretched" href="games/2048-astra-6-medium/">Astra 6 · medium</a></h3></header><p>Hex / 2048.</p></article>
+        <article><header><h3><a class="stretched" href="games/2048-sol-6.1-medium/">Sol 6.1 · medium</a></h3></header><p>HEX / 2048.</p></article>
+        <article><header><h3><a class="stretched" href="games/hex2048-3d/">Hex 2048 · 3D</a></h3></header><p>Hexagonal board rendered with Three.js.</p></article>
+        <article><header><h3><a class="stretched" href="games/2048-qbas-opus-5.5-high/2048-qbasic.bas">Hex 2048 · QBasic</a></h3></header><p>Source for QBJS (qbjs.org).</p><small>.bas source</small></article>
+        <article><header><h3><a class="stretched" href="games/2048-asm-opus-5.5-high/">Hex 2048 · x86 assembly</a></h3></header><p>A 2.8 KB DOS .COM in VGA mode 13h, running in DOSBox (js-dos).</p><small><a class="prompt" href="games/2048-asm-opus-5.5-high/prompt.html">prompt</a></small></article>
       </div>
     </section>
 
     <section>
       <h2>Games &amp; toys</h2>
       <div class="grid">
-        <article><header><h3><a class="stretched" href="td-opus-5.5-high/">Hex Bastion</a></h3></header><p>Tower defense on a hex grid.</p></article>
-        <article><header><h3><a class="stretched" href="fact-rocket/">Fact Rocket</a></h3></header><p>Fly a rocket by answering math facts.</p></article>
-        <article><header><h3><a class="stretched" href="math-garden/">Number Garden</a></h3></header><p>A little practice, a lot of growth. Addition and subtraction rounds.</p></article>
-        <article><header><h3><a class="stretched" href="hohmann-works/">Hohmann Works</a></h3></header><p>Orbital logistics: build stations and orbits.</p></article>
-        <article><header><h3><a class="stretched" href="sixfold-opus-5.5-medium/">Sixfold</a></h3></header><p>6DOF tunnel shooter in a mine built from deformed cubes. Three.js.</p></article>
+        <article><header><h3><a class="stretched" href="games/td-opus-5.5-high/">Hex Bastion</a></h3></header><p>Tower defense on a hex grid.</p></article>
+        <article><header><h3><a class="stretched" href="games/3dtd-opus-5.5-uiltra/">Hex Highlands TD</a></h3></header><p>3D tower defense on a hex grid.</p><small><a class="prompt" href="games/3dtd-opus-5.5-uiltra/prompt.html">prompt</a></small></article>
+        <article><header><h3><a class="stretched" href="games/fact-rocket/">Fact Rocket</a></h3></header><p>Fly a rocket by answering math facts.</p><small><a class="prompt" href="games/fact-rocket/prompt.html">prompt</a></small></article>
+        <article><header><h3><a class="stretched" href="games/math-garden/">Number Garden</a></h3></header><p>A little practice, a lot of growth. Addition and subtraction rounds.</p></article>
+        <article><header><h3><a class="stretched" href="games/hohmann-works/">Hohmann Works</a></h3></header><p>Orbital logistics: build stations and orbits.</p></article>
+        <article><header><h3><a class="stretched" href="games/sixfold-opus-5.5-medium/">Sixfold</a></h3></header><p>6DOF tunnel shooter in a mine built from deformed cubes. Three.js.</p><small><a class="prompt" href="games/sixfold-opus-5.5-medium/prompt.html">prompt</a></small></article>
       </div>
     </section>
 
@@ -67,11 +69,11 @@
       <h2>Tools</h2>
       <p>Python projects; see the README for how to run.</p>
       <div class="grid">
-        <article><header><h3><a class="stretched" href="overhead-opus-5.5-high/README.md">Overhead</a></h3></header><p>Live aircraft around you: 2D map, tilted 3D map, and sky dome.</p></article>
-        <article><header><h3><a class="stretched" href="tx-lege/README.md">tx-lege</a></h3></header><p>Full legislative history of a Texas bill: actions, versions, amendments.</p></article>
+        <article><header><h3><a class="stretched" href="overhead-opus-5.5-high/README.html">Overhead</a></h3></header><p>Live aircraft around you: 2D map, tilted 3D map, and sky dome.</p><small><a class="prompt" href="overhead-opus-5.5-high/prompt.html">prompt</a></small></article>
+        <article><header><h3><a class="stretched" href="tx-lege/README.html">tx-lege</a></h3></header><p>Full legislative history of a Texas bill: actions, versions, amendments.</p></article>
       </div>
     </section>
   </main>
-  <footer class="container"><small>Served from the repo root. Open with any static file server.</small></footer>
+  <footer class="container"><small>Games live in <code>games/</code>. Prompt and README pages are rendered from Markdown by the Pages build (<code>scripts/render-md.sh</code>).</small></footer>
 </body>
 </html>

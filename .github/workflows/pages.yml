@@ -22,41 +22,18 @@ jobs:
 
       - uses: actions/configure-pages@v6
 
-      # Each top-level folder with an index.html is one experiment, published at /<folder>/.
-      # The root page is generated so new experiments show up without editing anything.
+      # index.html at the repo root is the hand-maintained landing page.
+      # Everything else is copied as-is; prompt.md / README.md are rendered to .html.
       - name: Assemble site
         run: |
           mkdir -p _site
           touch _site/.nojekyll
-          items=""
-          for dir in */; do
-            dir="${dir%/}"
-            [ -f "$dir/index.html" ] || continue
-            [ "$dir" = "_site" ] && continue
-            cp -R "$dir" "_site/$dir"
-            title=$(grep -o -m1 '<title>[^<]*</title>' "$dir/index.html" | sed -e 's/<[^>]*>//g')
-            items="$items<li><a href=\"$dir/\">${title:-$dir}</a> <code>$dir</code></li>"
-          done
-          cat > _site/index.html <<EOF
-          <!doctype html>
-          <html lang="en">
-          <head>
-          <meta charset="utf-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1">
-          <title>AI Experiments</title>
-          <style>
-            :root { color-scheme: light dark; }
-            body { font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; max-width: 42rem; margin: 0 auto; padding: 3rem 1rem; }
-            li { margin: .5rem 0; }
-            code { color: GrayText; font-size: .85em; margin-left: .4rem; }
-          </style>
-          </head>
-          <body>
-          <h1>AI Experiments</h1>
-          <ul>$items</ul>
-          </body>
-          </html>
-          EOF
+          rsync -a \
+            --exclude='/_site' --exclude='.git*' --exclude='.claude' --exclude='.idea' \
+            --exclude='.serena' --exclude='scripts' --exclude='.DS_Store' \
+            --exclude='node_modules' --exclude='.venv' \
+            ./ _site/
+          scripts/render-md.sh _site
 
       - uses: actions/upload-pages-artifact@v5
         with:
