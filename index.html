@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>AI Experiments</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2.0.6/css/pico.min.css">
+  <style>
+    header.container { padding-block: 3rem 1rem; }
+    section.container { padding-block: 1rem; }
+    article { margin-bottom: 0; height: 100%; }
+    article > header { margin-bottom: 0.5rem; }
+    article h3 { margin: 0; font-size: 1.15rem; }
+    article p { margin-bottom: 0; font-size: 0.9rem; }
+    article small { display: block; margin-top: 0.75rem; }
+    article a.stretched::after { content: ""; position: absolute; inset: 0; }
+    article { position: relative; }
+    .grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+  </style>
+</head>
+<body>
+  <header class="container">
+    <h1>AI Experiments</h1>
+    <p>Small projects built with different models and settings. Most are a single static page.</p>
+  </header>
+
+  <main class="container">
+    <section>
+      <h2>Hex 2048 variants</h2>
+      <p>Same prompt, different models and effort levels.</p>
+      <div class="grid">
+        <article><header><h3><a class="stretched" href="2048-opus-5.5-max/">Opus 5.5 · max</a></h3></header><p>Hex 2048, highest effort.</p></article>
+        <article><header><h3><a class="stretched" href="2048-opus-5.5-high/">Opus 5.5 · high</a></h3></header><p>Hex 2048.</p></article>
+        <article><header><h3><a class="stretched" href="2048-sonnet-5.5-high/">Sonnet 5.5 · high</a></h3></header><p>Hex 2048.</p></article>
+        <article><header><h3><a class="stretched" href="2048-haiku-5.5-high/">Haiku 5.5 · high</a></h3></header><p>Hex 2048.</p></article>
+        <article><header><h3><a class="stretched" href="2048-astra-6-medium/">Astra 6 · medium</a></h3></header><p>Hex / 2048.</p></article>
+        <article><header><h3><a class="stretched" href="2048-sol-6.1-medium/">Sol 6.1 · medium</a></h3></header><p>HEX / 2048.</p></article>
+        <article><header><h3><a class="stretched" href="hex2048-3d/">Hex 2048 · 3D</a></h3></header><p>Hexagonal board rendered with Three.js.</p></article>
+        <article><header><h3><a class="stretched" href="2048-qbas/2048-qbasic.bas">Hex 2048 · QBasic</a></h3></header><p>Source for QBJS (qbjs.org).</p><small>.bas source</small></article>
+      </div>
+    </section>
+
+    <section>
+      <h2>Games &amp; toys</h2>
+      <div class="grid">
+        <article><header><h3><a class="stretched" href="td-opus-5.5-high/">Hex Bastion</a></h3></header><p>Tower defense on a hex grid.</p></article>
+        <article><header><h3><a class="stretched" href="fact-rocket/">Fact Rocket</a></h3></header><p>Fly a rocket by answering math facts.</p></article>
+        <article><header><h3><a class="stretched" href="math-garden/">Number Garden</a></h3></header><p>A little practice, a lot of growth. Addition and subtraction rounds.</p></article>
+        <article><header><h3><a class="stretched" href="hohmann-works/">Hohmann Works</a></h3></header><p>Orbital logistics: build stations and orbits.</p></article>
+      </div>
+    </section>
+
+    <section>
+      <h2>Worship planner mockups</h2>
+      <p>UI prototypes for a churches of Christ worship planner.</p>
+      <div class="grid">
+        <article><header><h3><a class="stretched" href="worship-planner/">Lectern</a></h3></header><p>Original planner.</p><small><a href="worship-planner/fluent.html">Fluent variant</a></small></article>
+        <article><header><h3><a class="stretched" href="worship-planner-sonnet-5.5/">Selah</a></h3></header><p>Desktop mockup, Sonnet 5.5.</p><small><a href="worship-planner-sonnet-5.5/mobile.html">Mobile</a></small></article>
+        <article><header><h3><a class="stretched" href="worship-planner-astra-6/">Gather</a></h3></header><p>Astra 6 prototype.</p><small><a href="worship-planner-astra-6/fluent.html">Fluent variant</a></small></article>
+      </div>
+    </section>
+
+    <section>
+      <h2>Tools</h2>
+      <p>Python projects; see the README for how to run.</p>
+      <div class="grid">
+        <article><header><h3><a class="stretched" href="overhead/README.md">Overhead</a></h3></header><p>Live aircraft around you: 2D map, tilted 3D map, and sky dome.</p></article>
+        <article><header><h3><a class="stretched" href="tx-lege/README.md">tx-lege</a></h3></header><p>Full legislative history of a Texas bill: actions, versions, amendments.</p></article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="container"><small>Served from the repo root. Open with any static file server.</small></footer>
+</body>
+</html>
