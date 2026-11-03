@@ -3,8 +3,8 @@
 - **Model:** claude-opus-5-5
 - **Effort:** high
 - **Session(s):** 540952f4-8304-48e4-9ec2-8c013e57d96c
-- **Tokens:** input 354, output 136831, cache read 26143362, cache write 329716
-- **Cost (tokscale estimate):** $10.6
+- **Tokens:** input 410, output 172346, cache read 31871987, cache write 378748
+- **Cost (tokscale estimate):** $12.85
 
 ## You
 
@@ -524,6 +524,80 @@ I added your two Purple Coneflowers as plants 13 and 20, which brings the map to
 - The plan tab has a matching "13, 20" care note.
 
 **Plan:** the two coneflowers I proposed (D) stay where they were, below the middle magnolia, and the entry now says you already grow two. The new plants sit inside the salvia masses, so coverage doesn't change: 38% today, 45% next summer as is, 73% with the plan.
+
+## You
+
+Commit and push
+
+## Claude
+
+Rebuilt `prompt.md`: restored the blurred screenshots and the sign redactions, and dropped the old close-ups. Checking the new screenshots 046–048, which look like this session's close-ups.
+
+*(Close-up photos of plants omitted.)*
+
+Committed and pushed to `origin/master` as `bd556eb`. Only the `garden-map/` folder went in. The other uncommitted changes in the repo (the Hexahedron files and the root `index.html`) stay out of the commit, untouched.
+
+The commit has:
+- all the plant fixes from this round, which bring the map to 22 plants
+- the care-by-species cards on the Now tab
+- the hanging mandevilla pots on the plan tab
+- a refreshed `prompt.md`
+
+For `prompt.md`:
+- **Signs:** regenerating it brought back the unblurred screenshots, so I swapped in the blurred versions again. The school and company names are replaced again too; neither name appears in `prompt.md` or the page.
+- **Close-ups:** I left out the old close-ups and the three you showed this round. A one-line note marks where each set was.
+- **Screenshots:** the 16 new ones are map views or crops of the already-blurred video frames.
+- **Cost:** the estimated session cost so far is about $10.60.
+
+## You
+
+Can we get a 3d render of the next year plan?
+
+## Claude
+
+Building it as a third tab: a Three.js scene loaded only when the tab opens, drawn from the same plan data.
+
+![screenshot 64](prompt-assets/064.jpg)
+
+Scene renders without errors. The lawn view shows too much lawn, so I'm lowering the framing; I'm also pushing the background trees back.
+
+![screenshot 65](prompt-assets/065.png)
+
+Click-to-name works (you'd selected G). Checking the other two views.
+
+![screenshot 66](prompt-assets/066.png)
+
+![screenshot 67](prompt-assets/067.png)
+
+![screenshot 68](prompt-assets/068.png)
+
+"Along the fence" puts the camera behind the left wooden fence, so the wall fills the view. Moving that camera inside the yard.
+
+![screenshot 69](prompt-assets/069.png)
+
+Along-the-fence view works. Checking phone width and tab switching.
+
+![screenshot 70](prompt-assets/070.jpg)
+
+I added a third tab, "Next year in 3D", with a 3D model of the plan that you can turn and zoom. It's in the preview now, and it looks like you've already been using it. It works at desktop and phone width with no console errors. Nothing is committed yet.
+
+- **What's in the scene:** everything comes from the same plan data as the 2D map, so later plan changes show up here too.
+  - **Existing plants:** your 22, at next summer's size.
+  - **New plants:** A–N from the plan.
+  - **Hardscape:** the mulch bed, both river-rock areas, the stepping stones, the iron fence with its posts and gate, the wooden fences on each side, and the trail and tree line beyond.
+- **Plant shapes:**
+  - Magnolias are evergreen columns, and the crape myrtles have bare trunks (pool noodles included on yours) under pink-flowered canopies.
+  - The salvias and speedwells have flower spikes, the coneflowers and daisies have flower heads on stems, and the Gulf Muhly is grass with a pink haze.
+  - The mandevillas hang in pots from brackets on the posts, and the Coral Honeysuckle covers a stretch of the fence.
+- **How it looks:** midsummer with everything blooming at once, so it's a best case, not any single week.
+- **Controls:**
+  - Drag to turn, scroll or pinch to zoom, and right-drag or two-finger drag to pan.
+  - Three preset buttons: "From the lawn", "From above" and "Along the fence".
+  - Number and letter labels match the map and can be turned off.
+  - Clicking a plant or its label shows its name, its Photos and Wikipedia links, its size, and whether it's new.
+- **Loading:** the 3D library loads only when the tab is first opened, so the other two tabs stay as fast as before. You can link straight to it with `#3d`.
+- **On a phone:** the narrow screen shows only part of the 50 ft bed at once, so you have to pinch out or turn to see the rest.
+- **Files:** the new code is in `garden-map/plan3d.js`; `index.html` has the tab and styles.
 
 ## You
 

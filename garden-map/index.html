@@ -100,6 +100,17 @@ tbody tr:hover, tbody tr.sel { background: color-mix(in srgb, var(--accent) 12%,
 .facts dt { color: var(--muted); }
 .facts dd { margin: 0; }
 .swatch { width: 100%; height: 10px; border-radius: 5px; }
+.view3d { position: relative; height: min(72vh, 640px); min-height: 380px; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: #bcd9ee; }
+.view3d canvas { display: block; touch-action: none; }
+.v3-ui { position: absolute; top: 10px; left: 10px; right: 10px; display: flex; flex-wrap: wrap; gap: 6px; z-index: 2; pointer-events: none; }
+.v3-ui > * { pointer-events: auto; }
+.v3-ui button, .v3-ui label { font: inherit; font-size: 13px; color: #23271f; background: rgba(255,255,255,.86); border: 1px solid rgba(0,0,0,.15); border-radius: 6px; padding: 4px 10px; cursor: pointer; }
+.v3-ui label { display: flex; align-items: center; gap: 5px; }
+.v3-info { position: absolute; left: 10px; bottom: 10px; max-width: min(340px, calc(100% - 20px)); z-index: 2; background: rgba(255,255,255,.92); color: #23271f; border-radius: 8px; padding: 10px 12px; font-size: 14px; box-shadow: 0 2px 8px rgba(0,0,0,.2); }
+.v3-info .sci, .v3-info .meta { color: #6b705f; }
+.v3-info .links a { color: #2f6b4f; }
+.v3-status { position: absolute; inset: 0; display: grid; place-items: center; color: #23271f; font-size: 14px; }
+.lbl3d { font: 700 11px/18px system-ui, sans-serif; color: #fff; min-width: 18px; height: 18px; padding: 0 4px; border-radius: 9px; text-align: center; border: 1px solid rgba(255,255,255,.8); box-shadow: 0 1px 3px rgba(0,0,0,.35); cursor: pointer; }
 h3 { font-size: 16px; margin: 24px 0 0; }
 .care-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 12px; margin-top: 10px; }
 .care-card h4 { font-size: 15px; margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
@@ -113,6 +124,7 @@ h3 { font-size: 16px; margin: 24px 0 0; }
   <nav class="tabs" role="tablist">
     <button role="tab" data-tab="now" aria-selected="true">Now</button>
     <button role="tab" data-tab="plan" aria-selected="false">Next year plan</button>
+    <button role="tab" data-tab="3d" aria-selected="false">Next year in 3D</button>
   </nav>
 
   <section id="tab-now">
@@ -172,8 +184,26 @@ h3 { font-size: 16px; margin: 24px 0 0; }
     <h3>Care notes for what you have</h3>
     <ul class="notes" id="care"></ul>
   </section>
+
+  <section id="tab-3d" hidden>
+    <p class="sub">The plan in 3D, shown in midsummer with everything in bloom at once. Sizes are typical for each plant's second season. Drag to turn the view, scroll or pinch to zoom, right-drag or drag with two fingers to pan, and click a plant to name it.</p>
+    <div class="view3d" id="view3d">
+      <div class="v3-ui">
+        <button data-view="lawn">From the lawn</button>
+        <button data-view="above">From above</button>
+        <button data-view="along">Along the fence</button>
+        <label><input type="checkbox" id="v3labels" checked> Labels</label>
+      </div>
+      <div class="v3-info" id="v3info" hidden></div>
+      <div class="v3-status" id="v3status">Loading 3D view…</div>
+    </div>
+  </section>
 </main>
 
+<script type="importmap">{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
+} }</script>
 <script>
 const DURATION = 38.7, WIDTH = 50, DEPTH = 7;
 
@@ -567,17 +597,22 @@ function planSelect(key) {
 
 drawStats(); drawPlan(); drawPlanTable(); planSelect("A");
 
-// tabs; #plan in the URL opens the plan
+// tabs; #plan or #3d in the URL opens that tab. The 3D view loads Three.js on first open.
+let view3d;
 function showTab(name) {
   document.querySelectorAll(".tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === name));
-  document.getElementById("tab-now").hidden = name !== "now";
-  document.getElementById("tab-plan").hidden = name !== "plan";
+  for (const t of ["now", "plan", "3d"]) document.getElementById(`tab-${t}`).hidden = name !== t;
+  if (name === "3d") {
+    view3d ??= import("./plan3d.js").then(m => m.init(document.getElementById("view3d")))
+      .catch(e => { document.getElementById("v3status").textContent = "Couldn't load the 3D view."; console.error(e); });
+    view3d.then(v => v?.resize());
+  }
 }
 document.querySelectorAll(".tabs button").forEach(b => b.addEventListener("click", () => {
   showTab(b.dataset.tab);
-  history.replaceState(null, "", b.dataset.tab === "plan" ? "#plan" : location.pathname);
+  history.replaceState(null, "", b.dataset.tab === "now" ? location.pathname : `#${b.dataset.tab}`);
 }));
-showTab(location.hash === "#plan" ? "plan" : "now");
+showTab({ "#plan": "plan", "#3d": "3d" }[location.hash] ?? "now");
 </script>
 </body>
 </html>
