@@ -4,13 +4,13 @@ Live aircraft around you, in the browser: 2D map, tilted 3D map with altitude, a
 "Sky" dome showing what is above you — all rotatable to match the direction you face.
 
 ```bash
-python3 overhead/server.py      # http://localhost:8795
+python3 overhead-opus-5.5-high/server.py      # http://localhost:8795
 ```
 
 To use it from other devices (a phone or tablet at the airport fence, another computer):
 
 ```bash
-python3 overhead/server.py --host 0.0.0.0 --https      # prints the LAN URLs to open
+python3 overhead-opus-5.5-high/server.py --host 0.0.0.0 --https      # prints the LAN URLs to open
 ```
 
 `--host 0.0.0.0` listens on every interface (plain `http://` works for viewing). Browsers only
@@ -34,8 +34,8 @@ location and data source are fixed; demo settings are stored separately from liv
 Re-record (needs network; polls the provider directly, no server needed):
 
 ```bash
-python3 overhead/tools/record_demo.py --minutes 15                 # Dallas–Fort Worth
-python3 overhead/tools/record_demo.py --lat 51.47 --lon -0.45 --name "London Heathrow"
+python3 overhead-opus-5.5-high/tools/record_demo.py --minutes 15                 # Dallas–Fort Worth
+python3 overhead-opus-5.5-high/tools/record_demo.py --lat 51.47 --lon -0.45 --name "London Heathrow"
 ```
 
 The recording leaves out aircraft flagged for limited display (LADD) or privacy addresses (PIA),

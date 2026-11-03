@@ -103,7 +103,7 @@ export class MapView {
   }
 
   syncBuildings() {
-    const m = this.map, id = "overhead-buildings";
+    const m = this.map, id = "overhead-opus-5.5-high-buildings";
     if (!m.isStyleLoaded() && !m.getSource("openmaptiles")) return;
     const show = this.buildings.on && this.mode === "3d";
     if (!m.getLayer(id)) {

@@ -93,6 +93,18 @@
         "sixfold"
       ],
       "port": 8797
+    },
+    {
+      "name": "2048-asm",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8799",
+        "-d",
+        "2048-asm-opus-5.5-high"
+      ],
+      "port": 8799
     }
   ]
 }

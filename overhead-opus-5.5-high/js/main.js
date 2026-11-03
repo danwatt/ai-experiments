@@ -19,7 +19,7 @@ try {
   console.error(e);
 }
 // demo settings are kept apart so trying the demo never moves your real home location
-const LS_KEY = DEMO ? "overhead.demo.v1" : "overhead.v1";
+const LS_KEY = DEMO ? "overhead-opus-5.5-high.demo.v1" : "overhead-opus-5.5-high.v1";
 
 // ---------------------------------------------------------------- settings
 const DEFAULTS = {
