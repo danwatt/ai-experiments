@@ -13,7 +13,7 @@ trap 'rm -rf "$tmp"' EXIT
 find "$root" \( -name node_modules -o -name '.*' -not -name . \) -prune -o \
   \( -name prompt.md -o -name README.md \) -type f -print | while read -r md; do
   out="${md%.md}.html"
-  title=$(grep -m1 '^# ' "$md" | sed 's/^# //; s/&/\&amp;/g; s/</\&lt;/g')
+  title=$({ grep -m1 '^# ' "$md" || true; } | sed 's/^# //; s/&/\&amp;/g; s/</\&lt;/g')
   body=$(node --input-type=module -e "
     import {marked} from '$tmp/node_modules/marked/lib/marked.esm.js';
     import fs from 'fs';
