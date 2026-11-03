@@ -57,4 +57,4 @@ Home/Up/PgUp/End/Down/PgDn on the numpad also work. `R` starts a new game, `Esc`
 ## Status
 
 - The game logic is verified by `tools/test.py`.
-- **The browser page is not confirmed working yet.** Hosted as a claude.ai artifact, both `dosboxDirect` and `dosboxWorker` froze the Chrome tab before the first frame. The likely cause is the artifact sandbox's CSP, since js-dos loads its runtime with `eval` and `fetch`. Here it is served as plain static files, which may simply fix it. If not, check DevTools first, then consider swapping to v86.
+- The browser page works when served as static files. An earlier hang at "BOOTING DOSBOX" was not js-dos: the emulator was rendering, but `.status { display: grid }` overrode the `hidden` attribute, so the overlay never went away. Fixed with `.status[hidden] { display: none; }`.
