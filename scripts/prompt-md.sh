@@ -1,12 +1,17 @@
 #!/usr/bin/env bash
-# Write <demo-dir>/prompt.md from a Claude Code session transcript:
-# user prompts, model(s), effort level(s), and token usage/cost via tokscale.
+# Write <demo-dir>/prompt.md from Claude Code session transcript(s):
+# model(s), effort level(s), token usage/cost via tokscale, then the
+# conversation (user prompts + Claude's replies) with screenshots saved to
+# <demo-dir>/prompt-assets/. Thinking and tool calls are omitted.
 #
-# Usage: scripts/prompt-md.sh <demo-dir> [session-id ...]
+# Usage: scripts/prompt-md.sh [--no-screenshots] <demo-dir> [session-id ...]
 # With no session id, uses the most recently modified transcript for this repo.
 set -euo pipefail
 
-demo_dir=${1:?usage: $0 <demo-dir> [session-id ...]}
+screenshots=1
+if [ "${1:-}" = "--no-screenshots" ]; then screenshots=0; shift; fi
+
+demo_dir=${1:?usage: $0 [--no-screenshots] <demo-dir> [session-id ...]}
 shift
 repo_root=$(cd "$(dirname "$0")/.." && pwd)
 project_dir="$HOME/.claude/projects/$(printf '%s' "$repo_root" | sed 's|[/.]|-|g')"
@@ -20,14 +25,6 @@ fi
 transcripts=()
 for s in "${sessions[@]}"; do transcripts+=("$project_dir/$s.jsonl"); done
 
-# Human-typed prompts only (skips tool results, hook/meta injections).
-prompts=$(jq -r '
-  select(.type == "user" and .origin.kind == "human" and (.isMeta | not))
-  | .message.content
-  | if type == "string" then . else map(select(.type == "text") | .text) | join("\n") end
-  | "### Prompt\n\n" + . + "\n"
-' "${transcripts[@]}")
-
 models=$(jq -r 'select(.type == "assistant" and .message.model != "<synthetic>") | .message.model' "${transcripts[@]}" | sort -u | paste -sd, - | sed 's/,/, /g')
 efforts=$(jq -r 'select(.type == "assistant") | .effort // empty' "${transcripts[@]}" | sort -u | paste -sd, - | sed 's/,/, /g')
 
@@ -39,6 +36,35 @@ usage=$(npx -y tokscale models -c claude --json --group-by session,model --no-sp
          cost: (map(.cost) | add // 0)}' || echo '{}')
 
 fmt() { jq -r "$1" <<<"$usage"; }
+
+# One JSON event per line, in transcript order:
+#   {role: "user"|"claude", text}  or  {role, image: {media_type, data}}
+events() {
+  jq -c '
+    select(.isSidechain | not)
+    | if .type == "user" and .origin.kind == "human" and (.isMeta | not) then
+        .message.content
+        | if type == "string" then {role: "user", text: .}
+          else .[] | if .type == "text" then {role: "user", text: .text}
+                     elif .type == "image" then {role: "user", image: .source}
+                     else empty end
+          end
+      elif .type == "user" and (.message.content | type) == "array" then
+        .message.content[] | select(.type == "tool_result")
+        | .. | objects | select(.type == "image" and .source.type == "base64")
+        | {role: "claude", image: .source}
+      elif .type == "assistant" then
+        .message.content[] | select(.type == "text" and (.text | test("\\S")))
+        | {role: "claude", text: .text}
+      else empty end
+  ' "${transcripts[@]}"
+}
+
+assets="$demo_dir/prompt-assets"
+rm -rf "$assets"
+out="$demo_dir/prompt.md"
+n=0
+last=""
 
 {
   echo "# Prompts"
@@ -52,8 +78,28 @@ fmt() { jq -r "$1" <<<"$usage"; }
   else
     echo "- **Cost:** unavailable (tokscale failed)"
   fi
-  echo
-  echo "$prompts"
-} > "$demo_dir/prompt.md"
 
-echo "wrote $demo_dir/prompt.md"
+  events | while IFS= read -r ev; do
+    role=$(jq -r .role <<<"$ev")
+    if [ "$role" != "$last" ]; then
+      echo
+      if [ "$role" = user ]; then echo "## You"; else echo "## Claude"; fi
+      last=$role
+    fi
+    if jq -e 'has("image")' <<<"$ev" >/dev/null; then
+      [ "$screenshots" = 1 ] || continue
+      n=$((n + 1))
+      ext=$(jq -r '.image.media_type | sub("^image/"; "") | sub("jpeg"; "jpg")' <<<"$ev")
+      file=$(printf '%03d.%s' "$n" "$ext")
+      mkdir -p "$assets"
+      jq -r .image.data <<<"$ev" | base64 -d > "$assets/$file"
+      echo
+      echo "![screenshot $n](prompt-assets/$file)"
+    else
+      echo
+      jq -r .text <<<"$ev"
+    fi
+  done
+} > "$out"
+
+echo "wrote $out"
