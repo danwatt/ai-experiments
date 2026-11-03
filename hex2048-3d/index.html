@@ -1,0 +1,891 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Hex 2048</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-0: #0a0c1c;
+    --bg-1: #151a38;
+    --bg-2: #2a3170;
+    --ink: #eef0ff;
+    --ink-dim: #9aa3d6;
+    --glass: rgba(255, 255, 255, 0.07);
+    --glass-edge: rgba(255, 255, 255, 0.12);
+    --accent: #f8ad5c;
+    --accent-2: #f4824b;
+    --gutter: 16px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; overflow: hidden; }
+  body {
+    background: radial-gradient(ellipse 120% 90% at 50% 25%, var(--bg-2) 0%, var(--bg-1) 50%, var(--bg-0) 100%);
+    color: var(--ink);
+    font-family: Fredoka, "Segoe UI", system-ui, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+  #scene { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; outline: none; }
+
+  .hud {
+    position: fixed; left: 0; right: 0;
+    padding: max(var(--gutter), env(safe-area-inset-top)) max(var(--gutter), env(safe-area-inset-right)) var(--gutter) max(var(--gutter), env(safe-area-inset-left));
+    display: flex; gap: 12px; align-items: center; justify-content: space-between;
+    pointer-events: none;
+  }
+  .hud > * { pointer-events: auto; }
+  .hud.top { top: 0; }
+  .hud.bottom {
+    bottom: 0; flex-direction: column; gap: 10px;
+    padding-top: var(--gutter); padding-bottom: max(var(--gutter), env(safe-area-inset-bottom));
+  }
+
+  .brand h1 { margin: 0; font-size: 30px; font-weight: 700; letter-spacing: 0.04em; line-height: 1; }
+  .brand h1 span {
+    margin-left: 6px;
+    background: linear-gradient(135deg, #f6d68a, var(--accent-2) 55%, #de3b7c);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .brand p { margin: 4px 0 0; font-size: 13px; color: var(--ink-dim); font-weight: 500; }
+
+  .scores { display: flex; gap: 8px; }
+  .score {
+    position: relative; min-width: 76px; padding: 6px 12px; text-align: center;
+    background: var(--glass); border: 1px solid var(--glass-edge); border-radius: 12px;
+    backdrop-filter: blur(6px);
+  }
+  .score label { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--ink-dim); }
+  .score output { display: block; font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .gain {
+    position: absolute; left: 0; right: 0; top: 50%; font-weight: 700; color: var(--accent);
+    opacity: 0; pointer-events: none;
+  }
+  .gain.show { animation: rise 700ms ease-out forwards; }
+  @keyframes rise {
+    0% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-34px); }
+  }
+
+  .controls { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+  button, select {
+    font: inherit; font-size: 15px; font-weight: 500; color: var(--ink);
+    padding: 9px 16px; border-radius: 12px; cursor: pointer;
+    background: var(--glass); border: 1px solid var(--glass-edge);
+    backdrop-filter: blur(6px);
+    transition: background 120ms, transform 120ms, opacity 120ms;
+  }
+  select { appearance: none; padding-right: 16px; }
+  select option { background: var(--bg-1); color: var(--ink); }
+  button:hover:not(:disabled), select:hover { background: rgba(255, 255, 255, 0.13); }
+  button:active:not(:disabled) { transform: translateY(1px); }
+  button:disabled { opacity: 0.4; cursor: default; }
+  button:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  button.primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    border-color: transparent; color: #2a1608; font-weight: 700;
+  }
+  button.primary:hover:not(:disabled) { background: linear-gradient(135deg, #ffbf75, #ff935c); }
+
+  .hint { margin: 0; font-size: 13px; color: var(--ink-dim); text-align: center; }
+  kbd {
+    display: inline-block; min-width: 20px; padding: 1px 5px; margin: 0 1px;
+    font: inherit; font-size: 12px; font-weight: 700; color: var(--ink);
+    border: 1px solid var(--glass-edge); border-bottom-width: 2px; border-radius: 5px;
+    background: var(--glass);
+  }
+
+  .overlay {
+    position: fixed; inset: 0; display: grid; place-items: center; padding: var(--gutter);
+    background: rgba(8, 10, 24, 0.55); backdrop-filter: blur(3px);
+    animation: fade 220ms ease-out;
+  }
+  .overlay[hidden] { display: none; }
+  .card {
+    width: min(340px, 100%); padding: 24px; text-align: center;
+    background: rgba(26, 31, 66, 0.92); border: 1px solid var(--glass-edge); border-radius: 20px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+    animation: pop 260ms cubic-bezier(.2, 1.4, .4, 1);
+  }
+  .card h2 { margin: 0 0 6px; font-size: 30px; }
+  .card p { margin: 0 0 20px; color: var(--ink-dim); }
+  .card .row { display: flex; gap: 8px; justify-content: center; }
+  @keyframes fade { from { opacity: 0; } }
+  @keyframes pop { from { opacity: 0; transform: scale(0.9); } }
+
+  @media (max-width: 480px) {
+    .brand h1 { font-size: 24px; }
+    .brand p { display: none; }
+    .score { min-width: 64px; padding: 5px 9px; }
+    .score output { font-size: 19px; }
+    button, select { padding: 8px 12px; font-size: 14px; }
+    .hint .keys { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .gain.show, .overlay, .card { animation-duration: 1ms; }
+  }
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
+  }
+}
+</script>
+</head>
+<body>
+<canvas id="scene" tabindex="-1"></canvas>
+
+<header class="hud top" id="hud-top">
+  <div class="brand">
+    <h1>HEX<span>2048</span></h1>
+    <p>Six ways to slide. One tile to rule them all.</p>
+  </div>
+  <div class="scores">
+    <div class="score"><label>Score</label><output id="score">0</output><span id="gain" class="gain"></span></div>
+    <div class="score"><label>Best</label><output id="best">0</output></div>
+  </div>
+</header>
+
+<footer class="hud bottom" id="hud-bottom">
+  <div class="controls">
+    <button id="undo" type="button" title="Undo (Z)">Undo</button>
+    <select id="size" title="Board size" aria-label="Board size">
+      <option value="2">Small · 19</option>
+      <option value="3">Medium · 37</option>
+      <option value="4">Large · 61</option>
+    </select>
+    <button id="new" type="button" class="primary">New game</button>
+  </div>
+  <p class="hint"><span class="keys"><kbd>Q</kbd><kbd>W</kbd><kbd>E</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> to slide · </span>swipe or tap the key caps</p>
+</footer>
+
+<div id="overlay" class="overlay" hidden>
+  <div class="card" role="dialog" aria-modal="true" aria-labelledby="ov-title">
+    <h2 id="ov-title"></h2>
+    <p id="ov-text"></p>
+    <div class="row" id="ov-actions"></div>
+  </div>
+</div>
+
+<script type="module">
+import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+// ---------------------------------------------------------------------------
+// Hex math. Flat-top hexes in axial coords (q, r). The six slide directions
+// line up with the Q W E / A S D block on a keyboard.
+// ---------------------------------------------------------------------------
+const SQ3 = Math.sqrt(3);
+const DIRS = [
+  { key: 'w', dq: 0,  dr: -1 },  // N
+  { key: 'e', dq: 1,  dr: -1 },  // NE
+  { key: 'd', dq: 1,  dr: 0 },   // SE
+  { key: 's', dq: 0,  dr: 1 },   // S
+  { key: 'a', dq: -1, dr: 1 },   // SW
+  { key: 'q', dq: -1, dr: 0 },   // NW
+];
+const key = (q, r) => q + ',' + r;
+const toWorld = (q, r) => ({ x: 1.5 * q, z: SQ3 * (r + q / 2) });
+
+// ---------------------------------------------------------------------------
+// Game rules (no rendering in here)
+// ---------------------------------------------------------------------------
+class Game {
+  constructor(n) {
+    this.n = n;
+    this.cells = [];
+    for (let q = -n; q <= n; q++)
+      for (let r = Math.max(-n, -q - n); r <= Math.min(n, -q + n); r++) this.cells.push({ q, r });
+    this.valid = new Set(this.cells.map(c => key(c.q, c.r)));
+    this.tiles = new Map();
+    this.score = 0;
+    this.won = false;
+    this.nextId = 1;
+  }
+  on(q, r) { return this.valid.has(key(q, r)); }
+  add(q, r, value) {
+    const t = { id: this.nextId++, q, r, value };
+    this.tiles.set(key(q, r), t);
+    return t;
+  }
+  spawn() {
+    const free = this.cells.filter(c => !this.tiles.has(key(c.q, c.r)));
+    if (!free.length) return null;
+    const c = free[Math.floor(Math.random() * free.length)];
+    return this.add(c.q, c.r, Math.random() < 0.9 ? 2 : 4);
+  }
+  // Slide every line toward direction d. Returns what moved and what merged.
+  move(d) {
+    const moves = [], merged = [], next = new Map();
+    let gained = 0;
+    for (const c of this.cells) {
+      if (this.on(c.q + d.dq, c.r + d.dr)) continue; // only start from the leading edge
+      const line = [];
+      for (let q = c.q, r = c.r; this.on(q, r); q -= d.dq, r -= d.dr) line.push({ q, r });
+      let slot = 0, last = null;
+      for (const p of line) {
+        const t = this.tiles.get(key(p.q, p.r));
+        if (!t) continue;
+        if (last && !last.merged && last.value === t.value) {
+          last.merged = true;
+          last.value *= 2;
+          gained += last.value;
+          moves.push({ tile: t, q: last.q, r: last.r, into: last });
+          merged.push(last);
+        } else {
+          const dest = line[slot++];
+          if (dest.q !== t.q || dest.r !== t.r) moves.push({ tile: t, q: dest.q, r: dest.r });
+          t.q = dest.q; t.r = dest.r;
+          next.set(key(t.q, t.r), t);
+          last = t;
+        }
+      }
+    }
+    for (const t of merged) delete t.merged;
+    this.tiles = next;
+    this.score += gained;
+    return { moved: moves.length > 0, moves, merged, gained };
+  }
+  canMove() {
+    if (this.tiles.size < this.cells.length) return true;
+    for (const t of this.tiles.values())
+      for (const d of DIRS.slice(0, 3)) {
+        const o = this.tiles.get(key(t.q + d.dq, t.r + d.dr));
+        if (o && o.value === t.value) return true;
+      }
+    return false;
+  }
+  snapshot() {
+    return { n: this.n, score: this.score, won: this.won, tiles: [...this.tiles.values()].map(t => [t.q, t.r, t.value]) };
+  }
+  static from(s) {
+    const g = new Game(s.n);
+    g.score = s.score;
+    g.won = s.won;
+    for (const [q, r, v] of s.tiles) if (g.on(q, r)) g.add(q, r, v);
+    return g;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Persistence (best-effort; the game works without it)
+// ---------------------------------------------------------------------------
+const store = {
+  get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+};
+const SAVE_KEY = 'hex2048-3d:game';
+const bestKey = n => 'hex2048-3d:best:' + n;
+
+// ---------------------------------------------------------------------------
+// Tweens
+// ---------------------------------------------------------------------------
+const MOTION = matchMedia('(prefers-reduced-motion: reduce)').matches ? 0.01 : 1;
+let tweens = [];
+function tween(dur, update, done, delay = 0) {
+  tweens.push({ start: performance.now() + delay * MOTION, dur: Math.max(1, dur * MOTION), update, done });
+}
+function stepTweens(now) {
+  const live = tweens;
+  tweens = [];
+  for (const t of live) {
+    const k = (now - t.start) / t.dur;
+    if (k < 0) { tweens.push(t); continue; }
+    t.update(Math.min(1, k));
+    if (k >= 1) t.done?.(); else tweens.push(t);
+  }
+}
+// Jump every running animation to its end state (used when input arrives mid-animation).
+function finishTweens() {
+  while (tweens.length) {
+    const live = tweens;
+    tweens = [];
+    for (const t of live) { t.update(1); t.done?.(); }
+  }
+}
+const easeOut = k => 1 - Math.pow(1 - k, 3);
+const easeBack = k => 1 + 2.2 * Math.pow(k - 1, 3) + 1.2 * Math.pow(k - 1, 2);
+
+// ---------------------------------------------------------------------------
+// Scene
+// ---------------------------------------------------------------------------
+await Promise.race([
+  document.fonts.load('700 100px Fredoka').catch(() => {}),
+  new Promise(r => setTimeout(r, 1500)),
+]);
+
+const canvas = document.getElementById('scene');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+const maxAniso = renderer.capabilities.getMaxAnisotropy();
+
+const scene = new THREE.Scene();
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+scene.environmentIntensity = 0.55;
+
+const camera = new THREE.PerspectiveCamera(36, innerWidth / innerHeight, 0.1, 200);
+const BASE_ELEV = THREE.MathUtils.degToRad(50);
+const look = { yaw: 0, elev: BASE_ELEV };
+const pointer = { x: 0, y: 0 };
+let camDist = 20;
+
+scene.add(new THREE.HemisphereLight(0xc4d4ff, 0x1d1534, 0.7));
+const sun = new THREE.DirectionalLight(0xfff0dc, 2.4);
+sun.position.set(-5, 12, 7);
+sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048);
+sun.shadow.bias = -0.0004;
+sun.shadow.normalBias = 0.02;
+scene.add(sun, sun.target);
+const rim = new THREE.DirectionalLight(0x8fa8ff, 0.8);
+rim.position.set(6, 4, -8);
+scene.add(rim);
+
+const world = new THREE.Group();
+const boardGroup = new THREE.Group();
+const tileGroup = new THREE.Group();
+const fxGroup = new THREE.Group();
+world.add(boardGroup, tileGroup, fxGroup);
+scene.add(world);
+
+const catcher = new THREE.Mesh(new THREE.PlaneGeometry(120, 120), new THREE.ShadowMaterial({ opacity: 0.32 }));
+catcher.rotation.x = -Math.PI / 2;
+catcher.position.y = -1.6;
+catcher.receiveShadow = true;
+scene.add(catcher);
+
+// ---------------------------------------------------------------------------
+// Geometry + materials
+// ---------------------------------------------------------------------------
+function hexPoints(r, startDeg) {
+  const pts = [];
+  for (let i = 0; i < 6; i++) {
+    const a = THREE.MathUtils.degToRad(startDeg + 60 * i);
+    pts.push(new THREE.Vector2(r * Math.cos(a), r * Math.sin(a)));
+  }
+  return pts;
+}
+const hexShape = (r, startDeg = 0) => new THREE.Shape(hexPoints(r, startDeg));
+
+// Extruded hex prism standing on y = 0, total height h.
+function hexPrism(r, h, bevel, startDeg = 0) {
+  const geo = new THREE.ExtrudeGeometry(hexShape(r - bevel, startDeg), {
+    depth: Math.max(0.001, h - 2 * bevel), bevelEnabled: bevel > 0,
+    bevelThickness: bevel, bevelSize: bevel, bevelSegments: 3, curveSegments: 1,
+  });
+  geo.rotateX(-Math.PI / 2);
+  geo.translate(0, bevel, 0);
+  return geo;
+}
+
+const CELL_GAP_R = 0.94;
+const TILE_R = 0.88;
+const TILE_Y = 0.012;
+const PALETTE = [
+  '#f3ead7', '#f6d68a', '#f8ad5c', '#f4824b', '#ec5a55', '#de3b7c', '#bb3fb5', '#8a4fd8',
+  '#5865ea', '#3690e6', '#1fb8c8', '#25c389', '#7ccf48', '#cfd545', '#f0c23a', '#ffffff',
+];
+const level = v => Math.round(Math.log2(v));
+const colorFor = v => PALETTE[Math.min(level(v), PALETTE.length) - 1];
+const tileHeight = v => 0.3 + 0.06 * level(v);
+
+const tileGeoCache = new Map(), tileMatCache = new Map(), labelMatCache = new Map();
+function tileGeo(v) {
+  if (!tileGeoCache.has(v)) tileGeoCache.set(v, hexPrism(TILE_R, tileHeight(v), 0.07));
+  return tileGeoCache.get(v);
+}
+function tileMat(v) {
+  if (!tileMatCache.has(v)) {
+    const c = new THREE.Color(colorFor(v));
+    tileMatCache.set(v, new THREE.MeshPhysicalMaterial({
+      color: c, roughness: 0.36, metalness: 0, clearcoat: 0.8, clearcoatRoughness: 0.22,
+      emissive: c, emissiveIntensity: level(v) >= 9 ? 0.28 : 0.05,
+    }));
+  }
+  return tileMatCache.get(v);
+}
+function labelMat(v) {
+  if (!labelMatCache.has(v)) {
+    const cv = document.createElement('canvas');
+    cv.width = cv.height = 256;
+    const g = cv.getContext('2d');
+    const s = String(v);
+    const size = [0, 150, 136, 112, 90, 74, 62, 52][Math.min(s.length, 7)];
+    g.font = `700 ${size}px Fredoka, "Segoe UI", system-ui, sans-serif`;
+    g.textAlign = 'center';
+    g.textBaseline = 'middle';
+    const dark = level(v) <= 2;
+    if (!dark) { g.shadowColor = 'rgba(0,0,0,0.35)'; g.shadowBlur = 10; g.shadowOffsetY = 4; }
+    g.fillStyle = dark ? '#5a4630' : '#ffffff';
+    g.fillText(s, 128, 136);
+    const tex = new THREE.CanvasTexture(cv);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    tex.anisotropy = maxAniso;
+    labelMatCache.set(v, new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, toneMapped: false }));
+  }
+  return labelMatCache.get(v);
+}
+const labelGeo = new THREE.PlaneGeometry(1.3, 1.3).rotateX(-Math.PI / 2);
+
+const slotGeo = hexPrism(CELL_GAP_R, TILE_Y, 0);
+const slotMat = new THREE.MeshStandardMaterial({ color: 0x141936, roughness: 0.85 });
+const slabMat = new THREE.MeshStandardMaterial({ color: 0x252c5c, roughness: 0.55, metalness: 0.15 });
+const ringGeo = (() => {
+  const s = hexShape(1.02);
+  s.holes.push(new THREE.Path(hexPoints(0.9, 0)));
+  return new THREE.ShapeGeometry(s).rotateX(-Math.PI / 2);
+})();
+const arrowGeo = (() => {
+  const s = new THREE.Shape([new THREE.Vector2(0, 0.24), new THREE.Vector2(-0.22, -0.1), new THREE.Vector2(0.22, -0.1)]);
+  return new THREE.ShapeGeometry(s).rotateX(-Math.PI / 2);
+})();
+
+const keyTexCache = new Map();
+function keyTexture(letter) {
+  if (!keyTexCache.has(letter)) {
+    const cv = document.createElement('canvas');
+    cv.width = cv.height = 128;
+    const g = cv.getContext('2d');
+    g.fillStyle = 'rgba(20, 24, 54, 0.85)';
+    g.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+    g.lineWidth = 5;
+    g.beginPath();
+    g.roundRect(10, 10, 108, 108, 24);
+    g.fill();
+    g.stroke();
+    g.fillStyle = '#eef0ff';
+    g.font = '700 64px Fredoka, "Segoe UI", system-ui, sans-serif';
+    g.textAlign = 'center';
+    g.textBaseline = 'middle';
+    g.fillText(letter, 64, 68);
+    const tex = new THREE.CanvasTexture(cv);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    keyTexCache.set(letter, tex);
+  }
+  return keyTexCache.get(letter);
+}
+
+// ---------------------------------------------------------------------------
+// Board
+// ---------------------------------------------------------------------------
+let keycaps = [], extent = 6, boardDisposables = [];
+const dirWorld = d => { const w = toWorld(d.dq, d.dr); const l = Math.hypot(w.x, w.z); return { x: w.x / l, z: w.z / l }; };
+
+function buildBoard(n) {
+  for (const d of boardDisposables) d.dispose();
+  boardDisposables = [];
+  boardGroup.clear();
+  keycaps = [];
+
+  // The cells of a flat-top hex grid form a pointy-top hexagon overall.
+  const slabR = (1.5 * n + 1.35) / (SQ3 / 2);
+  const slabGeo = hexPrism(slabR, 0.45, 0.12, 30);
+  slabGeo.translate(0, -0.45, 0);
+  boardDisposables.push(slabGeo);
+  const slab = new THREE.Mesh(slabGeo, slabMat);
+  slab.castShadow = slab.receiveShadow = true;
+  boardGroup.add(slab);
+
+  for (let q = -n; q <= n; q++)
+    for (let r = Math.max(-n, -q - n); r <= Math.min(n, -q + n); r++) {
+      const w = toWorld(q, r);
+      const slot = new THREE.Mesh(slotGeo, slotMat);
+      slot.position.set(w.x, 0, w.z);
+      slot.receiveShadow = true;
+      boardGroup.add(slot);
+    }
+
+  const corner = SQ3 * n;
+  for (const d of DIRS) {
+    const v = dirWorld(d);
+    const arrowMat = new THREE.MeshBasicMaterial({ color: 0x6c78c8, toneMapped: false });
+    const arrow = new THREE.Mesh(arrowGeo, arrowMat);
+    arrow.position.set(v.x * (corner + 1.05), 0.005, v.z * (corner + 1.05));
+    arrow.rotation.y = Math.atan2(-v.x, -v.z);
+    boardGroup.add(arrow);
+
+    const capMat = new THREE.SpriteMaterial({ map: keyTexture(d.key.toUpperCase()), toneMapped: false });
+    const cap = new THREE.Sprite(capMat);
+    cap.position.set(v.x * (slabR + 0.55), 0.45, v.z * (slabR + 0.55));
+    cap.scale.setScalar(0.95);
+    cap.userData = { dir: d, arrowMat, baseY: 0.45, phase: DIRS.indexOf(d) };
+    d.cap = cap;
+    boardGroup.add(cap);
+    keycaps.push(cap);
+    boardDisposables.push(arrowMat, capMat);
+  }
+
+  extent = slabR + 1.05;
+  const sc = sun.shadow.camera;
+  sc.left = sc.bottom = -(slabR + 2.5);
+  sc.right = sc.top = slabR + 2.5;
+  sc.near = 1; sc.far = 50;
+  sc.updateProjectionMatrix();
+  fitCamera();
+}
+
+const hudTop = document.getElementById('hud-top');
+const hudBottom = document.getElementById('hud-bottom');
+// Projected screen bounds of the board (slab corners + key caps) at distance dist.
+function screenBounds(dist) {
+  camera.position.set(0, dist * Math.sin(BASE_ELEV), dist * Math.cos(BASE_ELEV));
+  camera.lookAt(0, 0, 0);
+  camera.updateMatrixWorld();
+  const b = { x0: Infinity, x1: -Infinity, y0: Infinity, y1: -Infinity };
+  const p = new THREE.Vector3();
+  for (let i = 0; i < 12; i++) {
+    const a = Math.PI / 6 + (Math.PI / 6) * i;
+    for (const y of [-0.5, 1.1]) {
+      p.set(extent * Math.cos(a), y, extent * Math.sin(a)).project(camera);
+      b.x0 = Math.min(b.x0, p.x); b.x1 = Math.max(b.x1, p.x);
+      b.y0 = Math.min(b.y0, p.y); b.y1 = Math.max(b.y1, p.y);
+    }
+  }
+  return b;
+}
+function fitCamera() {
+  const W = innerWidth, H = innerHeight;
+  camera.aspect = W / H;
+  camera.clearViewOffset();
+  const top = hudTop.getBoundingClientRect().bottom;
+  const bot = hudBottom.getBoundingClientRect().top;
+  const freeH = Math.max(160, bot - top) - 12;
+  const freeW = W - 24;
+  // Binary search the closest distance at which everything fits the free area.
+  let lo = 2, hi = 200, b;
+  for (let i = 0; i < 30; i++) {
+    const mid = (lo + hi) / 2;
+    b = screenBounds(mid);
+    const fits = (b.x1 - b.x0) / 2 * W <= freeW && (b.y1 - b.y0) / 2 * H <= freeH;
+    if (fits) hi = mid; else lo = mid;
+  }
+  camDist = hi;
+  b = screenBounds(camDist);
+  const centerPx = (1 - (b.y0 + b.y1) / 2) * H / 2;
+  camera.setViewOffset(W, H, 0, centerPx - (top + bot) / 2, W, H);
+  camera.updateProjectionMatrix();
+}
+
+// ---------------------------------------------------------------------------
+// Tile meshes
+// ---------------------------------------------------------------------------
+const meshes = new Map(); // tile id -> Group
+
+function setTileValue(g, v) {
+  g.userData.body.geometry = tileGeo(v);
+  g.userData.body.material = tileMat(v);
+  g.userData.label.material = labelMat(v);
+  g.userData.label.position.y = tileHeight(v) + 0.004;
+}
+function addTileMesh(t, animate) {
+  const g = new THREE.Group();
+  const body = new THREE.Mesh(tileGeo(t.value), tileMat(t.value));
+  body.castShadow = body.receiveShadow = true;
+  const label = new THREE.Mesh(labelGeo, labelMat(t.value));
+  g.add(body, label);
+  g.userData = { body, label };
+  setTileValue(g, t.value);
+  const w = toWorld(t.q, t.r);
+  g.position.set(w.x, TILE_Y, w.z);
+  tileGroup.add(g);
+  meshes.set(t.id, g);
+  if (animate) {
+    g.scale.setScalar(0.001);
+    tween(200, k => g.scale.setScalar(Math.max(0.001, easeBack(k))), null, 70);
+  }
+}
+function removeTileMesh(id) {
+  const g = meshes.get(id);
+  if (g) { tileGroup.remove(g); meshes.delete(id); }
+}
+function syncAllTiles() {
+  finishTweens();
+  tileGroup.clear();
+  meshes.clear();
+  for (const t of game.tiles.values()) addTileMesh(t, false);
+}
+
+function popTile(g) {
+  tween(220, k => {
+    const s = Math.sin(Math.PI * k);
+    g.scale.set(1 + 0.16 * s, 1 + 0.3 * s, 1 + 0.16 * s);
+    g.position.y = TILE_Y + 0.28 * s;
+  }, () => { g.scale.setScalar(1); g.position.y = TILE_Y; });
+}
+function ringBurst(t) {
+  const w = toWorld(t.q, t.r);
+  const mat = new THREE.MeshBasicMaterial({
+    color: colorFor(t.value), transparent: true, opacity: 0.9, depthWrite: false,
+    blending: THREE.AdditiveBlending, toneMapped: false,
+  });
+  const ring = new THREE.Mesh(ringGeo, mat);
+  ring.position.set(w.x, TILE_Y + 0.02, w.z);
+  fxGroup.add(ring);
+  tween(420, k => {
+    ring.scale.setScalar(1 + 0.75 * easeOut(k));
+    mat.opacity = 0.9 * (1 - k);
+  }, () => { fxGroup.remove(ring); mat.dispose(); });
+}
+function pressCap(d) {
+  const cap = d.cap;
+  if (!cap) return;
+  const mat = cap.userData.arrowMat;
+  tween(240, k => {
+    const s = Math.sin(Math.PI * k);
+    cap.scale.setScalar(0.95 * (1 + 0.25 * s));
+    mat.color.setRGB(0.42 + 0.55 * s, 0.47 + 0.3 * s, 0.78 - 0.4 * s);
+  });
+}
+function nudge(d) {
+  const v = dirWorld(d);
+  tween(200, k => {
+    const o = 0.14 * Math.sin(Math.PI * k);
+    world.position.set(v.x * o, 0, v.z * o);
+  }, () => world.position.set(0, 0, 0));
+}
+
+function animateMove(res, spawned) {
+  for (const m of res.moves) {
+    const g = meshes.get(m.tile.id);
+    const from = g.position.clone();
+    const to = toWorld(m.q, m.r);
+    tween(130, k => {
+      const e = easeOut(k);
+      g.position.x = from.x + (to.x - from.x) * e;
+      g.position.z = from.z + (to.z - from.z) * e;
+    });
+  }
+  tween(130, () => {}, () => {
+    for (const m of res.moves) if (m.into) removeTileMesh(m.tile.id);
+    for (const t of res.merged) {
+      const g = meshes.get(t.id);
+      setTileValue(g, t.value);
+      popTile(g);
+      ringBurst(t);
+    }
+    if (spawned) addTileMesh(spawned, true);
+  });
+}
+
+// ---------------------------------------------------------------------------
+// HUD + overlay
+// ---------------------------------------------------------------------------
+const $ = id => document.getElementById(id);
+let game, prev = null, best = 0, overlayOpen = false, primaryAction = null;
+
+function updateHud(gained = 0) {
+  $('score').textContent = game.score;
+  if (game.score > best) { best = game.score; store.set(bestKey(game.n), best); }
+  $('best').textContent = best;
+  $('undo').disabled = !prev;
+  if (gained) {
+    const el = $('gain');
+    el.textContent = '+' + gained;
+    el.classList.remove('show');
+    void el.offsetWidth;
+    el.classList.add('show');
+  }
+}
+function showOverlay(title, text, actions) {
+  $('ov-title').textContent = title;
+  $('ov-text').textContent = text;
+  const row = $('ov-actions');
+  row.replaceChildren();
+  primaryAction = null;
+  for (const a of actions) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = a.label;
+    if (a.primary) { b.className = 'primary'; primaryAction = a.fn; }
+    b.addEventListener('click', a.fn);
+    row.append(b);
+  }
+  $('overlay').hidden = false;
+  overlayOpen = true;
+  row.querySelector('.primary')?.focus();
+}
+function hideOverlay() {
+  $('overlay').hidden = true;
+  overlayOpen = false;
+  canvas.focus();
+}
+function showGameOver() {
+  const actions = [{ label: 'New game', fn: () => newGame(), primary: true }];
+  if (prev) actions.unshift({ label: 'Undo', fn: undo });
+  showOverlay('Out of moves', `Final score ${game.score.toLocaleString()}.`, actions);
+}
+function showWin() {
+  showOverlay('2048!', 'You built the tile. The board is still yours.', [
+    { label: 'New game', fn: () => newGame() },
+    { label: 'Keep going', fn: () => { hideOverlay(); if (!game.canMove()) showGameOver(); }, primary: true },
+  ]);
+}
+const afterAnim = fn => setTimeout(fn, 380 * MOTION + 40);
+
+// ---------------------------------------------------------------------------
+// Game flow
+// ---------------------------------------------------------------------------
+function save() { store.set(SAVE_KEY, game.snapshot()); }
+
+function newGame(n = game?.n ?? 2) {
+  hideOverlay();
+  finishTweens();
+  const resized = !game || game.n !== n;
+  game = new Game(n);
+  prev = null;
+  best = store.get(bestKey(n)) || 0;
+  if (resized) buildBoard(n);
+  syncAllTiles();
+  for (const t of [game.spawn(), game.spawn()]) addTileMesh(t, true);
+  $('size').value = String(n);
+  updateHud();
+  save();
+}
+
+function undo() {
+  if (!prev) return;
+  hideOverlay();
+  game = Game.from(prev);
+  prev = null;
+  syncAllTiles();
+  updateHud();
+  save();
+}
+
+function doMove(d) {
+  if (overlayOpen || !d) return;
+  finishTweens();
+  pressCap(d);
+  const before = game.snapshot();
+  const res = game.move(d);
+  if (!res.moved) { nudge(d); return; }
+  prev = before;
+  const spawned = game.spawn();
+  animateMove(res, spawned);
+  const reached = !game.won && res.merged.some(t => t.value >= 2048);
+  if (reached) game.won = true;
+  updateHud(res.gained);
+  save();
+  if (reached) afterAnim(showWin);
+  else if (!game.canMove()) afterAnim(showGameOver);
+}
+
+// ---------------------------------------------------------------------------
+// Input
+// ---------------------------------------------------------------------------
+const KEYMAP = {
+  KeyW: 'w', KeyE: 'e', KeyD: 'd', KeyS: 's', KeyA: 'a', KeyQ: 'q',
+  Numpad8: 'w', Numpad9: 'e', Numpad3: 'd', Numpad2: 's', Numpad1: 'a', Numpad7: 'q',
+  ArrowUp: 'w', ArrowDown: 's',
+};
+addEventListener('keydown', e => {
+  if (e.target.closest?.('select, input, textarea')) return;
+  if (overlayOpen) {
+    if (e.key === 'Enter' && primaryAction && !e.target.closest?.('button')) { e.preventDefault(); primaryAction(); }
+    return;
+  }
+  if (e.code === 'KeyZ' || e.code === 'KeyU' || e.code === 'Backspace') { e.preventDefault(); undo(); return; }
+  if (e.ctrlKey || e.metaKey || e.altKey || e.repeat) return;
+  const k = KEYMAP[e.code];
+  if (!k) return;
+  e.preventDefault();
+  doMove(DIRS.find(d => d.key === k));
+});
+
+// Pick the slide direction whose on-screen projection best matches a swipe.
+function dirFromScreen(dx, dy) {
+  const o = new THREE.Vector3(0, 0, 0).project(camera);
+  const len = Math.hypot(dx, dy);
+  let best = null, bestDot = -Infinity;
+  for (const d of DIRS) {
+    const w = toWorld(d.dq, d.dr);
+    const p = new THREE.Vector3(w.x, 0, w.z).project(camera);
+    const sx = (p.x - o.x) * innerWidth, sy = -(p.y - o.y) * innerHeight;
+    const dot = (sx * dx + sy * dy) / (Math.hypot(sx, sy) * len);
+    if (dot > bestDot) { bestDot = dot; best = d; }
+  }
+  return best;
+}
+
+const raycaster = new THREE.Raycaster();
+const ndc = new THREE.Vector2();
+function capAt(e) {
+  ndc.set(e.clientX / innerWidth * 2 - 1, -(e.clientY / innerHeight) * 2 + 1);
+  raycaster.setFromCamera(ndc, camera);
+  return raycaster.intersectObjects(keycaps)[0]?.object.userData.dir;
+}
+
+const SWIPE_PX = 30;
+let down = null;
+canvas.addEventListener('pointerdown', e => {
+  down = { x: e.clientX, y: e.clientY, id: e.pointerId, fired: false };
+  canvas.setPointerCapture(e.pointerId);
+});
+canvas.addEventListener('pointermove', e => {
+  if (e.pointerType === 'mouse') {
+    pointer.x = e.clientX / innerWidth * 2 - 1;
+    pointer.y = e.clientY / innerHeight * 2 - 1;
+    if (!down) canvas.style.cursor = capAt(e) ? 'pointer' : '';
+  }
+  if (!down || down.fired || down.id !== e.pointerId) return;
+  const dx = e.clientX - down.x, dy = e.clientY - down.y;
+  if (Math.hypot(dx, dy) > SWIPE_PX) { down.fired = true; doMove(dirFromScreen(dx, dy)); }
+});
+canvas.addEventListener('pointerup', e => {
+  if (!down || down.id !== e.pointerId) return;
+  const tap = !down.fired;
+  down = null;
+  if (tap) doMove(capAt(e));
+});
+canvas.addEventListener('pointercancel', () => { down = null; });
+document.addEventListener('mouseleave', () => { pointer.x = pointer.y = 0; });
+
+$('new').addEventListener('click', () => newGame());
+$('undo').addEventListener('click', undo);
+$('size').addEventListener('change', e => newGame(Number(e.target.value)));
+addEventListener('resize', () => { renderer.setSize(innerWidth, innerHeight); fitCamera(); });
+
+// ---------------------------------------------------------------------------
+// Boot + render loop
+// ---------------------------------------------------------------------------
+const saved = store.get(SAVE_KEY);
+if (saved && [2, 3, 4].includes(saved.n) && Array.isArray(saved.tiles) && saved.tiles.length) {
+  game = Game.from(saved);
+  best = Math.max(store.get(bestKey(game.n)) || 0, game.score);
+  buildBoard(game.n);
+  syncAllTiles();
+  $('size').value = String(game.n);
+  updateHud();
+  if (!game.canMove()) showGameOver();
+} else {
+  newGame(2);
+}
+
+function frame(now) {
+  stepTweens(now);
+  look.yaw += (pointer.x * 0.08 - look.yaw) * 0.05;
+  look.elev += (BASE_ELEV - pointer.y * 0.05 - look.elev) * 0.05;
+  camera.position.set(
+    camDist * Math.cos(look.elev) * Math.sin(look.yaw),
+    camDist * Math.sin(look.elev),
+    camDist * Math.cos(look.elev) * Math.cos(look.yaw),
+  );
+  camera.lookAt(0, 0, 0);
+  for (const cap of keycaps) cap.position.y = cap.userData.baseY + 0.06 * Math.sin(now / 700 + cap.userData.phase);
+  renderer.render(scene, camera);
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

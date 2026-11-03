@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#f4f0e7">
+<title>HEX / 2048</title>
+<style>
+:root{color-scheme:light;--paper:#f4f0e7;--ink:#233d38;--muted:#697a72;--line:#d7ddd0;--green:#315f4c}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:Arial,Helvetica,sans-serif}button{font:inherit;cursor:pointer;touch-action:manipulation}button:focus-visible{outline:3px solid #bd6c35;outline-offset:4px}button:disabled{opacity:.4;cursor:default}
+.page{max-width:1080px;margin:auto;padding:48px 44px 24px}.top{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding-bottom:22px}.brand{font-size:12px;letter-spacing:2.5px;font-weight:700;display:flex;align-items:center;gap:10px}.brand-mark{font-size:25px;line-height:1}.edition{font-size:11px;letter-spacing:2px;color:var(--muted)}
+main{display:grid;grid-template-columns:290px 1fr;gap:54px;padding-top:44px}.eyebrow{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);font-weight:700}h1{font-size:78px;line-height:.91;letter-spacing:-5px;margin:20px 0 25px;font-weight:800}h1 span{display:block;color:var(--green)}.intro{font-size:16px;line-height:1.65;max-width:260px;color:var(--muted)}.intro strong{color:var(--ink);font-weight:500}.scores{display:flex;gap:30px;margin:30px 0}.score-label{font-size:10px;letter-spacing:1.5px;color:var(--muted)}.score-value{font-size:30px;font-weight:700;line-height:1.4;font-variant-numeric:tabular-nums}.actions{display:flex;gap:9px}.primary,.secondary{border-radius:6px;padding:12px 17px;font-size:12px;font-weight:700;border:1px solid var(--green)}.primary{color:#fff;background:var(--green)}.primary:hover{background:#244b3b}.secondary{color:var(--green);background:transparent}.secondary:hover{background:#e5e9dd}.rules{margin-top:42px;border-top:1px solid var(--line);padding-top:20px}.rules p{font-size:13px;line-height:1.7;color:var(--muted);margin:9px 0}.rules strong{color:var(--ink)}
+.play{min-width:0}.board-header{display:flex;justify-content:space-between;align-items:center;font-size:11px;letter-spacing:1.5px;color:var(--muted)}.live-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--green);margin-right:6px}.board-wrap{position:relative;margin:12px auto 0;max-width:550px}.board{display:block;width:100%;height:auto;overflow:visible;touch-action:none;user-select:none}.cell{fill:#e3e5d9;stroke:var(--paper);stroke-width:5}.tile polygon{stroke:var(--paper);stroke-width:5}.tile text{font-weight:700;letter-spacing:-1px;pointer-events:none}.tile{transition:transform 150ms ease}.tile.pop{animation:pop 180ms ease-out}.tile.merge polygon{animation:flash 240ms ease-out}@keyframes pop{from{opacity:.25}to{opacity:1}}@keyframes flash{50%{filter:brightness(1.18)}}
+.controls{display:flex;justify-content:center;align-items:center;gap:22px;margin:0 auto}.pad{display:grid;grid-template-columns:repeat(3,42px);gap:5px}.direction{height:37px;border:1px solid #cad3c6;border-radius:5px;background:#eceee3;color:var(--green);font-size:18px;position:relative}.direction:hover,.direction.pressed{background:var(--green);color:white}.direction small{position:absolute;bottom:3px;right:5px;font-size:8px;opacity:.7}.control-copy{font-size:12px;line-height:1.7;color:var(--muted)}kbd{font:11px Arial,sans-serif;color:var(--ink)}.status{min-height:20px;text-align:center;font-size:12px;color:var(--muted);margin:18px 0 0}.footer{border-top:1px solid var(--line);margin-top:38px;padding-top:17px;display:flex;justify-content:space-between;gap:15px;font-size:10px;letter-spacing:1.4px;color:var(--muted)}
+.overlay{position:absolute;inset:7% 0 7%;display:flex;align-items:center;justify-content:center;background:#f4f0e7e8;border-radius:20px;backdrop-filter:blur(4px);z-index:3}.overlay[hidden]{display:none}.dialog{text-align:center;padding:24px;max-width:330px}.dialog .symbol{font-size:42px;color:#c87739}.dialog h2{font-size:34px;letter-spacing:-1px;margin:12px 0}.dialog p{font-size:14px;line-height:1.6;color:var(--muted)}.dialog .actions{justify-content:center;flex-wrap:wrap}
+@media(max-width:800px){.page{padding:28px 24px 20px}main{grid-template-columns:230px 1fr;gap:20px}h1{font-size:66px}.scores{gap:20px}.controls{gap:12px}.control-copy{font-size:11px}}
+@media(max-width:620px){.page{padding:20px 19px}.edition{font-size:9px;letter-spacing:1px}.top{padding-bottom:15px}main{display:flex;flex-direction:column;gap:24px;padding-top:24px}.info{display:grid;grid-template-columns:1fr auto;gap:0 12px}.eyebrow{grid-column:1/-1}h1{font-size:49px;letter-spacing:-3px;margin:12px 0 14px}h1 span{display:inline}.intro{grid-column:1/-1;font-size:13px;max-width:none;margin:0 0 18px}.scores{grid-column:2;grid-row:2;align-self:center;margin:0;gap:16px}.score-value{font-size:23px}.score-label{font-size:9px}.actions{grid-column:1/-1}.rules{display:none}.board-header{font-size:10px}.board-wrap{max-width:430px;margin-top:4px}.controls{margin-top:4px;gap:20px}.status{margin-top:12px}.footer{margin-top:24px;letter-spacing:.8px;font-size:9px}.primary,.secondary{padding:10px 17px}}
+@media(prefers-reduced-motion:reduce){.tile{transition:none}.tile.pop,.tile.merge polygon{animation:none}}
+</style>
+</head>
+<body>
+<div class="page">
+  <header class="top"><div class="brand"><span class="brand-mark">⬡</span> SMALL GAMES / HEX</div><div class="edition">A NEW ANGLE ON 2048</div></header>
+  <main>
+    <section class="info" aria-label="Game information">
+      <div class="eyebrow">Nº 01 · The hexagon experiment</div>
+      <h1>HEX<span>2048</span></h1>
+      <p class="intro">Same satisfying puzzle.<br><strong>Six directions. A whole new rhythm.</strong><br>Bring matching tiles together. Find your way to 2048.</p>
+      <div class="scores"><div><div class="score-label">SCORE</div><div class="score-value" id="score">0</div></div><div><div class="score-label">BEST</div><div class="score-value" id="best">0</div></div></div>
+      <div class="actions"><button class="primary" id="new-game">New game</button><button class="secondary" id="undo" disabled>↶ Undo</button></div>
+      <div class="rules"><div class="eyebrow">How to find your flow</div><p>Move the whole board in one of <strong>six directions</strong>. Equal tiles merge and add to your score.</p><p>Each move adds a new <strong>2</strong> or <strong>4</strong>. A tile can merge once per move. Keep a little breathing room.</p><p>Reach <strong>2048</strong> to win, then keep going if you like.</p></div>
+    </section>
+    <section class="play" aria-label="Hex 2048 game">
+      <div class="board-header"><span>19 CELLS · 6 DIRECTIONS</span><span><i class="live-dot"></i><span id="highest">TOP TILE 2</span></span></div>
+      <div class="board-wrap">
+        <svg id="board" class="board" viewBox="0 0 550 490" role="img" aria-label="Hexagonal game board"><g id="cells"></g><g id="tiles"></g></svg>
+        <div class="overlay" id="overlay" hidden><div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dialog-title"><div class="symbol">⬡</div><h2 id="dialog-title"></h2><p id="dialog-copy"></p><div class="actions"><button class="primary" id="dialog-main"></button><button class="secondary" id="dialog-secondary"></button></div></div></div>
+      </div>
+      <div class="controls"><div class="pad" aria-label="Movement controls">
+        <button class="direction" data-dir="0" aria-label="Move northwest, Q">↖<small>Q</small></button><button class="direction" data-dir="1" aria-label="Move north, W or up arrow">↑<small>W</small></button><button class="direction" data-dir="2" aria-label="Move northeast, E or right arrow">↗<small>E</small></button>
+        <button class="direction" data-dir="5" aria-label="Move southwest, A or left arrow">↙<small>A</small></button><button class="direction" data-dir="4" aria-label="Move south, S or down arrow">↓<small>S</small></button><button class="direction" data-dir="3" aria-label="Move southeast, D">↘<small>D</small></button>
+      </div><div class="control-copy">Use <kbd>Q W E / A S D</kbd><br>or swipe in any direction.</div></div>
+      <p class="status" id="status" role="status" aria-live="polite">Pick a direction. Make some room.</p>
+    </section>
+  </main>
+  <footer class="footer"><span>A LITTLE SPACE. A LOT OF POSSIBILITY.</span><span>PROGRESS SAVED ON THIS DEVICE</span></footer>
+</div>
+<script>
+(() => {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const NS = 'http://www.w3.org/2000/svg', STORAGE = 'hex2048-sol61-v1';
+  const directions = [[-1,0],[0,-1],[1,-1],[1,0],[0,1],[-1,1]];
+  const coords = [];
+  for(let q=-2;q<=2;q++) for(let r=-2;r<=2;r++) if(Math.abs(q+r)<=2) coords.push({q,r});
+  const index = new Map(coords.map((c,i)=>[`${c.q},${c.r}`,i]));
+  const neighbor = (c,d) => index.get(`${c.q+d[0]},${c.r+d[1]}`);
+  const lines = directions.map(d => coords.flatMap(c => {
+    if(neighbor(c,d)!==undefined) return [];
+    const line=[]; let n=index.get(`${c.q},${c.r}`);
+    while(n!==undefined){line.push(n);n=neighbor(coords[n],[-d[0],-d[1]]);}
+    return [line];
+  }));
+  const position = i => ({x:275+Math.sqrt(3)*49*(coords[i].q+coords[i].r/2),y:245+73.5*coords[i].r});
+  const points = Array.from({length:6},(_,i)=>{const a=(i*60-30)*Math.PI/180;return `${49*Math.cos(a)},${49*Math.sin(a)}`;}).join(' ');
+  const palette = {2:['#d9e1cb','#304738'],4:['#c3d4af','#304738'],8:['#91b591','#203f32'],16:['#638f70','#fff'],32:['#406d56','#fff'],64:['#274c3e','#fff'],128:['#dfb771','#453a24'],256:['#d79a4c','#fff'],512:['#c77738','#fff'],1024:['#b35932','#fff'],2048:['#963d2d','#fff']};
+  let board=Array(19).fill(null), score=0, best=0, nextId=1, undoState=null, won=false, busy=false, modal=null, timer=null;
+  function svg(tag,attrs){const node=document.createElementNS(NS,tag);for(const [k,v] of Object.entries(attrs))node.setAttribute(k,v);return node;}
+  coords.forEach((c,i)=>{const p=position(i);$('cells').appendChild(svg('polygon',{points,transform:`translate(${p.x} ${p.y})`,class:'cell'}));});
+  const clone = b => b.map(t=>t?{...t}:null);
+  function spawn(){const empty=board.flatMap((t,i)=>t?[]:[i]);if(!empty.length)return null;const i=empty[Math.floor(Math.random()*empty.length)];board[i]={v:Math.random()<.9?2:4,id:nextId++};return board[i].id;}
+  function render(newId=null,merged=[]){
+    $('tiles').replaceChildren();
+    board.forEach((t,i)=>{if(!t)return;const p=position(i),colors=palette[t.v]||['#603c4d','#fff'];
+      const g=svg('g',{class:`tile${t.id===newId?' pop':''}${merged.includes(t.id)?' merge':''}`,id:`tile-${t.id}`,transform:`translate(${p.x} ${p.y})`});
+      g.appendChild(svg('polygon',{points,fill:colors[0]}));
+      const label=svg('text',{x:0,y:1,'text-anchor':'middle','dominant-baseline':'middle',fill:colors[1],'font-size':t.v>=16384?19:t.v>=1024?23:t.v>=128?28:33});label.textContent=t.v;g.appendChild(label);$('tiles').appendChild(g);
+    });
+    $('score').textContent=score.toLocaleString();$('best').textContent=best.toLocaleString();$('highest').textContent=`TOP TILE ${Math.max(...board.map(t=>t?t.v:0))}`;
+    $('undo').disabled=!undoState; $('board').setAttribute('aria-label','Hexagonal board. '+board.map((t,i)=>`${coords[i].q},${coords[i].r}: ${t?t.v:'empty'}`).join('; '));
+  }
+  // Each line is ordered from the destination edge inward. Consume equal pairs once.
+  function calculate(input,dir){
+    const output=Array(19).fill(null),motions=[],merged=[];let gain=0;
+    lines[dir].forEach(line=>{const tiles=line.filter(i=>input[i]).map(i=>({...input[i],from:i}));let dest=0;
+      for(let k=0;k<tiles.length;k++){
+        const t=tiles[k],target=line[dest++];let value=t.v;
+        motions.push({id:t.id,target});
+        if(k+1<tiles.length&&tiles[k+1].v===t.v){const other=tiles[++k];motions.push({id:other.id,target});value*=2;gain+=value;merged.push(t.id);}
+        output[target]={v:value,id:t.id};
+      }
+    });
+    const changed=input.some((t,i)=>(t?t.v:0)!==(output[i]?output[i].v:0));
+    return {board:output,motions,merged,gain,changed};
+  }
+  function save(){try{localStorage.setItem(STORAGE,JSON.stringify({board,score,best,won,nextId}));}catch{document.querySelector('.footer span:last-child').textContent='PLAYING WITHOUT LOCAL SAVE';}}
+  function showModal(type){modal=type;$('overlay').hidden=false;
+    $('dialog-title').textContent=type==='win'?'A beautiful 2048.':'Out of room.';
+    $('dialog-copy').textContent=type==='win'?'Six directions, one destination. You made it. There’s still room to go further.':`You scored ${score.toLocaleString()} points. Every new board is another possibility.`;
+    $('dialog-main').textContent=type==='win'?'Keep going':'Try again';$('dialog-secondary').textContent=type==='win'?'New game':'Undo last move';$('dialog-secondary').disabled=type==='loss'&&!undoState;
+    $('dialog-main').focus();
+  }
+  function hideModal(){modal=null;$('overlay').hidden=true;}
+  function check(){if(!won&&board.some(t=>t&&t.v>=2048)){won=true;save();showModal('win');return;}if(!directions.some((_,d)=>calculate(board,d).changed))showModal('loss');}
+  function move(dir){if(busy||modal)return;const result=calculate(board,dir);
+    const btn=document.querySelector(`[data-dir="${dir}"]`);btn.classList.add('pressed');setTimeout(()=>btn.classList.remove('pressed'),160);
+    if(!result.changed){$('status').textContent='No room in that direction. Try another angle.';return;}
+    undoState={board:clone(board),score,won};busy=true;
+    result.motions.forEach(m=>{const el=$(`tile-${m.id}`),p=position(m.target);if(el)el.setAttribute('transform',`translate(${p.x} ${p.y})`);});
+    board=result.board;score+=result.gain;best=Math.max(best,score);
+    timer=setTimeout(()=>{const fresh=spawn();render(fresh,result.merged);busy=false;save();$('status').textContent=result.gain?`+${result.gain} points. Keep the space flowing.`:'A new tile. A new possibility.';check();},160);
+  }
+  function newGame(){clearTimeout(timer);busy=false;hideModal();board=Array(19).fill(null);score=0;won=false;undoState=null;spawn();spawn();render();save();$('status').textContent='Pick a direction. Make some room.';}
+  function undo(){if(!undoState||busy)return;hideModal();board=clone(undoState.board);score=undoState.score;won=undoState.won;undoState=null;render();save();$('status').textContent='One move back. Try a different angle.';}
+  $('new-game').onclick=newGame;$('undo').onclick=undo;
+  $('dialog-main').onclick=()=>{if(modal==='win'){hideModal();check();}else newGame();};
+  $('dialog-secondary').onclick=()=>modal==='win'?newGame():undo();
+  document.querySelectorAll('[data-dir]').forEach(b=>b.onclick=()=>move(Number(b.dataset.dir)));
+  const keys={q:0,w:1,e:2,d:3,s:4,a:5,ArrowUp:1,ArrowRight:2,ArrowDown:4,ArrowLeft:5};
+  document.addEventListener('keydown',event=>{
+    if(modal&&event.key==='Tab'){const first=$('dialog-main'),last=$('dialog-secondary');if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}return;}
+    if(event.ctrlKey||event.metaKey||event.altKey)return;const key=event.key.length===1?event.key.toLowerCase():event.key;
+    if(keys[key]!==undefined){event.preventDefault();move(keys[key]);}else if(key==='z'&&!modal){event.preventDefault();undo();}
+  });
+  let touch=null;
+  $('board').addEventListener('pointerdown',e=>{if(e.button!==0)return;touch={x:e.clientX,y:e.clientY,id:e.pointerId};$('board').setPointerCapture(e.pointerId);});
+  $('board').addEventListener('pointerup',e=>{if(!touch||touch.id!==e.pointerId)return;const dx=e.clientX-touch.x,dy=e.clientY-touch.y;touch=null;if(Math.hypot(dx,dy)<24)return;
+    const angle=Math.atan2(dy,dx);const angles=[-5*Math.PI/6,-Math.PI/2,-Math.PI/6,Math.PI/6,Math.PI/2,5*Math.PI/6];let chosen=0,distance=Infinity;
+    angles.forEach((a,i)=>{const delta=Math.abs(Math.atan2(Math.sin(angle-a),Math.cos(angle-a)));if(delta<distance){distance=delta;chosen=i;}});move(chosen);
+  });
+  $('board').addEventListener('pointercancel',()=>touch=null);
+  try{const data=JSON.parse(localStorage.getItem(STORAGE));if(data){best=Number.isFinite(data.best)?Math.max(0,data.best):0;
+    if(Array.isArray(data.board)&&data.board.length===19&&data.board.every(t=>t===null||(Number.isSafeInteger(t.v)&&t.v>=2&&Math.log2(t.v)%1===0&&Number.isSafeInteger(t.id)))&&data.board.some(Boolean)&&Number.isFinite(data.score)&&data.score>=0){board=clone(data.board);score=data.score;best=Math.max(best,score);won=Boolean(data.won);nextId=Math.max(...board.map(t=>t?t.id:0))+1;render();check();}else newGame();
+  }else newGame();}catch{newGame();}
+})();
+</script>
+</body>
+</html>

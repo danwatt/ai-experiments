@@ -1,0 +1,1816 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f4ecdc">
+<meta name="description" content="2048 on a hexagonal grid. Slide the tiles in six directions and merge your way up.">
+<title>Hex 2048</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-10 -9 20 18'%3E%3Cpath d='M10 0 5 8.66H-5L-10 0-5-8.66H5Z' fill='%23f1a33b'/%3E%3Cpath d='M6 0 3 5.2H-3L-6 0-3-5.2H3Z' fill='%235c4633'/%3E%3C/svg%3E">
+<style>
+/* ---------- Tokens ---------- */
+:root {
+  color-scheme: light;
+  --font: ui-rounded, "SF Pro Rounded", "Nunito", "Varela Round", "Segoe UI Variable Display", "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+  --slide: 120ms;
+  --cell: 40px;
+  --ar: .88;
+  --hex-clip: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%);
+
+  --bg: #f4ecdc;
+  --bg-glow: #fffaf1;
+  --ink: #3a2a1c;
+  --ink-2: #6c5743;
+  --ink-3: #7a6550;
+
+  --plate: #5c4633;
+  --plate-edge: #45342a;
+  --well: #4b392a;
+  --socket: #6b5440;
+  --shadow: rgba(66, 42, 18, .28);
+
+  --panel: #5c4633;
+  --panel-ink: #fdf6ea;
+  --panel-label: #d9c2a3;
+
+  --btn: #e7d9c0;
+  --btn-hover: #ddcdb0;
+  --btn-ink: #4a3726;
+  --primary: #5c4633;
+  --primary-hover: #6d5440;
+  --primary-ink: #fdf6ea;
+  --seg-on: #fffaf1;
+  --seg-shadow: rgba(66, 42, 18, .18);
+
+  --arrow: rgba(92, 70, 51, .1);
+  --arrow-hover: rgba(92, 70, 51, .2);
+  --arrow-ink: #5c4633;
+  --accent: #f1a33b;
+  --accent-ink: #3a2410;
+
+  --keycap: #fffaf1;
+  --keycap-edge: #d8c7aa;
+  --veil: rgba(244, 236, 220, .66);
+  --card: #fffaf1;
+  --toast: #3a2a1c;
+  --toast-ink: #fdf6ea;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #14100c;
+    --bg-glow: #261c13;
+    --ink: #f4e9d6;
+    --ink-2: #c4ae92;
+    --ink-3: #9a8670;
+    --plate: #2b2119;
+    --plate-edge: #3d2f24;
+    --well: #1b1510;
+    --socket: #362a20;
+    --shadow: rgba(0, 0, 0, .55);
+    --panel: #2b2119;
+    --panel-ink: #f4e9d6;
+    --panel-label: #a8917a;
+    --btn: #2b2119;
+    --btn-hover: #382b20;
+    --btn-ink: #f0e2cb;
+    --primary: #f1a33b;
+    --primary-hover: #f6b456;
+    --primary-ink: #2b1a08;
+    --seg-on: #3d3024;
+    --seg-shadow: rgba(0, 0, 0, .4);
+    --arrow: rgba(244, 233, 214, .07);
+    --arrow-hover: rgba(244, 233, 214, .14);
+    --arrow-ink: #e6d4b8;
+    --keycap: #2b2119;
+    --keycap-edge: #120d09;
+    --veil: rgba(20, 16, 12, .66);
+    --card: #241b14;
+    --toast: #f4e9d6;
+    --toast-ink: #241b14;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #14100c;
+  --bg-glow: #261c13;
+  --ink: #f4e9d6;
+  --ink-2: #c4ae92;
+  --ink-3: #9a8670;
+  --plate: #2b2119;
+  --plate-edge: #3d2f24;
+  --well: #1b1510;
+  --socket: #362a20;
+  --shadow: rgba(0, 0, 0, .55);
+  --panel: #2b2119;
+  --panel-ink: #f4e9d6;
+  --panel-label: #a8917a;
+  --btn: #2b2119;
+  --btn-hover: #382b20;
+  --btn-ink: #f0e2cb;
+  --primary: #f1a33b;
+  --primary-hover: #f6b456;
+  --primary-ink: #2b1a08;
+  --seg-on: #3d3024;
+  --seg-shadow: rgba(0, 0, 0, .4);
+  --arrow: rgba(244, 233, 214, .07);
+  --arrow-hover: rgba(244, 233, 214, .14);
+  --arrow-ink: #e6d4b8;
+  --keycap: #2b2119;
+  --keycap-edge: #120d09;
+  --veil: rgba(20, 16, 12, .66);
+  --card: #241b14;
+  --toast: #f4e9d6;
+  --toast-ink: #241b14;
+}
+
+/* ---------- Base ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: radial-gradient(ellipse 90% 55% at 50% 0%, var(--bg-glow), transparent 72%) no-repeat, var(--bg);
+  color: var(--ink);
+  font-family: var(--font);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+}
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.sr-only {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* ---------- Layout ---------- */
+.app {
+  display: grid;
+  grid-template-areas: "head" "tools" "stage" "help";
+  gap: 14px;
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+  padding: max(14px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+}
+
+/* ---------- Header ---------- */
+.head { grid-area: head; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 12px; }
+.brand { flex: 1 1 0; } /* tagline wraps first; scores drop below only if the title can't fit */
+.title {
+  margin: 0;
+  display: flex; align-items: center; gap: .16em;
+  font-size: clamp(34px, 10vw, 46px); font-weight: 900; line-height: 1; letter-spacing: -.035em;
+}
+.badge { position: relative; display: grid; place-items: center; width: 1.16em; height: calc(1.16em * .866); flex: none; }
+.badge::before {
+  content: ""; position: absolute; inset: 0;
+  -webkit-clip-path: var(--hex-clip); clip-path: var(--hex-clip);
+  background: linear-gradient(180deg, #f8cd6c, #eb962c);
+}
+.badge span { position: relative; font-size: .29em; letter-spacing: .09em; text-transform: uppercase; color: #3d240b; }
+.tagline { margin: 6px 0 0; font-size: 14px; line-height: 1.35; color: var(--ink-2); }
+.tagline strong { color: var(--ink); }
+
+.scores { display: flex; gap: 6px; flex: none; }
+.score {
+  position: relative;
+  min-width: 70px; padding: 7px 12px 8px;
+  border-radius: 12px;
+  background: var(--panel); color: var(--panel-ink);
+  text-align: center;
+}
+.score-label { display: block; font-size: 11px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; color: var(--panel-label); }
+.score-value { display: block; margin-top: 2px; font-size: 21px; font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.score-add {
+  position: absolute; left: 0; right: 0; top: 30%;
+  font-size: 17px; font-weight: 900; color: var(--accent);
+  pointer-events: none;
+  animation: score-float 800ms ease-out forwards;
+}
+.score.flash { animation: score-flash 600ms ease-out; }
+@keyframes score-float {
+  from { transform: translateY(0); opacity: 1; }
+  to { transform: translateY(-34px); opacity: 0; }
+}
+@keyframes score-flash {
+  30% { box-shadow: 0 0 0 4px var(--accent); }
+}
+
+/* ---------- Toolbar ---------- */
+.tools { grid-area: tools; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.boards { display: flex; gap: 2px; padding: 3px; border-radius: 13px; background: var(--btn); }
+.seg {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  height: 36px; padding: 0 10px;
+  border: 0; border-radius: 10px;
+  background: none; color: var(--ink-2);
+  font-size: 14px; font-weight: 800;
+  cursor: pointer; touch-action: manipulation;
+  transition: background-color .15s, color .15s, box-shadow .15s;
+}
+.seg svg { width: 21px; height: 21px; fill: currentColor; flex: none; }
+.seg:hover { color: var(--ink); }
+.seg[aria-pressed="true"] { background: var(--seg-on); color: var(--ink); box-shadow: 0 1px 3px var(--seg-shadow); }
+.seg-name { display: none; }
+
+.actions { display: flex; gap: 6px; }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  height: 42px; min-width: 42px; padding: 0 11px;
+  border: 0; border-radius: 12px;
+  background: var(--btn); color: var(--btn-ink);
+  font-size: 15px; font-weight: 800; white-space: nowrap;
+  cursor: pointer; touch-action: manipulation;
+  transition: background-color .15s, opacity .15s, transform .1s;
+}
+.btn:hover:not(:disabled) { background: var(--btn-hover); }
+.btn:active:not(:disabled) { transform: scale(.96); }
+.btn:disabled { opacity: .4; cursor: default; }
+.btn svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.btn-label { display: none; }
+.btn.primary { background: var(--primary); color: var(--primary-ink); }
+.btn.primary:hover:not(:disabled) { background: var(--primary-hover); }
+
+/* ---------- Stage: board, tiles, arrows ---------- */
+.stage-wrap { grid-area: stage; display: grid; place-items: center; min-width: 0; }
+.stage {
+  --reserve: 190px; /* header + toolbar above the board in the one-column layout */
+  position: relative;
+  width: min(100%, 680px, max(260px, calc((100vh - var(--reserve)) * var(--ar))));
+  aspect-ratio: var(--ar);
+  touch-action: none;
+  -webkit-user-select: none; user-select: none;
+  -webkit-touch-callout: none;
+}
+@supports (height: 100dvh) {
+  .stage { width: min(100%, 680px, max(260px, calc((100dvh - var(--reserve)) * var(--ar)))); }
+}
+
+.board-svg {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  overflow: visible; pointer-events: none;
+  filter: drop-shadow(0 calc(var(--cell) * .14) calc(var(--cell) * .3) var(--shadow));
+}
+.board-svg .plate-edge { fill: var(--plate-edge); stroke: var(--plate-edge); stroke-linejoin: round; }
+.board-svg .plate { fill: var(--plate); stroke: var(--plate); stroke-linejoin: round; }
+.board-svg .well { fill: var(--well); }
+.board-svg .socket { fill: var(--socket); }
+
+.tiles { position: absolute; inset: 0; pointer-events: none; transition: transform .16s ease-out; }
+.tiles.nudge { animation: nudge 240ms ease-out; }
+@keyframes nudge { 35% { transform: translate(var(--nx), var(--ny)); } }
+
+.tile {
+  position: absolute;
+  left: var(--tile-l); top: var(--tile-t); width: var(--tile-w); height: var(--tile-h);
+  z-index: 2;
+  transition: transform var(--slide) cubic-bezier(.25, .75, .35, 1);
+  will-change: transform;
+}
+.tile.merged { z-index: 3; }
+.tile.ghost { z-index: 1; }
+.tile.fx { z-index: 0; }
+.tile.glow { filter: drop-shadow(0 0 calc(var(--cell) * .2) var(--glow)); }
+
+.hex {
+  position: absolute; inset: 5%;
+  -webkit-clip-path: var(--hex-clip); clip-path: var(--hex-clip);
+  display: grid; place-items: center;
+  background: var(--lip);
+  color: var(--ink-t);
+}
+.hex::before {
+  content: ""; position: absolute; inset: 0;
+  -webkit-clip-path: var(--hex-clip); clip-path: var(--hex-clip);
+  background: linear-gradient(180deg, var(--hi), var(--face) 58%);
+  transform: translateY(-6%);
+}
+.hex b {
+  position: relative; top: calc(var(--cell) * -.05);
+  font-size: calc(var(--cell) * var(--fs, .7)); font-weight: 800; line-height: 1; letter-spacing: -.02em;
+}
+.hex[data-d="1"] { --fs: .84; }
+.hex[data-d="2"] { --fs: .74; }
+.hex[data-d="3"] { --fs: .6; }
+.hex[data-d="4"] { --fs: .49; }
+.hex[data-d="5"] { --fs: .4; }
+.hex[data-d="6"] { --fs: .34; }
+.hex[data-d="7"] { --fs: .29; }
+
+.ring {
+  position: absolute; inset: 5%;
+  -webkit-clip-path: var(--hex-clip); clip-path: var(--hex-clip);
+  background: var(--face);
+  animation: ring 560ms ease-out var(--slide) backwards;
+}
+@keyframes ring {
+  from { transform: scale(.9); opacity: 0; }
+  15% { opacity: .5; }
+  to { transform: scale(1.7); opacity: 0; }
+}
+
+.tile.spawn .hex { animation: spawn 200ms cubic-bezier(.2, .9, .3, 1.25) var(--slide) backwards; }
+.tile.merged .hex { animation: pop 230ms ease-out calc(var(--slide) * .8) backwards; }
+.tile.restore .hex { animation: restore 180ms ease-out backwards; }
+@keyframes spawn { from { transform: scale(.15); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes pop {
+  0% { transform: scale(.7); opacity: 0; }
+  40% { transform: scale(1.14); opacity: 1; }
+  100% { transform: scale(1); }
+}
+@keyframes restore { from { opacity: .35; transform: scale(.92); } }
+
+.arrow {
+  position: absolute; z-index: 4;
+  width: clamp(30px, calc(var(--cell) * .84), 52px); aspect-ratio: 1;
+  padding: 0; border: 0; border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--arrow); color: var(--arrow-ink);
+  transform: translate(-50%, -50%);
+  cursor: pointer; touch-action: manipulation;
+  transition: background-color .15s, color .15s, opacity .2s;
+}
+.arrow::before { content: ""; position: absolute; inset: -8px; border-radius: 50%; }
+.arrow svg { width: 58%; height: 58%; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+.arrow:hover { background: var(--arrow-hover); }
+.arrow.idle { opacity: .32; }
+.arrow.preview, .arrow.hint { background: var(--accent); color: var(--accent-ink); opacity: 1; }
+.arrow.hint { animation: hint-throb 900ms ease-in-out infinite; }
+.arrow.pulse { animation: arrow-pulse 300ms ease-out; }
+@keyframes arrow-pulse {
+  35% { transform: translate(-50%, -50%) scale(1.2); background: var(--accent); color: var(--accent-ink); }
+}
+@keyframes hint-throb {
+  50% { transform: translate(-50%, -50%) scale(1.14); box-shadow: 0 0 0 6px rgba(241, 163, 59, .3); }
+}
+.arrow kbd {
+  display: none;
+  position: absolute;
+  left: calc(50% + var(--ux) * 52%); top: calc(50% + var(--uy) * 52%);
+  transform: translate(-50%, -50%);
+  min-width: 17px; padding: 2px 4px;
+  border-radius: 5px;
+  background: var(--keycap); color: var(--ink-2);
+  box-shadow: inset 0 -1.5px 0 var(--keycap-edge), 0 0 0 1px var(--keycap-edge);
+  font: 800 10px/1.1 var(--font);
+  pointer-events: none;
+}
+@media (hover: hover) and (pointer: fine) {
+  .arrow kbd { display: block; }
+}
+
+/* ---------- End-of-game card ---------- */
+.veil {
+  position: absolute; inset: 0; z-index: 10;
+  display: grid; place-items: center;
+  border-radius: 28px;
+  background: var(--veil);
+  -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
+  opacity: 0;
+  transition: opacity .35s ease;
+}
+.veil[hidden] { display: none; }
+.veil.show { opacity: 1; }
+.card {
+  width: min(88%, 330px);
+  padding: 0 22px 20px;
+  border-radius: 22px;
+  background: var(--card);
+  box-shadow: 0 20px 60px var(--shadow);
+  text-align: center;
+  transform: translateY(10px) scale(.97);
+  transition: transform .4s cubic-bezier(.2, .9, .3, 1.2);
+}
+.veil.show .card { transform: none; }
+.card-tile { --cell: 44px; position: relative; width: 88px; height: 76.2px; margin: -38px auto 10px; filter: drop-shadow(0 6px 10px var(--shadow)); }
+.card-title { margin: 0; font-size: 25px; font-weight: 900; letter-spacing: -.02em; }
+.card-text { margin: 8px 0 16px; font-size: 15px; line-height: 1.45; color: var(--ink-2); }
+.card-actions { display: flex; gap: 8px; justify-content: center; }
+.card-actions .btn { flex: 1; padding: 0 14px; }
+
+/* ---------- Help ---------- */
+.help { grid-area: help; color: var(--ink-2); font-size: 14px; line-height: 1.5; }
+.help-title { margin: 4px 0 10px; font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+.help p { margin: 0; }
+.help-body { display: flex; align-items: center; gap: 16px; }
+.keys { display: grid; grid-template-columns: repeat(3, 36px); gap: 5px 5px; flex: none; }
+.key {
+  display: grid; place-items: center; align-content: center; gap: 1px;
+  height: 38px; border-radius: 8px;
+  background: var(--keycap); color: var(--ink);
+  box-shadow: inset 0 -2.5px 0 var(--keycap-edge), 0 0 0 1px var(--keycap-edge);
+  font-size: 12px; font-weight: 800; line-height: 1;
+}
+.key:nth-child(n + 4) { transform: translateX(9px); }
+.key svg { width: 13px; height: 13px; fill: none; stroke: var(--accent); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.touch-only { display: none; }
+.shortcuts { margin-top: 12px !important; color: var(--ink-3); font-size: 13px; }
+.shortcuts kbd {
+  display: inline-block; min-width: 20px; margin-right: 3px; padding: 2px 5px;
+  border-radius: 5px; background: var(--keycap); color: var(--ink-2);
+  box-shadow: inset 0 -1.5px 0 var(--keycap-edge), 0 0 0 1px var(--keycap-edge);
+  font: 800 11px/1.3 var(--font); text-align: center;
+}
+.shortcuts span { margin-right: 10px; white-space: nowrap; }
+.fine-print { margin-top: 10px !important; font-size: 13px; color: var(--ink-3); }
+.prefs { display: flex; gap: 8px; margin-top: 14px; }
+.pref {
+  display: inline-flex; align-items: center; gap: 7px;
+  height: 34px; padding: 0 12px 0 10px;
+  border: 0; border-radius: 10px;
+  background: var(--btn); color: var(--btn-ink);
+  font-size: 13px; font-weight: 800;
+  cursor: pointer;
+}
+.pref:hover { background: var(--btn-hover); }
+.pref svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.1; stroke-linecap: round; stroke-linejoin: round; }
+
+@media (hover: none) and (pointer: coarse) {
+  .keys, .shortcuts, .desktop-only { display: none; }
+  .touch-only { display: inline; }
+  .help-body { display: block; }
+}
+
+/* ---------- Toast & confetti ---------- */
+.toast {
+  position: fixed; left: 50%; bottom: max(22px, env(safe-area-inset-bottom)); z-index: 40;
+  max-width: calc(100% - 32px);
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: var(--toast); color: var(--toast-ink);
+  box-shadow: 0 8px 30px var(--shadow);
+  font-size: 14px; font-weight: 700; text-align: center;
+  opacity: 0; transform: translate(-50%, 16px);
+  transition: opacity .25s, transform .25s;
+  pointer-events: none;
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+.confetti { position: fixed; inset: 0; z-index: 30; pointer-events: none; }
+
+/* ---------- Narrow phones ---------- */
+@media (max-width: 380px) {
+  .title { font-size: 31px; }
+  .tagline { font-size: 13px; }
+  .head { column-gap: 8px; }
+  .score { min-width: 0; padding: 6px 9px 7px; }
+  .score-value { font-size: 16px; }
+}
+
+/* ---------- Wider screens ---------- */
+@media (min-width: 420px) {
+  #newBtn .btn-label { display: inline; }
+  #newBtn { padding: 0 16px 0 12px; }
+}
+@media (min-width: 560px) {
+  .seg-name { display: inline; }
+  .seg { padding: 0 12px 0 9px; }
+}
+/* Landscape: board on the left, everything else in a sidebar. */
+@media (orientation: landscape) and (min-width: 640px) {
+  /* Auto margins centre the game vertically when it fits and pin it to the top when it doesn't. */
+  body { display: flex; flex-direction: column; }
+  .app {
+    margin: auto;
+    max-width: 1180px;
+    grid-template-columns: minmax(0, 1fr) clamp(300px, 26vw, 330px);
+    grid-template-rows: auto auto 1fr;
+    grid-template-areas: "stage head" "stage tools" "stage help";
+    column-gap: clamp(20px, 4vw, 60px);
+    row-gap: 18px;
+  }
+  .stage { --reserve: 40px; }
+  /* If the sidebar outgrows a short screen, the board stays put while it scrolls. */
+  .stage-wrap { align-self: start; position: sticky; top: max(14px, env(safe-area-inset-top)); }
+  .head { flex-direction: column; align-items: stretch; gap: 16px; }
+  .scores .score { flex: 1; }
+  .tools { flex-direction: column; align-items: stretch; }
+  .seg { flex: 1; }
+  .actions .btn { flex: 1 1 auto; padding: 0 10px; }
+  .btn-label { display: inline; }
+  .help { align-self: start; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --slide: 0ms; }
+  .tile.spawn .hex, .tile.merged .hex, .tile.restore .hex, .ring,
+  .arrow.pulse, .arrow.hint, .tiles.nudge, .score.flash { animation: none; }
+  .score-add, .tile.fx { display: none; }
+  .tiles, .veil, .card, .toast { transition: none; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="head">
+    <div class="brand">
+      <h1 class="title"><span class="badge" aria-hidden="true"><span>hex</span></span><span class="sr-only">Hex </span>2048</h1>
+      <p class="tagline" id="tagline">Slide in six directions. Merge your way to <strong>2048</strong>.</p>
+    </div>
+    <div class="scores">
+      <div class="score" id="scoreBox"><span class="score-label">Score</span><span class="score-value" id="score">0</span></div>
+      <div class="score" id="bestBox"><span class="score-label">Best</span><span class="score-value" id="best">0</span></div>
+    </div>
+  </header>
+
+  <nav class="tools" aria-label="Game controls">
+    <div class="boards" id="boards" role="group" aria-label="Board"></div>
+    <div class="actions">
+      <button class="btn" id="undoBtn" type="button" title="Undo (Z)" aria-label="Undo">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg><span class="btn-label">Undo</span>
+      </button>
+      <button class="btn" id="hintBtn" type="button" title="Hint (H)" aria-label="Hint">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 18h5M10.5 21h3"/><path d="M12 3a6 6 0 0 0-3.7 10.7c.7.6 1.2 1.4 1.2 2.3h5c0-.9.5-1.7 1.2-2.3A6 6 0 0 0 12 3z"/></svg><span class="btn-label">Hint</span>
+      </button>
+      <button class="btn primary" id="newBtn" type="button" title="New game (N)" aria-label="New game">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.6-5.9"/><path d="M20 4v5h-5"/></svg><span class="btn-label">New game</span>
+      </button>
+    </div>
+  </nav>
+
+  <main class="stage-wrap">
+    <div class="stage" id="stage">
+      <svg class="board-svg" id="boardSvg" aria-hidden="true"></svg>
+      <div class="tiles" id="tiles" aria-hidden="true"></div>
+      <div id="arrows"></div>
+      <div class="veil" id="veil" hidden>
+        <div class="card" role="dialog" aria-labelledby="cardTitle" aria-describedby="cardText">
+          <div class="card-tile" id="cardTile" aria-hidden="true"></div>
+          <h2 class="card-title" id="cardTitle"></h2>
+          <p class="card-text" id="cardText"></p>
+          <div class="card-actions" id="cardActions"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <section class="help" aria-labelledby="helpTitle">
+    <h2 class="help-title" id="helpTitle">How to play</h2>
+    <div class="help-body">
+      <div class="keys" id="keys" aria-hidden="true"></div>
+      <p>Every move slides <em>all</em> tiles as far as they go in one of six directions. Two tiles with the same number merge into one.
+        <span class="desktop-only">Use the keys, drag the board, or click an arrow.</span>
+        <span class="touch-only">Swipe the board or tap an arrow.</span></p>
+    </div>
+    <p class="shortcuts"><span><kbd>Z</kbd>undo</span><span><kbd>H</kbd>hint</span><span><kbd>N</kbd>new game</span><span><kbd>M</kbd>sound</span></p>
+    <p class="fine-print desktop-only">The number pad (7 8 9 / 1 2 3) and U I O / J K L steer too.</p>
+    <p class="fine-print">Undo is unlimited, but the next tile is fixed in advance, so undoing will not re-roll it.</p>
+    <div class="prefs">
+      <button class="pref" id="soundBtn" type="button" aria-pressed="true"></button>
+      <button class="pref" id="themeBtn" type="button"></button>
+    </div>
+  </section>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="sr-only" id="announcer" aria-live="polite"></div>
+<noscript><p style="text-align:center;padding:24px">Hex 2048 needs JavaScript to run.</p></noscript>
+
+<script>
+'use strict';
+
+/* ==========================================================================
+   Engine: the rules of the game. Pure data and functions, no DOM.
+   Hexes are flat-topped and addressed with axial coordinates (q, r).
+   ========================================================================== */
+
+const SQRT3 = Math.sqrt(3);
+
+// The six slide directions, clockwise from straight up.
+// `angle` is the screen heading in degrees (y grows downward).
+const DIRS = [
+  { name: 'up',         dq: 0,  dr: -1, angle: -90 },
+  { name: 'up-right',   dq: 1,  dr: -1, angle: -30 },
+  { name: 'down-right', dq: 1,  dr: 0,  angle: 30 },
+  { name: 'down',       dq: 0,  dr: 1,  angle: 90 },
+  { name: 'down-left',  dq: -1, dr: 1,  angle: 150 },
+  { name: 'up-left',    dq: -1, dr: 0,  angle: 210 },
+];
+
+// Six-way sliding merges far more easily than a 4×4 square does, so each
+// board's goal was tuned with a search bot. Bloom plays about as hard as
+// classic 2048; the full hexagon is gentler; Tiny is brutal.
+const BOARDS = [
+  { id: 'classic', name: 'Classic', radius: 2, trim: false, goal: 2048, note: '19 cells' },
+  { id: 'bloom',   name: 'Bloom',   radius: 2, trim: true,  goal: 1024, note: '13 cells' },
+  { id: 'tiny',    name: 'Tiny',    radius: 1, trim: false, goal: 128,  note: '7 cells' },
+];
+
+const FOUR_CHANCE = 0.1;
+const HISTORY_LIMIT = 200;
+
+// Exponent of a power of two, exactly (Math.log2 makes no such promise).
+const exponent = v => 31 - Math.clz32(v);
+
+function buildTopology(spec) {
+  const R = spec.radius;
+  const cells = [];
+  const index = new Map();
+  for (let q = -R; q <= R; q++) {
+    for (let r = Math.max(-R, -q - R); r <= Math.min(R, R - q); r++) {
+      const s = -q - r;
+      const ring = Math.max(Math.abs(q), Math.abs(r), Math.abs(s));
+      // `trim` drops the six corner cells of the outer ring.
+      if (spec.trim && ring === R && (q === 0 || r === 0 || s === 0)) continue;
+      index.set(q + ',' + r, cells.length);
+      cells.push({ q, r, x: 1.5 * q, y: SQRT3 * (r + q / 2) });
+    }
+  }
+  const at = (q, r) => (index.has(q + ',' + r) ? index.get(q + ',' + r) : -1);
+  const neighbors = cells.map(c => DIRS.map(d => at(c.q + d.dq, c.r + d.dr)));
+  // lines[dir]: every run of cells along dir, listed from the leading edge backwards.
+  const lines = DIRS.map((_, dir) => {
+    const back = (dir + 3) % 6;
+    const runs = [];
+    for (let i = 0; i < cells.length; i++) {
+      if (neighbors[i][dir] !== -1) continue;
+      const run = [];
+      for (let j = i; j !== -1; j = neighbors[j][back]) run.push(j);
+      runs.push(run);
+    }
+    return runs;
+  });
+  return { cells, neighbors, lines, size: cells.length };
+}
+
+// Slides every tile toward `dir` with 2048 rules: a tile merges at most once
+// per move, and the pair nearest the leading edge merges first.
+function slide(topo, board, dir, nextId) {
+  const next = new Array(topo.size).fill(null);
+  const moves = [];
+  const merges = [];
+  let gain = 0;
+  let moved = false;
+  for (const run of topo.lines[dir]) {
+    let fill = 0;
+    let open = null; // last placed tile, while it can still absorb a twin
+    for (const from of run) {
+      const tile = board[from];
+      if (!tile) continue;
+      if (open && open.value === tile.value) {
+        const at = run[fill - 1];
+        const merged = { id: nextId(), value: tile.value * 2 };
+        next[at] = merged;
+        merges.push({ id: merged.id, value: merged.value, at, from: [open.id, tile.id] });
+        moves.push({ id: tile.id, to: at });
+        gain += merged.value;
+        moved = true;
+        open = null;
+      } else {
+        const at = run[fill++];
+        next[at] = tile;
+        if (at !== from) {
+          moves.push({ id: tile.id, to: at });
+          moved = true;
+        }
+        open = tile;
+      }
+    }
+  }
+  return { board: next, moves, merges, gain, moved };
+}
+
+function hasMoves(topo, board) {
+  for (let i = 0; i < topo.size; i++) {
+    const tile = board[i];
+    if (!tile) return true;
+    for (let d = 0; d < 3; d++) {
+      const j = topo.neighbors[i][d];
+      if (j !== -1 && board[j] && board[j].value === tile.value) return true;
+    }
+  }
+  return false;
+}
+
+// mulberry32. The state is saved with every undo step, so replaying a move
+// after an undo spawns exactly the same tile.
+function makeRng(seed) {
+  let state = seed >>> 0;
+  return {
+    next() {
+      state = (state + 0x6d2b79f5) >>> 0;
+      let t = state;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    },
+    get state() { return state; },
+    set state(v) { state = v >>> 0; },
+  };
+}
+
+function randomSeed() {
+  try { return crypto.getRandomValues(new Uint32Array(1))[0]; }
+  catch { return (Math.random() * 4294967296) >>> 0; }
+}
+
+function isSnapshot(s, size) {
+  return !!s && Array.isArray(s.cells) && s.cells.length === size &&
+    s.cells.every(v => v === 0 || (Number.isInteger(v) && v >= 2 && (v & (v - 1)) === 0)) &&
+    Number.isFinite(s.score) && Number.isFinite(s.moves) && Number.isFinite(s.rng);
+}
+
+class Game {
+  constructor(spec, saved) {
+    this.spec = spec;
+    this.topo = buildTopology(spec);
+    this.uid = 0;
+    this.rng = makeRng(randomSeed());
+    this.history = [];
+    if (!this.restore(saved)) this.reset();
+  }
+
+  nextId() { return ++this.uid; }
+
+  reset() {
+    this.board = new Array(this.topo.size).fill(null);
+    this.score = 0;
+    this.moves = 0;
+    this.won = false;
+    this.keepPlaying = false;
+    this.over = false;
+    this.rng.state = randomSeed();
+    this.spawn();
+    this.spawn();
+  }
+
+  // Starting over is itself undoable.
+  newGame() {
+    if (this.moves > 0) this.remember();
+    this.reset();
+  }
+
+  get locked() { return this.over || (this.won && !this.keepPlaying); }
+
+  get maxTile() {
+    let max = 0;
+    for (const t of this.board) if (t && t.value > max) max = t.value;
+    return max;
+  }
+
+  spawn() {
+    const empty = [];
+    this.board.forEach((t, i) => { if (!t) empty.push(i); });
+    if (!empty.length) return null;
+    const at = empty[Math.floor(this.rng.next() * empty.length)];
+    const value = this.rng.next() < FOUR_CHANCE ? 4 : 2;
+    const tile = { id: this.nextId(), value };
+    this.board[at] = tile;
+    return { id: tile.id, value, at };
+  }
+
+  canSlide(dir) { return slide(this.topo, this.board, dir, () => 0).moved; }
+
+  move(dir) {
+    if (this.locked) return null;
+    const result = slide(this.topo, this.board, dir, () => this.nextId());
+    if (!result.moved) return result;
+    this.remember();
+    this.board = result.board;
+    this.score += result.gain;
+    this.moves += 1;
+    result.spawned = this.spawn();
+    result.justWon = !this.won && result.merges.some(m => m.value >= this.spec.goal);
+    if (result.justWon) this.won = true;
+    this.over = !hasMoves(this.topo, this.board);
+    return result;
+  }
+
+  undo() {
+    const snap = this.history.pop();
+    if (!snap) return false;
+    this.load(snap);
+    return true;
+  }
+
+  snapshot() {
+    return {
+      cells: this.board.map(t => (t ? t.value : 0)),
+      score: this.score,
+      moves: this.moves,
+      won: this.won,
+      keepPlaying: this.keepPlaying,
+      rng: this.rng.state,
+    };
+  }
+
+  load(snap) {
+    this.board = snap.cells.map(v => (v ? { id: this.nextId(), value: v } : null));
+    this.score = snap.score;
+    this.moves = snap.moves;
+    this.won = !!snap.won;
+    this.keepPlaying = !!snap.keepPlaying;
+    this.rng.state = snap.rng;
+    this.over = !hasMoves(this.topo, this.board);
+  }
+
+  remember() {
+    this.history.push(this.snapshot());
+    if (this.history.length > HISTORY_LIMIT) this.history.shift();
+  }
+
+  serialize(keep = 40) {
+    return { version: 1, now: this.snapshot(), history: this.history.slice(-keep) };
+  }
+
+  restore(data) {
+    if (!data || data.version !== 1 || !isSnapshot(data.now, this.topo.size)) return false;
+    if (!data.now.cells.some(Boolean)) return false;
+    this.load(data.now);
+    this.history = Array.isArray(data.history) ? data.history.filter(s => isSnapshot(s, this.topo.size)) : [];
+    return true;
+  }
+}
+
+/* ==========================================================================
+   Hint: a small expectimax search over tile exponents.
+   ========================================================================== */
+
+function suggestMove(topo, board, depth = 3) {
+  const n = topo.size;
+  const nb = topo.neighbors;
+  const degree = nb.map(list => list.filter(j => j !== -1).length);
+
+  const step = (b, dir) => {
+    const out = new Int8Array(n);
+    let moved = false;
+    for (const run of topo.lines[dir]) {
+      let fill = 0;
+      let open = 0;
+      for (const from of run) {
+        const v = b[from];
+        if (!v) continue;
+        if (open === v) {
+          out[run[fill - 1]] = v + 1;
+          open = 0;
+          moved = true;
+        } else {
+          const at = run[fill++];
+          out[at] = v;
+          open = v;
+          if (at !== from) moved = true;
+        }
+      }
+    }
+    return moved ? out : null;
+  };
+
+  // Rewards open cells, mergeable neighbours, smooth gradients, and big
+  // tiles parked on low-neighbour rim cells (the hex version of "keep it in a corner").
+  const evaluate = b => {
+    let empty = 0, pairs = 0, rough = 0, anchor = 0;
+    for (let i = 0; i < n; i++) {
+      const v = b[i];
+      if (!v) { empty++; continue; }
+      anchor += v * v * (6 - degree[i]);
+      for (let d = 0; d < 3; d++) {
+        const j = nb[i][d];
+        if (j === -1 || !b[j]) continue;
+        if (b[j] === v) pairs++;
+        rough += Math.abs(v - b[j]);
+      }
+    }
+    return empty * 3 + pairs - rough * 0.4 + anchor * 0.03;
+  };
+
+  const player = (b, left) => {
+    let best = -Infinity;
+    for (let d = 0; d < 6; d++) {
+      const next = step(b, d);
+      if (!next) continue;
+      const v = left <= 1 ? evaluate(next) : chance(next, left - 1);
+      if (v > best) best = v;
+    }
+    return best === -Infinity ? -1e6 : best;
+  };
+
+  const chance = (b, left) => {
+    const empty = [];
+    for (let i = 0; i < n; i++) if (!b[i]) empty.push(i);
+    const stride = Math.max(1, Math.ceil(empty.length / 6)); // sample at most six cells
+    let total = 0, count = 0;
+    for (let k = 0; k < empty.length; k += stride) {
+      const i = empty[k];
+      b[i] = 1; total += 0.9 * player(b, left);
+      b[i] = 2; total += 0.1 * player(b, left);
+      b[i] = 0;
+      count++;
+    }
+    return count ? total / count : player(b, left);
+  };
+
+  const start = Int8Array.from(board, t => (t ? exponent(t.value) : 0));
+  let bestDir = -1, bestVal = -Infinity;
+  for (let d = 0; d < 6; d++) {
+    const next = step(start, d);
+    if (!next) continue;
+    const v = depth <= 1 ? evaluate(next) : chance(next, depth - 1);
+    if (v > bestVal) { bestVal = v; bestDir = d; }
+  }
+  return bestDir;
+}
+
+/* ==========================================================================
+   Presentation
+   ========================================================================== */
+
+const $ = id => document.getElementById(id);
+const fmt = n => n.toLocaleString();
+const f = n => +n.toFixed(4);
+const pct = n => f(n * 100) + '%';
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
+const SLIDE_MS = 120;
+
+// Board geometry, in units of one hex radius.
+const TILE = 0.9;       // tile size relative to cell pitch, leaves the gaps
+const CORNER = 0.16;    // corner rounding, as a fraction of the radius
+const RIM = 0.3;        // board border beyond the outer cells
+const ARROW = 0.42;     // arrow button radius
+const ARROW_GAP = 0.16; // space between the board rim and the arrows
+
+// Physical key positions (layout independent), matching the hex directions:
+//   Q W E      up-left  up  up-right
+//   A S D    down-left down down-right
+const KEY_CODES = ['KeyW', 'KeyE', 'KeyD', 'KeyS', 'KeyA', 'KeyQ'];
+const KEYMAP = {
+  KeyW: 0, KeyE: 1, KeyD: 2, KeyS: 3, KeyA: 4, KeyQ: 5,
+  KeyI: 0, KeyO: 1, KeyL: 2, KeyK: 3, KeyJ: 4, KeyU: 5,
+  Numpad8: 0, Numpad9: 1, Numpad3: 2, Numpad2: 3, Numpad1: 4, Numpad7: 5,
+  ArrowUp: 0, ArrowDown: 3,
+};
+let keyLabels = ['W', 'E', 'D', 'S', 'A', 'Q'];
+
+const ICONS = {
+  soundOn: '<path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/>',
+  soundOff: '<path d="M11 5 6 9H3v6h3l5 4z"/><path d="m16 9.5 5 5M21 9.5l-5 5"/>',
+  moon: '<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>',
+  sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6 6 6M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/>',
+};
+
+// Tile colours by exponent: [face, ink]. Wax to honey to ember, then gold at 2048.
+const PALETTE = [
+  null,
+  ['#f3e9d5', '#5c4633'], // 2
+  ['#eedaa9', '#5c4633'], // 4
+  ['#f5c35b', '#4a2f14'], // 8
+  ['#f1a33b', '#45290f'], // 16
+  ['#e9822f', '#3d220c'], // 32
+  ['#dc5f2a', '#fff8ec'], // 64
+  ['#c6422f', '#fff8ec'], // 128
+  ['#a82c46', '#fff8ec'], // 256
+  ['#832758', '#fff8ec'], // 512
+  ['#5a2f73', '#fff8ec'], // 1024
+  ['#f5c21d', '#3b2608'], // 2048
+  ['#2c7d71', '#fff8ec'], // 4096
+  ['#23598a', '#fff8ec'], // 8192
+  ['#2a2c62', '#ffe08a'], // 16384
+  ['#1c1916', '#ffd24a'], // 32768 and beyond
+];
+
+function mix(a, b, t) {
+  const x = parseInt(a.slice(1), 16), y = parseInt(b.slice(1), 16);
+  const ch = s => Math.round(((x >> s) & 255) + ((((y >> s) & 255) - ((x >> s) & 255)) * t));
+  return '#' + ((1 << 24) | (ch(16) << 16) | (ch(8) << 8) | ch(0)).toString(16).slice(1);
+}
+
+const tileLook = (() => {
+  const cache = new Map();
+  return value => {
+    if (!cache.has(value)) {
+      const [face, ink] = PALETTE[Math.min(exponent(value), PALETTE.length - 1)];
+      cache.set(value, { face, ink, hi: mix(face, '#ffffff', 0.22), lip: mix(face, '#000000', 0.3) });
+    }
+    return cache.get(value);
+  };
+})();
+
+// Flat-topped hexagon path, optionally with rounded corners.
+function hexPath(cx, cy, radius, corner = 0) {
+  let d = '';
+  if (!corner) {
+    for (let k = 0; k < 6; k++) {
+      const a = (k * Math.PI) / 3;
+      d += (k ? 'L' : 'M') + f(cx + radius * Math.cos(a)) + ' ' + f(cy + radius * Math.sin(a));
+    }
+    return d + 'Z';
+  }
+  const rc = corner * radius;
+  const reach = radius - rc / Math.cos(Math.PI / 6);
+  for (let k = 0; k < 6; k++) {
+    const a = (k * Math.PI) / 3;
+    const ax = cx + reach * Math.cos(a), ay = cy + reach * Math.sin(a);
+    const t0 = a - Math.PI / 6, t1 = a + Math.PI / 6;
+    d += (k ? 'L' : 'M') + f(ax + rc * Math.cos(t0)) + ' ' + f(ay + rc * Math.sin(t0)) +
+      'A' + f(rc) + ' ' + f(rc) + ' 0 0 1 ' + f(ax + rc * Math.cos(t1)) + ' ' + f(ay + rc * Math.sin(t1));
+  }
+  return d + 'Z';
+}
+
+// The same rounded hexagon as a CSS polygon() in percentages of a 2 : √3 box.
+function hexClip(corner, steps = 4) {
+  const reach = 1 - corner / Math.cos(Math.PI / 6);
+  const pts = [];
+  for (let k = 0; k < 6; k++) {
+    const a = (k * Math.PI) / 3;
+    for (let s = 0; s <= steps; s++) {
+      const t = a - Math.PI / 6 + (s / steps) * (Math.PI / 3);
+      const x = reach * Math.cos(a) + corner * Math.cos(t);
+      const y = reach * Math.sin(a) + corner * Math.sin(t);
+      pts.push(`${f((x + 1) * 50)}% ${f((y / SQRT3 + 0.5) * 100)}%`);
+    }
+  }
+  return `polygon(${pts.join(',')})`;
+}
+
+// Fits board, rim and the six arrows into one box centred on the middle cell.
+function computeLayout(topo) {
+  const arrows = DIRS.map(d => {
+    const a = (d.angle * Math.PI) / 180, ux = Math.cos(a), uy = Math.sin(a);
+    // Each slide direction is perpendicular to a hex edge, so the board's
+    // extent that way is the farthest centre plus one apothem.
+    const extent = Math.max(...topo.cells.map(c => c.x * ux + c.y * uy)) + SQRT3 / 2;
+    const dist = extent + RIM + ARROW_GAP + ARROW;
+    return { x: ux * dist, y: uy * dist };
+  });
+  let hw = 0, hh = 0;
+  for (const c of topo.cells) {
+    hw = Math.max(hw, Math.abs(c.x) + 1 + RIM);
+    hh = Math.max(hh, Math.abs(c.y) + SQRT3 / 2 + RIM);
+  }
+  // Mouse and keyboard users also get key badges on the arrows' outer rims.
+  const outer = ARROW + (finePointer.matches ? 0.26 : 0);
+  for (const p of arrows) {
+    hw = Math.max(hw, Math.abs(p.x) + outer);
+    hh = Math.max(hh, Math.abs(p.y) + outer);
+  }
+  hw += 0.12;
+  hh += 0.12;
+  return { w: hw * 2, h: hh * 2, cx: hw, cy: hh, arrows };
+}
+
+function shapeIcon(spec) {
+  const topo = buildTopology(spec);
+  const d = topo.cells.map(c => hexPath(c.x, c.y, 0.84, 0.2)).join('');
+  // Shared viewBox, so the icons show the boards' relative sizes.
+  return `<svg viewBox="-4.3 -4.5 8.6 9" aria-hidden="true"><path d="${d}"/></svg>`;
+}
+
+function arrowIcon(angle) {
+  return `<svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M-6.5 0H6M1.5-5 6.5 0 1.5 5" transform="rotate(${angle})"/></svg>`;
+}
+
+function paintTile(el, value) {
+  const look = tileLook(value);
+  el.style.setProperty('--face', look.face);
+  el.style.setProperty('--hi', look.hi);
+  el.style.setProperty('--lip', look.lip);
+  el.style.setProperty('--ink-t', look.ink);
+  el.dataset.d = String(value).length;
+  const num = document.createElement('b');
+  num.textContent = value;
+  el.replaceChildren(num);
+}
+
+/* ---------- Storage ---------- */
+
+const Store = {
+  get(key, fallback) {
+    try {
+      const raw = localStorage.getItem('hex2048:' + key);
+      return raw === null ? fallback : JSON.parse(raw);
+    } catch { return fallback; }
+  },
+  set(key, value) {
+    try { localStorage.setItem('hex2048:' + key, JSON.stringify(value)); } catch { /* storage full or blocked */ }
+  },
+};
+
+/* ---------- Sound: tiny synthesised blips, no audio files ---------- */
+
+const Sound = {
+  enabled: true,
+  ctx: null,
+  out: null,
+
+  wake() {
+    if (!this.enabled) return null;
+    try {
+      if (!this.ctx) {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return null;
+        this.ctx = new AC();
+        this.out = this.ctx.createGain();
+        this.out.gain.value = 0.55;
+        this.out.connect(this.ctx.destination);
+      }
+      if (this.ctx.state === 'suspended') this.ctx.resume();
+      return this.ctx;
+    } catch { return null; }
+  },
+
+  tone(freq, { at = 0, dur = 0.15, type = 'sine', gain = 0.12, bend = 1 } = {}) {
+    const ctx = this.wake();
+    if (!ctx) return;
+    const t = ctx.currentTime + at;
+    const osc = ctx.createOscillator();
+    const env = ctx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, t);
+    if (bend !== 1) osc.frequency.exponentialRampToValueAtTime(freq * bend, t + dur);
+    env.gain.setValueAtTime(0.0001, t);
+    env.gain.exponentialRampToValueAtTime(gain, t + 0.012);
+    env.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    osc.connect(env);
+    env.connect(this.out);
+    osc.start(t);
+    osc.stop(t + dur + 0.05);
+  },
+
+  // Pentatonic ladder: bigger merges ring higher.
+  pitch(value) {
+    const steps = [0, 2, 4, 7, 9];
+    const k = Math.max(0, exponent(value) - 2);
+    return 311.13 * Math.pow(2, (steps[k % 5] + 12 * Math.floor(k / 5)) / 12);
+  },
+
+  slide() { this.tone(160, { dur: 0.07, type: 'triangle', gain: 0.05, bend: 0.7 }); },
+  merge(value, count) {
+    const p = this.pitch(value);
+    this.tone(p, { at: 0.07, dur: 0.24, gain: 0.13 });
+    this.tone(p * 2, { at: 0.07, dur: 0.1, type: 'triangle', gain: 0.025 });
+    if (count > 1) this.tone(p * 1.5, { at: 0.11, dur: 0.2, gain: 0.06 });
+  },
+  bump() { this.tone(95, { dur: 0.12, gain: 0.1, bend: 0.7 }); },
+  undo() { this.tone(560, { dur: 0.1, type: 'triangle', gain: 0.05, bend: 0.6 }); },
+  win() { [0, 4, 7, 12, 16].forEach((s, i) => this.tone(392 * Math.pow(2, s / 12), { at: i * 0.09, dur: 0.4, type: 'triangle', gain: 0.1 })); },
+  lose() { [7, 3, 0].forEach((s, i) => this.tone(220 * Math.pow(2, s / 12), { at: i * 0.17, dur: 0.45, gain: 0.09, bend: 0.97 })); },
+};
+
+/* ---------- Board view: SVG board, DOM tiles, arrows ---------- */
+
+class BoardView {
+  constructor() {
+    this.stage = $('stage');
+    this.svg = $('boardSvg');
+    this.layer = $('tiles');
+    this.els = new Map(); // tile id -> element
+    this.ghosts = [];     // merged-away tiles still sliding into place
+    this.ghostTimer = 0;
+    this.hintTimer = 0;
+    this.arrows = DIRS.map((d, i) => {
+      const b = document.createElement('button');
+      const a = (d.angle * Math.PI) / 180;
+      b.type = 'button';
+      b.className = 'arrow';
+      b.dataset.dir = i;
+      b.setAttribute('aria-label', 'Slide ' + d.name);
+      b.style.setProperty('--ux', f(Math.cos(a)));
+      b.style.setProperty('--uy', f(Math.sin(a)));
+      b.innerHTML = arrowIcon(d.angle) + '<kbd aria-hidden="true"></kbd>';
+      $('arrows').appendChild(b);
+      return b;
+    });
+    this.labelArrows();
+    const measure = () => this.measure();
+    if ('ResizeObserver' in window) new ResizeObserver(measure).observe(this.stage);
+    else window.addEventListener('resize', measure);
+  }
+
+  labelArrows() {
+    this.arrows.forEach((b, i) => {
+      b.title = `Slide ${DIRS[i].name} (${keyLabels[i]})`;
+      b.querySelector('kbd').textContent = keyLabels[i];
+    });
+  }
+
+  setBoard(topo, goal) {
+    this.topo = topo;
+    this.goal = goal;
+    const L = (this.layout = computeLayout(topo));
+    const s = this.stage.style;
+    s.setProperty('--ar', f(L.w / L.h));
+    s.setProperty('--tile-l', pct((L.cx - 1) / L.w));
+    s.setProperty('--tile-t', pct((L.cy - SQRT3 / 2) / L.h));
+    s.setProperty('--tile-w', pct(2 / L.w));
+    s.setProperty('--tile-h', pct(SQRT3 / L.h));
+
+    let plate = '', wells = '', sockets = '';
+    for (const c of topo.cells) {
+      const x = L.cx + c.x, y = L.cy + c.y;
+      plate += hexPath(x, y, 1);
+      wells += hexPath(x, y, TILE, CORNER);
+      sockets += hexPath(x, y + 0.035, TILE * 0.94, CORNER);
+    }
+    this.svg.setAttribute('viewBox', `0 0 ${f(L.w)} ${f(L.h)}`);
+    this.svg.innerHTML =
+      `<path class="plate-edge" d="${plate}" stroke-width="${f(RIM * 2 + 0.1)}"/>` +
+      `<path class="plate" d="${plate}" stroke-width="${f(RIM * 2)}"/>` +
+      `<path class="well" d="${wells}"/>` +
+      `<path class="socket" d="${sockets}"/>`;
+
+    L.arrows.forEach((p, i) => {
+      this.arrows[i].style.left = pct((L.cx + p.x) / L.w);
+      this.arrows[i].style.top = pct((L.cy + p.y) / L.h);
+    });
+    this.measure();
+  }
+
+  measure() {
+    if (!this.layout) return;
+    const w = this.stage.getBoundingClientRect().width;
+    if (w) this.stage.style.setProperty('--cell', f(w / this.layout.w) + 'px');
+  }
+
+  cellPx() {
+    return this.layout ? this.stage.getBoundingClientRect().width / this.layout.w : 40;
+  }
+
+  place(i) {
+    const c = this.topo.cells[i];
+    // Percentages of the tile's own box: one column is 1.5 radii = 75% of
+    // the 2-radius width, one row is √3 radii = 100% of the height.
+    return `translate(${f(75 * c.q)}%, ${f(100 * (c.r + c.q / 2))}%)`;
+  }
+
+  makeTile(value, cell, cls) {
+    const el = document.createElement('div');
+    el.className = cls ? 'tile ' + cls : 'tile';
+    el.style.transform = this.place(cell);
+    if (value >= 2048 || value >= this.goal) {
+      el.classList.add('glow');
+      el.style.setProperty('--glow', tileLook(value).face + 'aa');
+    }
+    const hex = document.createElement('div');
+    hex.className = 'hex';
+    paintTile(hex, value);
+    el.appendChild(hex);
+    this.layer.appendChild(el);
+    return el;
+  }
+
+  // Redraws every tile from scratch: new game, undo, board switch.
+  renderAll(board, mode) {
+    this.settle();
+    this.layer.replaceChildren();
+    this.els.clear();
+    board.forEach((t, i) => { if (t) this.els.set(t.id, this.makeTile(t.value, i, mode)); });
+  }
+
+  animate(result) {
+    this.settle();
+    for (const el of this.els.values()) el.classList.remove('spawn', 'merged', 'restore');
+    for (const m of result.moves) {
+      const el = this.els.get(m.id);
+      if (el) el.style.transform = this.place(m.to);
+    }
+    for (const m of result.merges) {
+      for (const id of m.from) {
+        const el = this.els.get(id);
+        if (!el) continue;
+        this.els.delete(id);
+        el.classList.add('ghost');
+        this.ghosts.push(el);
+      }
+      this.els.set(m.id, this.makeTile(m.value, m.at, 'merged'));
+      if (m.value >= 32) this.ring(m.value, m.at);
+    }
+    const s = result.spawned;
+    if (s) this.els.set(s.id, this.makeTile(s.value, s.at, 'spawn'));
+    if (this.ghosts.length) {
+      this.ghostTimer = setTimeout(() => this.settle(), reducedMotion.matches ? 0 : SLIDE_MS + 130);
+    }
+  }
+
+  // Drops merged-away tiles immediately, so a fast next move starts clean.
+  settle() {
+    clearTimeout(this.ghostTimer);
+    for (const el of this.ghosts) el.remove();
+    this.ghosts = [];
+  }
+
+  ring(value, cell) {
+    if (reducedMotion.matches) return;
+    const el = document.createElement('div');
+    el.className = 'tile fx';
+    el.style.transform = this.place(cell);
+    const ring = document.createElement('div');
+    ring.className = 'ring';
+    ring.style.setProperty('--face', tileLook(value).face);
+    ring.addEventListener('animationend', () => el.remove());
+    setTimeout(() => el.remove(), 1500); // in case the animation never runs
+    el.appendChild(ring);
+    this.layer.appendChild(el);
+  }
+
+  // While dragging: light the arrow and lean the tiles a hair that way.
+  preview(dir) {
+    this.arrows.forEach((a, i) => a.classList.toggle('preview', i === dir));
+    if (dir < 0 || reducedMotion.matches) {
+      this.layer.style.transform = '';
+      return;
+    }
+    const a = (DIRS[dir].angle * Math.PI) / 180;
+    this.layer.style.transform =
+      `translate(calc(var(--cell) * ${f(Math.cos(a) * 0.07)}), calc(var(--cell) * ${f(Math.sin(a) * 0.07)}))`;
+  }
+
+  // Blocked move: bump the tiles toward the wall and back.
+  nudge(dir) {
+    const a = (DIRS[dir].angle * Math.PI) / 180;
+    this.layer.style.setProperty('--nx', `calc(var(--cell) * ${f(Math.cos(a) * 0.12)})`);
+    this.layer.style.setProperty('--ny', `calc(var(--cell) * ${f(Math.sin(a) * 0.12)})`);
+    this.layer.classList.remove('nudge');
+    void this.layer.offsetWidth;
+    this.layer.classList.add('nudge');
+  }
+
+  pulse(dir, delay = 0) {
+    const a = this.arrows[dir];
+    a.classList.remove('pulse');
+    void a.offsetWidth;
+    a.style.animationDelay = delay ? delay + 'ms' : '';
+    a.classList.add('pulse');
+    a.addEventListener('animationend', () => { a.classList.remove('pulse'); a.style.animationDelay = ''; }, { once: true });
+  }
+
+  setIdle(valid) {
+    this.arrows.forEach((a, i) => a.classList.toggle('idle', !valid[i]));
+  }
+
+  showHint(dir) {
+    this.clearHint();
+    this.arrows[dir].classList.add('hint');
+    this.hintTimer = setTimeout(() => this.clearHint(), 2600);
+  }
+
+  clearHint() {
+    clearTimeout(this.hintTimer);
+    this.arrows.forEach(a => a.classList.remove('hint'));
+  }
+}
+
+/* ---------- Small UI helpers ---------- */
+
+let toastTimer = 0;
+function toast(message) {
+  const el = $('toast');
+  el.textContent = message;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
+}
+
+function announce(message) {
+  const el = $('announcer');
+  el.textContent = '';
+  setTimeout(() => { el.textContent = message; }, 40);
+}
+
+function confetti(originEl) {
+  if (reducedMotion.matches) return;
+  const canvas = document.createElement('canvas');
+  canvas.className = 'confetti';
+  document.body.appendChild(canvas);
+  const ctx = canvas.getContext('2d');
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const W = window.innerWidth, H = window.innerHeight;
+  canvas.width = W * dpr;
+  canvas.height = H * dpr;
+  ctx.scale(dpr, dpr);
+  const box = originEl.getBoundingClientRect();
+  const ox = box.left + box.width / 2, oy = box.top + box.height * 0.42;
+  const colors = [3, 4, 5, 6, 7, 9, 11].map(e => PALETTE[e][0]);
+  const bits = Array.from({ length: 110 }, () => {
+    const a = Math.random() * Math.PI * 2, v = 4 + Math.random() * 9;
+    return {
+      x: ox, y: oy, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 5,
+      r: 4 + Math.random() * 6, rot: Math.random() * 6, spin: (Math.random() - 0.5) * 0.3,
+      c: colors[(Math.random() * colors.length) | 0],
+    };
+  });
+  const start = performance.now();
+  let last = start;
+  const frame = now => {
+    const k = Math.min(3, (now - last) / 16.7);
+    const life = (now - start) / 2600;
+    last = now;
+    ctx.clearRect(0, 0, W, H);
+    ctx.globalAlpha = Math.max(0, 1 - life * life);
+    for (const p of bits) {
+      p.vy += 0.32 * k;
+      p.vx *= Math.pow(0.985, k);
+      p.x += p.vx * k;
+      p.y += p.vy * k;
+      p.rot += p.spin * k;
+      ctx.fillStyle = p.c;
+      ctx.beginPath();
+      for (let i = 0; i < 6; i++) {
+        const a = p.rot + (i * Math.PI) / 3;
+        ctx.lineTo(p.x + Math.cos(a) * p.r, p.y + Math.sin(a) * p.r * 0.8);
+      }
+      ctx.fill();
+    }
+    if (life < 1) requestAnimationFrame(frame);
+    else canvas.remove();
+  };
+  requestAnimationFrame(frame);
+}
+
+/* ---------- App ---------- */
+
+const App = {
+  games: new Map(),
+  bests: {},
+  spec: null,
+  game: null,
+  view: null,
+  card: null,     // 'won' | 'over' | null
+  cardTimer: 0,
+  flashedBest: false,
+
+  init() {
+    document.documentElement.style.setProperty('--hex-clip', hexClip(CORNER));
+    const prefs = Store.get('prefs', {});
+    Sound.enabled = prefs.sound !== false;
+    this.theme = prefs.theme === 'light' || prefs.theme === 'dark' ? prefs.theme : null;
+    this.applyTheme();
+    prefersDark.addEventListener?.('change', () => this.applyTheme());
+
+    this.view = new BoardView();
+    this.buildPicker();
+    this.buildKeys();
+    this.renderSoundButton();
+    this.localiseKeys();
+
+    $('undoBtn').addEventListener('click', () => this.undo());
+    $('hintBtn').addEventListener('click', () => this.hint());
+    $('newBtn').addEventListener('click', () => this.newGame());
+    $('soundBtn').addEventListener('click', () => this.toggleSound());
+    $('themeBtn').addEventListener('click', () => this.toggleTheme());
+    $('arrows').addEventListener('click', e => {
+      const b = e.target.closest('.arrow');
+      if (b) this.move(+b.dataset.dir);
+    });
+    this.bindKeys();
+    this.bindSwipe();
+    // Key badges come and go with the pointer type, and they need room.
+    finePointer.addEventListener?.('change', () => this.view.setBoard(this.game.topo, this.spec.goal));
+
+    const spec = BOARDS.find(b => b.id === prefs.board) || BOARDS[0];
+    this.selectBoard(spec);
+    if (!prefs.seen) {
+      // First visit: sweep the arrows once to show off the six directions.
+      if (!reducedMotion.matches) [5, 0, 1, 2, 3, 4].forEach((d, i) => this.view.pulse(d, 500 + i * 110));
+      this.savePrefs({ seen: true });
+    }
+  },
+
+  buildPicker() {
+    const wrap = $('boards');
+    wrap.innerHTML = BOARDS.map(b =>
+      `<button type="button" class="seg" data-board="${b.id}" aria-pressed="false" ` +
+      `aria-label="${b.name} board, ${b.note}, goal ${b.goal}" title="${b.name} · ${b.note} · goal ${b.goal}">` +
+      `${shapeIcon(b)}<span class="seg-name">${b.name}</span></button>`).join('');
+    wrap.addEventListener('click', e => {
+      const btn = e.target.closest('.seg');
+      if (btn) this.selectBoard(BOARDS.find(b => b.id === btn.dataset.board));
+    });
+  },
+
+  buildKeys() {
+    // Keyboard rows: Q W E over A S D.
+    $('keys').innerHTML = [5, 0, 1, 4, 3, 2]
+      .map(d => `<span class="key">${arrowIcon(DIRS[d].angle)}<span>${keyLabels[d]}</span></span>`)
+      .join('');
+  },
+
+  // Show the user's own key caps (e.g. AZERTY) where the browser can tell us.
+  localiseKeys() {
+    if (!navigator.keyboard || !navigator.keyboard.getLayoutMap) return;
+    navigator.keyboard.getLayoutMap().then(map => {
+      const labels = KEY_CODES.map((code, i) => (map.get(code) || keyLabels[i]).toUpperCase());
+      if (labels.join() === keyLabels.join()) return;
+      keyLabels = labels;
+      this.view.labelArrows();
+      this.buildKeys();
+    }).catch(() => {});
+  },
+
+  selectBoard(spec) {
+    if (!spec || spec === this.spec) return;
+    clearTimeout(this.cardTimer);
+    const first = !this.spec;
+    this.spec = spec;
+    this.flashedBest = false;
+    if (!this.games.has(spec.id)) this.games.set(spec.id, new Game(spec, Store.get('game:' + spec.id)));
+    this.game = this.games.get(spec.id);
+    this.bests[spec.id] = Math.max(Number(Store.get('best:' + spec.id, 0)) || 0, this.game.score);
+
+    for (const btn of $('boards').children) btn.setAttribute('aria-pressed', String(btn.dataset.board === spec.id));
+    $('tagline').innerHTML = `${spec.name} board, ${spec.note}. Merge your way to <strong>${spec.goal}</strong>.`;
+
+    this.hideCard();
+    this.view.clearHint();
+    this.view.setBoard(this.game.topo, spec.goal);
+    this.view.renderAll(this.game.board, 'spawn');
+    this.updateScore(0);
+    this.refresh();
+    if (this.game.won && !this.game.keepPlaying) this.showCard('won', true);
+    else if (this.game.over) this.showCard('over', true);
+    this.savePrefs({ board: spec.id });
+    if (!first) announce(`${spec.name} board, ${spec.note}. Goal ${spec.goal}.`);
+  },
+
+  move(dir) {
+    if (this.card) return;
+    const game = this.game;
+    const before = game.maxTile;
+    const result = game.move(dir);
+    if (!result) return;
+    if (!result.moved) {
+      if (!reducedMotion.matches) this.view.nudge(dir);
+      Sound.bump();
+      return;
+    }
+    this.view.clearHint();
+    this.view.animate(result);
+    this.view.pulse(dir);
+    this.updateScore(result.gain);
+    this.refresh();
+    this.save();
+
+    if (result.merges.length) {
+      const top = Math.max(...result.merges.map(m => m.value));
+      Sound.merge(top, result.merges.length);
+      if (top >= 64 && top > before) announce(`New tile: ${top}.`);
+    } else {
+      Sound.slide();
+    }
+
+    if (result.justWon) this.later(() => this.showCard('won'), 520);
+    else if (game.over) this.later(() => this.showCard('over'), 700);
+  },
+
+  later(fn, ms) {
+    clearTimeout(this.cardTimer);
+    this.cardTimer = setTimeout(fn, reducedMotion.matches ? 0 : ms);
+  },
+
+  undo() {
+    if (!this.game.undo()) return;
+    clearTimeout(this.cardTimer);
+    this.hideCard();
+    this.view.clearHint();
+    this.view.renderAll(this.game.board, 'restore');
+    this.updateScore(0);
+    this.refresh();
+    this.save();
+    Sound.undo();
+  },
+
+  newGame() {
+    clearTimeout(this.cardTimer);
+    const abandoned = this.game.moves > 0 && !this.game.over;
+    this.hideCard();
+    this.view.clearHint();
+    this.flashedBest = false;
+    this.game.newGame();
+    this.view.renderAll(this.game.board, 'spawn');
+    this.updateScore(0);
+    this.refresh();
+    this.save();
+    if (abandoned) toast('New game. Undo brings the old one back.');
+  },
+
+  keepGoing() {
+    this.game.keepPlaying = true;
+    this.save();
+    this.hideCard();
+    this.refresh();
+    if (this.game.over) this.later(() => this.showCard('over'), 250);
+  },
+
+  hint() {
+    if (this.card || this.game.locked) return;
+    const dir = suggestMove(this.game.topo, this.game.board);
+    if (dir < 0) return;
+    this.view.showHint(dir);
+    toast(finePointer.matches ? `Try ${DIRS[dir].name} (${keyLabels[dir]})` : `Try swiping ${DIRS[dir].name}`);
+  },
+
+  updateScore(gain) {
+    const game = this.game;
+    $('score').textContent = fmt(game.score);
+    if (gain > 0) {
+      const add = document.createElement('span');
+      add.className = 'score-add';
+      add.textContent = '+' + fmt(gain);
+      add.addEventListener('animationend', () => add.remove());
+      $('scoreBox').appendChild(add);
+    }
+    const best = this.bests[this.spec.id] || 0;
+    if (game.score > best) {
+      if (best > 0 && gain > 0 && !this.flashedBest) {
+        this.flashedBest = true;
+        const box = $('bestBox');
+        box.classList.remove('flash');
+        void box.offsetWidth;
+        box.classList.add('flash');
+      }
+      this.bests[this.spec.id] = game.score;
+      Store.set('best:' + this.spec.id, game.score);
+    }
+    $('best').textContent = fmt(this.bests[this.spec.id]);
+  },
+
+  refresh() {
+    const game = this.game;
+    $('undoBtn').disabled = game.history.length === 0;
+    $('hintBtn').disabled = game.locked;
+    this.view.setIdle(DIRS.map((_, d) => !game.locked && game.canSlide(d)));
+  },
+
+  save() {
+    Store.set('game:' + this.spec.id, this.game.serialize());
+  },
+
+  savePrefs(patch) {
+    Store.set('prefs', Object.assign(Store.get('prefs', {}), patch));
+  },
+
+  showCard(kind, quiet = false) {
+    const game = this.game;
+    this.card = kind;
+    const cardTile = document.createElement('div');
+    cardTile.className = 'hex';
+    let actions;
+    if (kind === 'won') {
+      paintTile(cardTile, this.spec.goal);
+      $('cardTitle').textContent = `You made ${this.spec.goal}!`;
+      $('cardText').textContent = `${fmt(game.moves)} ${game.moves === 1 ? 'move' : 'moves'}, ` +
+        `${fmt(game.score)} points. Keep merging for a higher score?`;
+      actions = [['Keep going', () => this.keepGoing(), true], ['New game', () => this.newGame()]];
+    } else {
+      const best = game.score > 0 && game.score >= (this.bests[this.spec.id] || 0);
+      paintTile(cardTile, game.maxTile || 2);
+      $('cardTitle').textContent = 'Out of moves';
+      $('cardText').textContent = `Score ${fmt(game.score)}, best tile ${game.maxTile}.` + (best ? ' A new best!' : '');
+      actions = [];
+      if (game.history.length) actions.push(['Undo', () => this.undo()]);
+      actions.push(['Try again', () => this.newGame(), true]);
+    }
+    $('cardTile').replaceChildren(cardTile);
+    $('cardActions').replaceChildren(...actions.map(([label, fn, primary]) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = primary ? 'btn primary' : 'btn';
+      b.textContent = label;
+      b.addEventListener('click', fn);
+      return b;
+    }));
+    const veil = $('veil');
+    veil.hidden = false;
+    void veil.offsetWidth;
+    veil.classList.add('show');
+    const primary = veil.querySelector('.btn.primary');
+    if (primary && finePointer.matches) primary.focus({ preventScroll: true });
+    this.refresh();
+    if (quiet) return;
+    if (kind === 'won') {
+      Sound.win();
+      confetti(this.view.stage);
+      announce(`You made ${this.spec.goal}! Keep going or start a new game.`);
+    } else {
+      Sound.lose();
+      announce(`Out of moves. Final score ${game.score}.`);
+    }
+  },
+
+  hideCard() {
+    const veil = $('veil');
+    const hadFocus = veil.contains(document.activeElement);
+    veil.classList.remove('show');
+    veil.hidden = true;
+    this.card = null;
+    if (hadFocus) document.activeElement.blur();
+  },
+
+  toggleSound() {
+    Sound.enabled = !Sound.enabled;
+    this.savePrefs({ sound: Sound.enabled });
+    this.renderSoundButton();
+    if (Sound.enabled) Sound.merge(8, 1);
+    toast(Sound.enabled ? 'Sound on' : 'Sound off');
+  },
+
+  renderSoundButton() {
+    const b = $('soundBtn');
+    b.setAttribute('aria-pressed', String(Sound.enabled));
+    b.title = 'Sound (M)';
+    b.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${Sound.enabled ? ICONS.soundOn : ICONS.soundOff}</svg>` +
+      `<span>${Sound.enabled ? 'Sound on' : 'Sound off'}</span>`;
+  },
+
+  isDark() {
+    return this.theme ? this.theme === 'dark' : prefersDark.matches;
+  },
+
+  applyTheme() {
+    const root = document.documentElement;
+    if (this.theme) root.dataset.theme = this.theme;
+    else delete root.dataset.theme;
+    const dark = this.isDark();
+    document.querySelector('meta[name="theme-color"]').content = dark ? '#14100c' : '#f4ecdc';
+    $('themeBtn').innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${dark ? ICONS.sun : ICONS.moon}</svg>` +
+      `<span>${dark ? 'Light theme' : 'Dark theme'}</span>`;
+  },
+
+  toggleTheme() {
+    this.theme = this.isDark() ? 'light' : 'dark';
+    this.savePrefs({ theme: this.theme });
+    this.applyTheme();
+  },
+
+  bindKeys() {
+    window.addEventListener('keydown', e => {
+      if (e.defaultPrevented) return;
+      if (e.ctrlKey || e.metaKey || e.altKey) {
+        if ((e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && e.code === 'KeyZ') {
+          e.preventDefault();
+          this.undo();
+        }
+        return;
+      }
+      Sound.wake();
+      const dir = KEYMAP[e.code];
+      if (dir !== undefined) {
+        e.preventDefault();
+        if (!e.repeat) this.move(dir);
+        return;
+      }
+      if (e.repeat) return;
+      switch (e.code) {
+        case 'KeyZ':
+        case 'Backspace':
+          e.preventDefault();
+          this.undo();
+          break;
+        case 'KeyN': this.newGame(); break;
+        case 'KeyH': this.hint(); break;
+        case 'KeyM': this.toggleSound(); break;
+        case 'Escape': if (this.card === 'won') this.keepGoing(); break;
+        case 'ArrowLeft':
+        case 'ArrowRight':
+          e.preventDefault();
+          toast(`Six directions here: ${keyLabels[5]} ${keyLabels[0]} ${keyLabels[1]} / ${keyLabels[4]} ${keyLabels[3]} ${keyLabels[2]}`);
+          break;
+      }
+    });
+  },
+
+  bindSwipe() {
+    const stage = this.view.stage;
+    let drag = null;
+    const dirOf = (dx, dy) => {
+      if (Math.hypot(dx, dy) < Math.max(16, this.view.cellPx() * 0.35)) return -1;
+      const deg = (Math.atan2(dy, dx) * 180) / Math.PI;
+      return ((Math.round((deg + 90) / 60) % 6) + 6) % 6;
+    };
+    stage.addEventListener('pointerdown', e => {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      if (this.card || e.target.closest('button, .veil')) return;
+      drag = { id: e.pointerId, x: e.clientX, y: e.clientY, dir: -1 };
+      try { stage.setPointerCapture(e.pointerId); } catch { /* not capturable */ }
+    });
+    stage.addEventListener('pointermove', e => {
+      if (!drag || e.pointerId !== drag.id) return;
+      const dir = dirOf(e.clientX - drag.x, e.clientY - drag.y);
+      if (dir !== drag.dir) {
+        drag.dir = dir;
+        this.view.preview(dir);
+      }
+    });
+    const finish = e => {
+      if (!drag || e.pointerId !== drag.id) return;
+      const dir = e.type === 'pointerup' ? dirOf(e.clientX - drag.x, e.clientY - drag.y) : -1;
+      drag = null;
+      this.view.preview(-1);
+      if (dir >= 0) this.move(dir);
+    };
+    stage.addEventListener('pointerup', finish);
+    stage.addEventListener('pointercancel', finish);
+    // Older iOS ignores touch-action on some elements; keep the page still mid-swipe.
+    stage.addEventListener('touchmove', e => { if (drag) e.preventDefault(); }, { passive: false });
+  },
+};
+
+App.init();
+</script>
+</body>
+</html>
