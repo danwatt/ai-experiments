@@ -105,6 +105,18 @@
         "games/2048-asm-opus-5.5-high"
       ],
       "port": 8799
+    },
+    {
+      "name": "garden-map",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8803",
+        "-d",
+        "garden-map"
+      ],
+      "port": 8803
     }
   ]
 }
