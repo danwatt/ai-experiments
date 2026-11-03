@@ -101,6 +101,10 @@ tbody tr:hover, tbody tr.sel { background: color-mix(in srgb, var(--accent) 12%,
 .facts dd { margin: 0; }
 .swatch { width: 100%; height: 10px; border-radius: 5px; }
 h3 { font-size: 16px; margin: 24px 0 0; }
+.care-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 12px; margin-top: 10px; }
+.care-card h4 { font-size: 15px; margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
+.care-card .dot { cursor: pointer; }
+.care-card .facts dt { font-size: 13px; }
 </style>
 </head>
 <body>
@@ -137,6 +141,10 @@ h3 { font-size: 16px; margin: 24px 0 0; }
     <li>Expect ±2 ft of error on position. The walk was not perfectly steady and the camera angle shifts.</li>
     <li>"Low" confidence plants are young or seen only from a distance. A close-up photo of a leaf and flower would confirm them.</li>
   </ul>
+
+  <h3>Care by species</h3>
+  <p class="meta">Timed for North Texas: the first freeze usually comes in mid to late November and the last in mid-March. Click a number to find that plant on the map.</p>
+  <div class="care-grid" id="speciescare"></div>
   </section>
 
   <section id="tab-plan" hidden>
@@ -175,57 +183,109 @@ const PLANTS = [
     note: "Tall, open clump with smooth, narrow, opposite leaves and flat-topped clusters of starry golden-yellow flowers. The close-up shows the milkweed crown on each flower. Grows against the fence behind the yard sign, and is a monarch host plant." },
   { name: "Southern Magnolia 'Little Gem'", sci: "Magnolia grandiflora 'Little Gem'", kind: "magnolia", conf: "high", x: 5.2, y: 2.6, d: 4.5, t: 4,
     note: "Columnar evergreen with glossy leaves that are rusty brown underneath. Dark mulch ring at the base." },
-  { name: "Spike Speedwell", sci: "Veronica spicata (likely, e.g. 'Red Fox')", kind: "speedwell", conf: "medium", x: 7.6, y: 4.6, d: 1.3, t: 7,
-    note: "Low clump with toothed, oval leaves and short, dense spikes of fuzzy hot-pink flowers with long stamens. Many spent spikes have browned, so it would bloom again after deadheading." },
+  { name: "Spike Speedwell (purple)", sci: "Veronica spicata (purple-flowered form)", kind: "violet", conf: "medium", x: 7.6, y: 4.6, d: 1.3, t: 7,
+    note: "Low clump with toothed, oval leaves and short, dense spikes of violet-purple flowers. Confirmed in person to be the same species as plant 6, in a purple form. Plant 8 is another one." },
   { name: "Autumn Sage", sci: "Salvia greggii", kind: "sage", conf: "high", x: 8.6, y: 1.3, d: 1.6, t: 7,
     note: "Loose, twiggy sub-shrub with small, rounded, opposite leaves and magenta-red two-lipped tubular flowers along the stems (from the close-up)." },
   { name: "Mexican Heather", sci: "Cuphea hyssopifolia (likely)", kind: "shrub", conf: "medium", x: 9.6, y: 3.3, d: 2.1, t: 7,
     note: "Dense lime-green mound of upright stems lined with tiny, narrow leaves in flat, fern-like sprays. No flowers in the close-up, so the ID rests on the foliage." },
-  { name: "Coral Honeysuckle (young)", sci: "Lonicera sempervirens (or Salvia greggii)", kind: "vine", conf: "low", x: 10.8, y: 0.7, d: 1.2, t: 8,
-    note: "Upright young stem with opposite oval leaves and a red-pink tubular bloom. Staked and tied toward the fence, as if trained to climb." },
-  { name: "Coral Honeysuckle (young)", sci: "Lonicera sempervirens (or Salvia greggii)", kind: "vine", conf: "low", x: 12.2, y: 0.7, d: 1.2, t: 9,
-    note: "Second upright stem next to the fence post with the wire ties." },
+  { name: "Spike Speedwell 'Red Fox'", sci: "Veronica spicata 'Red Fox' (likely)", kind: "speedwell", conf: "medium", x: 11.6, y: 4.6, d: 1.3, t: 9,
+    note: "Low clump with toothed, oval leaves and short, dense spikes of fuzzy hot-pink flowers with long stamens (from the close-up). Many spent spikes have browned, so it would bloom again after deadheading. Added after the first pass: about 4 ft right of the purple speedwell, plant 3." },
   { name: "Crape Myrtle", sci: "Lagerstroemia indica", kind: "crape", conf: "high", x: 13.6, y: 2.6, d: 6, t: 11,
     note: "Multi-trunk small tree with smooth tan bark and pink blooms. Pink pool noodles are wrapped on the trunks as guards." },
-  { name: "Gray-green mound", sci: "possibly lavender or rosemary", kind: "herb", conf: "low", x: 15.3, y: 1.2, d: 1.4, t: 12,
-    note: "Soft gray-green mound by the fence, behind the young salvia." },
-  { name: "Blue Salvia (young)", sci: "Salvia 'Mystic Spires Blue'", kind: "salvia", conf: "medium", x: 15.6, y: 4.0, d: 1.6, t: 12,
-    note: "Small plant with violet-blue flower spikes, next to a rock and a half brick." },
-  { name: "Violet Sage", sci: "Salvia nemorosa (likely, e.g. 'May Night')", kind: "salvia", conf: "medium", x: 17.4, y: 4.4, d: 1.4, t: 14,
-    note: "Compact clump with lance-shaped leaves and dense spikes of deep indigo-violet hooded flowers. Many green spent spikes, plus old woody stems from last season. Not the same as the big pale-blue salvia masses; plant 10 may be this too." },
-  { name: "Gray-green mound", sci: "possibly lavender or rosemary", kind: "herb", conf: "low", x: 18.0, y: 1.2, d: 1.4, t: 14,
-    note: "Matches the mound at 15 ft." },
+  { name: "Spike Speedwell (purple)", sci: "Veronica spicata (purple-flowered form)", kind: "violet", conf: "high", x: 17.4, y: 4.4, d: 1.4, t: 14,
+    note: "Compact clump with lance-shaped leaves and dense violet-purple spikes, plus old woody stems from last season. Confirmed in person to be the same as plant 3." },
+  { name: "Autumn Sage", sci: "Salvia greggii", kind: "sage", conf: "high", x: 18.0, y: 1.2, d: 1.6, t: 14,
+    note: "Small-leaved sub-shrub by the fence. Confirmed in person to be the same as plant 4. Plant 14 is a third one." },
   { name: "Mexican Heather", sci: "Cuphea hyssopifolia (likely)", kind: "shrub", conf: "medium", x: 18.8, y: 3.2, d: 2.1, t: 14,
     note: "Lime-green fine-textured mound that matches plant 5 in the video. No close-up of this one." },
   { name: "Southern Magnolia 'Little Gem'", sci: "Magnolia grandiflora 'Little Gem'", kind: "magnolia", conf: "high", x: 21.0, y: 2.6, d: 4.5, t: 16,
     note: "Second columnar magnolia. Some yellowing older leaves." },
   { name: "Blue Salvia (large mass)", sci: "Salvia 'Mystic Spires Blue' (or 'Indigo Spires')", kind: "salvia", conf: "medium", x: 25.4, y: 3.2, d: 6.8, t: 19,
     note: "Large, sprawling planting with soft, oval gray-green leaves and tall violet-blue flower spikes. It fills about 6–7 ft of the bed." },
+  { name: "Purple Coneflower", sci: "Echinacea purpurea", kind: "coneflower", conf: "high", x: 27.0, y: 3.2, d: 1.5, t: 21,
+    note: "Past bloom, so only the dark seed heads and coarse leaves show, tucked into the right side of the salvia mass (plant 12). Added after the first pass; confirmed in person." },
+  { name: "Autumn Sage", sci: "Salvia greggii", kind: "sage", conf: "high", x: 28.2, y: 1.2, d: 1.6, t: 22,
+    note: "Hidden where the salvia mass and the crape myrtle canopies meet near the fence. Added after the first pass; confirmed in person to be the same as plants 4 and 9." },
   { name: "Crape Myrtle", sci: "Lagerstroemia indica", kind: "crape", conf: "high", x: 30.6, y: 2.6, d: 5.6, t: 24,
     note: "Multi-trunk, still staked, with magenta blooms. Sits just left of the stepping-stone path." },
+  { name: "Red Mandevilla (hanging pot)", sci: "Mandevilla sp.", kind: "vine", conf: "high", x: 33.0, y: 1.6, d: 1.6, t: 25,
+    note: "Second hanging pot, on the left side of the stepping-stone path directly across from plant 17. Added after the first pass; confirmed in person." },
   { name: "Red Mandevilla (hanging pot)", sci: "Mandevilla sp.", kind: "vine", conf: "high", x: 36.4, y: 1.6, d: 1.6, t: 27,
-    note: "Red trumpet flowers with yellow throats, in a container hanging near the string lights by the gate." },
+    note: "Red trumpet flowers with yellow throats, in a container hanging near the string lights by the gate. Plant 16 is its twin across the path." },
   { name: "Crape Myrtle", sci: "Lagerstroemia indica", kind: "crape", conf: "high", x: 38.8, y: 2.6, d: 5.6, t: 30,
     note: "Multi-trunk with bright magenta blooms. Sits just right of the stepping-stone path." },
   { name: "Tropical Milkweed 'Silky Gold'", sci: "Asclepias curassavica 'Silky Gold'", kind: "yellow", conf: "high", x: 39.6, y: 0.7, d: 1.8, t: 31,
     note: "Second milkweed, against the fence behind crape myrtle 18. Missed on the first pass: in the video only its wispy, narrow leaves show between the crape myrtle and the salvia. Confirmed in person to be the same as plant 1." },
+  { name: "Purple Coneflower", sci: "Echinacea purpurea", kind: "coneflower", conf: "high", x: 40.2, y: 3.6, d: 1.5, t: 31,
+    note: "Second coneflower, just left of the salvia mass (plant 21), also past bloom. Added after the first pass; confirmed in person." },
   { name: "Blue Salvia (mass)", sci: "Salvia 'Mystic Spires Blue' (or 'Indigo Spires')", kind: "salvia", conf: "medium", x: 41.8, y: 3.6, d: 5, t: 32,
     note: "Second large salvia planting, wrapping around the base of the last magnolia." },
   { name: "Southern Magnolia 'Little Gem'", sci: "Magnolia grandiflora 'Little Gem'", kind: "magnolia", conf: "high", x: 45.0, y: 2.6, d: 4.5, t: 35,
     note: "Third columnar magnolia, next to a yard sign and the river rock bed." },
 ];
 
-const COLORS = { magnolia: "--magnolia", crape: "--crape", salvia: "--salvia", shrub: "--shrub", herb: "--herb", vine: "--vine", yellow: "--yellow", sage: "--vine", speedwell: "--crape" };
+// care by species, keyed like WIKI (first two words of `sci`); timing is for North Texas
+const SPECIES_CARE = {
+  "Asclepias curassavica": {
+    care: "Full sun. Drought tolerant, but water weekly in a dry spell to keep it blooming. Hose off yellow oleander aphids; don't spray insecticide on a monarch host.",
+    winter: "Cut the stems back to about 6 in. now, before the first freeze, so monarchs move on south and the OE parasite doesn't build up on old leaves. Pull or bag the seed pods if you don't want seedlings. Spread 2–3 in. of mulch over the crown.",
+    spring: "In a mild winter it comes back from the roots in April. Cut off any dead stems once new shoots show. If there's nothing by early May, replace it, or plant the native butterfly weed instead.",
+  },
+  "Magnolia grandiflora": {
+    care: "Evergreen. Water deeply every week or two in summer for the first 2–3 years. Keep 3 in. of mulch out to the drip line but off the trunk. The roots are shallow, so don't dig or plant right under it.",
+    winter: "No pruning needed. If the winter is dry, give it a deep soak every 3–4 weeks and the day before a hard freeze; evergreens dry out in cold wind.",
+    spring: "Older leaves yellow and drop in spring as new ones come in; that's normal. Feed lightly with a slow-release fertilizer in March. Yellow leaves with green veins mean iron chlorosis from alkaline soil; treat with chelated iron.",
+  },
+  "Veronica spicata": {
+    care: "Full sun to afternoon shade. Wants more water than the rest of the bed and good drainage. Cut spent spikes back to a leaf pair for a second round of bloom.",
+    winter: "After frost blackens the stems, cut them down to the low rosette of leaves. Fully hardy, so it needs no protection. Keep heavy, wet mulch off the crown.",
+    spring: "Clear old foliage in late February. Every 3–4 years, divide the clump in early spring when the center starts to thin out. Top-dress with a little compost.",
+  },
+  "Salvia greggii": {
+    care: "Full sun and very little water once established. Overwatering is the usual way to kill it. Shear lightly after each flush of bloom.",
+    winter: "Leave it alone. It's mostly evergreen here, and pruning in fall pushes tender growth a freeze can damage.",
+    spring: "In late February or early March, cut it back by a third to a half and take out dead, woody stems. Plants get leggy after 5–7 years; replace them or take cuttings.",
+  },
+  "Cuphea hyssopifolia": {
+    care: "Sun to part shade. Water regularly the first season, then about weekly in summer heat. Needs no deadheading.",
+    winter: "Only root-hardy to about 20°F. Before the first hard freeze, pile 3–4 in. of pine straw or shredded leaves over the crown. After frost, leave the dead top in place over winter to shelter the roots.",
+    spring: "After the last freeze in mid-March, cut the dead stems to the ground. Give it until May to resprout from the roots before replacing it.",
+  },
+  "Echinacea purpurea": {
+    care: "Full sun. Drought tolerant once established; water every week or two in a hot, dry summer. Deadhead early blooms to stretch the season, but leave the late ones to set seed.",
+    winter: "Leave the seed heads standing over winter; goldfinches eat them and the stems mark where the plants are. Don't mulch over the crown, since wet mulch rots it.",
+    spring: "In late February, cut the old stems to the ground before new leaves come up. Pull any extra seedlings, or move them while small. Divide crowded clumps every 4 years or so in early spring.",
+  },
+  "Lagerstroemia indica": {
+    care: "Drought tolerant once established; water deeply every couple of weeks in a dry summer. Keep the trunk guards on against the string trimmer. Take the stake off once the trunk stands firm on its own, usually after a year.",
+    winter: "Nothing to do before winter. Leave the seed heads; birds eat them.",
+    spring: "In late January or February, remove suckers at the base, crossing branches and twigs thinner than a pencil. Never top it (\"crape murder\"). Check the bark for crape myrtle bark scale, white felt patches with black sooty mold; scrub them off with soapy water and a soft brush.",
+  },
+  "Salvia 'Mystic": {
+    care: "Full sun. Moderate water; it blooms best with a deep soak each week in summer. Cut spent spikes to keep it flowering, and cut the whole plant back by a third in early July.",
+    winter: "Let frost take the top growth and leave it standing over winter; it protects the crown. Add 2–3 in. of mulch around the base.",
+    spring: "When new shoots show at the base, usually in March, cut the old stems down to 4–6 in. Divide crowded clumps then too, before they spread into the magnolias.",
+  },
+  "Mandevilla sp.": {
+    care: "Tropical vine. Full sun to light afternoon shade. Water when the top inch of soil is dry, and feed every two weeks with a bloom fertilizer from spring through summer.",
+    winter: "Bring both pots inside before nights drop below 50°F, which is usually now. Check for mealybugs and spider mites first and rinse the leaves. Cut the vines back by about a third. Keep them in a sunny window or a bright garage above 45°F, water sparingly and don't feed.",
+    spring: "Move the pots back out once nights stay above 55–60°F, usually late April. Refresh the top few inches of potting soil or repot, then start feeding again.",
+  },
+};
+const speciesKey = sci => sci.split(" ").slice(0, 2).join(" ");
+
+const COLORS = { magnolia: "--magnolia", crape: "--crape", salvia: "--salvia", shrub: "--shrub", herb: "--herb", vine: "--vine", yellow: "--yellow", sage: "--vine", speedwell: "--crape", violet: "--salvia", coneflower: "--crape" };
 const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
 
 // Wikipedia article per species, keyed by the first two words of `sci`; "" means no article
 const WIKI = {
-  "possibly lavender": "Lavandula", "Salvia 'Mystic": "Salvia_farinacea", "Mandevilla sp.": "Mandevilla",
+  "Salvia 'Mystic": "Salvia_farinacea", "Mandevilla sp.": "Mandevilla",
   "Lantana ×": "Lantana_camara", "Scutellaria suffrutescens": "",
 };
-const PHOTO_QUERY = { "possibly lavender": "lavender plant", "Mandevilla sp.": "red mandevilla plant" };
+const PHOTO_QUERY = { "Mandevilla sp.": "red mandevilla plant" };
 function plantLinks(sci) {
-  const key = sci.split(" ").slice(0, 2).join(" ");
+  const key = speciesKey(sci);
   const wiki = key in WIKI ? WIKI[key] : key.replace(" ", "_");
   const q = PHOTO_QUERY[key] ?? sci.replace(/\s*\(.*?\)/g, "") + " plant";
   const photos = `<a href="https://www.google.com/search?tbm=isch&q=${encodeURIComponent(q)}" target="_blank" rel="noopener">Photos</a>`;
@@ -325,6 +385,7 @@ function select(i) {
     <p class="sci">${p.sci}</p>
     <p>${plantLinks(p.sci)}</p>
     <p>${p.note}</p>
+    ${SPECIES_CARE[speciesKey(p.sci)] ? `<p><strong>Before winter:</strong> ${SPECIES_CARE[speciesKey(p.sci)].winter}</p>` : ""}
     <p class="meta">About ${p.x.toFixed(0)} ft from the left fence, ${p.y.toFixed(0)} ft out from the iron fence, roughly ${p.d} ft across. Seen at ${p.t}s in the video.</p>`;
 }
 function showFrame(s) {
@@ -337,51 +398,73 @@ function showFrame(s) {
     <h2>Frame at ${s}s</h2><p class="meta">About ${ft.toFixed(0)} ft along the fence. Nearest plants:</p><p>${near}</p>`;
 }
 
-drawBase(nowSvg); drawPlants(); drawTable(); drawStrip(); select(1);
+function drawSpeciesCare() {
+  // order cards by the first plant of each species
+  const firstIndex = key => PLANTS.findIndex(p => speciesKey(p.sci) === key);
+  document.getElementById("speciescare").innerHTML = Object.entries(SPECIES_CARE).sort(([a], [b]) => firstIndex(a) - firstIndex(b)).map(([key, c]) => {
+    const nums = PLANTS.map((p, i) => [p, i]).filter(([p]) => speciesKey(p.sci) === key);
+    const [first] = nums[0];
+    const dots = nums.map(([p, i]) => `<span class="dot" style="background:var(${COLORS[p.kind]})" data-i="${i}" title="Show plant ${i + 1}">${i + 1}</span>`).join("");
+    return `<div class="card care-card">
+      <h4>${first.name.replace(/\s*\(.*?\)/, "")} ${dots}</h4>
+      <p class="sci">${first.sci.replace(/\s*\(.*?\)/g, "")}</p>
+      <dl class="facts"><dt>Ongoing</dt><dd>${c.care}</dd><dt>Before winter</dt><dd>${c.winter}</dd><dt>Spring</dt><dd>${c.spring}</dd></dl>
+    </div>`;
+  }).join("");
+  document.querySelectorAll("#speciescare .dot").forEach(d => d.addEventListener("click", () => {
+    select(+d.dataset.i);
+    document.querySelector("#tab-now .scroller").scrollIntoView({ behavior: "smooth" });
+  }));
+}
+
+drawBase(nowSvg); drawPlants(); drawTable(); drawStrip(); drawSpeciesCare(); select(1);
 
 // ---- Next year plan ----
 
 // expected spread (ft) by the end of next summer for plants already in the bed, keyed by plant number
-const NEXT_SPREAD = { 1: 3, 2: 5, 3: 1.5, 4: 3, 5: 2.5, 6: 1.5, 7: 1.5, 8: 6.5, 9: 2, 10: 2, 11: 2, 12: 2, 13: 2.5, 14: 5, 16: 6, 18: 6, 19: 2.5, 21: 5 };
-// trees shade the bed but are limbed up, and the mandevilla hangs in a pot, so none of them cover ground
-const CANOPY = new Set([8, 16, 17, 18]);
+const NEXT_SPREAD = { 1: 3, 2: 5, 3: 1.5, 4: 3, 5: 2.5, 6: 1.5, 7: 6.5, 8: 1.5, 9: 3, 10: 2.5, 11: 5, 13: 2, 14: 3, 15: 6, 18: 6, 19: 2.5, 20: 2, 22: 5 };
+// trees shade the bed but are limbed up, and the mandevillas hang in pots, so none of them cover ground
+const CANOPY = new Set([7, 15, 16, 17, 18]);
 const CARE = {
   "1, 19": "Tropical milkweed: cut stems back to about 6 in. in late fall so monarchs don't linger and to clear the OE parasite. It's root-hardy in a mild winter; the native butterfly weed (L) is the hardier backup.",
-  "5, 13": "Mexican heather is only root-hardy to about 20°F. Mulch the crowns before the first hard freeze and expect to replace one after a cold winter.",
-  "3": "Spike speedwell wants more water than the rest of the bed. If it struggles in July, swap it for pink skullcap (I).",
-  "4": "Autumn sage: shear by a third in late winter and again lightly in midsummer to keep it dense.",
-  "15, 20": "Blue salvia masses: cut back by a third in early July for a second flush. Divide in spring if they start crowding the magnolias.",
-  "17": "Mandevilla is tropical. Bring the pot into a garage or bright room below 50°F, or treat it as an annual.",
+  "5, 10": "Mexican heather is only root-hardy to about 20°F. Mulch the crowns before the first hard freeze and expect to replace one after a cold winter.",
+  "3, 6, 8": "Spike speedwell wants more water than the rest of the bed. Deadhead the spent spikes for more bloom. If one struggles in July, swap it for pink skullcap (I).",
+  "4, 9, 14": "Autumn sage: shear by a third in late winter and again lightly in midsummer to keep it dense.",
+  "12, 21": "Blue salvia masses: cut back by a third in early July for a second flush. Divide in spring if they start crowding the magnolias.",
+  "13, 20": "Purple coneflowers: leave the seed heads up for the goldfinches, then cut the stems down in late February.",
+  "16, 17": "Mandevilla is tropical. Bring the pots into a garage or bright room below 50°F, or treat it as an annual.",
 };
 
-// spread: mature width (ft); at: [x, y] positions in feet, same frame as the Now map
+// spread: mature width (ft); at: [x, y] positions in feet, same frame as the Now map; hanging: in a pot, covers no ground
 const NEW_PLANTS = [
   { id: "A", name: "Gulf Muhly", sci: "Muhlenbergia capillaris", color: "#b8508f", spread: 3, height: "3 ft", water: "Low", bloom: "Sep–Nov, pink plumes",
-    why: "Native grass that turns into a pink haze in fall when most of the bed is winding down. Fills the empty fence line behind the middle crape myrtle.", at: [[29.3, 1.4], [32.4, 1.4]] },
+    why: "Native grass that turns into a pink haze in fall when most of the bed is winding down. Fills the empty fence line behind the middle crape myrtle, next to the autumn sage.", at: [[31.4, 1.4]] },
   { id: "B", name: "Flame Acanthus", sci: "Anisacanthus quadrifidus var. wrightii", color: "#d0602a", spread: 3, height: "3–4 ft", water: "Very low", bloom: "Jul–Oct, orange tubes",
     why: "Tough Texas native that blooms through the August heat. Hummingbirds work it all fall. Anchors the gate side of the path.", at: [[37.6, 1.9]] },
   { id: "C", name: "Rock Rose", sci: "Pavonia lasiopetala", color: "#d8648a", spread: 3, height: "3 ft", water: "Low", bloom: "Apr–Nov, pink",
-    why: "Small native shrub with hibiscus-like pink flowers most of the year. Takes the light shade under the crape myrtles.", at: [[11.8, 3.7], [30.8, 4.2]] },
+    why: "Small native shrub with hibiscus-like pink flowers most of the year. Takes the light shade under the crape myrtles.", at: [[12.4, 2.4], [15.6, 1.8], [30.8, 4.2]] },
   { id: "D", name: "Purple Coneflower", sci: "Echinacea purpurea", color: "#8f4d93", spread: 2, height: "2–3 ft", water: "Low–moderate", bloom: "May–Jul, purple-pink",
-    why: "Classic pollinator plant; goldfinches eat the seed heads if you leave them. Fills the front gap below the middle magnolia.", at: [[19.5, 5.7], [21.7, 5.8]] },
+    why: "You already grow two (plants 13 and 20), so these extend them. Classic pollinator plant; goldfinches eat the seed heads if you leave them. Fills the front gap below the middle magnolia.", at: [[19.5, 5.7], [21.7, 5.8]] },
   { id: "E", name: "Gaura (Whirling Butterflies)", sci: "Oenothera lindheimeri", color: "#7b7598", spread: 2.5, height: "2–3 ft", water: "Low", bloom: "Apr–Oct, white to pink",
-    why: "Airy native with flowers that float above the foliage. Its deep taproot makes it very drought tolerant.", at: [[37.6, 4.6]] },
+    why: "Airy native with flowers that float above the foliage. Its deep taproot makes it very drought tolerant.", at: [[15.2, 4.3], [37.6, 4.6]] },
   { id: "F", name: "Gregg's Mistflower", sci: "Conoclinium greggii", color: "#6b83c6", spread: 2.5, height: "1.5–2 ft", water: "Low", bloom: "Mar–Nov, lavender",
     why: "Butterfly magnet, especially queens and monarchs, so it pairs well with the milkweed. Spreads slowly by roots to fill gaps.", at: [[9.8, 5.7]] },
   { id: "G", name: "Blackfoot Daisy", sci: "Melampodium leucanthum", color: "#55796d", spread: 1.5, height: "1 ft", water: "Very low", bloom: "Mar–Nov, white",
-    why: "Low, neat edging plant covered in small white daisies. Needs good drainage; overwatering kills it faster than drought.", at: [[3.2, 5.6], [14.0, 6.2], [29.6, 6.1], [37.2, 6.3]] },
+    why: "Low, neat edging plant covered in small white daisies. Needs good drainage; overwatering kills it faster than drought.", at: [[3.2, 5.6], [14.3, 6.2], [29.6, 6.1], [37.2, 6.3]] },
   { id: "H", name: "Zexmenia", sci: "Wedelia acapulcensis var. hispida", color: "#bf8410", spread: 2, height: "1.5–2 ft", water: "Very low", bloom: "May–Nov, orange-yellow",
     why: "Native daisy that blooms through the summer with almost no water. Good front-edge filler next to the lawn.", at: [[16.0, 6.1], [32.2, 6.0]] },
   { id: "I", name: "Pink Skullcap", sci: "Scutellaria suffrutescens", color: "#ad467c", spread: 1.3, height: "1 ft", water: "Low", bloom: "May–Oct, pink",
     why: "Tidy little evergreen mound of rose-pink flowers for the very front edge.", at: [[5.6, 6.3], [17.6, 6.3], [43.5, 6.3]] },
   { id: "J", name: "Aromatic Aster", sci: "Symphyotrichum oblongifolium", color: "#6a52b0", spread: 2, height: "2 ft", water: "Low", bloom: "Oct–Nov, purple",
-    why: "Covers itself in purple daisies in late fall, a key late nectar source for migrating monarchs. Pinch back in June to keep it compact.", at: [[12.0, 5.9]] },
+    why: "Covers itself in purple daisies in late fall, a key late nectar source for migrating monarchs. Pinch back in June to keep it compact.", at: [[12.4, 6.1]] },
   { id: "K", name: "Lantana 'New Gold'", sci: "Lantana × hybrida 'New Gold'", color: "#a8900e", spread: 2.5, height: "1.5–2 ft", water: "Very low", bloom: "May–frost, gold",
     why: "Texas Superstar plant. Sterile, so it blooms nonstop without seeding. Takes the reflected heat by the river rock.", at: [[45.6, 5.8]] },
   { id: "L", name: "Butterfly Weed", sci: "Asclepias tuberosa", color: "#de7a1c", spread: 1.5, height: "1.5–2 ft", water: "Very low", bloom: "May–Sep, orange",
     why: "Native, fully hardy milkweed. Another monarch host near milkweed 19 that comes back every year, even after a cold winter.", at: [[39.4, 6.1]] },
   { id: "M", name: "Coral Honeysuckle", sci: "Lonicera sempervirens", color: "#c3433a", spread: 1.5, height: "vine, 8–12 ft along fence", water: "Low", bloom: "Mar–Jun and fall, red",
-    why: "Repeat of plants 6 and 7. Train it along the fence behind the last salvia; the footprint is small but it screens the fence and feeds hummingbirds.", at: [[42.6, 0.4]] },
+    why: "Native evergreen vine for the bare iron fence. Train one behind the first crape myrtle and one behind the last salvia; the footprint is small but it screens the fence and feeds hummingbirds.", at: [[11.2, 0.4], [42.6, 0.4]] },
+  { id: "N", name: "Red Mandevilla (hanging pot)", sci: "Mandevilla sp.", color: "#c8323a", spread: 1.6, height: "pot on a post, vines trail 3–6 ft", water: "Moderate (in a pot)", bloom: "May–frost, red", hanging: true,
+    why: "More of the hanging pots by the gate (plants 16 and 17), one on each iron fence post, so a line of red runs the length of the fence. Posts are about 7 ft apart, found from the video. Bring every pot in for the winter.", at: [[3.1, 0.5], [9.7, 0.5], [17.8, 0.5], [24.7, 0.5], [41.2, 0.5], [46.5, 0.5]] },
 ];
 
 const planSvg = document.getElementById("planmap");
@@ -402,12 +485,12 @@ function coverage(circles) {
 function drawStats() {
   const groundNow = PLANTS.filter((p, i) => !CANOPY.has(i + 1));
   const groundNext = groundNow.map(p => ({ ...p, d: NEXT_SPREAD[PLANTS.indexOf(p) + 1] ?? p.d }));
-  const added = NEW_PLANTS.flatMap(s => s.at.map(([x, y]) => ({ x, y, d: s.spread })));
-  const count = added.length;
+  const added = NEW_PLANTS.filter(s => !s.hanging).flatMap(s => s.at.map(([x, y]) => ({ x, y, d: s.spread })));
+  const count = added.length, pots = NEW_PLANTS.filter(s => s.hanging).reduce((t, s) => t + s.at.length, 0);
   const tiles = [
     ["Ground covered today", coverage(groundNow), "Measured from the video."],
     ["Next summer, as is", coverage(groundNext), "What you have, grown in."],
-    ["Next summer, with plan", coverage(groundNext.concat(added)), `${count} new plants, ${NEW_PLANTS.length} kinds.`],
+    ["Next summer, with plan", coverage(groundNext.concat(added)), `${count} new plants, ${NEW_PLANTS.filter(s => !s.hanging).length} kinds, plus ${pots} hanging pots.`],
   ];
   document.getElementById("stats").innerHTML = tiles.map(([label, v, sub]) =>
     `<div class="card stat"><div class="meta">${label}</div><div class="big">${Math.round(v * 100)}%</div>
@@ -442,17 +525,17 @@ function drawPlanTable() {
       <td><strong>${s.name}</strong><div class="sci">${s.sci}</div>${plantLinks(s.sci)}</td>
       <td>${s.at.length}</td>
       <td>${s.spread} ft</td>
-      <td>${Math.round(area(s.spread) * s.at.length)} sq ft</td>
+      <td>${s.hanging ? "hangs" : `${Math.round(area(s.spread) * s.at.length)} sq ft`}</td>
       <td>${s.water}</td>`;
     tr.addEventListener("click", () => planSelect(s.id));
     planRows.appendChild(tr);
   }
-  const total = NEW_PLANTS.reduce((t, s) => t + area(s.spread) * s.at.length, 0);
+  const total = NEW_PLANTS.filter(s => !s.hanging).reduce((t, s) => t + area(s.spread) * s.at.length, 0);
   const tr = document.createElement("tr");
   tr.style.cursor = "default";
   tr.innerHTML = `<td></td><td><strong>Total</strong></td><td>${NEW_PLANTS.reduce((t, s) => t + s.at.length, 0)}</td><td></td><td><strong>${Math.round(total)} sq ft</strong></td><td></td>`;
   planRows.appendChild(tr);
-  document.getElementById("care").innerHTML = Object.entries(CARE).map(([n, t]) => `<li><strong>${n}:</strong> ${t}</li>`).join("");
+  document.getElementById("care").innerHTML = Object.entries(CARE).sort((a, b) => parseInt(a[0]) - parseInt(b[0])).map(([n, t]) => `<li><strong>${n}:</strong> ${t}</li>`).join("");
 }
 
 const planDetail = document.getElementById("plandetail");
@@ -475,9 +558,9 @@ function planSelect(key) {
     <p>${s.why}</p>
     <dl class="facts">
       <dt>Plant</dt><dd>${s.at.length} at ${s.at.map(([x]) => Math.round(x) + " ft").join(", ")}</dd>
-      <dt>Spread</dt><dd>${s.spread} ft across, about ${Math.round(area(s.spread))} sq ft each</dd>
+      <dt>Spread</dt><dd>${s.hanging ? "Hangs from the fence, so it covers no ground" : `${s.spread} ft across, about ${Math.round(area(s.spread))} sq ft each`}</dd>
       <dt>Height</dt><dd>${s.height}</dd>
-      <dt>Water</dt><dd>${s.water} once established; water weekly the first summer</dd>
+      <dt>Water</dt><dd>${s.hanging ? "Whenever the top inch of soil is dry; pots can need it daily in July" : `${s.water} once established; water weekly the first summer`}</dd>
       <dt>Bloom</dt><dd>${s.bloom}</dd>
     </dl>`;
 }
