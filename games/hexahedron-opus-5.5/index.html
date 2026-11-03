@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hexahedron</title>
+  <style>
+    html, body { margin: 0; height: 100%; overflow: hidden; background: #000; color: #9fd0ff; font-family: "Courier New", ui-monospace, monospace; }
+    canvas { display: block; }
+    .hud { position: fixed; pointer-events: none; text-shadow: 0 0 6px rgba(60,140,255,0.6); }
+    #crosshair { left: 50%; top: 50%; width: 30px; height: 30px; transform: translate(-50%, -50%); }
+    #crosshair::before, #crosshair::after { content: ""; position: absolute; background: rgba(120,200,255,0.75); }
+    #crosshair::before { left: 14px; top: 0; width: 2px; height: 30px; clip-path: polygon(0 0,100% 0,100% 33%,0 33%,0 66%,100% 66%,100% 100%,0 100%); }
+    #crosshair::after { top: 14px; left: 0; height: 2px; width: 30px; clip-path: polygon(0 0,33% 0,33% 100%,0 100%,0 0,66% 0,100% 0,100% 100%,66% 100%); }
+    #shieldbox { left: 24px; bottom: 22px; width: 220px; }
+    #shieldbox .label { font-size: 12px; letter-spacing: 2px; opacity: 0.8; }
+    #shield-num { font-size: 34px; font-weight: bold; }
+    #shield-frame { height: 8px; border: 1px solid rgba(120,200,255,0.5); margin-top: 4px; }
+    #shield-bar { height: 100%; width: 50%; background: #40a0ff; }
+    #weaponbox { right: 24px; bottom: 22px; text-align: right; font-size: 14px; letter-spacing: 1px; }
+    #weapon span { opacity: 0.55; margin-left: 10px; }
+    #weapon span.sel { opacity: 1; color: #fff; }
+    #weapon span.na { opacity: 0.2; }
+    #missiles { margin-top: 6px; color: #ffc080; }
+    #key { left: 24px; top: 22px; display: none; padding: 6px 10px; border: 2px solid #ff3020; color: #ff5040; font-weight: bold; text-shadow: 0 0 8px #f20; }
+    #room { right: 24px; top: 22px; font-size: 12px; letter-spacing: 2px; opacity: 0.7; }
+    #objective { left: 50%; bottom: 22px; transform: translateX(-50%); font-size: 12px; opacity: 0.75; text-align: center; max-width: 40vw; }
+    #msg { left: 50%; top: 16%; transform: translateX(-50%); font-size: 20px; font-weight: bold; color: #fff; text-align: center; transition: opacity .4s; opacity: 0; max-width: 80vw; }
+    #timer { left: 50%; top: 6%; transform: translateX(-50%); font-size: 48px; font-weight: bold; color: #ff4030; text-shadow: 0 0 12px #f00; display: none; }
+    .tint { position: fixed; inset: 0; pointer-events: none; opacity: 0; }
+    #hurt { background: radial-gradient(ellipse at center, rgba(255,0,0,0) 40%, rgba(255,0,0,0.65) 100%); }
+    #heat { background: radial-gradient(ellipse at bottom, rgba(255,120,0,0.8), rgba(255,60,0,0) 70%); }
+    #pick { background: rgba(80,150,255,0.35); }
+    #map-ui { display: none; left: 24px; top: 22px; font-size: 13px; line-height: 1.6; background: rgba(0,0,10,0.6); padding: 10px 14px; border: 1px solid #234; }
+    #map-ui b { color: #fff; letter-spacing: 3px; }
+    .sw { display: inline-block; width: 14px; height: 3px; vertical-align: middle; margin-right: 6px; }
+    body.mapping #crosshair, body.mapping #objective { display: none; }
+    .screen { position: fixed; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; background: rgba(0,0,0,0.72); cursor: pointer; text-align: center; padding: 16px; box-sizing: border-box; }
+    .screen h1 { font-size: clamp(36px, 8vw, 72px); margin: 0 0 6px; letter-spacing: 10px; color: #fff; text-shadow: 0 0 20px #39f, 0 0 40px #136; }
+    .screen h2 { margin: 0 0 18px; letter-spacing: 4px; font-weight: normal; color: #7ab; font-size: 15px; }
+    .screen p { max-width: 640px; line-height: 1.5; }
+    .controls { display: grid; grid-template-columns: auto auto; gap: 3px 22px; text-align: left; font-size: 14px; margin: 14px 0; }
+    .controls span:nth-child(odd) { color: #fff; }
+    .go { margin-top: 18px; font-size: 20px; color: #fff; animation: blink 1.2s infinite; }
+    @keyframes blink { 50% { opacity: 0.35; } }
+    #dead h1 { color: #ff6050; text-shadow: 0 0 20px #f20; }
+    #win h1 { color: #80ffa0; text-shadow: 0 0 20px #0f6; }
+  </style>
+  <script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }</script>
+</head>
+<body>
+  <div id="crosshair" class="hud"></div>
+  <div id="shieldbox" class="hud"><div class="label">SHIELD</div><div id="shield-num">100</div><div id="shield-frame"><div id="shield-bar"></div></div></div>
+  <div id="weaponbox" class="hud"><div id="weapon"></div><div id="missiles"></div></div>
+  <div id="key" class="hud">RED KEY</div>
+  <div id="room" class="hud"></div>
+  <div id="objective" class="hud">Find the red access key. It is somewhere hot.</div>
+  <div id="msg" class="hud"></div>
+  <div id="timer" class="hud"></div>
+  <div id="hurt" class="tint"></div>
+  <div id="heat" class="tint"></div>
+  <div id="pick" class="tint"></div>
+  <div id="map-ui" class="hud">
+    <b>AUTOMAP</b><br>
+    Mouse: rotate &nbsp; Wheel: zoom<br>WASD / Space / Shift: pan<br>Tab or M: back to flight<br><br>
+    <span class="sw" style="background:#3a86ff"></span>visited<br>
+    <span class="sw" style="background:#1c3f78"></span>seen, not visited<br>
+    <span class="sw" style="background:#ffc830"></span>door<br>
+    <span class="sw" style="background:#ff2a20"></span>red door / key<br>
+    <span class="sw" style="background:#30ff60"></span>exit<br>
+    <span class="sw" style="background:#ff6a20"></span>lava<br>
+    <span class="sw" style="background:#ff40d0"></span>reactor
+  </div>
+
+  <div id="title" class="screen">
+    <h1>HEXAHEDRON</h1>
+    <h2>A SIX-DEGREES-OF-FREEDOM MINE RUN</h2>
+    <p>Robots have overrun a deep mining outpost. Find the red access key in the lava cavern, break through to the reactor, destroy it, and fly back out before the mine blows.</p>
+    <div class="controls">
+      <span>Mouse / Arrows</span><span>pitch and yaw</span>
+      <span>W A S D</span><span>thrust and strafe</span>
+      <span>Space / R &nbsp; Shift / F</span><span>slide up / down</span>
+      <span>Q / E</span><span>roll</span>
+      <span>Left click</span><span>primary weapon</span>
+      <span>Right click / G</span><span>homing missile</span>
+      <span>1 / 2</span><span>laser / spreadfire</span>
+      <span>Tab or M</span><span>automap</span>
+      <span>Esc</span><span>pause</span>
+    </div>
+    <div class="go">CLICK TO LAUNCH</div>
+  </div>
+  <div id="pause" class="screen"><h1>PAUSED</h1><div class="go">CLICK TO RESUME</div></div>
+  <div id="dead" class="screen"><h1>DESTROYED</h1><p id="dead-reason"></p><div class="go">CLICK TO TRY AGAIN</div></div>
+  <div id="win" class="screen"><h1>ESCAPED</h1><p>The mine collapses behind you.</p><p id="win-stats"></p><div class="go">CLICK TO PLAY AGAIN</div></div>
+
+  <script type="module" src="game.js"></script>
+</body>
+</html>

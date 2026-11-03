@@ -107,6 +107,18 @@
       "port": 8799
     },
     {
+      "name": "hexahedron",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8801",
+        "-d",
+        "games/hexahedron-opus-5.5"
+      ],
+      "port": 8801
+    },
+    {
       "name": "garden-map",
       "runtimeExecutable": "python3",
       "runtimeArgs": [
