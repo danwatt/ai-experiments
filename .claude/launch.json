@@ -81,6 +81,18 @@
         "8795"
       ],
       "port": 8795
+    },
+    {
+      "name": "sixfold",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8797",
+        "-d",
+        "sixfold"
+      ],
+      "port": 8797
     }
   ]
 }
