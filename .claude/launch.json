@@ -129,6 +129,42 @@
         "garden-map"
       ],
       "port": 8803
+    },
+    {
+      "name": "2048-qbas",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8805",
+        "-d",
+        "games/2048-qbas-opus-5.5-high"
+      ],
+      "port": 8805
+    },
+    {
+      "name": "2048-gba",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8807",
+        "-d",
+        "games/2048-gba-opus-5.5-high"
+      ],
+      "port": 8807
+    },
+    {
+      "name": "2048-ps1-opus-5.5-high",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8791",
+        "-d",
+        "games/2048-ps1-opus-5.5-high"
+      ],
+      "port": 8791
     }
   ]
 }
