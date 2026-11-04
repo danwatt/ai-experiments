@@ -165,6 +165,18 @@
         "games/2048-ps1-opus-5.5-high"
       ],
       "port": 8791
+    },
+    {
+      "name": "2048-lynx",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8809",
+        "-d",
+        "games/2048-lynx-opus-5.5-high"
+      ],
+      "port": 8809
     }
   ]
 }
