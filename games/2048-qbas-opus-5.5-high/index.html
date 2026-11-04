@@ -1,0 +1,301 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hex 2048 · QBasic</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=VT323&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one column; the QBJS canvas in a bezel is the hero, a hex pad under it, the .bas source at the foot. */
+@font-face { font-family: dosvga; src: url(qbjs/qbjs.woff2); }
+@font-face { font-family: dosvga8; src: url(qbjs/fonts/WebPlus_IBM_EGA_8x8.woff); }
+:root {
+  --bg: #e6e3db;
+  --surface: #f3f1eb;
+  --ink: #2a2722;
+  --muted: #6b655b;
+  --line: #cdc7ba;
+  --accent: #9c770c;
+  --bezel: #2b2925;
+  --bezel-ink: #bdb6a8;
+  --code-bg: #f3f1eb;
+  --display: "VT323", "Courier New", monospace;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #171613; --surface: #211f1b; --ink: #ece7dc; --muted: #a29b8e; --line: #38352f;
+    --accent: #edc22e; --bezel: #0c0b09; --bezel-ink: #8d8679; --code-bg: #1d1b18;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #171613; --surface: #211f1b; --ink: #ece7dc; --muted: #a29b8e; --line: #38352f;
+  --accent: #edc22e; --bezel: #0c0b09; --bezel-ink: #8d8679; --code-bg: #1d1b18;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 15px;
+  line-height: 1.55;
+}
+.wrap {
+  max-width: 760px;
+  margin: 0 auto;
+  padding-block: 28px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid;
+  gap: 24px;
+}
+header { display: grid; gap: 6px; }
+h1 {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(44px, 9vw, 72px);
+  line-height: .9;
+  margin: 0;
+}
+header p { margin: 0; color: var(--muted); max-width: 60ch; }
+a { color: var(--accent); }
+
+.bezel {
+  background: var(--bezel);
+  border-radius: 14px;
+  padding: 14px;
+  display: grid;
+  gap: 10px;
+}
+.screen {
+  position: relative;
+  aspect-ratio: 640 / 600;
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+  background: #faf8ef;
+  border-radius: 4px;
+  overflow: hidden;
+}
+/* QBJS creates #gx-canvas inside #gx-container at 640x600. A transform (not a CSS width)
+   scales it to fit, because GX reads mouse offsetX/offsetY, which ignore transforms. */
+#gx-container { position: absolute; inset: 0; }
+#gx-canvas {
+  display: block;
+  width: 640px;
+  height: 600px;
+  transform-origin: 0 0;
+  transform: scale(var(--fit, 1));
+  outline: none;
+  touch-action: none;
+}
+#gx-footer { display: none; }
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  gap: 10px;
+  text-align: center;
+  background: color-mix(in srgb, var(--bezel) 82%, transparent);
+  color: #f3efe6;
+  border: 0;
+  font: inherit;
+  cursor: pointer;
+  width: 100%;
+}
+.overlay[hidden] { display: none; }
+.overlay .big { font-family: var(--display); font-size: 44px; line-height: 1; }
+.overlay .small { color: var(--bezel-ink); font-size: 14px; }
+.status {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--bezel-ink);
+  font-family: var(--mono);
+  font-size: 12px;
+  flex-wrap: wrap;
+}
+
+.pad {
+  display: grid;
+  grid-template-columns: repeat(3, 64px);
+  gap: 8px;
+  justify-content: center;
+}
+.pad button {
+  font-family: var(--mono);
+  font-size: 13px;
+  height: 48px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+  line-height: 1.1;
+}
+.pad button:active { background: var(--line); }
+.pad button span { display: block; color: var(--muted); font-size: 11px; }
+.pad .wide { grid-column: span 3; height: 36px; }
+
+section h2 { font-size: 16px; margin: 0 0 8px; }
+section p { margin: 0 0 10px; color: var(--muted); }
+details { border: 1px solid var(--line); border-radius: 10px; background: var(--code-bg); }
+summary { cursor: pointer; padding: 10px 14px; font-weight: 500; }
+pre {
+  margin: 0;
+  padding: 0 14px 14px;
+  overflow: auto;
+  max-height: 520px;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+footer { color: var(--muted); font-size: 13px; }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Hex 2048 · QBasic</h1>
+    <p>The original <code>2048-qbasic.bas</code>, compiled to JavaScript in your browser by a bundled copy of
+      <a href="https://github.com/boxgaming/qbjs">QBJS</a> (a QBasic / QB64 implementation for the web) and run on a canvas.</p>
+  </header>
+
+  <div class="bezel">
+    <div class="screen">
+      <div id="gx-container"></div>
+      <div id="gx-footer"></div>
+      <button class="overlay" id="overlay" type="button">
+        <span class="big" id="overlay-title">RUN 2048-QBASIC.BAS</span>
+        <span class="small" id="overlay-sub">Click to compile and start</span>
+      </button>
+    </div>
+    <div class="status"><span id="status">Idle</span><span>Q W E / A S D · R new game · Esc quit</span></div>
+  </div>
+
+  <div class="pad" aria-label="Slide controls">
+    <button data-key="q">NW<span>Q</span></button>
+    <button data-key="w">N<span>W</span></button>
+    <button data-key="e">NE<span>E</span></button>
+    <button data-key="a">SW<span>A</span></button>
+    <button data-key="s">S<span>S</span></button>
+    <button data-key="d">SE<span>D</span></button>
+    <button class="wide" data-key="r">New game <span style="display:inline">R</span></button>
+  </div>
+
+  <section>
+    <h2>Source</h2>
+    <p>This is the file the page fetches and compiles. Edit the <code>.bas</code> and reload to run your changes.</p>
+    <details>
+      <summary>2048-qbasic.bas</summary>
+      <pre id="source">Loading…</pre>
+    </details>
+  </section>
+
+  <footer>QBJS is MIT-licensed; see <a href="qbjs/LICENSE">qbjs/LICENSE</a> and <a href="qbjs/3rd-party-licenses.txt">third-party licenses</a>.</footer>
+</div>
+
+<script src="qbjs/pako.2.1.0.min.js"></script>
+<script src="qbjs/vfs.js"></script>
+<script src="gx/gx.js"></script>
+<script src="qbjs/qb.js"></script>
+<script src="qbjs/qb2js.js"></script>
+<script>
+const SOURCE = "2048-qbasic.bas";
+const overlay = document.getElementById("overlay");
+const overlayTitle = document.getElementById("overlay-title");
+const overlaySub = document.getElementById("overlay-sub");
+const statusEl = document.getElementById("status");
+const sourcePromise = fetch(SOURCE).then(r => {
+  if (!r.ok) throw new Error(SOURCE + ": HTTP " + r.status);
+  return r.text();
+});
+sourcePromise.then(t => { document.getElementById("source").textContent = t; },
+                   e => { document.getElementById("source").textContent = String(e); });
+
+let compiled = null;
+let running = false;
+
+async function compile() {
+  const qbCode = await sourcePromise;
+  const compiler = await _QBCompiler();
+  const t0 = performance.now();
+  const js = await compiler.compile(qbCode);
+  const errors = compiler.getWarnings().filter(w => w.mtype);
+  if (errors.length) {
+    throw new Error(errors.map(w => "line " + w.line + ": " + w.text).join("\n"));
+  }
+  statusEl.textContent = "Compiled " + qbCode.split("\n").length + " lines of BASIC to " +
+    Math.round(js.length / 1024) + " KB of JS in " + Math.round(performance.now() - t0) + " ms";
+  const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
+  return new AsyncFunction(js);
+}
+
+async function run() {
+  if (running) return;
+  running = true;
+  overlay.hidden = true;
+  try {
+    if (!compiled) {
+      statusEl.textContent = "Compiling…";
+      // Canvas text uses the DOS fonts, which only load once something asks for them.
+      await Promise.all([document.fonts.load("16px dosvga"), document.fonts.load("8px dosvga8")]);
+      compiled = await compile();
+    }
+    GX.reset();
+    QB.start();
+    const done = compiled();
+    document.getElementById("gx-canvas")?.focus();
+    await done;
+    QB.halt();
+    overlayTitle.textContent = "PROGRAM ENDED";
+    overlaySub.textContent = "Click to run again";
+  } catch (err) {
+    console.error(err);
+    QB.halt();
+    overlayTitle.textContent = "ERROR";
+    overlaySub.textContent = err.message;
+    statusEl.textContent = "Error";
+  }
+  running = false;
+  overlay.hidden = false;
+}
+
+overlay.addEventListener("click", run);
+
+const screenEl = document.querySelector(".screen");
+new ResizeObserver(() => {
+  screenEl.style.setProperty("--fit", screenEl.clientWidth / 640);
+}).observe(screenEl);
+
+// GX's own touch handlers measure from the page origin and ignore the scale, so turn
+// touches into mouse events before they reach the canvas; offsetX/Y then come out right.
+const touchToMouse = { touchstart: "mousedown", touchmove: "mousemove", touchend: "mouseup", touchcancel: "mouseup" };
+const gxContainer = document.getElementById("gx-container");
+for (const [touchType, mouseType] of Object.entries(touchToMouse)) {
+  gxContainer.addEventListener(touchType, e => {
+    if (e.target.id !== "gx-canvas") return;
+    e.stopPropagation();
+    e.preventDefault();
+    const t = e.changedTouches[0];
+    const init = { clientX: t.clientX, clientY: t.clientY, button: 0, bubbles: true };
+    if (mouseType === "mousedown") e.target.dispatchEvent(new MouseEvent("mousemove", init));
+    e.target.dispatchEvent(new MouseEvent(mouseType, init));
+  }, { capture: true, passive: false });
+}
+
+// The pad sends the same key events the program reads with INKEY$.
+document.querySelectorAll(".pad button").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const key = btn.dataset.key;
+    const code = "Key" + key.toUpperCase();
+    dispatchEvent(new KeyboardEvent("keydown", { key, code }));
+    dispatchEvent(new KeyboardEvent("keyup", { key, code }));
+    document.getElementById("gx-canvas")?.focus();
+  });
+});
+</script>

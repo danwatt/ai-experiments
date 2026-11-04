@@ -129,6 +129,18 @@
         "garden-map"
       ],
       "port": 8803
+    },
+    {
+      "name": "2048-qbas",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8805",
+        "-d",
+        "games/2048-qbas-opus-5.5-high"
+      ],
+      "port": 8805
     }
   ]
 }
