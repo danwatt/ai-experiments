@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Back Yard Garden Map</title>
+<title>Garden Map</title>
 <style>
 :root {
   --bg: #f6f4ee;
@@ -26,20 +26,22 @@
   --vine: #c8463c;
   --yellow: #d9a91a;
   --accent: #2f6b4f;
+  --pink: #c9558f;
+  --orange: #d9662a;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #171a15; --panel: #22261f; --ink: #e8eadf; --muted: #a3a893; --line: #3a3f34;
     --lawn: #2d3b22; --mulch: #5a4834; --rock: #5a5a57; --fence: #cfcfcf; --wood: #8a603c; --path: #4a4539;
     --tree: #5fa458; --magnolia: #3f9a6c; --crape: #e07aa8; --salvia: #9d8ff0; --shrub: #a6d65a;
-    --herb: #b5c0a4; --vine: #ef6a5f; --yellow: #f0c445; --accent: #7cc5a0;
+    --herb: #b5c0a4; --vine: #ef6a5f; --yellow: #f0c445; --accent: #7cc5a0; --pink: #ea83b8; --orange: #f08a4b;
   }
 }
 :root[data-theme="dark"] {
   --bg: #171a15; --panel: #22261f; --ink: #e8eadf; --muted: #a3a893; --line: #3a3f34;
   --lawn: #2d3b22; --mulch: #5a4834; --rock: #5a5a57; --fence: #cfcfcf; --wood: #8a603c; --path: #4a4539;
   --tree: #5fa458; --magnolia: #3f9a6c; --crape: #e07aa8; --salvia: #9d8ff0; --shrub: #a6d65a;
-  --herb: #b5c0a4; --vine: #ef6a5f; --yellow: #f0c445; --accent: #7cc5a0;
+  --herb: #b5c0a4; --vine: #ef6a5f; --yellow: #f0c445; --accent: #7cc5a0; --pink: #ea83b8; --orange: #f08a4b;
 }
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
@@ -81,8 +83,11 @@ tbody tr:hover, tbody tr.sel { background: color-mix(in srgb, var(--accent) 12%,
 .dot { display: inline-block; width: 18px; height: 18px; border-radius: 50%; color: #fff; font-size: 11px; font-weight: 700; text-align: center; line-height: 18px; }
 .notes { font-size: 13px; color: var(--muted); margin-top: 20px; }
 .notes li { margin-bottom: 4px; }
-.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); margin: 0 0 18px; }
-.tabs button { font: inherit; font-weight: 600; color: var(--muted); background: none; border: 0; border-bottom: 3px solid transparent; padding: 8px 14px; cursor: pointer; }
+.yards { display: inline-flex; gap: 2px; padding: 3px; background: color-mix(in srgb, var(--line) 60%, transparent); border-radius: 9px; margin: 0 0 10px; }
+.yards button { font: inherit; font-weight: 600; color: var(--muted); background: none; border: 0; border-radius: 7px; padding: 6px 14px; cursor: pointer; }
+.yards button[aria-pressed="true"] { background: var(--panel); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.12); }
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); margin: 0 0 18px; overflow-x: auto; }
+.tabs button { white-space: nowrap; font: inherit; font-weight: 600; color: var(--muted); background: none; border: 0; border-bottom: 3px solid transparent; padding: 8px 14px; cursor: pointer; }
 .tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
 .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
 @media (max-width: 640px) { .stats { grid-template-columns: 1fr; } }
@@ -116,6 +121,10 @@ h3 { font-size: 16px; margin: 24px 0 0; }
 .care-card h4 { font-size: 15px; margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
 .care-card .dot { cursor: pointer; }
 .care-card .facts dt { font-size: 13px; }
+.mapwrap.front { min-width: 720px; }
+.gallery { display: flex; gap: 4px; margin-top: 8px; overflow-x: auto; }
+.gallery img { flex: none; height: 64px; width: auto; border-radius: 4px; cursor: pointer; opacity: .85; }
+.gallery img:hover, .gallery img.sel { opacity: 1; outline: 2px solid var(--accent); }
 .tl { position: relative; min-width: 680px; --name: 240px; }
 .tl-row { display: grid; grid-template-columns: var(--name) 1fr; align-items: center; border-bottom: 1px solid var(--line); }
 .tl-row.pick { cursor: pointer; }
@@ -159,7 +168,11 @@ h3 { font-size: 16px; margin: 24px 0 0; }
 </head>
 <body>
 <main>
-  <h1>Back Yard Garden Map</h1>
+  <h1>Garden Map</h1>
+  <nav class="yards" aria-label="Yard">
+    <button data-yard="back" aria-pressed="true">Back yard</button>
+    <button data-yard="front" aria-pressed="false">Front yard</button>
+  </nav>
   <nav class="tabs" role="tablist">
     <button role="tab" data-tab="now" aria-selected="true">Now</button>
     <button role="tab" data-tab="plan" aria-selected="false">Next year plan</button>
@@ -199,6 +212,39 @@ h3 { font-size: 16px; margin: 24px 0 0; }
   <div class="care-grid" id="speciescare"></div>
   </section>
 
+  <section id="tab-f-now" hidden>
+  <p class="sub">Plants identified from a 49-second video that wanders through the front beds, plus three still photos. The walk wasn't a straight line, so positions come from matching landmarks between frames (the porch, the front walk, the hollies, the birdbath) rather than from timestamps. Parts of the photos that aren't garden are blurred. Click a plant, a row, or a photo.</p>
+
+  <div class="scroller">
+    <div class="mapwrap front">
+      <svg id="frontmap" viewBox="-3 -3.2 54 36.4" role="img" aria-label="Top-down map of the front yard beds"></svg>
+      <div class="gallery" id="frontgallery"></div>
+    </div>
+  </div>
+
+  <div class="cols">
+    <div class="card">
+      <table>
+        <thead><tr><th>#</th><th>Plant</th><th>Where</th><th>Confidence</th></tr></thead>
+        <tbody id="frontrows"></tbody>
+      </table>
+    </div>
+    <div class="card detail" id="frontdetail"></div>
+  </div>
+
+  <ul class="notes">
+    <li>Distances are in feet from the left end of the bed in front of the porch, and out from the house wall. Expect ±3 ft of error; the island bed's distance from the house is the roughest.</li>
+    <li>The tall shrubs are dwarf Burford hollies, confirmed by the spine-tipped leaves and berries in the close-up. The big one toward the side gate (21) has looser, lighter growth and may be a different holly.</li>
+    <li>Brown, spent plants in the island bed weren't counted; they look like zinnias that have finished.</li>
+    <li>Light: the beds against the house are shaded from about noon, and the island bed gets sun until late afternoon in summer. The lantanas by the house bloom a little less for it, but they're doing fine.</li>
+    <li>The live oak bed (28) wasn't in the video; it's placed from your description, about 20 ft left of the birdbath.</li>
+  </ul>
+
+  <h3>Care by species</h3>
+  <p class="meta">Same North Texas timing as the back yard. Click a number to find that plant on the map.</p>
+  <div class="care-grid" id="frontcare"></div>
+  </section>
+
   <section id="tab-plan" hidden>
     <p class="sub">A fuller bed for next year using perennials you already grow plus North Texas natives and Texas-adapted plants that get by on little water once established. Circles show each plant's expected spread by the end of next summer; most perennials reach full size in their second season. Assumes the bed gets full sun, as the video suggests.</p>
     <div class="stats" id="stats"></div>
@@ -232,10 +278,10 @@ h3 { font-size: 16px; margin: 24px 0 0; }
         <button data-view="lawn">From the lawn</button>
         <button data-view="above">From above</button>
         <button data-view="along">Along the fence</button>
-        <label><input type="checkbox" id="v3labels" checked> Labels</label>
+        <label><input type="checkbox" class="v3labels" checked> Labels</label>
       </div>
-      <div class="v3-info" id="v3info" hidden></div>
-      <div class="v3-status" id="v3status">Loading 3D view…</div>
+      <div class="v3-info" hidden></div>
+      <div class="v3-status">Loading 3D view…</div>
     </div>
   </section>
 
@@ -250,6 +296,58 @@ h3 { font-size: 16px; margin: 24px 0 0; }
       <li>Bars show flowers only. The magnolias are evergreen and the grasses and Mexican heather hold their foliage most of the year.</li>
       <li>The mandevilla bar ends when the pots come inside for the winter, usually late October.</li>
       <li>A hot, dry August slows many of these down; a deep soak every week or so keeps them going.</li>
+    </ul>
+  </section>
+  <section id="tab-f-plan" hidden>
+    <p class="sub">A fuller front yard for next year, built around the hollies, boxwoods and lantanas you have. The additions are natives and Texas-adapted plants that need little water once established, picked to fill the open mulch in the bed right of the walk, plant the empty bed under the live oak, and give the island bed perennials that come back after the annuals. The beds against the house are shaded from about noon, so the picks there take afternoon shade; the island bed gets sun until late afternoon, so it keeps the sun lovers. Circles show each plant's expected spread by the end of next summer. Assumes the annuals (purslane and zinnias) are replanted where they grew this year.</p>
+    <div class="stats" id="f-stats"></div>
+    <div class="scroller">
+      <div class="mapwrap front">
+        <svg id="f-planmap" viewBox="-3 -3.2 54 36.4" role="img" aria-label="Top-down plan for the front yard next year"></svg>
+        <div class="legend">
+          <span><i style="background:var(--accent)"></i>New plant (letter = species)</span>
+          <span><i style="background:var(--herb);opacity:.5"></i>Plant you have (number from the Now tab)</span>
+          <span><i style="border:1.5px dashed var(--muted)"></i>Tree canopy: shades the bed, doesn't cover the ground</span>
+        </div>
+      </div>
+    </div>
+    <div class="cols">
+      <div class="card">
+        <table>
+          <thead><tr><th></th><th>New plant</th><th>Qty</th><th>Spread</th><th>Covers</th><th>Water</th></tr></thead>
+          <tbody id="f-planrows"></tbody>
+        </table>
+      </div>
+      <div class="card detail" id="f-plandetail"></div>
+    </div>
+    <h3>Care notes for what you have</h3>
+    <ul class="notes" id="f-care"></ul>
+  </section>
+
+  <section id="tab-f-3d" hidden>
+    <p class="sub">The front yard plan in 3D, in midsummer with everything in bloom at once. The house is a plain stand-in. Drag to turn the view, scroll or pinch to zoom, right-drag or drag with two fingers to pan, and click a plant to name it.</p>
+    <div class="view3d" id="f-view3d">
+      <div class="v3-ui">
+        <button data-view="lawn">From the street</button>
+        <button data-view="above">From above</button>
+        <button data-view="along">From the walk</button>
+        <label><input type="checkbox" class="v3labels" checked> Labels</label>
+      </div>
+      <div class="v3-info" hidden></div>
+      <div class="v3-status">Loading 3D view…</div>
+    </div>
+  </section>
+
+  <section id="tab-f-timeline" hidden>
+    <p class="sub">When each plant in next year's front yard should be in flower, with the best planting times for the new plants and the yearly upkeep, timed for North Texas. Solid bars are full bloom and faded bars lighter bloom; hatched strips are planting windows and the small marks are tasks. Hover over one for details or see the month-by-month list. Click a row to find the plant on the plan.</p>
+    <div class="tl-legend" id="f-tllegend"></div>
+    <div class="scroller"><div class="tl" id="f-timeline"></div></div>
+    <h3>Month by month</h3>
+    <p class="meta">The front yard's evergreens need little; most of the work is the late-February cutback and replanting the annuals in April.</p>
+    <div class="tl-months" id="f-tlmonths"></div>
+    <ul class="notes">
+      <li>The hollies and boxwoods have small, plain spring flowers, shown as light bars; the hollies' red berries carry color from fall through winter.</li>
+      <li>The elephant ear and the unidentified shrub (18) are grown for their leaves, so they have no bloom bar.</li>
     </ul>
   </section>
 </main>
@@ -351,6 +449,46 @@ const SPECIES_CARE = {
     winter: "Let frost take the top growth and leave it standing over winter; it protects the crown. Add 2–3 in. of mulch around the base.",
     spring: "When new shoots show at the base, usually in March, cut the old stems down to 4–6 in. Divide crowded clumps then too, before they spread into the magnolias.",
   },
+  "Quercus virginiana": {
+    care: "Young trees need a deep soak every week or two in a dry summer for their first few years. Keep mulch in a wide ring but pulled back off the trunk, and keep string trimmers away from the bark.",
+    winter: "Nothing to protect; it's evergreen and fully hardy. Water deeply once a month in a dry winter.",
+    spring: "Do any pruning in late January or early February, or in July and August, when the beetles that spread oak wilt are least active, and paint every cut at once with pruning paint or latex paint. Oak wilt kills live oaks across Texas, so never prune from February through June.",
+  },
+  "Ilex cornuta": {
+    care: "Evergreen and very drought tolerant once established; water deeply every 2–3 weeks in a dry summer. Sun to part shade. The berries turn red in fall and feed birds through the winter.",
+    winter: "Nothing to do; it's fully hardy. In a dry winter, give it a deep soak before a hard freeze.",
+    spring: "Shape it in late February, before new growth, by cutting single branches back inside the canopy instead of shearing the outside, which makes a hollow shell and removes the berries. Feed lightly in March if the leaves look pale.",
+  },
+  "Buxus microphylla": {
+    care: "Water weekly the first year, then every week or two in summer; it hates wet feet. Watch in spring for blistered leaves from boxwood leafminer.",
+    winter: "Leaves may bronze in cold wind; that's only cosmetic. Don't prune in fall. Water before a hard freeze if the winter is dry.",
+    spring: "Shear or thin in late spring, once the first flush of new growth firms up. Thin a few branches each year so light reaches the center. Feed in March.",
+  },
+  "Lantana camara": {
+    care: "Full sun and very little water once established; it blooms right through the heat. Shear lightly in midsummer if it gets woody or slows down. Go easy on fertilizer, which gives leaves instead of flowers.",
+    winter: "Leave the frozen tops standing over winter to shelter the crown, and spread 2–3 in. of mulch over the base. These are root-hardy here and come back from the roots.",
+    spring: "Wait until new growth shows at the base, usually April, then cut the dead stems down to about 6 in.",
+  },
+  "Portulaca oleracea": {
+    care: "Annual succulent that loves heat and full sun. Water when the soil is dry; the baskets can need it every day or two in July. Flowers close in the afternoon and on cloudy days.",
+    winter: "The first frost kills it; pull it then. To keep the colors, root a few stem cuttings in water or damp potting mix on a sunny windowsill.",
+    spring: "Plant new ones, or your rooted cuttings, after the last freeze, usually April. Use fast-draining potting mix in the baskets.",
+  },
+  "Zinnia elegans": {
+    care: "Annual. Full sun; water at the base, and deadhead or cut flowers often for more buds. Powdery mildew is common by late summer, and good air flow helps.",
+    winter: "Frost kills it. Pull the plants, or leave a few seed heads for finches and next year's volunteers.",
+    spring: "Sow seed right in the bed once the soil warms, mid-April to May. Sow again in early July for fresh plants in fall.",
+  },
+  "Zinnia angustifolia": {
+    care: "Annual. Thrives on heat and little water and shrugs off mildew better than common zinnias. Needs no deadheading.",
+    winter: "Frost kills it; pull the plants after the first freeze.",
+    spring: "Set out transplants or sow seed after the last freeze, April to May.",
+  },
+  "Colocasia esculenta": {
+    care: "Wants more water than the rest of this bed: keep the soil moist or the leaves scorch in July. Does best with afternoon shade. A heavy feeder; fertilize every few weeks in summer.",
+    winter: "Frost blackens the leaves. Cut them off and mulch the crown 3–4 in. deep; it often returns in North Texas. For a sure thing, dig the corm and store it dry in the garage.",
+    spring: "New leaves come up in May once the soil is warm. Pull the mulch back a little then.",
+  },
   "Mandevilla sp.": {
     care: "Tropical vine. Full sun to light afternoon shade. Water when the top inch of soil is dry, and feed every two weeks with a bloom fertilizer from spring through summer.",
     winter: "Bring both pots inside before nights drop below 50°F, which is usually now. Check for mealybugs and spider mites first and rinse the leaves. Cut the vines back by about a third. Keep them in a sunny window or a bright garage above 45°F, water sparingly and don't feed.",
@@ -359,7 +497,8 @@ const SPECIES_CARE = {
 };
 const speciesKey = sci => sci.split(" ").slice(0, 2).join(" ");
 
-const COLORS = { magnolia: "--magnolia", crape: "--crape", salvia: "--salvia", shrub: "--shrub", herb: "--herb", vine: "--vine", yellow: "--yellow", sage: "--vine", speedwell: "--crape", violet: "--salvia", coneflower: "--crape" };
+const COLORS = { magnolia: "--magnolia", crape: "--crape", salvia: "--salvia", shrub: "--shrub", herb: "--herb", vine: "--vine", yellow: "--yellow", sage: "--vine", speedwell: "--crape", violet: "--salvia", coneflower: "--crape",
+  holly: "--tree", boxwood: "--shrub", lantanaPink: "--pink", lantanaOrange: "--orange", whitesage: "--herb", purslane: "--vine", zinnia: "--crape", narrowzinnia: "--yellow", elephant: "--magnolia", unknown: "--herb", oak: "--tree" };
 const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
 
 // Wikipedia article per species, keyed by the first two words of `sci`; "" means no article
@@ -369,6 +508,7 @@ const WIKI = {
 };
 const PHOTO_QUERY = { "Mandevilla sp.": "red mandevilla plant" };
 function plantLinks(sci) {
+  if (sci === "Not identified") return "";
   const key = speciesKey(sci);
   const wiki = key in WIKI ? WIKI[key] : key.replace(" ", "_");
   const q = PHOTO_QUERY[key] ?? sci.replace(/\s*\(.*?\)/g, "") + " plant";
@@ -482,11 +622,12 @@ function showFrame(s) {
     <h2>Frame at ${s}s</h2><p class="meta">About ${ft.toFixed(0)} ft along the fence. Nearest plants:</p><p>${near}</p>`;
 }
 
-function drawSpeciesCare() {
-  // order cards by the first plant of each species
-  const firstIndex = key => PLANTS.findIndex(p => speciesKey(p.sci) === key);
-  document.getElementById("speciescare").innerHTML = Object.entries(SPECIES_CARE).sort(([a], [b]) => firstIndex(a) - firstIndex(b)).map(([key, c]) => {
-    const nums = PLANTS.map((p, i) => [p, i]).filter(([p]) => speciesKey(p.sci) === key);
+// one care card per species in `plants`, in order of the first plant of each; dots call pick(index)
+function drawSpeciesCare(plants, target, pick) {
+  const keys = [...new Set(plants.map(p => speciesKey(p.sci)))].filter(k => SPECIES_CARE[k]);
+  target.innerHTML = keys.map(key => {
+    const c = SPECIES_CARE[key];
+    const nums = plants.map((p, i) => [p, i]).filter(([p]) => speciesKey(p.sci) === key);
     const [first] = nums[0];
     const dots = nums.map(([p, i]) => `<span class="dot" style="background:var(${COLORS[p.kind]})" data-i="${i}" title="Show plant ${i + 1}">${i + 1}</span>`).join("");
     return `<div class="card care-card">
@@ -495,13 +636,180 @@ function drawSpeciesCare() {
       <dl class="facts"><dt>Ongoing</dt><dd>${c.care}</dd><dt>Before winter</dt><dd>${c.winter}</dd><dt>Spring</dt><dd>${c.spring}</dd></dl>
     </div>`;
   }).join("");
-  document.querySelectorAll("#speciescare .dot").forEach(d => d.addEventListener("click", () => {
-    select(+d.dataset.i);
-    document.querySelector("#tab-now .scroller").scrollIntoView({ behavior: "smooth" });
+  target.querySelectorAll(".dot").forEach(d => d.addEventListener("click", () => {
+    pick(+d.dataset.i);
+    target.closest("section").querySelector(".scroller").scrollIntoView({ behavior: "smooth" });
   }));
 }
 
-drawBase(nowSvg); drawPlants(); drawTable(); drawStrip(); drawSpeciesCare(); select(1);
+drawBase(nowSvg); drawPlants(); drawTable(); drawStrip(); drawSpeciesCare(PLANTS, document.getElementById("speciescare"), select); select(1);
+
+// ---- Front yard ----
+
+// x: ft from the left end of the bed in front of the porch; y: ft out from the house wall;
+// d: spread (ft); img: the photo in front/ that shows it best; hanging: in a basket on the porch
+const FRONT = [
+  { name: "Dwarf Burford Holly", sci: "Ilex cornuta 'Burfordii Nana'", kind: "holly", conf: "high", x: 2.6, y: 7.2, d: 5.2, img: "f01",
+    note: "Big rounded evergreen at the corner where the walk bends. Glossy leaves with a single spine at the tip, and clusters of green berries that ripen red (from the close-up)." },
+  { name: "Dwarf Burford Holly", sci: "Ilex cornuta 'Burfordii Nana'", kind: "holly", conf: "high", x: 1.7, y: 2.4, d: 4.6, img: "f11",
+    note: "Second holly, the same as plant 1, tucked against the house left of the porch. The video only caught its edge behind plant 1; added after the first pass and confirmed in person." },
+  { name: "Japanese Boxwood", sci: "Buxus microphylla var. japonica (likely)", kind: "boxwood", conf: "medium", x: 5.9, y: 6.1, d: 2.3, img: "f11",
+    note: "One of three small lime-green shrubs with tiny, rounded leaves along the front of the porch. Could also be a dwarf yaupon; a close-up of a leaf edge would settle it (boxwood leaves are smooth, yaupon's are finely scalloped)." },
+  { name: "Lantana (orange-red)", sci: "Lantana camara (orange-red form)", kind: "lantanaOrange", conf: "high", x: 6.8, y: 8.6, d: 3.4, img: "p0666",
+    note: "Low, spreading lantana with rough, toothed leaves and small orange-red and yellow flower clusters, left of the pumpkin." },
+  { name: "White Autumn Sage", sci: "Salvia greggii (white-flowered)", kind: "whitesage", conf: "medium", x: 8.6, y: 7.3, d: 2, img: "f09",
+    note: "Twiggy little shrub with small, smooth, oval leaves and two-lipped white flowers, tucked behind the lantanas. Same species as the autumn sage in the back yard, in a white form." },
+  { name: "Japanese Boxwood", sci: "Buxus microphylla var. japonica (likely)", kind: "boxwood", conf: "medium", x: 9.4, y: 6.1, d: 2.3, img: "f11",
+    note: "Middle boxwood of the three in front of the porch." },
+  { name: "Lantana (pink and yellow)", sci: "Lantana camara (pink-and-yellow form)", kind: "lantanaPink", conf: "high", x: 10.6, y: 8.8, d: 3, img: "p0666",
+    note: "Mounding lantana with clusters that open yellow and turn pink, right of the pumpkin and just in from the edging stones." },
+  { name: "Japanese Boxwood", sci: "Buxus microphylla var. japonica (likely)", kind: "boxwood", conf: "medium", x: 11.8, y: 6.1, d: 2.3, img: "f11",
+    note: "Right-hand boxwood in front of the porch." },
+  { name: "Dwarf Burford Holly", sci: "Ilex cornuta 'Burfordii Nana'", kind: "holly", conf: "high", x: 13.2, y: 7.8, d: 4.6, img: "f17",
+    note: "Holly on the left side of the walk up to the front door. It's sending up a few long shoots that could be cut back inside the canopy." },
+  { name: "Flowering Purslane (hanging basket)", sci: "Portulaca oleracea (flowering purslane hybrid)", kind: "purslane", conf: "high", x: 6.8, y: 2.6, d: 1.8, img: "p0667", hanging: true,
+    note: "Hanging basket on the left side of the porch. Fleshy, paddle-shaped leaves on red stems, with small magenta flowers." },
+  { name: "Flowering Purslane (hanging basket)", sci: "Portulaca oleracea (flowering purslane hybrid)", kind: "purslane", conf: "high", x: 11.4, y: 2.6, d: 1.8, img: "p0667", hanging: true,
+    note: "Hanging basket on the right side of the porch: same purslane, with soft yellow flowers." },
+  { name: "Dwarf Burford Holly", sci: "Ilex cornuta 'Burfordii Nana'", kind: "holly", conf: "high", x: 21.6, y: 5.0, d: 5.4, img: "f20",
+    note: "Holly on the right side of the walk to the door, the twin of plant 9 across the walk." },
+  { name: "Japanese Boxwood", sci: "Buxus microphylla var. japonica (likely)", kind: "boxwood", conf: "medium", x: 25.2, y: 1.6, d: 2.3, img: "f25",
+    note: "First of three boxwoods along the house wall in the bed right of the walk, matching the ones by the porch." },
+  { name: "Lantana (pink and yellow)", sci: "Lantana camara (pink-and-yellow form)", kind: "lantanaPink", conf: "high", x: 26.0, y: 7.2, d: 3, img: "f22",
+    note: "Large pink-and-yellow lantana near the front of the bed." },
+  { name: "Lantana (pink and yellow)", sci: "Lantana camara (pink-and-yellow form)", kind: "lantanaPink", conf: "high", x: 27.4, y: 4.0, d: 2.2, img: "f25",
+    note: "Smaller pink-and-yellow lantana between the front lantana and the boxwoods." },
+  { name: "Elephant Ear", sci: "Colocasia esculenta", kind: "elephant", conf: "high", x: 27.8, y: 8.3, d: 2, img: "f28",
+    note: "One large, smooth, heart-shaped leaf on a long stalk, growing up through the front lantana." },
+  { name: "Japanese Boxwood", sci: "Buxus microphylla var. japonica (likely)", kind: "boxwood", conf: "medium", x: 28.7, y: 1.6, d: 2.3, img: "f25",
+    note: "Middle boxwood along the house." },
+  { name: "Small gray-green shrub (not identified)", sci: "Not identified", kind: "unknown", conf: "low", x: 30.6, y: 5.0, d: 1.5, img: "f28",
+    note: "Young, airy plant with small gray-green leaves on thin stems and no flowers, alone in the middle of the bed. Possibly a young autumn sage or a Mexican oregano; a close-up of a leaf would help." },
+  { name: "Japanese Boxwood", sci: "Buxus microphylla var. japonica (likely)", kind: "boxwood", conf: "medium", x: 32.4, y: 1.6, d: 2.3, img: "f25",
+    note: "Right-hand boxwood along the house." },
+  { name: "Lantana (orange-red)", sci: "Lantana camara (orange-red form)", kind: "lantanaOrange", conf: "high", x: 33.6, y: 7.0, d: 3.6, img: "f28",
+    note: "Sprawling orange-red lantana with long, loose stems, in front of holly 21." },
+  { name: "Holly", sci: "Ilex cornuta (likely)", kind: "holly", conf: "medium", x: 39.1, y: 4.4, d: 6.2, img: "f33",
+    note: "One big holly between the window and the side gate. The video saw it from two angles and the first pass counted it twice; confirmed in person as a single plant. Same glossy, pointed leaves as the Burford hollies but looser and lighter green, so it may be a different holly or a Burford that hasn't been sheared. Open mulch on its right, toward the gate." },
+  { name: "Lantana (pink and yellow)", sci: "Lantana camara (pink-and-yellow form)", kind: "lantanaPink", conf: "medium", x: 38.8, y: 7.4, d: 2.2, img: "f33",
+    note: "Pink-and-yellow lantana at the front of the bed, in front of holly 21." },
+  { name: "Flowering Purslane", sci: "Portulaca oleracea (flowering purslane hybrid)", kind: "purslane", conf: "high", x: 25.6, y: 23.3, d: 3.4, img: "p0665",
+    note: "Low mat of fleshy leaves on red stems, covered in red-orange and rose flowers with yellow centers, along the street side of the island bed." },
+  { name: "Narrowleaf Zinnia", sci: "Zinnia angustifolia (likely)", kind: "narrowzinnia", conf: "medium", x: 26.6, y: 20.4, d: 2.4, img: "p0665",
+    note: "Bushy annual with narrow leaves and small golden-yellow daisies, left of the birdbath. Could also be a yellow Zahara or Profusion zinnia." },
+  { name: "Narrowleaf Zinnia", sci: "Zinnia angustifolia (likely)", kind: "narrowzinnia", conf: "medium", x: 31.2, y: 20.6, d: 3, img: "f40",
+    note: "Larger clump of the same yellow zinnia, right of the birdbath." },
+  { name: "Flowering Purslane", sci: "Portulaca oleracea (flowering purslane hybrid)", kind: "purslane", conf: "high", x: 31.8, y: 23.4, d: 3.4, img: "f40",
+    note: "Second purslane mat, on the right front of the island bed." },
+  { name: "Zinnia (mixed)", sci: "Zinnia elegans", kind: "zinnia", conf: "high", x: 28.4, y: 17.8, d: 3.4, img: "f45",
+    note: "Tall zinnias in pink, magenta and orange-gold with broad, gray-green leaves, on the house side of the island next to the hummingbird feeder pole. These are likely the ones in your close-up photos." },
+  { name: "Live Oak", sci: "Quercus virginiana", kind: "oak", conf: "high", x: 9, y: 20.8, d: 8, img: null,
+    note: "Young live oak in the middle of a round bed about 5 ft across, roughly 20 ft left of the birdbath. Not in the video or photos; added from your description. Nothing is planted under it yet." },
+];
+// photos in walking order
+const FRONT_PHOTOS = ["f01", "f05", "f09", "p0666", "f11", "p0667", "f17", "f20", "f22", "f25", "f28", "f30", "f33", "f35", "p0665", "f40", "f45"];
+const frontImg = name => `front/${name}.jpg`;
+
+// bed outlines (porch bed, bed right of the walk), the island bed and the live oak bed, shared by the maps, coverage and 3D
+const FRONT_BEDS = ["M-.5 0 H4 V5 H14 V0 H15.3 V8.4 Q15.3 9.8 13.6 9.8 H-.5 Z", "M19.3 0 H44 Q46.4 5 42.4 9 Q34 10.6 24 10.1 Q19.3 10 19.3 8 Z"];
+const ISLAND = { cx: 29, cy: 20.8, rx: 6.3, ry: 4.4 };
+const TREE_BED = { cx: 9, cy: 20.8, r: 2.5 };
+const frontSvg = document.getElementById("frontmap");
+function drawFrontBase(svg) {
+  const t = (x, y, s, a = "middle") => { const e = el("text", { x, y, class: "lbl", "text-anchor": a }, svg); e.textContent = s; };
+  el("rect", { x: -3, y: -3.2, width: 54, height: 36.4, fill: "var(--lawn)" }, svg);
+  // house wall and porch
+  el("rect", { x: -3, y: -3.2, width: 47, height: 3.2, fill: "var(--muted)", opacity: .3 }, svg);
+  el("rect", { x: 4, y: 0, width: 10, height: 5, fill: "var(--path)", stroke: "var(--line)", "stroke-width": .08 }, svg);
+  // front walk from the stoop, bending left along the porch bed
+  el("rect", { x: 15, y: 0, width: 4.2, height: 2.2, fill: "var(--path)", stroke: "var(--line)", "stroke-width": .08 }, svg);
+  el("path", { d: "M15.5 2.2 H19 V9.5 Q19 13.4 15 13.4 H-3 V10 H13.6 Q15.5 10 15.5 8.4 Z", fill: "var(--path)" }, svg);
+  el("line", { x1: 15.9, y1: .05, x2: 18.3, y2: .05, stroke: "var(--wood)", "stroke-width": .3 }, svg);
+  // beds, edged with stones
+  const bed = { fill: "var(--mulch)", "fill-opacity": .55, stroke: "var(--rock)", "stroke-width": .3, "stroke-dasharray": ".55 .25" };
+  FRONT_BEDS.forEach(d => el("path", { d, ...bed }, svg));
+  el("ellipse", { cx: ISLAND.cx, cy: ISLAND.cy, rx: ISLAND.rx, ry: ISLAND.ry, ...bed }, svg);
+  el("circle", { cx: TREE_BED.cx, cy: TREE_BED.cy, r: TREE_BED.r, ...bed }, svg);
+  // side fence and gate, birdbath, feeder pole
+  el("line", { x1: 44, y1: .2, x2: 51, y2: .2, stroke: "var(--wood)", "stroke-width": .35 }, svg);
+  el("circle", { cx: 29, cy: 20.8, r: .95, fill: "var(--path)", stroke: "var(--muted)", "stroke-width": .08 }, svg);
+  el("circle", { cx: 27.3, cy: 19.4, r: .22, fill: "var(--ink)" }, svg);
+  t(20, -1.3, "house");
+  t(9, 4.4, "porch");
+  t(17.1, 1.4, "door");
+  t(6, 12, "front walk");
+  t(47.5, -.5, "side gate");
+  t(29, 22.25, "birdbath");
+  t(26.2, 19.05, "feeder", "end");
+  t(9, 26.2, "live oak bed");
+  t(17, 28, "lawn");
+  t(25, 32.4, "toward the street");
+  // scale bar
+  el("line", { x1: 0, y1: 30.6, x2: 10, y2: 30.6, stroke: "var(--muted)", "stroke-width": .08 }, svg);
+  [0, 10].forEach(x => el("line", { x1: x, y1: 30.3, x2: x, y2: 30.9, stroke: "var(--muted)", "stroke-width": .08 }, svg));
+  t(5, 30.2, "10 ft");
+}
+
+const frontGroups = [], frontRows = document.getElementById("frontrows"), frontDetail = document.getElementById("frontdetail");
+function drawFront() {
+  drawFrontBase(frontSvg);
+  const order = FRONT.map((p, i) => i).sort((a, b) => FRONT[b].d - FRONT[a].d);
+  for (const i of order) {
+    const p = FRONT[i];
+    const tree = p.kind === "oak";
+    const g = el("g", { class: `plant${tree ? " canopy" : ""}`, tabindex: 0 }, frontSvg);
+    el("circle", { cx: p.x, cy: p.y, r: p.d / 2, fill: `var(${COLORS[p.kind]})` }, g);
+    el("text", { x: p.x, y: tree ? p.y - p.d / 2 + .45 : p.y }, g).textContent = i + 1;
+    el("title", {}, g).textContent = `${i + 1}. ${p.name}`;
+    g.addEventListener("click", () => frontSelect(i));
+    g.addEventListener("keydown", e => { if (e.key === "Enter") frontSelect(i); });
+    frontGroups[i] = g;
+  }
+  const area = p => p.hanging ? "Porch" : p.kind === "oak" ? "Live oak bed" : p.y > 14 ? "Island bed" : p.x < 15.5 ? "Porch bed" : "Bed right of the walk";
+  FRONT.forEach((p, i) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td><span class="dot" style="background:var(${COLORS[p.kind]})">${i + 1}</span></td>
+      <td><strong>${p.name}</strong><div class="sci">${p.sci}</div>${plantLinks(p.sci)}</td>
+      <td>${area(p)}<br><span class="meta">${p.x.toFixed(0)} ft along, ${p.y.toFixed(0)} ft out</span></td>
+      <td><span class="conf ${p.conf}">${p.conf}</span></td>`;
+    tr.addEventListener("click", () => frontSelect(i));
+    frontRows.appendChild(tr);
+  });
+  const gallery = document.getElementById("frontgallery");
+  for (const name of FRONT_PHOTOS) {
+    const img = document.createElement("img");
+    img.src = frontImg(name); img.alt = "Front yard photo"; img.dataset.name = name;
+    img.addEventListener("click", () => frontPhoto(name));
+    gallery.appendChild(img);
+  }
+}
+function frontHighlight(i, photo) {
+  frontGroups.forEach((g, j) => g.classList.toggle("sel", j === i));
+  [...frontRows.children].forEach((r, j) => r.classList.toggle("sel", j === i));
+  document.querySelectorAll("#frontgallery img").forEach(im => im.classList.toggle("sel", im.dataset.name === photo));
+}
+function frontSelect(i) {
+  const p = FRONT[i];
+  frontHighlight(i, p.img);
+  const care = SPECIES_CARE[speciesKey(p.sci)];
+  frontDetail.innerHTML = `${p.img ? `<img src="${frontImg(p.img)}" alt="Photo showing ${p.name}">` : ""}
+    <h2>${i + 1}. ${p.name}<span class="conf ${p.conf}">${p.conf}</span></h2>
+    <p class="sci">${p.sci}</p>
+    <p>${plantLinks(p.sci)}</p>
+    <p>${p.note}</p>
+    ${care ? `<p><strong>Before winter:</strong> ${care.winter}</p>` : ""}
+    <p class="meta">${p.hanging ? "Hangs from the porch beam" : `About ${p.x.toFixed(0)} ft along and ${p.y.toFixed(0)} ft out from the house, roughly ${p.d} ft across`}.</p>`;
+}
+function frontPhoto(name) {
+  frontHighlight(-1, name);
+  const shown = FRONT.map((p, i) => [p, i]).filter(([p]) => p.img === name).map(([p, i]) => `${i + 1}. ${p.name}`);
+  frontDetail.innerHTML = `<img src="${frontImg(name)}" alt="Front yard photo">
+    ${shown.length ? `<p class="meta">Best view of:</p><p>${shown.join("<br>")}</p>` : `<p class="meta">Another angle on the beds; click a plant on the map for its details.</p>`}`;
+}
+
+drawFront();
+drawSpeciesCare(FRONT, document.getElementById("frontcare"), frontSelect);
+frontSelect(0);
 
 // ---- Next year plan ----
 
@@ -549,60 +857,96 @@ const NEW_PLANTS = [
     why: "Native evergreen vine for the bare iron fence. Train one behind the first crape myrtle and one behind the last salvia; the footprint is small but it screens the fence and feeds hummingbirds.", at: [[11.2, 0.4], [42.6, 0.4]] },
   { id: "N", name: "Red Mandevilla (hanging pot)", sci: "Mandevilla sp.", color: "#c8323a", spread: 1.6, height: "pot on a post, vines trail 3–6 ft", water: "Moderate (in a pot)", bloom: "May–frost, red", hanging: true,
     why: "More of the hanging pots by the gate (plants 16 and 17), one on each iron fence post, so a line of red runs the length of the fence. Posts are about 7 ft apart, found from the video. Bring every pot in for the winter.", at: [[3.1, 0.5], [9.7, 0.5], [17.8, 0.5], [24.7, 0.5], [41.2, 0.5], [46.5, 0.5]] },
+  { id: "O", name: "Zinnia", sci: "Zinnia elegans", color: "#d9572f", spread: 1.5, height: "2–3 ft", water: "Low–moderate", bloom: "Jun–frost, mixed colors", annual: true,
+    why: "The tall double zinnias from your photos, in orange, gold, pink and magenta. An annual, so sow seed right into the open spots along the front edge once the soil warms in April; they bloom from June until frost and draw butterflies. Water at the base to keep powdery mildew down, and leave a few seed heads in fall for finches and next year's volunteers.", at: [[7.4, 6.3], [23.2, 6.3], [28.0, 6.3], [33.0, 3.3], [40.8, 6.3]] },
 ];
 
-const planSvg = document.getElementById("planmap");
+// ---- Front yard plan ----
+
+// expected spread (ft) next summer, keyed by front plant number; annuals are assumed replanted at this year's size
+const FRONT_NEXT_SPREAD = { 1: 5.5, 2: 5, 3: 2.5, 4: 3.8, 5: 2.5, 6: 2.5, 7: 3.5, 8: 2.5, 9: 5, 12: 5.7, 13: 2.5, 14: 3.5, 15: 3, 16: 3, 17: 2.5, 18: 2, 19: 2.5, 20: 4, 21: 6.6, 22: 3, 28: 8.5 };
+// the porch baskets hang and the live oak is overhead, so none of them cover ground
+const FRONT_CANOPY = new Set([10, 11, 28]);
+const FRONT_CARE = {
+  "1, 2, 9, 12, 21": "Hollies: in late February, cut the odd long shoot back inside the canopy rather than shearing, and keep them trimmed back off the walk. Feed in March if the leaves look pale.",
+  "3, 6, 8, 13, 17, 19": "Boxwoods: thin lightly in late spring. If a close look shows finely scalloped leaf edges, they're dwarf yaupon, which is even tougher.",
+  "4, 7, 14, 15, 20, 22": "Lantanas: leave the frosted tops up until new growth shows in April, then cut to about 6 in. They fill back out to 3–4 ft by midsummer.",
+  "5": "White autumn sage: cut back by a third in late February and shear lightly after the spring flush.",
+  "10, 11, 23, 26": "Purslane is an annual: replant the baskets and the island in April, or root a few cuttings indoors this fall.",
+  "16": "Elephant ear: mulch the crown deeply after frost, since it's borderline hardy here, and give it regular water next summer.",
+  "18": "Unidentified shrub: take a close-up of a leaf when it leafs out in spring before deciding whether to keep it.",
+  "24, 25, 27": "Zinnias are annuals: sow again in April where they grew, or let this year's seed heads self-sow.",
+};
+// same fields as NEW_PLANTS; x, y in the front map's frame
+const FRONT_NEW = [
+  { id: "A", name: "Turk's Cap", sci: "Malvaviscus arboreus var. drummondii", color: "#c8322f", spread: 3, height: "3–4 ft", water: "Low", bloom: "Jun–Nov, red",
+    why: "Native shrub that flowers well in afternoon shade, for the gaps against the house. Small red flowers that never quite open; hummingbirds love them, so it pairs with the feeder in the island bed.", at: [[22.9, 1.4], [35.4, 1.6], [43.9, 1.8]] },
+  { id: "B", name: "Mealy Blue Sage 'Henry Duelberg'", sci: "Salvia farinacea 'Henry Duelberg'", color: "#5b62c9", spread: 2.5, height: "2–3 ft", water: "Very low", bloom: "Apr–Nov, blue",
+    why: "Texas Superstar perennial with blue spikes from spring to frost, a cool contrast to the hot lantana colors. Best in the sunny island bed, where it comes back every year after the zinnias and purslane; the one in the front bed still blooms with only morning sun.", at: [[30.4, 7.9], [24.0, 20.8], [34.0, 20.8]] },
+  { id: "C", name: "Gregg's Mistflower", sci: "Conoclinium greggii", color: "#6b83c6", spread: 2.5, height: "1.5–2 ft", water: "Low", bloom: "Mar–Nov, lavender",
+    why: "Fluffy lavender flowers that pull in queen and monarch butterflies. Takes the afternoon shade by the house and spreads slowly by roots to fill the open mulch in the middle of the bed right of the walk, fills the open corner by the side gate, and fills the house side of the island bed.", at: [[29.8, 3.4], [44.1, 5.0], [24.9, 18.0], [32.6, 17.6]] },
+  { id: "D", name: "Blackfoot Daisy", sci: "Melampodium leucanthum", color: "#55796d", spread: 1.5, height: "1 ft", water: "Very low", bloom: "Mar–Nov, white",
+    why: "Low white daisies for the sunny front edge of the island bed, in front of the birdbath. It needs full sun, so it isn't used in the beds by the house. Needs good drainage; overwatering kills it faster than drought.", at: [[28.9, 23.9]] },
+  { id: "E", name: "Cedar Sage", sci: "Salvia roemeriana", color: "#c42b3a", spread: 1.5, height: "1–2 ft", water: "Low", bloom: "Apr–Jun, then scattered to fall, red",
+    why: "Small native sage from Hill Country woodlands, at home in dry shade, with scalloped leaves and slender spikes of scarlet flowers for hummingbirds. Edges the shady front of the bed right of the walk and rings the live oak; it self-sows gently to fill in.", at: [[20.4, 9.0], [22.6, 9.1], [32.3, 9.5], [37.0, 9.2], [41.8, 8.3], [9, 22.5], [7.4, 21.4], [10.6, 21.4]] },
+  { id: "F", name: "Inland Sea Oats", sci: "Chasmanthium latifolium", color: "#8a9a3c", spread: 2, height: "2–3 ft", water: "Low", bloom: "Jul–Nov, nodding seed heads",
+    why: "Native grass for shade, with flat, oat-like seed heads that dangle and turn bronze in fall. Two on the house side of the live oak bed. It seeds itself freely, so cut some of the heads before they drop.", at: [[7.8, 19.4], [10.2, 19.4]] },
+];
+
+// ---- plan, shared by both yards ----
+
 const area = d => Math.PI * (d / 2) ** 2;
 
-// share of the plantable bed (river rock and stepping-stone path excluded) under at least one circle
-function coverage(circles) {
+// share of the yard's plantable bed under at least one circle
+function coverage(Y, circles) {
+  const [x0, x1, y0, y1] = Y.bounds;
   let inBed = 0, covered = 0;
-  for (let x = 0.05; x < WIDTH; x += 0.1) for (let y = 0.05; y < DEPTH; y += 0.1) {
-    const rockL = 2.6 - 2.0 * (y / DEPTH), rockR = 45.8 + 2.6 * (y / DEPTH);
-    if (x < rockL || x > rockR || (x > 33.8 && x < 36.0)) continue;
+  for (let x = x0 + .05; x < x1; x += .1) for (let y = y0 + .05; y < y1; y += .1) {
+    if (!Y.inBed(x, y)) continue;
     inBed++;
     if (circles.some(c => (x - c.x) ** 2 + (y - c.y) ** 2 < (c.d / 2) ** 2)) covered++;
   }
   return covered / inBed;
 }
 
-function drawStats() {
-  const groundNow = PLANTS.filter((p, i) => !CANOPY.has(i + 1));
-  const groundNext = groundNow.map(p => ({ ...p, d: NEXT_SPREAD[PLANTS.indexOf(p) + 1] ?? p.d }));
-  const added = NEW_PLANTS.filter(s => !s.hanging).flatMap(s => s.at.map(([x, y]) => ({ x, y, d: s.spread })));
-  const count = added.length, pots = NEW_PLANTS.filter(s => s.hanging).reduce((t, s) => t + s.at.length, 0);
+function drawStats(Y) {
+  const groundNow = Y.plants.filter((p, i) => !Y.canopy.has(i + 1));
+  const groundNext = groundNow.map(p => ({ ...p, d: Y.nextSpread[Y.plants.indexOf(p) + 1] ?? p.d }));
+  const added = Y.newPlants.filter(s => !s.hanging).flatMap(s => s.at.map(([x, y]) => ({ x, y, d: s.spread })));
+  const pots = Y.newPlants.filter(s => s.hanging).reduce((t, s) => t + s.at.length, 0);
   const tiles = [
-    ["Ground covered today", coverage(groundNow), "Measured from the video."],
-    ["Next summer, as is", coverage(groundNext), "What you have, grown in."],
-    ["Next summer, with plan", coverage(groundNext.concat(added)), `${count} new plants, ${NEW_PLANTS.filter(s => !s.hanging).length} kinds, plus ${pots} hanging pots.`],
+    ["Ground covered today", coverage(Y, groundNow), Y.measured],
+    ["Next summer, as is", coverage(Y, groundNext), "What you have, grown in."],
+    ["Next summer, with plan", coverage(Y, groundNext.concat(added)), `${added.length} new plants, ${Y.newPlants.filter(s => !s.hanging).length} kinds${pots ? `, plus ${pots} hanging pots` : ""}.`],
   ];
-  document.getElementById("stats").innerHTML = tiles.map(([label, v, sub]) =>
+  Y.$("stats").innerHTML = tiles.map(([label, v, sub]) =>
     `<div class="card stat"><div class="meta">${label}</div><div class="big">${Math.round(v * 100)}%</div>
      <div class="bar"><span style="width:${(v * 100).toFixed(1)}%"></span></div><div class="meta" style="margin-top:6px">${sub}</div></div>`).join("");
 }
 
-const planGroups = [];
-function drawPlan() {
-  drawBase(planSvg);
+function drawPlan(Y) {
+  const svg = Y.$("planmap");
+  Y.drawBase(svg);
+  Y.planGroups = [];
   const items = [];
-  PLANTS.forEach((p, i) => items.push({ n: i + 1, x: p.x, y: p.y, d: NEXT_SPREAD[i + 1] ?? p.d, fill: `var(${COLORS[p.kind]})`,
-    cls: CANOPY.has(i + 1) && p.kind !== "vine" ? "canopy" : "old", label: i + 1, key: `old-${i + 1}` }));
-  NEW_PLANTS.forEach(s => s.at.forEach(([x, y]) => items.push({ x, y, d: s.spread, fill: s.color, cls: "", label: s.id, key: s.id, name: s.name })));
+  Y.plants.forEach((p, i) => items.push({ n: i + 1, x: p.x, y: p.y, d: Y.nextSpread[i + 1] ?? p.d, fill: `var(${COLORS[p.kind]})`,
+    cls: Y.canopy.has(i + 1) && p.kind !== "vine" && !p.hanging ? "canopy" : "old", label: i + 1, key: `old-${i + 1}` }));
+  Y.newPlants.forEach(s => s.at.forEach(([x, y]) => items.push({ x, y, d: s.spread, fill: s.color, cls: "", label: s.id, key: s.id, name: s.name })));
   items.sort((a, b) => b.d - a.d);
   for (const it of items) {
-    const g = el("g", { class: `plant ${it.cls}`, tabindex: 0, "data-key": it.key }, planSvg);
+    const g = el("g", { class: `plant ${it.cls}`, tabindex: 0, "data-key": it.key }, svg);
     el("circle", { cx: it.x, cy: it.y, r: it.d / 2, fill: it.fill }, g);
     el("text", { x: it.x, y: it.cls === "canopy" ? it.y - it.d / 2 + .45 : it.y }, g).textContent = it.label;
-    el("title", {}, g).textContent = it.name ? `${it.label}. ${it.name}` : `${it.label}. ${PLANTS[it.n - 1].name}`;
-    g.addEventListener("click", () => planSelect(it.key));
-    g.addEventListener("keydown", e => { if (e.key === "Enter") planSelect(it.key); });
-    planGroups.push(g);
+    el("title", {}, g).textContent = it.name ? `${it.label}. ${it.name}` : `${it.label}. ${Y.plants[it.n - 1].name}`;
+    g.addEventListener("click", () => planSelect(Y, it.key));
+    g.addEventListener("keydown", e => { if (e.key === "Enter") planSelect(Y, it.key); });
+    Y.planGroups.push(g);
   }
 }
 
-const planRows = document.getElementById("planrows");
-function drawPlanTable() {
-  for (const s of NEW_PLANTS) {
+function drawPlanTable(Y) {
+  const rows = Y.$("planrows");
+  for (const s of Y.newPlants) {
     const tr = document.createElement("tr");
     tr.dataset.key = s.id;
     tr.innerHTML = `<td><span class="dot" style="background:${s.color}">${s.id}</span></td>
@@ -611,45 +955,46 @@ function drawPlanTable() {
       <td>${s.spread} ft</td>
       <td>${s.hanging ? "hangs" : `${Math.round(area(s.spread) * s.at.length)} sq ft`}</td>
       <td>${s.water}</td>`;
-    tr.addEventListener("click", () => planSelect(s.id));
-    planRows.appendChild(tr);
+    tr.addEventListener("click", () => planSelect(Y, s.id));
+    rows.appendChild(tr);
   }
-  const total = NEW_PLANTS.filter(s => !s.hanging).reduce((t, s) => t + area(s.spread) * s.at.length, 0);
+  const total = Y.newPlants.filter(s => !s.hanging).reduce((t, s) => t + area(s.spread) * s.at.length, 0);
   const tr = document.createElement("tr");
   tr.style.cursor = "default";
-  tr.innerHTML = `<td></td><td><strong>Total</strong></td><td>${NEW_PLANTS.reduce((t, s) => t + s.at.length, 0)}</td><td></td><td><strong>${Math.round(total)} sq ft</strong></td><td></td>`;
-  planRows.appendChild(tr);
-  document.getElementById("care").innerHTML = Object.entries(CARE).sort((a, b) => parseInt(a[0]) - parseInt(b[0])).map(([n, t]) => `<li><strong>${n}:</strong> ${t}</li>`).join("");
+  tr.innerHTML = `<td></td><td><strong>Total</strong></td><td>${Y.newPlants.reduce((t, s) => t + s.at.length, 0)}</td><td></td><td><strong>${Math.round(total)} sq ft</strong></td><td></td>`;
+  rows.appendChild(tr);
+  Y.$("care").innerHTML = Object.entries(Y.care).sort((a, b) => parseInt(a[0]) - parseInt(b[0])).map(([n, t]) => `<li><strong>${n}:</strong> ${t}</li>`).join("");
 }
 
-const planDetail = document.getElementById("plandetail");
-function planSelect(key) {
-  planGroups.forEach(g => g.classList.toggle("sel", g.dataset.key === key));
-  [...planRows.children].forEach(r => r.classList.toggle("sel", r.dataset.key === key));
+function planSelect(Y, key) {
+  Y.planGroups.forEach(g => g.classList.toggle("sel", g.dataset.key === key));
+  [...Y.$("planrows").children].forEach(r => r.classList.toggle("sel", r.dataset.key === key));
+  const detail = Y.$("plandetail");
   if (key.startsWith("old-")) {
-    const n = +key.slice(4), p = PLANTS[n - 1];
-    const care = Object.entries(CARE).find(([k]) => k.split(", ").map(Number).includes(n));
-    planDetail.innerHTML = `<img src="${frameFor(p.t)}" alt="Video frame showing ${p.name}">
+    const n = +key.slice(4), p = Y.plants[n - 1];
+    const care = Object.entries(Y.care).find(([k]) => k.split(", ").map(Number).includes(n));
+    const covers = p.hanging ? " (hangs, so it covers no ground)" : Y.canopy.has(n) ? " (canopy overhead, not ground cover)" : "";
+    detail.innerHTML = `${Y.photo(p) ? `<img src="${Y.photo(p)}" alt="Photo showing ${p.name}">` : ""}
       <h2>${n}. ${p.name}</h2><p class="sci">${p.sci}</p><p>${plantLinks(p.sci)}</p>
-      <p class="meta">Already in the bed. Expected spread next summer: about ${NEXT_SPREAD[n] ?? p.d} ft${CANOPY.has(n) ? " (canopy overhead, not ground cover)" : ""}.</p>
+      <p class="meta">Already planted. Expected spread next summer: about ${Y.nextSpread[n] ?? p.d} ft${covers}.</p>
       ${care ? `<p>${care[1]}</p>` : ""}`;
     return;
   }
-  const s = NEW_PLANTS.find(s => s.id === key);
-  planDetail.innerHTML = `<div class="swatch" style="background:${s.color}"></div>
+  const s = Y.newPlants.find(s => s.id === key);
+  detail.innerHTML = `<div class="swatch" style="background:${s.color}"></div>
     <h2>${s.id}. ${s.name}</h2><p class="sci">${s.sci}</p>
     <p>${plantLinks(s.sci)}</p>
     <p>${s.why}</p>
     <dl class="facts">
-      <dt>Plant</dt><dd>${s.at.length} at ${s.at.map(([x]) => Math.round(x) + " ft").join(", ")}</dd>
+      <dt>Plant</dt><dd>${s.at.length} at ${s.at.map(([x]) => Math.round(x) + " ft").join(", ")}${Y.along}</dd>
       <dt>Spread</dt><dd>${s.hanging ? "Hangs from the fence, so it covers no ground" : `${s.spread} ft across, about ${Math.round(area(s.spread))} sq ft each`}</dd>
       <dt>Height</dt><dd>${s.height}</dd>
-      <dt>Water</dt><dd>${s.hanging ? "Whenever the top inch of soil is dry; pots can need it daily in July" : `${s.water} once established; water weekly the first summer`}</dd>
+      <dt>Water</dt><dd>${s.hanging ? "Whenever the top inch of soil is dry; pots can need it daily in July"
+        : s.annual ? `${s.water}; keep the seedbed moist until seedlings are a few inches tall, then about weekly`
+        : `${s.water} once established; water weekly the first summer`}</dd>
       <dt>Bloom</dt><dd>${s.bloom}</dd>
     </dl>`;
 }
-
-drawStats(); drawPlan(); drawPlanTable(); planSelect("A");
 
 // ---- Next year timeline ----
 
@@ -677,6 +1022,17 @@ const BLOOM = {
   "Lantana ×": [[5, 11.65, 1]],
   "Asclepias tuberosa": [[5, 7.5, 1], [7.5, 9.5, .4]],
   "Lonicera sempervirens": [[3, 6, 1], [6, 9, .3], [9, 11, .6]],
+  "Zinnia elegans": [[5.5, 6, .4], [6, 11.65, 1]],
+  "Ilex cornuta": [[3.3, 4.3, .4]],
+  "Buxus microphylla": [[3, 4, .3]],
+  "Lantana camara": [[4.8, 5.5, .4], [5.5, 11.65, 1]],
+  "Portulaca oleracea": [[5, 10.8, 1]],
+  "Zinnia angustifolia": [[5.5, 11.65, 1]],
+  "Malvaviscus arboreus": [[6, 7, .4], [7, 11.3, 1]],
+  "Salvia farinacea": [[4, 6.5, 1], [6.5, 8.5, .4], [8.5, 11.65, 1]],
+  "Salvia roemeriana": [[3.5, 6.5, 1], [6.5, 10.5, .35]],
+  "Chasmanthium latifolium": [[6.5, 7.5, .4], [7.5, 11.65, 1]],
+  "Quercus virginiana": [[3, 4, .3]],
 };
 // planting windows (new plantings only) and yearly tasks per species, same month scale as BLOOM;
 // task: [month, type, what to do]
@@ -710,32 +1066,45 @@ const MAINT = {
   "Lantana ×": { plant: [[4, 6]], tasks: [[3.7, "cut", "Cut back to 6–12 in. after the last freeze"]] },
   "Asclepias tuberosa": { plant: [[3.5, 5.5], [9.5, 10.5]], tasks: [[2.7, "cut", "Cut old stems; it sprouts late, so don't dig until May"]] },
   "Lonicera sempervirens": { plant: [[3, 4.5], [10, 12]], tasks: [[6.3, "trim", "Prune lightly after the spring bloom and tie in new shoots"]] },
+  "Zinnia elegans": { plant: [[4, 6]], replant: true, tasks: [[6.5, "trim", "Deadhead or cut for vases; more buds follow"], [8.2, "trim", "Cut back tired plants by a third for a fall flush"], [11.8, "cut", "Pull plants after the first freeze; leave a few seed heads"]] },
+  "Ilex cornuta": { tasks: [[2.6, "cut", "Cut long shoots back inside the canopy instead of shearing"], [3.3, "feed", "Feed lightly if the leaves look pale"]] },
+  "Buxus microphylla": { tasks: [[3.3, "feed", "Slow-release fertilizer"], [5.6, "trim", "Thin or shear lightly once new growth firms up"]] },
+  "Lantana camara": { tasks: [[4.2, "cut", "Cut frozen stems to 6 in. once new growth shows"], [7.6, "trim", "Shear lightly if it gets woody"], [11.7, "mulch", "Mulch the crowns; leave the frosted tops standing"]] },
+  "Portulaca oleracea": { plant: [[4, 5.5]], replant: true, tasks: [[10.8, "cut", "Pull after frost; root a few cuttings indoors to keep the colors"]] },
+  "Zinnia angustifolia": { plant: [[4, 5.5]], replant: true, tasks: [[11.8, "cut", "Pull plants after the first freeze"]] },
+  "Colocasia esculenta": { tasks: [[5.3, "feed", "Feed every few weeks through summer"], [11.8, "mulch", "Cut off frosted leaves and mulch the crown 3–4 in. deep"]] },
+  "Malvaviscus arboreus": { plant: [[4, 6], [9.5, 10.5]], tasks: [[2.8, "cut", "Cut back to about 1 ft before new growth"]] },
+  "Salvia roemeriana": { plant: [[3, 5], [9.5, 11]], tasks: [[2.8, "trim", "Pull old flower stalks and tidy the rosettes"], [6.6, "trim", "Cut spent stalks; leave a few to self-sow"]] },
+  "Chasmanthium latifolium": { plant: [[3.5, 5.5], [9.5, 11]], tasks: [[2.6, "cut", "Cut to the ground before new growth"], [10.5, "trim", "Cut some seed heads before they drop, to limit seedlings"]] },
+  "Quercus virginiana": { tasks: [[1.7, "cut", "Prune only now (or in midsummer), and paint every cut right away to keep out oak wilt"], [7.5, "mulch", "Keep 2–3 in. of mulch over the bed, off the trunk; water deeply every 2 weeks if it's dry"]] },
+  "Salvia farinacea": { plant: [[3.5, 5.5], [9.5, 11]], tasks: [[2.8, "cut", "Cut old stems down to the new growth at the base"], [7.2, "trim", "Cut back by a third for a fall flush"]] },
 };
 const taskIcon = type => `<svg viewBox="0 0 10 10" aria-hidden="true">${TASK_TYPES[type].svg}</svg>`;
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const monthRange = (from, to) => `${MONTHS[Math.floor(from) - 1]}–${MONTHS[Math.ceil(to) - 2]}`;
 const pct = m => `${(m - 1) / 12 * 100}%`;
 
-function drawTimeline() {
+function drawTimeline(Y) {
   // one row per kind of plant already in the bed; a new species that matches one joins its row
   const rows = [];
-  PLANTS.forEach((p, i) => {
+  Y.plants.forEach((p, i) => {
     let r = rows.find(r => r.kind === p.kind);
-    if (!r) rows.push(r = { kind: p.kind, key: speciesKey(p.sci), name: p.name.replace(/\s*\((large )?mass\)/, ""), color: `var(${COLORS[p.kind]})`, nums: [], pick: `old-${i + 1}` });
+    if (!r) rows.push(r = { kind: p.kind, key: speciesKey(p.sci), name: p.name.replace(/\s*\((large )?mass\)|\s*\(hanging basket\)/, ""), color: `var(${COLORS[p.kind]})`, nums: [], pick: `old-${i + 1}` });
     r.nums.push(i + 1);
   });
-  for (const s of NEW_PLANTS) {
+  for (const s of Y.newPlants) {
     const r = rows.find(r => r.key === speciesKey(s.sci));
     if (r) r.add = s;
     else rows.push({ key: speciesKey(s.sci), name: s.name, color: s.color, add: s, pick: s.id, isNew: true });
   }
-  const start = r => BLOOM[r.key][0][0];
+  const bloom = r => BLOOM[r.key] ?? [];
+  const start = r => bloom(r)[0]?.[0] ?? 13;
   const byStart = (a, b) => start(a) - start(b) || a.name.localeCompare(b.name);
-  // planting windows only matter where something new goes in
-  const plantWindows = r => r.add ? MAINT[r.key]?.plant ?? [] : [];
+  // planting windows only matter where something new goes in, or for annuals sown again each year
+  const plantWindows = r => r.add || MAINT[r.key]?.replant ? MAINT[r.key]?.plant ?? [] : [];
   const row = r => {
     const which = [r.nums && `Plant${r.nums.length > 1 ? "s" : ""} ${r.nums.join(", ")}`, r.add && `${r.add.at.length} new (${r.add.id})`].filter(Boolean).join(" + ");
-    const bars = BLOOM[r.key].map(([from, to, level]) =>
+    const bars = bloom(r).map(([from, to, level]) =>
       `<div class="tl-bar${level < 1 ? " light" : ""}" style="left:${pct(from)};width:${(to - from) / 12 * 100}%;background:${r.color}" title="${monthRange(from, to)}${level < 1 ? ", lighter bloom" : ""}"></div>`).join("");
     const plant = plantWindows(r).map(([from, to]) =>
       `<div class="tl-plant" style="left:${pct(from)};width:${(to - from) / 12 * 100}%" title="Plant: ${monthRange(from, to)}"></div>`).join("");
@@ -749,23 +1118,23 @@ function drawTimeline() {
   // species in full bloom in each half month
   const counts = Array.from({ length: 24 }, (_, h) => {
     const m = 1 + (h + .5) / 2;
-    return rows.filter(r => BLOOM[r.key].some(([from, to, level]) => level === 1 && from <= m && m < to)).length;
+    return rows.filter(r => bloom(r).some(([from, to, level]) => level === 1 && from <= m && m < to)).length;
   });
   const most = Math.max(...counts);
   const frost = (m, label) => `<div class="tl-frost" style="left:calc(var(--name) + (100% - var(--name)) * ${(m - 1) / 12})"><span>${label}</span></div>`;
-  document.getElementById("timeline").innerHTML = `
+  Y.$("timeline").innerHTML = `
     <div class="tl-row tl-head"><div></div><div class="tl-track">${MONTHS.map(m => `<span>${m}</span>`).join("")}</div></div>
-    <div class="tl-group">Already in the bed</div>${rows.filter(r => !r.isNew).sort(byStart).map(row).join("")}
+    <div class="tl-group">Already planted</div>${rows.filter(r => !r.isNew).sort(byStart).map(row).join("")}
     <div class="tl-group">New for next year</div>${rows.filter(r => r.isNew).sort(byStart).map(row).join("")}
     <div class="tl-row tl-count"><div class="tl-name"><div>Species in full bloom<div class="meta">Each half month, of ${rows.length}</div></div></div>
       <div class="tl-track">${counts.map((c, h) => `<b style="height:${c / most * 100}%" title="${c} in full bloom, ${h % 2 ? "late" : "early"} ${MONTHS[h >> 1]}">${c || ""}</b>`).join("")}</div></div>
     ${frost(3.5, "last freeze")}${frost(11.65, "first freeze")}`;
-  document.getElementById("tllegend").innerHTML = `<span><i class="tl-plant-key"></i>Best time to plant</span>` +
+  Y.$("tllegend").innerHTML = `<span><i class="tl-plant-key"></i>Best time to plant</span>` +
     Object.entries(TASK_TYPES).map(([type, t]) => `<span><span class="tl-icon">${taskIcon(type)}</span>${t.label}</span>`).join("");
 
   // the same tasks as a list, month by month, starting with this month
   const thisMonth = new Date().getMonth() + 1;
-  document.getElementById("tlmonths").innerHTML = MONTHS.map((_, i) => {
+  Y.$("tlmonths").innerHTML = MONTHS.map((_, i) => {
     const m = (thisMonth - 1 + i) % 12 + 1, label = MONTHS[m - 1];
     const toPlant = ordered.filter(r => plantWindows(r).some(([from, to]) => from < m + 1 && to > m)).map(r => r.name);
     const tasks = ordered.flatMap(r => (MAINT[r.key]?.tasks ?? []).filter(([t]) => Math.floor(t) === m).map(([t, type, what]) => [t, type, r.name, what]))
@@ -777,31 +1146,54 @@ function drawTimeline() {
     </ul></div>`;
   }).join("");
 
-  document.querySelectorAll("#timeline .tl-row.pick").forEach(r => r.addEventListener("click", () => {
-    showTab("plan");
-    history.replaceState(null, "", "#plan");
-    planSelect(r.dataset.pick);
-    document.querySelector("#tab-plan .scroller").scrollIntoView({ behavior: "smooth" });
+  Y.$("timeline").querySelectorAll(".tl-row.pick").forEach(r => r.addEventListener("click", () => {
+    showTab(Y.id, "plan");
+    planSelect(Y, r.dataset.pick);
+    Y.$("planmap").closest(".scroller").scrollIntoView({ behavior: "smooth" });
   }));
 }
-drawTimeline();
 
-// tabs; #plan, #3d or #timeline in the URL opens that tab. The 3D view loads Three.js on first open.
-let view3d;
-function showTab(name) {
-  document.querySelectorAll(".tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === name));
-  for (const t of ["now", "plan", "3d", "timeline"]) document.getElementById(`tab-${t}`).hidden = name !== t;
-  if (name === "3d") {
-    view3d ??= import("./plan3d.js").then(m => m.init(document.getElementById("view3d")))
-      .catch(e => { document.getElementById("v3status").textContent = "Couldn't load the 3D view."; console.error(e); });
-    view3d.then(v => v?.resize());
+// ---- yards ----
+
+const frontCtx = document.createElement("canvas").getContext("2d"), frontBedPaths = FRONT_BEDS.map(d => new Path2D(d));
+const YARDS = {
+  back: { id: "back", prefix: "", plants: PLANTS, nextSpread: NEXT_SPREAD, canopy: CANOPY, care: CARE, newPlants: NEW_PLANTS,
+    drawBase, photo: p => frameFor(p.t), bounds: [0, WIDTH, 0, DEPTH], measured: "Measured from the video.", along: " along the fence",
+    // river rock at both ends and the stepping-stone path aren't plantable
+    inBed: (x, y) => !(x < 2.6 - 2.0 * (y / DEPTH) || x > 45.8 + 2.6 * (y / DEPTH) || (x > 33.8 && x < 36.0)) },
+  front: { id: "front", prefix: "f-", plants: FRONT, nextSpread: FRONT_NEXT_SPREAD, canopy: FRONT_CANOPY, care: FRONT_CARE, newPlants: FRONT_NEW,
+    drawBase: drawFrontBase, photo: p => p.img && frontImg(p.img), bounds: [-1, 47, 0, 26], measured: "Estimated from the video and photos.", along: " from the left end",
+    inBed: (x, y) => frontBedPaths.some(p => frontCtx.isPointInPath(p, x, y)) || ((x - ISLAND.cx) / ISLAND.rx) ** 2 + ((y - ISLAND.cy) / ISLAND.ry) ** 2 < 1
+      || Math.hypot(x - TREE_BED.cx, y - TREE_BED.cy) < TREE_BED.r },
+};
+for (const Y of Object.values(YARDS)) {
+  Y.$ = id => document.getElementById(Y.prefix + id);
+  drawStats(Y); drawPlan(Y); drawPlanTable(Y); planSelect(Y, "A"); drawTimeline(Y);
+}
+
+// tabs: a yard (back or front) and a view. The URL hash is #plan, #3d, #timeline for the back yard and
+// #front, #front-plan, ... for the front. The 3D views load Three.js on first open.
+const VIEWS = ["now", "plan", "3d", "timeline"], views3d = {};
+let yard = "back", view = "now";
+function showTab(y, v) {
+  yard = y; view = v;
+  document.querySelectorAll(".yards button").forEach(b => b.setAttribute("aria-pressed", b.dataset.yard === y));
+  document.querySelectorAll(".tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === v));
+  for (const Y of Object.values(YARDS)) for (const t of VIEWS) document.getElementById(`tab-${Y.prefix}${t}`).hidden = !(Y.id === y && t === v);
+  history.replaceState(null, "", y === "back" ? (v === "now" ? location.pathname + location.search : `#${v}`) : `#front${v === "now" ? "" : `-${v}`}`);
+  if (v === "3d") {
+    const box = YARDS[y].$("view3d");
+    views3d[y] ??= import("./plan3d.js").then(m => m.init(box, y))
+      .catch(e => { box.querySelector(".v3-status").textContent = "Couldn't load the 3D view."; console.error(e); });
+    views3d[y].then(v => v?.resize());
   }
 }
-document.querySelectorAll(".tabs button").forEach(b => b.addEventListener("click", () => {
-  showTab(b.dataset.tab);
-  history.replaceState(null, "", b.dataset.tab === "now" ? location.pathname : `#${b.dataset.tab}`);
-}));
-showTab({ "#plan": "plan", "#3d": "3d", "#timeline": "timeline" }[location.hash] ?? "now");
+document.querySelectorAll(".yards button").forEach(b => b.addEventListener("click", () => showTab(b.dataset.yard, view)));
+document.querySelectorAll(".tabs button").forEach(b => b.addEventListener("click", () => showTab(yard, b.dataset.tab)));
+{
+  const h = location.hash.slice(1), front = h.startsWith("front"), v = front ? h.slice(6) || "now" : h || "now";
+  showTab(front ? "front" : "back", VIEWS.includes(v) ? v : "now");
+}
 </script>
 </body>
 </html>
