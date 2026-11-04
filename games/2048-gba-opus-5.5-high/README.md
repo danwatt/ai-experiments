@@ -23,6 +23,7 @@ RAM is kept in `localStorage`.
 | `src/main.asm` | The game: input, slide/merge rules, spawning, drawing, sound. |
 | `src/hardware.inc` | Register names used by the game. |
 | `src/gfx.inc` | Generated: tiles, cell layout, per-direction line tables, neighbour pairs, BCD score table. |
+| `build.sh`, `Dockerfile` | Dockerized build: RGBDS + Node image, runs `tools/build-rom.sh`. |
 | `tools/gen.mjs` | Generates `src/gfx.inc` (font, hex cell art, board geometry). |
 | `tools/test.cjs` | Headless test: plays random moves and checks every board and score against a JS model of the rules. |
 | `gb.js` | Emulator: SM83 CPU, PPU, timer, joypad, MBC1, APU (two squares, wave, noise). |
@@ -30,15 +31,22 @@ RAM is kept in `localStorage`.
 
 ## Build
 
-Needs [RGBDS](https://rgbds.gbdev.io/) (`brew install rgbds`) and Node.
+Needs only Docker. `build.sh` builds a small image (the `Dockerfile` compiles
+[RGBDS](https://rgbds.gbdev.io/) 1.0.4 from source on top of Node) and runs
+`tools/build-rom.sh` in it with this folder mounted.
 
 ```bash
 ./build.sh
 ```
 
+Build, then run the headless rules test (2000 random moves) in the same image:
+
 ```bash
-node tools/test.cjs 3000
+./build.sh --test
 ```
+
+With RGBDS 1.0 and Node installed locally, `tools/build-rom.sh` also works
+without Docker.
 
 ## How it works
 
