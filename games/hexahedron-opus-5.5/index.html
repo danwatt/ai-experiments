@@ -22,15 +22,26 @@
     #weapon span.sel { opacity: 1; color: #fff; }
     #weapon span.na { opacity: 0.2; }
     #missiles { margin-top: 6px; color: #ffc080; }
-    #key { left: 24px; top: 22px; display: none; padding: 6px 10px; border: 2px solid #ff3020; color: #ff5040; font-weight: bold; text-shadow: 0 0 8px #f20; }
+    #keys { left: 24px; top: 22px; }
+    #keys span { display: none; padding: 6px 10px; margin-right: 8px; border: 2px solid; font-weight: bold; }
+    #key-blue { border-color: #3a7aff !important; color: #6aa0ff; text-shadow: 0 0 8px #26f; }
+    #key-yellow { border-color: #ffc81a !important; color: #ffd84a; text-shadow: 0 0 8px #fa0; }
+    #key-red { border-color: #ff3020 !important; color: #ff5040; text-shadow: 0 0 8px #f20; }
+    body.mapping #keys { display: none; }
     #room { right: 24px; top: 22px; font-size: 12px; letter-spacing: 2px; opacity: 0.7; }
     #objective { left: 50%; bottom: 22px; transform: translateX(-50%); font-size: 12px; opacity: 0.75; text-align: center; max-width: 40vw; }
     #msg { left: 50%; top: 16%; transform: translateX(-50%); font-size: 20px; font-weight: bold; color: #fff; text-align: center; transition: opacity .4s; opacity: 0; max-width: 80vw; }
+    #boss { display: none; left: 50%; top: 4%; transform: translateX(-50%); width: min(440px, 70vw); text-align: center; }
+    #boss .b-name { font-size: 12px; letter-spacing: 6px; color: #ff70b0; text-shadow: 0 0 8px #f08; margin-bottom: 4px; }
+    #boss-frame { height: 10px; border: 1px solid rgba(255,90,170,0.6); }
+    #boss-bar { height: 100%; width: 100%; background: linear-gradient(90deg, #ff2a80, #ff80c0); box-shadow: 0 0 8px #f08; }
     #timer { left: 50%; top: 6%; transform: translateX(-50%); font-size: 48px; font-weight: bold; color: #ff4030; text-shadow: 0 0 12px #f00; display: none; }
     .tint { position: fixed; inset: 0; pointer-events: none; opacity: 0; }
     #hurt { background: radial-gradient(ellipse at center, rgba(255,0,0,0) 40%, rgba(255,0,0,0.65) 100%); }
     #heat { background: radial-gradient(ellipse at bottom, rgba(255,120,0,0.8), rgba(255,60,0,0) 70%); }
     #pick { background: rgba(80,150,255,0.35); }
+    #power { display: none; background: radial-gradient(ellipse at center, rgba(255,200,40,0) 55%, rgba(255,190,30,0.45) 100%); }
+    #power-time { position: absolute; left: 50%; bottom: 52px; transform: translateX(-50%); font-weight: bold; letter-spacing: 3px; color: #ffd860; text-shadow: 0 0 10px #fa0; }
     #map-ui { display: none; left: 24px; top: 22px; font-size: 13px; line-height: 1.6; background: rgba(0,0,10,0.6); padding: 10px 14px; border: 1px solid #234; }
     #map-ui b { color: #fff; letter-spacing: 3px; }
     .sw { display: inline-block; width: 14px; height: 3px; vertical-align: middle; margin-right: 6px; }
@@ -43,29 +54,85 @@
     .controls span:nth-child(odd) { color: #fff; }
     .go { margin-top: 18px; font-size: 20px; color: #fff; animation: blink 1.2s infinite; }
     @keyframes blink { 50% { opacity: 0.35; } }
+    #title { cursor: default; }
+    body.inmenu .hud { display: none; }
+    .menu-wrap { display: flex; gap: 28px; align-items: flex-start; margin-top: 10px; text-align: left; }
+    .menu { display: flex; flex-direction: column; gap: 6px; min-width: 230px; }
+    button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+    .menu button { text-align: left; font-size: 18px; letter-spacing: 3px; padding: 8px 14px; border-left: 3px solid transparent; color: #7ab; }
+    .menu button.sel { color: #fff; border-left-color: #3a9aff; background: linear-gradient(90deg, rgba(40,120,255,0.28), rgba(40,120,255,0)); text-shadow: 0 0 10px #39f; }
+    .menu-panel { width: min(460px, 60vw); min-height: 260px; border: 1px solid #1e3a55; background: rgba(0,10,24,0.6); padding: 14px 18px; box-sizing: border-box; }
+    .menu-panel .controls { display: none; margin: 0; }
+    .menu-panel.show-controls #missions { display: none; }
+    .menu-panel.show-controls .controls { display: grid; }
+    .mission { font-size: 14px; line-height: 1.5; }
+    .mission .m-num { font-size: 11px; letter-spacing: 3px; color: #5a8fb0; }
+    .mission h3 { margin: 2px 0 8px; color: #fff; letter-spacing: 3px; font-size: 18px; }
+    .mission p { margin: 0 0 8px; }
+    .mission .m-meta { font-size: 12px; color: #6a9ab8; }
+    .m-error { margin: 10px 0 0; font-size: 12px; color: #ff7a6a; }
+    .hint { margin-top: 18px; font-size: 12px; opacity: 0.5; letter-spacing: 2px; }
+    @media (max-width: 760px) { .menu-wrap { flex-direction: column; align-items: stretch; } .menu-panel { width: 100%; } }
+    #holo { position: fixed; inset: 0; display: none; pointer-events: none; }
+    #holo > * { pointer-events: auto; }
+    #holo::after { content: ""; position: fixed; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 45% 50%, rgba(0,0,0,0) 45%, rgba(0,0,0,0.75) 100%), repeating-linear-gradient(0deg, rgba(0,0,0,0.18) 0 1px, rgba(0,0,0,0) 1px 3px); }
+    .h-head { position: absolute; left: 24px; top: 20px; letter-spacing: 3px; font-size: 13px; color: #6aa8d0; }
+    .h-head b { color: #fff; font-size: 20px; letter-spacing: 6px; text-shadow: 0 0 12px #39f; }
+    .h-list { position: absolute; left: 24px; top: 70px; display: flex; flex-direction: column; gap: 2px; z-index: 1; }
+    .h-list button { text-align: left; font-size: 13px; letter-spacing: 2px; padding: 5px 10px; color: #5a8fb0; border-left: 2px solid transparent; }
+    .h-list button.sel { color: #fff; border-left-color: #50c8ff; background: rgba(40,140,255,0.15); }
+    .h-stage { position: absolute; inset: 0; cursor: grab; }
+    .h-stage:active { cursor: grabbing; }
+    .h-stats { position: absolute; right: 24px; top: 70px; width: min(360px, 34vw); max-height: calc(100vh - 160px); overflow: auto; font-size: 13px; line-height: 1.45; background: rgba(0,12,28,0.55); border: 1px solid #1e4466; padding: 14px 16px; z-index: 1; }
+    .h-role { font-size: 11px; letter-spacing: 3px; color: #5a8fb0; }
+    .h-stats h3 { margin: 2px 0 8px; color: #fff; font-size: 22px; letter-spacing: 4px; text-shadow: 0 0 10px #39f; }
+    .h-stats p { margin: 0 0 12px; }
+    .h-grid { display: grid; grid-template-columns: auto 1fr auto; gap: 5px 10px; align-items: center; margin-bottom: 10px; font-size: 12px; letter-spacing: 1px; }
+    .h-grid b { color: #fff; text-align: right; }
+    .bar { display: flex; gap: 2px; }
+    .bar i { flex: 1; height: 9px; background: #50c8ff; box-shadow: 0 0 5px #39f; }
+    .bar i.off { background: #12283a; box-shadow: none; }
+    .h-row { display: grid; grid-template-columns: 112px 1fr; gap: 10px; border-top: 1px solid #16324a; padding: 6px 0; font-size: 12px; }
+    .h-row > span { letter-spacing: 1px; color: #5a8fb0; }
+    .h-row em { font-style: normal; color: #ffc080; margin-left: 4px; }
+    .h-nav { position: absolute; left: 50%; bottom: 46px; transform: translateX(-50%); display: flex; gap: 14px; align-items: center; z-index: 1; letter-spacing: 2px; }
+    .h-nav button { border: 1px solid #2a5a80; padding: 7px 14px; color: #bfe4ff; background: rgba(0,16,36,0.6); letter-spacing: 2px; }
+    .h-nav button:hover, .menu button:hover, .h-list button:hover { color: #fff; }
+    .h-back { margin-left: 18px; }
+    .h-hint { position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%); font-size: 11px; opacity: 0.5; letter-spacing: 2px; white-space: nowrap; }
+    @media (max-width: 760px) {
+      .h-list { flex-direction: row; flex-wrap: wrap; right: 16px; left: 16px; top: 52px; }
+      .h-list button { padding: 3px 6px; font-size: 11px; }
+      .h-stats { left: 16px; right: 16px; width: auto; top: auto; bottom: 96px; max-height: 38vh; }
+      .h-hint { display: none; } .h-nav { bottom: 20px; gap: 8px; white-space: nowrap; } .h-nav button { padding: 6px 9px; } .h-back { margin-left: 4px; }
+    }
     #dead h1 { color: #ff6050; text-shadow: 0 0 20px #f20; }
     #win h1 { color: #80ffa0; text-shadow: 0 0 20px #0f6; }
   </style>
-  <script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }</script>
+  <script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/" } }</script>
 </head>
 <body>
   <div id="crosshair" class="hud"></div>
   <div id="shieldbox" class="hud"><div class="label">SHIELD</div><div id="shield-num">100</div><div id="shield-frame"><div id="shield-bar"></div></div></div>
   <div id="weaponbox" class="hud"><div id="weapon"></div><div id="missiles"></div></div>
-  <div id="key" class="hud">RED KEY</div>
+  <div id="keys" class="hud"><span id="key-blue">BLUE KEY</span><span id="key-yellow">YELLOW KEY</span><span id="key-red">RED KEY</span></div>
   <div id="room" class="hud"></div>
-  <div id="objective" class="hud">Find the red access key. It is somewhere hot.</div>
+  <div id="objective" class="hud"></div>
   <div id="msg" class="hud"></div>
   <div id="timer" class="hud"></div>
+  <div id="boss" class="hud"><div class="b-name">OVERSEER</div><div id="boss-frame"><div id="boss-bar"></div></div></div>
   <div id="hurt" class="tint"></div>
   <div id="heat" class="tint"></div>
   <div id="pick" class="tint"></div>
+  <div id="power" class="tint"><div id="power-time"></div></div>
   <div id="map-ui" class="hud">
     <b>AUTOMAP</b><br>
     Mouse: rotate &nbsp; Wheel: zoom<br>WASD / Space / Shift: pan<br>Tab or M: back to flight<br><br>
     <span class="sw" style="background:#3a86ff"></span>visited<br>
     <span class="sw" style="background:#1c3f78"></span>seen, not visited<br>
-    <span class="sw" style="background:#ffc830"></span>door<br>
+    <span class="sw" style="background:#b8c4d0"></span>door<br>
+    <span class="sw" style="background:#3a7aff"></span>blue door / key<br>
+    <span class="sw" style="background:#ffd020"></span>yellow door / key<br>
     <span class="sw" style="background:#ff2a20"></span>red door / key<br>
     <span class="sw" style="background:#30ff60"></span>exit<br>
     <span class="sw" style="background:#ff6a20"></span>lava<br>
@@ -75,23 +142,45 @@
   <div id="title" class="screen">
     <h1>HEXAHEDRON</h1>
     <h2>A SIX-DEGREES-OF-FREEDOM MINE RUN</h2>
-    <p>Robots have overrun a deep mining outpost. Find the red access key in the lava cavern, break through to the reactor, destroy it, and fly back out before the mine blows.</p>
-    <div class="controls">
-      <span>Mouse / Arrows</span><span>pitch and yaw</span>
-      <span>W A S D</span><span>thrust and strafe</span>
-      <span>Space / R &nbsp; Shift / F</span><span>slide up / down</span>
-      <span>Q / E</span><span>roll</span>
-      <span>Left click</span><span>primary weapon</span>
-      <span>Right click / G</span><span>homing missile</span>
-      <span>1 / 2</span><span>laser / spreadfire</span>
-      <span>Tab or M</span><span>automap</span>
-      <span>Esc</span><span>pause</span>
+    <div class="menu-wrap">
+      <nav class="menu">
+        <button data-act="launch">LAUNCH MISSION</button>
+        <button data-act="mission">MISSION: <span id="mission-num">1</span></button>
+        <button data-act="holo">HOLOTANK</button>
+        <button data-act="controls">CONTROLS</button>
+        <button data-act="music">MUSIC: <span id="music-state">ON</span></button>
+        <button data-act="import">IMPORT DESCENT: <span id="import-state">HOG / PIG</span></button>
+      </nav>
+      <div class="menu-panel">
+        <div id="missions"></div>
+        <div id="controls-panel" class="controls">
+          <span>Mouse / Arrows</span><span>pitch and yaw</span>
+          <span>W A S D</span><span>thrust and strafe</span>
+          <span>Space / R &nbsp; Shift / F</span><span>slide up / down</span>
+          <span>Q / E</span><span>roll</span>
+          <span>Left click</span><span>primary weapon</span>
+          <span>Right click / G</span><span>homing missile</span>
+          <span>1 2 3 4 / Wheel</span><span>laser, spreadfire, plasma, fusion</span>
+          <span>Tab or M</span><span>automap</span>
+          <span>N</span><span>music on / off</span>
+          <span>Esc</span><span>pause</span>
+        </div>
+      </div>
     </div>
-    <div class="go">CLICK TO LAUNCH</div>
+    <input type="file" id="import-file" accept=".hog,.pig,.rdl,.sdl" multiple hidden>
+    <div class="hint" id="menu-hint">&uarr; &darr; and Enter, or click &middot; &larr; &rarr; change mission</div>
+  </div>
+  <div id="holo">
+    <div class="h-head"><b>HOLOTANK</b> &middot; ROBOT DATABASE</div>
+    <div class="h-list"></div>
+    <div class="h-stage"></div>
+    <div class="h-stats"></div>
+    <div class="h-nav"><button class="h-prev">&#9664; PREV</button><span class="h-count"></span><button class="h-next">NEXT &#9654;</button><button class="h-back">BACK</button></div>
+    <div class="h-hint">Drag to turn &middot; wheel to zoom &middot; &larr; &rarr; browse &middot; Esc back</div>
   </div>
   <div id="pause" class="screen"><h1>PAUSED</h1><div class="go">CLICK TO RESUME</div></div>
   <div id="dead" class="screen"><h1>DESTROYED</h1><p id="dead-reason"></p><div class="go">CLICK TO TRY AGAIN</div></div>
-  <div id="win" class="screen"><h1>ESCAPED</h1><p>The mine collapses behind you.</p><p id="win-stats"></p><div class="go">CLICK TO PLAY AGAIN</div></div>
+  <div id="win" class="screen"><h1>ESCAPED</h1><p>The mine collapses behind you.</p><p id="win-stats"></p><div class="go" id="win-next">CLICK TO PLAY AGAIN</div></div>
 
   <script type="module" src="game.js"></script>
 </body>

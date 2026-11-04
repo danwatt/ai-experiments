@@ -158,6 +158,35 @@ const painters = {
     ctx.fillStyle = 'rgba(0,0,0,0.25)'; ctx.fillRect(30, 40, 68, 48); bevel(ctx, 30, 40, 68, 48, 0.12, 0.5);
     ctx.fillStyle = '#ff4030'; ctx.fillRect(58, 56, 12, 16);
   },
+  panel(ctx) {
+    const n = fbm(91), r = rng(12);
+    pixels(ctx, (x, y) => { const v = n(x, y) * 18 + r() * 6; return [150 + v, 156 + v, 164 + v]; });
+    for (const [x, y, w, h] of [[4, 4, 58, 76], [66, 4, 58, 76], [4, 84, 120, 40]]) bevel(ctx, x, y, w, h, 0.35, 0.45);
+    ctx.fillStyle = 'rgba(40,60,80,0.55)'; ctx.fillRect(14, 96, 100, 6);
+    ctx.fillStyle = '#4cc8ff'; ctx.fillRect(16, 97, 30, 4);
+    ctx.fillStyle = 'rgba(0,0,0,0.2)'; ctx.fillRect(0, 80, SIZE, 4);
+    rivets(ctx, [[10, 10], [56, 10], [72, 10], [118, 10]]);
+  },
+  pipes(ctx) {
+    const n = fbm(101), r = rng(14);
+    pixels(ctx, (x, y) => { const v = n(x, y) * 20 + r() * 6; return [44 + v, 50 + v, 48 + v]; });
+    for (const [x, w, c] of [[8, 34, [120, 128, 122]], [52, 18, [160, 110, 64]], [80, 40, [104, 118, 124]]]) {
+      const g = ctx.createLinearGradient(x, 0, x + w, 0);
+      g.addColorStop(0, `rgb(${c.map(v => v * 0.35)})`); g.addColorStop(0.35, `rgb(${c.map(v => Math.min(255, v * 1.25))})`); g.addColorStop(1, `rgb(${c.map(v => v * 0.3)})`);
+      ctx.fillStyle = g; ctx.fillRect(x, 0, w, SIZE);
+      for (const y of [20, 88]) { ctx.fillStyle = 'rgba(0,0,0,0.45)'; ctx.fillRect(x - 2, y, w + 4, 7); ctx.fillStyle = 'rgba(255,255,255,0.18)'; ctx.fillRect(x - 2, y, w + 4, 2); }
+    }
+  },
+  crystal(ctx) {
+    const n = fbm(111), m = fbm(117), r = rng(16);
+    pixels(ctx, (x, y) => {
+      const v = n(x, y), w = m(x, y);
+      const k = v * 60 + r() * 10;
+      const vein = v > 0.5 ? Math.max(0, 1 - Math.abs(w - 0.5) / 0.012) : 0;
+      const glint = r() > 0.997 ? 1 : 0;
+      return [34 + k * 0.55 + vein * 50 + glint * 150, 40 + k * 0.7 + vein * 150 + glint * 200, 58 + k * 0.95 + vein * 190 + glint * 200];
+    });
+  },
 };
 
 function doorPainter(main, accent) {
@@ -179,6 +208,8 @@ function doorPainter(main, accent) {
 painters.door = doorPainter([84, 92, 104], '#e0b020');
 painters.door_red = doorPainter([120, 34, 30], '#ff3a2a');
 painters.door_exit = doorPainter([40, 96, 52], '#50ff70');
+painters.door_blue = doorPainter([30, 54, 120], '#3a8aff');
+painters.door_yellow = doorPainter([122, 98, 18], '#ffd21a');
 
 export function makeTextures(renderer) {
   const out = {};
