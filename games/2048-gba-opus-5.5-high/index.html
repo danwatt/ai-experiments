@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hex 2048 GB</title>
+<style>
+  :root {
+    --page: #2b2d33;
+    --ink: #e9e6dc;
+    --muted: #a9a59a;
+    --shell: #d6d2c7;
+    --shell-shade: #b9b4a7;
+    --shell-ink: #3c3a52;
+    --bezel: #55576a;
+    --btn: #8b1d4f;
+    --btn-hi: #b02a67;
+    --pad: #2e2e34;
+    --accent: #8bc070;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: radial-gradient(circle at 30% 0%, #3a3d46, var(--page) 60%);
+    color: var(--ink);
+    font: 15px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    display: flex;
+    justify-content: center;
+    padding: 24px 16px 48px;
+  }
+  main {
+    display: flex;
+    gap: 40px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+    max-width: 980px;
+    min-width: 0;
+  }
+
+  /* ---------------------------------------------------------- handheld */
+  .shell {
+    width: 360px;
+    max-width: 100%;
+    background: linear-gradient(160deg, var(--shell), var(--shell-shade));
+    border-radius: 14px 14px 64px 14px;
+    padding: 22px 22px 30px;
+    box-shadow: 0 18px 40px rgba(0,0,0,.45), inset 0 -4px 0 rgba(0,0,0,.12), inset 0 2px 0 rgba(255,255,255,.5);
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+  }
+  .bezel {
+    background: var(--bezel);
+    border-radius: 10px 10px 36px 10px;
+    padding: 14px 22px 22px;
+  }
+  .bezel-top {
+    display: flex; align-items: center; gap: 8px;
+    color: #c9c9d6; font-size: 9px; letter-spacing: .12em; margin-bottom: 8px;
+  }
+  .bezel-top .line { flex: 1; height: 2px; background: linear-gradient(#8b1d4f 0 1px, #3c3a8a 1px 2px); }
+  .led { width: 8px; height: 8px; border-radius: 50%; background: #e33; box-shadow: 0 0 6px #f44; margin-right: 6px; }
+  .screen-row { display: flex; align-items: center; }
+  canvas {
+    display: block;
+    width: 100%;
+    aspect-ratio: 160 / 144;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    background: #081820;
+    border-radius: 2px;
+  }
+  .brand {
+    margin: 12px 0 18px 4px;
+    color: var(--shell-ink);
+    font: italic 700 20px/1 "Trebuchet MS", ui-sans-serif, sans-serif;
+    letter-spacing: .02em;
+  }
+  .brand small { font-size: 12px; font-style: normal; font-weight: 600; letter-spacing: .1em; margin-left: 6px; }
+
+  .controls { display: flex; justify-content: space-between; align-items: center; }
+
+  .hexpad { position: relative; width: 140px; height: 140px; }
+  .hexpad::before {
+    content: ""; position: absolute; left: 50%; top: 50%; width: 46px; height: 52px;
+    transform: translate(-50%, -50%);
+    background: var(--pad);
+    clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+  }
+  .hexpad button {
+    position: absolute; width: 44px; height: 44px; margin: -22px 0 0 -22px;
+    border: 0; padding: 0; cursor: pointer;
+    background: var(--pad); color: #8d8d99;
+    clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+    display: grid; place-items: center;
+    font-size: 18px;
+  }
+  .hexpad button.down, .hexpad button:active { background: #18181c; color: var(--accent); }
+  .hexpad button span { display: block; transform: rotate(var(--rot)); }
+
+  .ab { position: relative; width: 120px; height: 90px; transform: rotate(-25deg); }
+  .ab button {
+    position: absolute; width: 46px; height: 46px; border-radius: 50%; border: 0;
+    background: radial-gradient(circle at 35% 30%, var(--btn-hi), var(--btn));
+    box-shadow: 0 3px 0 rgba(0,0,0,.35);
+    cursor: pointer;
+  }
+  .ab button.down { transform: translateY(2px); box-shadow: 0 1px 0 rgba(0,0,0,.35); filter: brightness(.85); }
+  .ab .b { left: 0; top: 30px; }
+  .ab .a { right: 0; top: 4px; }
+  .ab label { position: absolute; font: 700 12px/1 ui-sans-serif, sans-serif; color: var(--shell-ink); transform: rotate(25deg); }
+  .ab .lb { left: 18px; top: 82px; }
+  .ab .la { right: 18px; top: 56px; }
+
+  .startsel { display: flex; justify-content: center; gap: 22px; margin-top: 22px; }
+  .startsel div { text-align: center; color: var(--shell-ink); font: 700 10px/1 ui-sans-serif, sans-serif; letter-spacing: .1em; }
+  .startsel button {
+    display: block; margin: 0 auto 6px; width: 46px; height: 12px; border-radius: 6px; border: 0;
+    background: #8a8892; transform: rotate(-25deg); cursor: pointer;
+    box-shadow: inset 0 -2px 0 rgba(0,0,0,.25);
+  }
+  .startsel button.down { background: #5d5b66; }
+
+  /* ---------------------------------------------------------- side panel */
+  .info { width: 400px; max-width: 100%; }
+  h1 { font-size: 26px; margin: 4px 0 4px; letter-spacing: .01em; }
+  .sub { color: var(--muted); margin: 0 0 20px; }
+  h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .12em; color: var(--accent); margin: 22px 0 8px; }
+  table { border-collapse: collapse; width: 100%; }
+  td { padding: 4px 0; vertical-align: top; }
+  td:first-child { width: 150px; color: var(--muted); }
+  kbd {
+    display: inline-block; min-width: 22px; padding: 1px 6px; margin: 0 2px 2px 0;
+    border-radius: 4px; border: 1px solid #5b5e69; border-bottom-width: 2px;
+    background: #363943; color: var(--ink); font: 12px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace; text-align: center;
+  }
+  .keyhex { margin: 2px 0 4px; }
+  .keyhex div { display: flex; gap: 4px; margin-bottom: 4px; }
+  .keyhex .off { margin-left: 17px; }
+  .keyhex kbd { width: 30px; margin: 0; }
+  .keyhex .ghost { opacity: .3; }
+  p { margin: 0 0 10px; }
+  .row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 8px; }
+  select, .btnlink {
+    background: #363943; color: var(--ink); border: 1px solid #5b5e69; border-radius: 6px;
+    padding: 5px 10px; font: inherit; font-size: 13px; text-decoration: none; cursor: pointer;
+  }
+  .note { color: var(--muted); font-size: 13px; }
+  a { color: var(--accent); }
+
+  @media (max-width: 440px) {
+    body { padding: 12px 8px 32px; }
+    .shell { padding: 16px 14px 24px; }
+    .bezel { padding: 10px 14px 16px; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <div class="shell" id="shell">
+    <div class="bezel">
+      <div class="bezel-top"><span class="line"></span>DOT MATRIX WITH STEREO SOUND<span class="line"></span></div>
+      <div class="screen-row">
+        <span class="led" title="power"></span>
+        <canvas id="screen" width="160" height="144" aria-label="Game Boy screen"></canvas>
+      </div>
+    </div>
+    <div class="brand">Hex 2048<small>GB</small></div>
+    <div class="controls">
+      <div class="hexpad" aria-label="Six-way direction pad">
+        <button data-keys="0x50" style="left:94px;top:30px" aria-label="North-east"><span style="--rot:-60deg">➜</span></button>
+        <button data-keys="0x60" style="left:46px;top:30px" aria-label="North-west"><span style="--rot:-120deg">➜</span></button>
+        <button data-keys="0x10" style="left:118px;top:70px" aria-label="East"><span style="--rot:0deg">➜</span></button>
+        <button data-keys="0x20" style="left:22px;top:70px" aria-label="West"><span style="--rot:180deg">➜</span></button>
+        <button data-keys="0x90" style="left:94px;top:110px" aria-label="South-east"><span style="--rot:60deg">➜</span></button>
+        <button data-keys="0xA0" style="left:46px;top:110px" aria-label="South-west"><span style="--rot:120deg">➜</span></button>
+      </div>
+      <div class="ab">
+        <button class="b" data-keys="0x02" aria-label="B"></button>
+        <button class="a" data-keys="0x01" aria-label="A"></button>
+        <label class="lb">B</label><label class="la">A</label>
+      </div>
+    </div>
+    <div class="startsel">
+      <div><button data-keys="0x04" aria-label="Select"></button>SELECT</div>
+      <div><button data-keys="0x08" aria-label="Start"></button>START</div>
+    </div>
+  </div>
+
+  <section class="info">
+    <h1>Hex 2048</h1>
+    <p class="sub">2048 on a 19-cell hexagonal board, written in Game Boy (SM83) assembly and running here in a small JavaScript Game Boy emulator.</p>
+
+    <h2>How to play</h2>
+    <p>Every move slides all tiles as far as they go in one of six directions. Two equal tiles that collide merge into their sum. A new 2 or 4 appears after every move. Reach 2048, and keep going until no move is left.</p>
+
+    <h2>Keyboard</h2>
+    <table>
+      <tr><td>Six directions</td><td>
+        <div class="keyhex">
+          <div class="off"><kbd>W</kbd><kbd>E</kbd></div>
+          <div><kbd>A</kbd><kbd class="ghost">S</kbd><kbd>D</kbd></div>
+          <div class="off"><kbd>Z</kbd><kbd>X</kbd></div>
+        </div>
+        <span class="note">the keys around S form a hexagon</span>
+      </td></tr>
+      <tr><td>D-pad</td><td><kbd>←</kbd><kbd>→</kbd> slide W / E; hold <kbd>↑</kbd> or <kbd>↓</kbd> plus <kbd>←</kbd>/<kbd>→</kbd> for diagonals</td></tr>
+      <tr><td>A / B</td><td><kbd>K</kbd> / <kbd>J</kbd> — with <kbd>↑</kbd>/<kbd>↓</kbd>, B picks the left diagonal and A the right</td></tr>
+      <tr><td>Start / Select</td><td><kbd>Enter</kbd> / <kbd>Shift</kbd> (Select offers a new game)</td></tr>
+    </table>
+
+    <h2>Options</h2>
+    <div class="row">
+      <label>Palette
+        <select id="palette">
+          <option value="dmg">DMG green</option>
+          <option value="pocket">Pocket grey</option>
+          <option value="amber">Amber</option>
+          <option value="ice">Ice</option>
+        </select>
+      </label>
+      <label><input type="checkbox" id="sound" checked> Sound</label>
+      <a class="btnlink" href="hex2048.gb" download>Download ROM</a>
+    </div>
+    <p class="note" style="margin-top:14px">The best score lives in the cartridge's battery-backed RAM, saved to this browser. The ROM runs on real hardware and other emulators too. Source: <code>src/main.asm</code>, emulator: <code>gb.js</code>.</p>
+  </section>
+</main>
+
+<script src="gb.js"></script>
+<script src="rom.js"></script>
+<script>
+(() => {
+  'use strict';
+  const PALETTES = {
+    dmg: ['#e0f8d0', '#88c070', '#346856', '#081820'],
+    pocket: ['#f2f2ea', '#b0b0a2', '#66665e', '#1e1e1c'],
+    amber: ['#ffe7a8', '#e2a443', '#8b4a14', '#2a1406'],
+    ice: ['#eaf5ff', '#8fb7de', '#3d5d96', '#0f1830'],
+  };
+  const SAVE_KEY = 'hex2048-gb-sram';
+  const store = {
+    get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+    set(k, v) { try { localStorage.setItem(k, v); } catch { /* private mode */ } },
+  };
+
+  const romBin = atob(window.HEX2048_ROM);
+  const rom = new Uint8Array(romBin.length);
+  for (let i = 0; i < romBin.length; i++) rom[i] = romBin.charCodeAt(i);
+  const gb = new GameBoy(rom);
+
+  const saved = store.get(SAVE_KEY);
+  if (saved) {
+    const bin = atob(saved);
+    for (let i = 0; i < Math.min(bin.length, gb.eram.length); i++) gb.eram[i] = bin.charCodeAt(i);
+  }
+  gb.onSave = ram => {
+    let s = '';
+    for (let i = 0; i < ram.length; i++) s += String.fromCharCode(ram[i]);
+    store.set(SAVE_KEY, btoa(s));
+  };
+
+  // ---------------------------------------------------------- video
+  const canvas = document.getElementById('screen');
+  const ctx = canvas.getContext('2d');
+  const image = ctx.createImageData(160, 144);
+  const px = new Uint32Array(image.data.buffer);
+  let colors;
+  const paletteSel = document.getElementById('palette');
+  function setPalette(name) {
+    if (!PALETTES[name]) name = 'dmg';
+    paletteSel.value = name;
+    colors = PALETTES[name].map(hex => {
+      const n = parseInt(hex.slice(1), 16);
+      return 0xFF000000 | ((n & 0xFF) << 16) | (n & 0xFF00) | (n >> 16);
+    });
+    canvas.style.background = PALETTES[name][3];
+    store.set('hex2048-gb-palette', name);
+  }
+  setPalette(store.get('hex2048-gb-palette') || 'dmg');
+  paletteSel.addEventListener('change', () => setPalette(paletteSel.value));
+
+  function draw() {
+    const fb = gb.fb;
+    for (let i = 0; i < fb.length; i++) px[i] = colors[fb[i]];
+    ctx.putImageData(image, 0, 0);
+  }
+
+  // ---------------------------------------------------------- audio
+  const soundBox = document.getElementById('sound');
+  soundBox.checked = store.get('hex2048-gb-sound') !== 'off';
+  let audio = null;
+  function startAudio() {
+    if (audio || !soundBox.checked) return;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    audio = new AC();
+    gb.apu.setRate(audio.sampleRate);
+    const node = audio.createScriptProcessor(1024, 0, 1);
+    node.onaudioprocess = e => {
+      const out = e.outputBuffer.getChannelData(0);
+      if (soundBox.checked) gb.apu.pull(out); else out.fill(0);
+    };
+    node.connect(audio.destination);
+  }
+  soundBox.addEventListener('change', () => {
+    store.set('hex2048-gb-sound', soundBox.checked ? 'on' : 'off');
+    if (soundBox.checked) { startAudio(); if (audio) audio.resume(); }
+  });
+
+  // ---------------------------------------------------------- input
+  // Pad bits: 7 Down, 6 Up, 5 Left, 4 Right, 3 Start, 2 Select, 1 B, 0 A
+  const KEYMAP = {
+    ArrowRight: 0x10, ArrowLeft: 0x20, ArrowUp: 0x40, ArrowDown: 0x80,
+    KeyW: 0x60, KeyE: 0x50, KeyA: 0x20, KeyD: 0x10, KeyZ: 0xA0, KeyX: 0x90,
+    KeyK: 0x01, KeyJ: 0x02, Enter: 0x08, Space: 0x08, ShiftLeft: 0x04, ShiftRight: 0x04, Backspace: 0x04,
+  };
+  // The game samples the pad once per frame, so a quick tap is held for at
+  // least MIN_HOLD frames before it is released.
+  const MIN_HOLD = 3;
+  let frameNo = 0;
+  const held = new Map(); // source id -> { mask, at, released }
+  function update() {
+    let m = 0;
+    for (const v of held.values()) m |= v.mask;
+    gb.setKeys(m);
+  }
+  function press(id, mask) {
+    startAudio();
+    held.set(id, { mask, at: frameNo, released: false });
+    update();
+  }
+  function release(id) {
+    const h = held.get(id);
+    if (!h) return false;
+    if (frameNo - h.at >= MIN_HOLD) held.delete(id);
+    else h.released = true;
+    update();
+    return true;
+  }
+  function settleReleases() {
+    let changed = false;
+    for (const [id, h] of held) {
+      if (h.released && frameNo - h.at >= MIN_HOLD) { held.delete(id); changed = true; }
+    }
+    if (changed) update();
+  }
+  addEventListener('keydown', e => {
+    const m = KEYMAP[e.code];
+    if (m === undefined || e.metaKey || e.ctrlKey || e.altKey) return;
+    e.preventDefault();
+    if (!e.repeat) press('k' + e.code, m);
+  });
+  addEventListener('keyup', e => { release('k' + e.code); });
+  addEventListener('blur', () => { held.clear(); update(); });
+
+  document.querySelectorAll('[data-keys]').forEach(btn => {
+    const mask = parseInt(btn.dataset.keys, 16);
+    const up = e => {
+      if (release('p' + e.pointerId + btn.dataset.keys)) btn.classList.remove('down');
+    };
+    btn.addEventListener('pointerdown', e => {
+      e.preventDefault();
+      btn.setPointerCapture?.(e.pointerId);
+      press('p' + e.pointerId + btn.dataset.keys, mask);
+      btn.classList.add('down');
+    });
+    btn.addEventListener('pointerup', up);
+    btn.addEventListener('pointercancel', up);
+    btn.addEventListener('lostpointercapture', up);
+    btn.addEventListener('contextmenu', e => e.preventDefault());
+  });
+
+  // ---------------------------------------------------------- main loop
+  const FRAME_MS = 1000 * GameBoy.FRAME_CYCLES / GameBoy.CLOCK;
+  let last = performance.now(), acc = 0;
+  function loop(now) {
+    acc += Math.min(now - last, 100);
+    last = now;
+    let ran = 0;
+    while (acc >= FRAME_MS && ran < 4) {
+      gb.runFrame();
+      frameNo++;
+      settleReleases();
+      acc -= FRAME_MS;
+      ran++;
+    }
+    if (ran) {
+      draw();
+      if (audio) gb.apu.trim(Math.floor(audio.sampleRate * 0.08));
+    }
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+  addEventListener('pagehide', () => { if (gb.ramDirty) gb.flushSave(); });
+})();
+</script>
+</body>
+</html>

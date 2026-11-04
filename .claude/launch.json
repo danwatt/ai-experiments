@@ -141,6 +141,18 @@
         "games/2048-qbas-opus-5.5-high"
       ],
       "port": 8805
+    },
+    {
+      "name": "2048-gba",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8807",
+        "-d",
+        "games/2048-gba-opus-5.5-high"
+      ],
+      "port": 8807
     }
   ]
 }
