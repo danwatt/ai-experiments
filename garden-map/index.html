@@ -116,6 +116,45 @@ h3 { font-size: 16px; margin: 24px 0 0; }
 .care-card h4 { font-size: 15px; margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
 .care-card .dot { cursor: pointer; }
 .care-card .facts dt { font-size: 13px; }
+.tl { position: relative; min-width: 680px; --name: 240px; }
+.tl-row { display: grid; grid-template-columns: var(--name) 1fr; align-items: center; border-bottom: 1px solid var(--line); }
+.tl-row.pick { cursor: pointer; }
+.tl-row.pick:hover { background: color-mix(in srgb, var(--accent) 10%, transparent); }
+.tl-name { display: flex; align-items: center; gap: 8px; padding: 5px 10px 5px 2px; font-size: 14px; line-height: 1.25; }
+.tl-name i { flex: none; width: 12px; height: 12px; border-radius: 50%; }
+.tl-name .meta { font-size: 12px; }
+/* on phones the names stay pinned while the months scroll under them */
+@media (max-width: 640px) {
+  .tl { --name: 140px; }
+  .tl-name { position: sticky; left: 0; z-index: 2; background: var(--panel); box-shadow: -12px 0 0 var(--panel); align-self: stretch; font-size: 13px; }
+}
+.tl-track { position: relative; height: 40px; background: linear-gradient(to right, var(--line) 1px, transparent 1px) 0 0 / calc(100% / 12) 100%; }
+.tl-bar { position: absolute; top: 12px; height: 16px; border-radius: 4px; }
+.tl-bar.light { opacity: .35; }
+.tl-head { border-bottom: 0; }
+.tl-head .tl-track { height: 24px; background: none; display: flex; }
+.tl-head .tl-track span { flex: 1; font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; padding-left: 4px; }
+.tl-group { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); padding: 14px 0 4px; border-bottom: 1px solid var(--line); }
+.tl-frost { position: absolute; top: 0; bottom: 0; width: 0; border-left: 1.5px dashed var(--muted); pointer-events: none; }
+.tl-frost span { position: absolute; top: 2px; left: 4px; font-size: 11px; color: var(--muted); white-space: nowrap; background: var(--panel); padding: 0 3px; }
+.tl-row:not(.tl-head):not(.tl-count) .tl-track { height: 46px; }
+.tl-row:not(.tl-head):not(.tl-count) .tl-bar { top: 15px; }
+.tl-plant { position: absolute; top: 35px; height: 7px; border-radius: 3px; border: 1px solid var(--accent); background: repeating-linear-gradient(135deg, var(--accent) 0 2px, transparent 2px 5px); }
+.tl-task { position: absolute; top: 2px; width: 11px; height: 11px; margin-left: -5.5px; color: var(--ink); }
+.tl-task svg, .tl-icon svg { display: block; width: 100%; height: 100%; fill: currentColor; stroke: currentColor; }
+.tl-icon { flex: none; display: inline-block; width: 11px; height: 11px; color: var(--ink); }
+.tl-plant-key { flex: none; display: inline-block; width: 22px; height: 8px; border-radius: 3px; border: 1px solid var(--accent); background: repeating-linear-gradient(135deg, var(--accent) 0 2px, transparent 2px 5px); }
+.tl-legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 13px; color: var(--muted); margin: 0 0 10px; }
+.tl-legend > span { display: inline-flex; align-items: center; gap: 6px; }
+.tl-months { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; margin-top: 10px; }
+.tl-month h4 { font-size: 15px; margin: 0 0 6px; }
+.tl-month.now { border-color: var(--accent); }
+.tl-month ul { list-style: none; margin: 0; padding: 0; font-size: 13px; }
+.tl-month li { display: flex; align-items: baseline; gap: 8px; margin-bottom: 5px; }
+.tl-month li .tl-icon, .tl-month li .tl-plant-key { transform: translateY(1px); }
+.tl-month li .tl-plant-key { width: 11px; }
+.tl-count .tl-track { height: 64px; background: none; display: flex; align-items: flex-end; gap: 2px; }
+.tl-count .tl-track b { flex: 1; background: var(--accent); opacity: .75; border-radius: 3px 3px 0 0; font-size: 10px; font-weight: 600; color: var(--panel); text-align: center; line-height: 14px; }
 </style>
 </head>
 <body>
@@ -125,6 +164,7 @@ h3 { font-size: 16px; margin: 24px 0 0; }
     <button role="tab" data-tab="now" aria-selected="true">Now</button>
     <button role="tab" data-tab="plan" aria-selected="false">Next year plan</button>
     <button role="tab" data-tab="3d" aria-selected="false">Next year in 3D</button>
+    <button role="tab" data-tab="timeline" aria-selected="false">Next year timeline</button>
   </nav>
 
   <section id="tab-now">
@@ -197,6 +237,20 @@ h3 { font-size: 16px; margin: 24px 0 0; }
       <div class="v3-info" id="v3info" hidden></div>
       <div class="v3-status" id="v3status">Loading 3D view…</div>
     </div>
+  </section>
+
+  <section id="tab-timeline" hidden>
+    <p class="sub">When each plant in next year's bed should be in flower, timed for North Texas. Solid bars are full bloom; faded bars are lighter or repeat bloom (often only after deadheading or a cutback). The hatched strip under a bar is the best time to put in the new plants, and the small marks above it are the yearly upkeep; hover over one for details, or see the month-by-month list below. The dashed lines mark the average last freeze in mid-March and first freeze in late November. Click a row to find the plant on the plan.</p>
+    <div class="tl-legend" id="tllegend"></div>
+    <div class="scroller"><div class="tl" id="timeline"></div></div>
+    <h3>Month by month</h3>
+    <p class="meta">Fall is the best planting season here: roots grow through the mild winter, so new plants handle their first summer better. Spring planting works too, but plan on watering more.</p>
+    <div class="tl-months" id="tlmonths"></div>
+    <ul class="notes">
+      <li>Bars show flowers only. The magnolias are evergreen and the grasses and Mexican heather hold their foliage most of the year.</li>
+      <li>The mandevilla bar ends when the pots come inside for the winter, usually late October.</li>
+      <li>A hot, dry August slows many of these down; a deep soak every week or so keeps them going.</li>
+    </ul>
   </section>
 </main>
 
@@ -597,11 +651,146 @@ function planSelect(key) {
 
 drawStats(); drawPlan(); drawPlanTable(); planSelect("A");
 
-// tabs; #plan or #3d in the URL opens that tab. The 3D view loads Three.js on first open.
+// ---- Next year timeline ----
+
+// bloom periods per species (keyed like SPECIES_CARE) for North Texas: [from, to, level] in months,
+// where 1 is Jan 1 and 13 is Dec 31; level 1 is full bloom, lower is light or repeat bloom
+const BLOOM = {
+  "Asclepias curassavica": [[5, 6, .4], [6, 11.65, 1]],
+  "Magnolia grandiflora": [[5, 7, 1], [7, 10, .4]],
+  "Veronica spicata": [[5, 7.5, 1], [8, 10, .4]],
+  "Salvia greggii": [[3.5, 6, 1], [6, 9, .4], [9, 11.65, 1]],
+  "Cuphea hyssopifolia": [[5, 11.65, 1]],
+  "Lagerstroemia indica": [[6, 9.5, 1], [9.5, 10, .4]],
+  "Salvia 'Mystic": [[4.5, 7, 1], [7, 8.5, .4], [8.5, 11.65, 1]],
+  "Echinacea purpurea": [[5, 7.5, 1], [7.5, 9.5, .4]],
+  "Mandevilla sp.": [[5, 11, 1]],
+  "Muhlenbergia capillaris": [[9, 9.5, .4], [9.5, 11.65, 1]],
+  "Anisacanthus quadrifidus": [[6, 7, .4], [7, 11, 1]],
+  "Pavonia lasiopetala": [[4, 11.65, 1]],
+  "Oenothera lindheimeri": [[4, 7.5, 1], [7.5, 9, .4], [9, 11, 1]],
+  "Conoclinium greggii": [[3.5, 7, .4], [7, 11.65, 1]],
+  "Melampodium leucanthum": [[3, 11.65, 1]],
+  "Wedelia acapulcensis": [[5, 11.65, 1]],
+  "Scutellaria suffrutescens": [[5, 11, 1]],
+  "Symphyotrichum oblongifolium": [[9.5, 10, .4], [10, 12, 1]],
+  "Lantana ×": [[5, 11.65, 1]],
+  "Asclepias tuberosa": [[5, 7.5, 1], [7.5, 9.5, .4]],
+  "Lonicera sempervirens": [[3, 6, 1], [6, 9, .3], [9, 11, .6]],
+};
+// planting windows (new plantings only) and yearly tasks per species, same month scale as BLOOM;
+// task: [month, type, what to do]
+const TASK_TYPES = {
+  cut: { label: "Cut back or prune", svg: `<path d="M0 1h10L5 9.5z"/>` },
+  trim: { label: "Trim, deadhead or pinch", svg: `<path d="M5 0l5 5-5 5-5-5z"/>` },
+  mulch: { label: "Mulch or protect", svg: `<rect x="1" y="1" width="8" height="8"/>` },
+  divide: { label: "Divide crowded clumps", svg: `<circle cx="5" cy="5" r="3.6" fill="none" stroke-width="1.8"/>` },
+  feed: { label: "Feed", svg: `<path d="M4 0h2v4h4v2H6v4H4V6H0V4h4z"/>` },
+  move: { label: "Move pots out or in", svg: `<path d="M5 .5l5 9H0z"/>` },
+};
+const MAINT = {
+  "Asclepias curassavica": { tasks: [[4.3, "cut", "Cut off dead stems once new shoots show"], [10.8, "cut", "Cut stems back to about 6 in. before the first freeze"], [11.3, "mulch", "Spread 2–3 in. of mulch over the crown"]] },
+  "Magnolia grandiflora": { tasks: [[3.3, "feed", "Light slow-release fertilizer"]] },
+  "Veronica spicata": { tasks: [[2.7, "cut", "Clear old foliage"], [3.3, "divide", "Divide every 3–4 years if the center thins"], [7.3, "trim", "Cut spent spikes back to a leaf pair for a second bloom"], [12, "cut", "Cut frost-blackened stems down to the rosette"]] },
+  "Salvia greggii": { tasks: [[2.8, "cut", "Cut back by a third to a half; take out dead wood"], [7.3, "trim", "Shear lightly after the spring flush"]] },
+  "Cuphea hyssopifolia": { tasks: [[3.7, "cut", "Cut dead stems to the ground after the last freeze"], [11.4, "mulch", "Pile 3–4 in. of pine straw over the crown before a hard freeze"]] },
+  "Lagerstroemia indica": { tasks: [[2.1, "cut", "Remove suckers, crossing branches and thin twigs; never top it"]] },
+  "Salvia 'Mystic": { tasks: [[3.3, "cut", "Cut old stems down to 4–6 in. when new shoots show"], [3.7, "divide", "Divide crowded clumps before they reach the magnolias"], [7.1, "trim", "Cut back by a third for a second flush"], [11.7, "mulch", "Mulch around the base; leave the frosted tops standing"]] },
+  "Echinacea purpurea": { plant: [[3.5, 5], [9.5, 11.5]], tasks: [[2.7, "cut", "Cut old stems to the ground"], [3.2, "divide", "Divide crowded clumps every 4 years or so"], [6.3, "trim", "Deadhead early blooms; leave late ones for seed"]] },
+  "Mandevilla sp.": { plant: [[4.7, 5.5]], tasks: [[4.8, "move", "Hang the pots out once nights stay above 55–60°F"], [5.4, "feed", "Bloom fertilizer every two weeks through September"], [10.8, "move", "Cut back by a third and bring inside before nights drop below 50°F"]] },
+  "Muhlenbergia capillaris": { plant: [[4, 6], [9.5, 10.5]], tasks: [[2.7, "cut", "Cut back to about 6 in. before new growth"]] },
+  "Anisacanthus quadrifidus": { plant: [[4, 6], [9.5, 11]], tasks: [[2.8, "cut", "Cut back hard to 6–12 in."]] },
+  "Pavonia lasiopetala": { plant: [[3.5, 5.5], [9.5, 11]], tasks: [[2.8, "cut", "Cut back by a third to keep it bushy"], [7.5, "trim", "Trim lightly to refresh it in the heat"]] },
+  "Oenothera lindheimeri": { plant: [[3.5, 5], [9.5, 11.5]], tasks: [[2.7, "cut", "Cut to the ground before new growth"], [7.4, "trim", "Cut back by half when it flops; it reblooms in fall"]] },
+  "Conoclinium greggii": { plant: [[3.5, 5.5], [9.5, 11]], tasks: [[2.7, "cut", "Cut old stems to the ground"]] },
+  "Melampodium leucanthum": { plant: [[3.5, 5.5]], tasks: [[2.9, "trim", "Trim lightly to keep it tidy; plant only in spring, wet winters rot new ones"]] },
+  "Wedelia acapulcensis": { plant: [[4, 6], [9.5, 10.5]], tasks: [[2.8, "cut", "Cut back by half"], [7.5, "trim", "Shear lightly if it gets leggy"]] },
+  "Scutellaria suffrutescens": { plant: [[3.5, 5.5], [9.5, 11]], tasks: [[2.9, "trim", "Trim off winter-worn tips"], [7.4, "trim", "Shear after the first flush"]] },
+  "Symphyotrichum oblongifolium": { plant: [[3.5, 5.5], [9.5, 11]], tasks: [[6.2, "trim", "Pinch back by half to keep it compact"], [7.1, "trim", "Pinch once more"], [12.2, "cut", "Cut back after bloom"]] },
+  "Lantana ×": { plant: [[4, 6]], tasks: [[3.7, "cut", "Cut back to 6–12 in. after the last freeze"]] },
+  "Asclepias tuberosa": { plant: [[3.5, 5.5], [9.5, 10.5]], tasks: [[2.7, "cut", "Cut old stems; it sprouts late, so don't dig until May"]] },
+  "Lonicera sempervirens": { plant: [[3, 4.5], [10, 12]], tasks: [[6.3, "trim", "Prune lightly after the spring bloom and tie in new shoots"]] },
+};
+const taskIcon = type => `<svg viewBox="0 0 10 10" aria-hidden="true">${TASK_TYPES[type].svg}</svg>`;
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const monthRange = (from, to) => `${MONTHS[Math.floor(from) - 1]}–${MONTHS[Math.ceil(to) - 2]}`;
+const pct = m => `${(m - 1) / 12 * 100}%`;
+
+function drawTimeline() {
+  // one row per kind of plant already in the bed; a new species that matches one joins its row
+  const rows = [];
+  PLANTS.forEach((p, i) => {
+    let r = rows.find(r => r.kind === p.kind);
+    if (!r) rows.push(r = { kind: p.kind, key: speciesKey(p.sci), name: p.name.replace(/\s*\((large )?mass\)/, ""), color: `var(${COLORS[p.kind]})`, nums: [], pick: `old-${i + 1}` });
+    r.nums.push(i + 1);
+  });
+  for (const s of NEW_PLANTS) {
+    const r = rows.find(r => r.key === speciesKey(s.sci));
+    if (r) r.add = s;
+    else rows.push({ key: speciesKey(s.sci), name: s.name, color: s.color, add: s, pick: s.id, isNew: true });
+  }
+  const start = r => BLOOM[r.key][0][0];
+  const byStart = (a, b) => start(a) - start(b) || a.name.localeCompare(b.name);
+  // planting windows only matter where something new goes in
+  const plantWindows = r => r.add ? MAINT[r.key]?.plant ?? [] : [];
+  const row = r => {
+    const which = [r.nums && `Plant${r.nums.length > 1 ? "s" : ""} ${r.nums.join(", ")}`, r.add && `${r.add.at.length} new (${r.add.id})`].filter(Boolean).join(" + ");
+    const bars = BLOOM[r.key].map(([from, to, level]) =>
+      `<div class="tl-bar${level < 1 ? " light" : ""}" style="left:${pct(from)};width:${(to - from) / 12 * 100}%;background:${r.color}" title="${monthRange(from, to)}${level < 1 ? ", lighter bloom" : ""}"></div>`).join("");
+    const plant = plantWindows(r).map(([from, to]) =>
+      `<div class="tl-plant" style="left:${pct(from)};width:${(to - from) / 12 * 100}%" title="Plant: ${monthRange(from, to)}"></div>`).join("");
+    const tasks = (MAINT[r.key]?.tasks ?? []).map(([m, type, what]) =>
+      `<span class="tl-task" style="left:${pct(m)}" title="${TASK_TYPES[type].label}: ${what}">${taskIcon(type)}</span>`).join("");
+    return `<div class="tl-row pick" data-pick="${r.pick}" title="${r.name}">
+      <div class="tl-name"><i style="background:${r.color}"></i><div>${r.name}<div class="meta">${which}</div></div></div>
+      <div class="tl-track">${bars}${plant}${tasks}</div></div>`;
+  };
+  const ordered = [...rows.filter(r => !r.isNew).sort(byStart), ...rows.filter(r => r.isNew).sort(byStart)];
+  // species in full bloom in each half month
+  const counts = Array.from({ length: 24 }, (_, h) => {
+    const m = 1 + (h + .5) / 2;
+    return rows.filter(r => BLOOM[r.key].some(([from, to, level]) => level === 1 && from <= m && m < to)).length;
+  });
+  const most = Math.max(...counts);
+  const frost = (m, label) => `<div class="tl-frost" style="left:calc(var(--name) + (100% - var(--name)) * ${(m - 1) / 12})"><span>${label}</span></div>`;
+  document.getElementById("timeline").innerHTML = `
+    <div class="tl-row tl-head"><div></div><div class="tl-track">${MONTHS.map(m => `<span>${m}</span>`).join("")}</div></div>
+    <div class="tl-group">Already in the bed</div>${rows.filter(r => !r.isNew).sort(byStart).map(row).join("")}
+    <div class="tl-group">New for next year</div>${rows.filter(r => r.isNew).sort(byStart).map(row).join("")}
+    <div class="tl-row tl-count"><div class="tl-name"><div>Species in full bloom<div class="meta">Each half month, of ${rows.length}</div></div></div>
+      <div class="tl-track">${counts.map((c, h) => `<b style="height:${c / most * 100}%" title="${c} in full bloom, ${h % 2 ? "late" : "early"} ${MONTHS[h >> 1]}">${c || ""}</b>`).join("")}</div></div>
+    ${frost(3.5, "last freeze")}${frost(11.65, "first freeze")}`;
+  document.getElementById("tllegend").innerHTML = `<span><i class="tl-plant-key"></i>Best time to plant</span>` +
+    Object.entries(TASK_TYPES).map(([type, t]) => `<span><span class="tl-icon">${taskIcon(type)}</span>${t.label}</span>`).join("");
+
+  // the same tasks as a list, month by month, starting with this month
+  const thisMonth = new Date().getMonth() + 1;
+  document.getElementById("tlmonths").innerHTML = MONTHS.map((_, i) => {
+    const m = (thisMonth - 1 + i) % 12 + 1, label = MONTHS[m - 1];
+    const toPlant = ordered.filter(r => plantWindows(r).some(([from, to]) => from < m + 1 && to > m)).map(r => r.name);
+    const tasks = ordered.flatMap(r => (MAINT[r.key]?.tasks ?? []).filter(([t]) => Math.floor(t) === m).map(([t, type, what]) => [t, type, r.name, what]))
+      .sort((a, b) => a[0] - b[0]);
+    if (!toPlant.length && !tasks.length) return "";
+    return `<div class="card tl-month${m === thisMonth ? " now" : ""}"><h4>${label}${m === thisMonth ? ` <span class="conf high">this month</span>` : ""}</h4><ul>
+      ${toPlant.length ? `<li><i class="tl-plant-key"></i><span><strong>Plant:</strong> ${toPlant.join(", ")}</span></li>` : ""}
+      ${tasks.map(([, type, name, what]) => `<li><span class="tl-icon" title="${TASK_TYPES[type].label}">${taskIcon(type)}</span><span><strong>${name}:</strong> ${what}</span></li>`).join("")}
+    </ul></div>`;
+  }).join("");
+
+  document.querySelectorAll("#timeline .tl-row.pick").forEach(r => r.addEventListener("click", () => {
+    showTab("plan");
+    history.replaceState(null, "", "#plan");
+    planSelect(r.dataset.pick);
+    document.querySelector("#tab-plan .scroller").scrollIntoView({ behavior: "smooth" });
+  }));
+}
+drawTimeline();
+
+// tabs; #plan, #3d or #timeline in the URL opens that tab. The 3D view loads Three.js on first open.
 let view3d;
 function showTab(name) {
   document.querySelectorAll(".tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === name));
-  for (const t of ["now", "plan", "3d"]) document.getElementById(`tab-${t}`).hidden = name !== t;
+  for (const t of ["now", "plan", "3d", "timeline"]) document.getElementById(`tab-${t}`).hidden = name !== t;
   if (name === "3d") {
     view3d ??= import("./plan3d.js").then(m => m.init(document.getElementById("view3d")))
       .catch(e => { document.getElementById("v3status").textContent = "Couldn't load the 3D view."; console.error(e); });
@@ -612,7 +801,7 @@ document.querySelectorAll(".tabs button").forEach(b => b.addEventListener("click
   showTab(b.dataset.tab);
   history.replaceState(null, "", b.dataset.tab === "now" ? location.pathname : `#${b.dataset.tab}`);
 }));
-showTab({ "#plan": "plan", "#3d": "3d" }[location.hash] ?? "now");
+showTab({ "#plan": "plan", "#3d": "3d", "#timeline": "timeline" }[location.hash] ?? "now");
 </script>
 </body>
 </html>

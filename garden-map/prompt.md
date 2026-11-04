@@ -3,8 +3,8 @@
 - **Model:** claude-opus-5-5
 - **Effort:** high
 - **Session(s):** 540952f4-8304-48e4-9ec2-8c013e57d96c
-- **Tokens:** input 410, output 172346, cache read 31871987, cache write 378748
-- **Cost (tokscale estimate):** $12.85
+- **Tokens:** input 468, output 205089, cache read 36079373, cache write 497366
+- **Cost (tokscale estimate):** $15.3
 
 ## You
 
@@ -598,6 +598,105 @@ I added a third tab, "Next year in 3D", with a 3D model of the plan that you can
 - **Loading:** the 3D library loads only when the tab is first opened, so the other two tabs stay as fast as before. You can link straight to it with `#3d`.
 - **On a phone:** the narrow screen shows only part of the 50 ft bed at once, so you have to pinch out or turn to see the rest.
 - **Files:** the new code is in `garden-map/plan3d.js`; `index.html` has the tab and styles.
+
+## You
+
+Commit and push
+
+
+## Claude
+
+Committed and pushed to `origin/master` as `2c08902`. The Pages site will have the 3D tab after its next build, and you can link straight to it with `#3d`. Only the `garden-map/` folder went in; the Hexahedron files and the root `index.html` stay out, untouched.
+
+For `prompt.md`:
+- **Signs:** regenerating it brought back the unblurred screenshots again, so I swapped the blurred ones back in. The sign names still appear nowhere in the published files.
+- **Close-ups:** last round's side-by-side check image of the three close-ups also got pulled in, so I removed it and left the usual one-line note.
+- **Screenshots:** the seven new ones are views of the 3D scene.
+- **Cost:** the estimated session cost so far is about $12.85.
+
+## You
+
+Lets add another tab - next year timeline
+On the timeline, lets show each species that will be planted, and using their color - what times of the year they will be blooming
+
+## Claude
+
+Whole file is 618 lines. Read it fully.
+
+![screenshot 71](prompt-assets/071.jpg)
+
+![screenshot 72](prompt-assets/072.jpg)
+
+Timeline tab built; checking render now.
+
+![screenshot 73](prompt-assets/073.jpg)
+
+![screenshot 74](prompt-assets/074.jpg)
+
+![screenshot 75](prompt-assets/075.jpg)
+
+Mobile: name column hogs width, bars off-screen. Fix: narrower sticky name column on phones.
+
+![screenshot 76](prompt-assets/076.jpg)
+
+![screenshot 77](prompt-assets/077.jpg)
+
+Bars leak into scroller padding left of the pinned names. Cover it with a panel-colored shadow.
+
+![screenshot 78](prompt-assets/078.png)
+
+Mobile clean. Check row click plus dark mode.
+
+![screenshot 79](prompt-assets/079.jpg)
+
+The "Next year timeline" tab is in [index.html](index.html), and you can link straight to it with `#timeline`. It works on desktop, on a phone and in dark mode. Not committed yet.
+
+- **Rows:** one per species, split into "Already in the bed" (10) and "New for next year" (12). Each row lists the plant numbers or plan letters it covers. The coneflower and mandevilla rows also include the new D and N plantings, since they're the same species.
+- **Bars:** in the same colors as the maps. Solid means full bloom. Faded means lighter or repeat bloom, like speedwell after deadheading or the autumn sage summer lull.
+- **Bloom times:** these are my estimates of typical North Texas timing. Dashed lines mark the average last freeze (mid-March) and first freeze (late November).
+- **Count chart:** a strip at the bottom shows how many species are in full bloom each half month. It peaks at 16 in May and June and dips to 11 in July and August. Early spring is thin: only blackfoot daisy and coral honeysuckle are in full bloom in March.
+- **Clicking a row** opens the plan tab with that plant selected.
+- **On phones** the names stay pinned on the left while the months scroll sideways.
+
+Autumn sage and the red mandevilla share a red on the existing map, so their two bars are the same color.
+
+## You
+
+Lets add to the timeline a marker to indicate the best time to plant or do other maintenance tasks per species
+
+## Claude
+
+![screenshot 80](prompt-assets/080.jpg)
+
+Markers render. Check legend and month list.
+
+![screenshot 81](prompt-assets/081.png)
+
+![screenshot 82](prompt-assets/082.jpg)
+
+Month list works. Start it at current month so due-now tasks come first.
+
+![screenshot 83](prompt-assets/083.jpg)
+
+![screenshot 84](prompt-assets/084.jpg)
+
+Timeline now marks when to plant and when to do upkeep, per species. Checked on desktop and phone with no errors. Not committed yet.
+
+- **Planting windows:** green hatched strip under a bloom bar. Shown only where new plants go in: the 12 new species, plus the new coneflowers (D) and new mandevilla pots (N).
+  - Most new species get a spring and a fall window.
+  - Blackfoot daisy and lantana get spring only. Wet winters rot new blackfoot daisies, and new lantana is tender at first.
+- **Upkeep marks:** small shapes along the top of each row, with a legend above the chart. Hover over one for what to do.
+  - ▼ cut back or prune
+  - ◆ trim, deadhead or pinch
+  - ■ mulch or protect
+  - ○ divide
+  - ✚ feed
+  - ▲ move pots out or in
+- **Timing:** the existing plants' tasks come from their Now-tab care notes; the new plants' tasks are my North Texas estimates.
+- **"Month by month" list:** under the chart, the same tasks as text, so they're usable on a phone without hovering. It starts with this month, so November is marked "this month" and comes first: milkweed, Mexican heather and blue salvia mulching, plus fall planting. Late February is the busiest stretch for cutting back.
+- **Fall planting:** the list notes that fall is the better season here. That means most of the new plants could go in now rather than waiting for spring.
+
+One mismatch: the timeline puts bringing in the mandevilla pots in late October. The Now tab's care note says to do it now, before nights drop below 50°F.
 
 ## You
 
