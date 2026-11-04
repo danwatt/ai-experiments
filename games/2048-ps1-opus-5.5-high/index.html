@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hex 2048 — PlayStation</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh;
+    background: radial-gradient(ellipse at top, #262b52 0%, #0d0f1f 70%);
+    color: #e8e4f4; font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+    display: flex; flex-direction: column; align-items: center; padding: 20px 16px 40px;
+  }
+  h1 { margin: 4px 0 2px; font-size: 26px; letter-spacing: .5px; }
+  h1 span { color: #edc22e; }
+  .sub { margin: 0 0 16px; color: #a9a4c4; font-size: 14px; text-align: center; }
+  #wrap {
+    width: min(960px, 100%); aspect-ratio: 4 / 3;
+    background: #000; border-radius: 10px; overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0,0,0,.6), 0 0 0 1px #3a3560;
+  }
+  #game { width: 100%; height: 100%; }
+  .help { width: min(960px, 100%); display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; margin-top: 18px; }
+  .card { background: #1a1d38; border: 1px solid #34305a; border-radius: 10px; padding: 12px 16px; }
+  .card h2 { margin: 0 0 8px; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; color: #f2b179; }
+  table { border-collapse: collapse; width: 100%; }
+  td { padding: 2px 0; vertical-align: top; }
+  td:first-child { width: 48%; }
+  kbd { background: #2c2f55; border: 1px solid #4a4680; border-bottom-width: 2px; border-radius: 4px; padding: 0 5px; font: 12px ui-monospace, monospace; }
+  .wheel { font: 13px ui-monospace, monospace; line-height: 1.9; text-align: center; margin: 6px 0; }
+  a { color: #f2b179; }
+</style>
+</head>
+<body>
+<h1>HEX <span>2048</span></h1>
+<p class="sub">A PlayStation game written in C (no SDK), running in PCSX-ReARMed via EmulatorJS. Click the play button to boot.</p>
+
+<div id="wrap"><div id="game"></div></div>
+
+<div class="help">
+  <div class="card">
+    <h2>Keyboard</h2>
+    <div class="wheel">
+      <kbd>Q</kbd> NW &nbsp; <kbd>W</kbd> N &nbsp; <kbd>E</kbd> NE<br>
+      <kbd>A</kbd> SW &nbsp; <kbd>S</kbd> S &nbsp; <kbd>D</kbd> SE
+    </div>
+    <table>
+      <tr><td><kbd>↑</kbd> <kbd>↓</kbd></td><td>N / S</td></tr>
+      <tr><td><kbd>↑</kbd>+<kbd>←</kbd> etc.</td><td>diagonals (press together)</td></tr>
+      <tr><td><kbd>Enter</kbd></td><td>Start / pause menu</td></tr>
+      <tr><td><kbd>Backspace</kbd></td><td>Undo last move</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h2>PlayStation pad</h2>
+    <table>
+      <tr><td>Triangle / Up</td><td>slide N</td></tr>
+      <tr><td>Cross / Down</td><td>slide S</td></tr>
+      <tr><td>L1 / Up+Left</td><td>slide NW</td></tr>
+      <tr><td>R1 / Up+Right</td><td>slide NE</td></tr>
+      <tr><td>L2 / Down+Left</td><td>slide SW</td></tr>
+      <tr><td>R2 / Down+Right</td><td>slide SE</td></tr>
+      <tr><td>Select</td><td>undo</td></tr>
+      <tr><td>Start</td><td>start / pause</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h2>How to play</h2>
+    <p style="margin:0">Nineteen hexagonal cells, six directions. Every slide pushes all tiles as far as they go;
+      two equal tiles that collide merge into their sum. A new 2 (or 4) appears after each move.
+      Reach <b>2048</b>. Source: <a href="src/game.c">src/game.c</a>, ROM: <a href="hex2048.exe">hex2048.exe</a>.</p>
+  </div>
+</div>
+
+<script>
+  const k = (value) => ({ value });
+  EJS_player = "#game";
+  EJS_core = "pcsx_rearmed";
+  EJS_gameName = "Hex 2048";
+  EJS_gameUrl = "hex2048.exe";
+  EJS_pathtodata = "https://cdn.emulatorjs.org/4.2.3/data/";
+  EJS_color = "#edc22e";
+  EJS_backgroundColor = "#000000";
+  EJS_disableDatabases = true;   // ROM is tiny; IndexedDB caching keys on size and serves stale builds
+  EJS_defaultControls = {
+    0: {
+      0: k("s"),            // Cross    -> S
+      1: k("x"),            // Square
+      2: k("backspace"),    // Select   -> undo
+      3: k("enter"),        // Start
+      4: k("up arrow"), 5: k("down arrow"), 6: k("left arrow"), 7: k("right arrow"),
+      8: k("c"),            // Circle
+      9: k("w"),            // Triangle -> N
+      10: k("q"),           // L1 -> NW
+      11: k("e"),           // R1 -> NE
+      12: k("a"),           // L2 -> SW
+      13: k("d"),           // R2 -> SE
+      24: k("1"), 25: k("2"), 26: k("3"),
+    },
+    1: {}, 2: {}, 3: {},
+  };
+</script>
+<script src="https://cdn.emulatorjs.org/4.2.3/data/loader.js"></script>
+</body>
+</html>
