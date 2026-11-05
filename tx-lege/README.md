@@ -13,6 +13,16 @@ uv run tx_lege.py "HB 2" --session 892      # 89th Legislature, 2nd called sessi
 
 Open `output/89R-SB17/report.html` in a browser.
 
+## Static demo
+
+`demo/` holds copies of the reports for a few bills, with an index page, so they can be browsed
+on GitHub Pages without running anything. They are snapshots; rebuild from whatever is in
+`output/` (the old `demo/` is replaced):
+
+```bash
+python3 tools/build_demo.py
+```
+
 ## Where the data comes from
 
 LegiScan blocks scripted access to its web pages, and its API needs a key, so

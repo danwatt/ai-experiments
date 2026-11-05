@@ -1,0 +1,1103 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>89(R) HB 128 history</title><style>
+:root{--bg:#fbfaf7;--fg:#1d1d1b;--muted:#6b6a65;--line:#e4e1d8;--card:#fff;--accent:#7a4b13;
+--yea:#2f7d4f;--nay:#b23a3a;--na:#c9c5ba;--with:#cfe8d6;--against:#f3cccc;--other:#eeebe3;
+--R:#b23a3a;--D:#2c5fa8;--I:#7a6a1f;--U:#777}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#171715;--fg:#ecebe6;--muted:#a19f97;--line:#34332f;
+--card:#1f1f1c;--accent:#e0a35c;--yea:#6cc08f;--nay:#ee7b7b;--na:#55534c;--with:#24452f;--against:#562a2a;--other:#2a2926}}
+:root[data-theme=dark]{--bg:#171715;--fg:#ecebe6;--muted:#a19f97;--line:#34332f;--card:#1f1f1c;--accent:#e0a35c;
+--yea:#6cc08f;--nay:#ee7b7b;--na:#55534c;--with:#24452f;--against:#562a2a;--other:#2a2926}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif}
+main{max-width:1180px;margin:0 auto;padding:24px 16px 80px}
+h1{font:600 28px/1.2 Georgia,serif;margin:0 0 6px}h2{font:600 21px/1.3 Georgia,serif;margin:44px 0 12px;
+padding-top:12px;border-top:1px solid var(--line)}h3{font-size:16px;margin:24px 0 8px}
+a{color:var(--accent)}.muted{color:var(--muted)}.small{font-size:13px}
+nav{position:sticky;top:0;background:var(--bg);border-bottom:1px solid var(--line);z-index:5;padding:8px 16px;
+display:flex;gap:16px;flex-wrap:wrap;font-size:14px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:18px 0}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+.tile b{display:block;font-size:22px}.meta{display:grid;grid-template-columns:120px 1fr;gap:4px 12px;font-size:14px}
+.meta dt{color:var(--muted)}.meta dd{margin:0}
+.badge{display:inline-block;min-width:22px;text-align:center;border-radius:4px;padding:0 5px;font-size:12px;
+font-weight:600;color:#fff;background:var(--U)}.b-H{background:#5b6b3a}.b-S{background:#6a4c8c}.b-E{background:#555}
+.p-R{color:var(--R)}.p-D{color:var(--D)}.p-I{color:var(--I)}
+table{border-collapse:collapse;width:100%}th,td{text-align:left;padding:5px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:13px;color:var(--muted);font-weight:600}
+.timeline td{font-size:14px}.timeline tr.minor td{color:var(--muted);font-size:13px}
+.timeline tr.day td{border-bottom:none;padding-top:16px;font-weight:600}
+.vote{display:inline-block;margin-top:3px;padding:2px 8px;border-radius:5px;background:var(--other);font-size:13px}
+.pass{color:var(--yea);font-weight:600}.fail{color:var(--nay);font-weight:600}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px 14px;margin:12px 0}
+.card h3{margin:0 0 4px}.names{font-size:13px;margin:4px 0}.names b{display:inline-block;min-width:150px}
+details summary{cursor:pointer;color:var(--accent)}pre{white-space:pre-wrap;font:12.5px/1.45 ui-monospace,Menlo,monospace;
+background:var(--card);border:1px solid var(--line);border-radius:6px;padding:10px;max-height:560px;overflow:auto}
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--card)}
+.matrix{width:auto;font-size:12px}.matrix th,.matrix td{padding:2px 4px;border-bottom:1px solid var(--line);white-space:nowrap}
+.matrix td.v{text-align:center;width:26px;font-weight:600}
+.matrix th.rc{writing-mode:vertical-rl;transform:rotate(180deg);height:150px;vertical-align:bottom;font-weight:500}
+.matrix th.rc a{text-decoration:none;color:var(--fg)}
+.matrix .name{position:sticky;left:0;background:var(--card);z-index:1}
+.matrix .num{text-align:right}
+[data-color=sponsor] .s-with,[data-color=party] .p-with{background:var(--with)}
+[data-color=sponsor] .s-against,[data-color=party] .p-against{background:var(--against)}
+[data-color=vote] .v-Y{color:var(--yea)}[data-color=vote] .v-N{color:var(--nay)}
+.v-PNV,.v-EXC,.v-ABS,.v-{color:var(--muted);font-weight:400}
+.controls{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:6px 0 10px;font-size:13px}
+.controls button{font:inherit;padding:3px 10px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--fg);cursor:pointer}
+.controls button.on{border-color:var(--accent);color:var(--accent);font-weight:600}
+.journal p{margin:4px 0;font-size:13.5px}.journal p.h{font-weight:600;text-align:center;margin-top:12px}
+
+:root{--dadd:#e6ffec;--daddw:#abf2bc;--ddel:#ffebe9;--ddelw:#ffcecb;--dhunk:#ddf4ff;--dln:#f6f8fa;--dfg:#1f2328;--dmk:#8c959f}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--dadd:rgba(46,160,67,.15);--daddw:rgba(46,160,67,.4);
+--ddel:rgba(248,81,73,.15);--ddelw:rgba(248,81,73,.4);--dhunk:rgba(56,139,253,.15);--dln:#161b22;--dfg:#e6edf3;--dmk:#6e7681}}
+:root[data-theme=dark]{--dadd:rgba(46,160,67,.15);--daddw:rgba(46,160,67,.4);--ddel:rgba(248,81,73,.15);--ddelw:rgba(248,81,73,.4);
+--dhunk:rgba(56,139,253,.15);--dln:#161b22;--dfg:#e6edf3;--dmk:#6e7681}
+details.diff{border:1px solid var(--line);border-radius:8px;margin:10px 0;background:var(--card);overflow:hidden}
+summary.diffhead{padding:8px 12px;background:var(--dln);cursor:pointer;color:var(--dfg);font-size:14px;list-style-position:inside}
+details.diff[open] summary.diffhead{border-bottom:1px solid var(--line)}
+.stat{float:right;font:600 12px ui-monospace,Menlo,monospace}.plus{color:#1a7f37}.minus{color:#cf222e}
+.stat i{display:inline-block;width:8px;height:8px;margin-left:1px;border-radius:1px}.stat .ba{background:#2da44e}.stat .bd{background:#cf222e}
+table.difft{width:100%;border-collapse:collapse;font:12.5px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;table-layout:fixed}
+.difft td{border:0;padding:1px 8px;vertical-align:top}
+.difft td.ln{width:46px;text-align:right;color:var(--muted);background:var(--dln);user-select:none;font-size:11.5px}
+.difft td.sg{width:18px;text-align:center;user-select:none;color:var(--muted)}
+.difft td.tx{white-space:pre-wrap;word-wrap:break-word;color:var(--dfg)}
+.difft tr.add td{background:var(--dadd)}.difft tr.add td.ln{background:var(--daddw)}
+.difft tr.del td{background:var(--ddel)}.difft tr.del td.ln{background:var(--ddelw)}
+.difft .wadd{background:var(--daddw);border-radius:2px}.difft .wdel{background:var(--ddelw);border-radius:2px}
+.difft .mk{color:var(--dmk)}
+.difft tr.skip td{background:var(--dhunk);padding:0}
+.difft tr.skip button{all:unset;cursor:pointer;display:block;width:100%;padding:3px 12px;color:var(--muted);font-size:12px}
+.difft tr.skip button:hover{color:var(--accent)}.difft tr.hid{display:none}.difft td.ctxnote{padding:10px 12px;color:var(--muted)}
+.lawtext{font:13.5px/1.55 Georgia,serif;background:var(--card);border:1px solid var(--line);border-radius:6px;padding:4px 14px;max-height:620px;overflow:auto}
+.lawtext p{margin:6px 0}.mk{color:var(--dmk);font-family:ui-monospace,Menlo,monospace}ins{text-decoration:underline;text-decoration-color:#2da44e;text-decoration-thickness:2px;background:var(--dadd)}
+del{color:var(--muted);text-decoration-color:#cf222e;background:var(--ddel)}
+</style></head><body>
+<nav><b>89(R) HB 128</b><a href=#timeline>Timeline</a><a href=#amendments>Amendments</a><a href=#votes>Record votes</a><a href=#matrix>Vote matrix</a><a href=#members>Members</a><a href=#text>Bill text</a><a href=#changes>Changes</a><a href=#journal>Journal</a></nav><main>
+<h1>89(R) HB 128</h1><p>Relating to certain sister-city agreements between governmental entities and foreign countries and communities.</p>
+<dl class=meta>
+<dt>Author</dt><dd>Orr | Hefner | McLaughlin</dd>
+<dt>Coauthor</dt><dd>Bonnen | Bumgarner | Capriglione | Cook | Harris | Hickland | Holt | Hull | Isaac | Leach | Lopez, Janie | McQueeney | Metcalf | Pierson | Troxclair | Wilson</dd>
+<dt>Sponsor</dt><dd>Kolkhorst</dd>
+<dt>Last Action</dt><dd>06/20/2025 E Effective on 9/1/25</dd>
+<dt>Senate Committee</dt><dd>State Affairs</dd>
+<dt>Senate Committee Vote</dt><dd>Ayes=11 Nays=0 Present Not Voting=0 Absent=0</dd>
+<dt>House Committee</dt><dd>Homeland Security, Public Safety &amp; Veterans&#x27; Affairs</dd>
+<dt>House Committee Vote</dt><dd>Ayes=8 Nays=3 Present Not Voting=0 Absent=0</dd>
+<dt>Subjects</dt><dd>City Government--General (I0060) | Intergovernmental Relations (I0447) | Political Subdivisions (I0588) | State Agencies, Boards &amp; Commissions (I0749) | INTERNATIONAL RELATIONS (S0038)</dd>
+<dt>Source</dt><dd><a href='https://capitol.texas.gov/BillLookup/History.aspx?LegSess=89R&amp;Bill=HB128'>Texas Legislature Online</a> · House &amp; Senate journals</dd></dl>
+<div class=tiles>
+<div class=tile><b>50</b><span class=muted>actions</span></div>
+<div class=tile><b>0</b><span class=muted>floor amendments: </span></div>
+<div class=tile><b>4</b><span class=muted>record votes</span></div>
+<div class=tile><b>29–2 (voice, deemed)</b><span class=muted>Senate Pass 2nd rdg · R 20–0 · D 9–2</span></div>
+<div class=tile><b>29–2 (voice, deemed)</b><span class=muted>Senate Pass 3rd rdg · R 20–0 · D 9–2</span></div>
+</div>
+<h2 id=timeline>Timeline</h2><p class='small muted'>Every action from the bill history, oldest first. Record votes and amendments link to their details below.</p><table class=timeline>
+<tr class=day><td colspan=3>2025-03-13</td></tr>
+<tr class=''><td><span class='badge b-H'>H</span></td><td>Filed</td><td class='small muted'></td></tr>
+<tr class=day><td colspan=3>2025-03-14</td></tr>
+<tr class=''><td><span class='badge b-H'>H</span></td><td><a href='http://journals.house.texas.gov/hjrnl/89r/pdf/89RDAY26FINAL.PDF#page=77&amp;seqNum=10' title='Journal page 605'>Read first time</a></td><td class='small muted'></td></tr>
+<tr class=''><td><span class='badge b-H'>H</span></td><td><a href='http://journals.house.texas.gov/hjrnl/89r/pdf/89RDAY26FINAL.PDF#page=77&amp;seqNum=15' title='Journal page 605'>Referred to Homeland Security, Public Safety &amp; Veterans&#x27; Affairs</a></td><td class='small muted'>02:42 PM</td></tr>
+<tr class=day><td colspan=3>2025-04-02</td></tr>
+<tr class='minor'><td><span class='badge b-H'>H</span></td><td>Scheduled for public hearing on . . .</td><td class='small muted'></td></tr>
+<tr class=''><td><span class='badge b-H'>H</span></td><td>Considered in public hearing</td><td class='small muted'></td></tr>
+<tr class=''><td><span class='badge b-H'>H</span></td><td>Testimony taken/registration(s) recorded in committee</td><td class='small muted'></td></tr>
+<tr class=''><td><span class='badge b-H'>H</span></td><td>Left pending in committee</td><td class='small muted'></td></tr>
+<tr class=day><td colspan=3>2025-04-09</td></tr>
+<tr class=''><td><span class='badge b-H'>H</span></td><td>Considered in public hearing</td><td class='small muted'></td></tr>
+<tr class=''><td><span class='badge b-H'>H</span></td><td>Reported favorably w/o amendment(s)</td><td class='small muted'></td></tr>
+<tr class=day><td colspan=3>2025-04-16</td></tr>
+<tr class='minor'><td><span class='badge b-H'>H</span></td><td><a href='http://journals.house.texas.gov/hjrnl/89r/pdf/89RDAY46FINAL.PDF#page=30&amp;seqNum=50' title='Journal page 1688'>Comte report filed with Committee Coordinator</a></td><td class='small muted'></td></tr>
+<tr class='minor'><td><span class='badge b-H'>H</span></td><td>Committee report distributed</td><td class='small muted'>03:44 PM</td></tr>
+<tr class=day><td colspan=3>2025-04-17</td></tr>
+<tr class='minor'><td><span class='badge b-H'>H</span></td><td>Committee report sent to Calendars</td><td class='small muted'></td></tr>
+<tr class=day><td colspan=3>2025-04-24</td></tr>
+<tr class='minor'><td><span class='badge b-H'>H</span></td><td>Considered in Calendars</td><td class='small muted'></td></tr>
+<tr class=day><td colspan=3>2025-04-29</td></tr>
+<tr class='minor'><td><span class='badge b-H'>H</span></td><td>Placed on General State Calendar</td><td class='small muted'></td></tr>
+<tr class=''><td><span class='badge b-H'>H</span></td><td><a href='http://journals.house.texas.gov/hjrnl/89r/pdf/89RDAY52FINAL.PDF#page=130&amp;seqNum=71' title='Journal page 2284'>Read 2nd time</a></td><td class='small muted'></td></tr>
+<tr class=''><td><span class='badge b-H'>H</span></td><td><a href='http://journals.house.texas.gov/hjrnl/89r/pdf/89RDAY52FINAL.PDF#page=130&amp;seqNum=76' title='Journal page 2284'>Passed to engrossment</a></td><td class='small muted'></td></tr>
+<tr class=''><td><span class='badge b-H'>H</span></td><td><a href='http://journals.house.texas.gov/hjrnl/89r/pdf/89RDAY52FINAL.PDF#page=130&amp;seqNum=81' title='Journal page 2284'>Record vote</a> <span class=muted>— RV#818</span><br><a class=vote href='#rc-H-RV818'><span class=pass>passed</span> Pass 2nd rdg 97–41, 2 PNV · R 84–0 · D 13–41</a></td><td class='small muted'></td></tr>
+<tr class='minor'><td><span class='badge b-H'>H</span></td><td><a href='http://journals.house.texas.gov/hjrnl/89r/pdf/89RDAY52FINAL.PDF#page=131&amp;seqNum=86' title='Journal page 2285'>Statement(s) of vote recorded in Journal</a></td><td class='small muted'></td></tr>
+<tr class=day><td colspan=3>2025-04-30</td></tr>
+<tr class=''><td><span class='badge b-H'>H</span></td><td><a href='http://journals.house.texas.gov/hjrnl/89r/pdf/89RDAY53FINAL.PDF#page=28&amp;seqNum=91' title='Journal page 2434'>Read 3rd time</a></td><td class='small muted'></td></tr>
+<tr class=''><td><span class='badge b-H'>H</span></td><td><a href='http://journals.house.texas.gov/hjrnl/89r/pdf/89RDAY53FINAL.PDF#page=28&amp;seqNum=96' title='Journal page 2434'>Passed</a></td><td class='small muted'></td></tr>
+<tr class=''><td><span class='badge b-H'>H</span></td><td><a href='http://journals.house.texas.gov/hjrnl/89r/pdf/89RDAY53FINAL.PDF#page=28&amp;seqNum=101' title='Journal page 2434'>Record vote</a> <span class=muted>— RV#966</span><br><a class=vote href='#rc-H-RV966'><span class=pass>passed</span> Pass 3rd rdg 104–32, 2 PNV · R 83–0 · D 21–32</a></td><td class='small muted'></td></tr>
+<tr class='minor'><td><span class='badge b-H'>H</span></td><td><a href='http://journals.house.texas.gov/hjrnl/89r/pdf/89RDAY53FINAL.PDF#page=29&amp;seqNum=106' title='Journal page 2435'>Statement(s) of vote recorded in Journal</a></td><td class='small muted'></td></tr>
+<tr class=''><td><span class='badge b-H'>H</span></td><td><a href='http://journals.house.texas.gov/hjrnl/89r/pdf/89RDAY54FINAL.PDF#page=208&amp;seqNum=107' title='Journal page 2852'>Reported engrossed</a></td><td class='small muted'>01:45 PM</td></tr>
+<tr class=''><td><span class='badge b-S'>S</span></td><td><a href='http://journals.senate.texas.gov/sjrnl/89r/pdf/89RSJ04-30-F1.PDF#page=21&amp;seqNum=112' title='Journal page 1633'>Received from the House</a></td><td class='small muted'></td></tr>
+<tr class=day><td colspan=3>2025-05-05</td></tr>
+<tr class=''><td><span class='badge b-S'>S</span></td><td><a href='http://journals.senate.texas.gov/sjrnl/89r/pdf/89RSJ05-05-F.PDF#page=45&amp;seqNum=117' title='Journal page 1757'>Read first time</a></td><td class='small muted'></td></tr>
+<tr class=''><td><span class='badge b-S'>S</span></td><td><a href='http://journals.senate.texas.gov/sjrnl/89r/pdf/89RSJ05-05-F.PDF#page=45&amp;seqNum=122' title='Journal page 1757'>Referred to State Affairs</a></td><td class='small muted'></td></tr>
+<tr class=day><td colspan=3>2025-05-08</td></tr>
+<tr class='minor'><td><span class='badge b-S'>S</span></td><td>Scheduled for public hearing on . . .</td><td class='small muted'></td></tr>
+<tr class=''><td><span class='badge b-S'>S</span></td><td>Considered in public hearing</td><td class='small muted'></td></tr>
+<tr class=''><td><span class='badge b-S'>S</span></td><td>Left pending in committee</td><td class='small muted'></td></tr>
+<tr class=day><td colspan=3>2025-05-13</td></tr>
+<tr class=''><td><span class='badge b-S'>S</span></td><td>Considered in public hearing</td><td class='small muted'></td></tr>
+<tr class=''><td><span class='badge b-S'>S</span></td><td>Vote taken in committee</td><td class='small muted'></td></tr>
+<tr class=day><td colspan=3>2025-05-15</td></tr>
+<tr class=''><td><span class='badge b-S'>S</span></td><td><a href='http://journals.senate.texas.gov/sjrnl/89r/pdf/89RSJ05-15-F.PDF#page=37&amp;seqNum=152' title='Journal page 2179'>Reported favorably w/o amendments</a></td><td class='small muted'></td></tr>
+<tr class=''><td><span class='badge b-S'>S</span></td><td>Recommended for local &amp; uncontested calendar</td><td class='small muted'></td></tr>
+<tr class='minor'><td><span class='badge b-S'>S</span></td><td>Committee report printed and distributed</td><td class='small muted'>11:58 AM</td></tr>
+<tr class=day><td colspan=3>2025-05-25</td></tr>
+<tr class='minor'><td><span class='badge b-S'>S</span></td><td>Placed on local &amp; uncontested calendar</td><td class='small muted'></td></tr>
+<tr class=''><td><span class='badge b-S'>S</span></td><td><a href='http://journals.senate.texas.gov/sjrnl/89r/pdf/89RSJ05-25-F1.PDF#page=5&amp;seqNum=168' title='Journal page 2513'>Laid before the Senate</a></td><td class='small muted'></td></tr>
+<tr class=''><td><span class='badge b-S'>S</span></td><td><a href='http://journals.senate.texas.gov/sjrnl/89r/pdf/89RSJ05-25-F1.PDF#page=5&amp;seqNum=173' title='Journal page 2513'>Read 2nd time &amp; passed to 3rd reading</a></td><td class='small muted'></td></tr>
+<tr class=''><td><span class='badge b-S'>S</span></td><td><a href='http://journals.senate.texas.gov/sjrnl/89r/pdf/89RSJ05-25-F1.PDF#page=5&amp;seqNum=178' title='Journal page 2513'>Vote recorded in Journal</a><br><a class=vote href='#rc-S-2025-05-25-1'><span class=pass>passed</span> Pass 2nd rdg 29–2 (voice, deemed) · R 20–0 · D 9–2</a></td><td class='small muted'></td></tr>
+<tr class=''><td><span class='badge b-S'>S</span></td><td><a href='http://journals.senate.texas.gov/sjrnl/89r/pdf/89RSJ05-25-F1.PDF#page=5&amp;seqNum=183' title='Journal page 2513'>Three day rule suspended</a></td><td class='small muted'></td></tr>
+<tr class=''><td><span class='badge b-S'>S</span></td><td><a href='http://journals.senate.texas.gov/sjrnl/89r/pdf/89RSJ05-25-F1.PDF#page=5&amp;seqNum=188' title='Journal page 2513'>Record vote</a><br><a class=vote href='#rc-S-2025-05-25-2'><span class=pass>passed</span> Pass 3rd rdg 29–2 (voice, deemed) · R 20–0 · D 9–2</a></td><td class='small muted'></td></tr>
+<tr class=''><td><span class='badge b-S'>S</span></td><td><a href='http://journals.senate.texas.gov/sjrnl/89r/pdf/89RSJ05-25-F1.PDF#page=5&amp;seqNum=193' title='Journal page 2513'>Read 3rd time</a></td><td class='small muted'></td></tr>
+<tr class=''><td><span class='badge b-S'>S</span></td><td><a href='http://journals.senate.texas.gov/sjrnl/89r/pdf/89RSJ05-25-F1.PDF#page=5&amp;seqNum=198' title='Journal page 2513'>Passed</a></td><td class='small muted'></td></tr>
+<tr class=''><td><span class='badge b-S'>S</span></td><td><a href='http://journals.senate.texas.gov/sjrnl/89r/pdf/89RSJ05-25-F1.PDF#page=5&amp;seqNum=203' title='Journal page 2513'>Record vote</a></td><td class='small muted'></td></tr>
+<tr class=''><td><span class='badge b-H'>H</span></td><td><a href='http://journals.house.texas.gov/hjrnl/89r/pdf/89RDAY73FINAL.PDF#page=97&amp;seqNum=208' title='Journal page 6177'>Senate passage reported</a></td><td class='small muted'></td></tr>
+<tr class=day><td colspan=3>2025-05-26</td></tr>
+<tr class='minor'><td><span class='badge b-H'>H</span></td><td><a href='http://journals.house.texas.gov/hjrnl/89r/pdf/89RDAY75FINAL.PDF#page=250&amp;seqNum=209' title='Journal page 6642'>Reported enrolled</a></td><td class='small muted'>12:31 PM</td></tr>
+<tr class=day><td colspan=3>2025-05-27</td></tr>
+<tr class=''><td><span class='badge b-H'>H</span></td><td><a href='http://journals.house.texas.gov/hjrnl/89r/pdf/89RDAY75FINAL.PDF#page=248&amp;seqNum=214' title='Journal page 6640'>Signed in the House</a></td><td class='small muted'></td></tr>
+<tr class=''><td><span class='badge b-S'>S</span></td><td><a href='http://journals.senate.texas.gov/sjrnl/89r/pdf/89RSJ05-27-F.PDF#page=25&amp;seqNum=219' title='Journal page 2849'>Signed in the Senate</a></td><td class='small muted'></td></tr>
+<tr class=day><td colspan=3>2025-05-28</td></tr>
+<tr class=''><td><span class='badge b-E'>E</span></td><td><a href='http://journals.house.texas.gov/hjrnl/89r/pdf/89RDAY77FINAL.PDF#page=336&amp;seqNum=224' title='Journal page 7442'>Sent to the Governor</a></td><td class='small muted'></td></tr>
+<tr class=day><td colspan=3>2025-06-20</td></tr>
+<tr class=''><td><span class='badge b-E'>E</span></td><td><a href='http://journals.house.texas.gov/hjrnl/89r/pdf/89RDAY81FINAL.PDF#page=31&amp;seqNum=229' title='Journal page 7951'>Signed by the Governor</a></td><td class='small muted'></td></tr>
+<tr class=''><td><span class='badge b-E'>E</span></td><td>Effective on 9/1/25</td><td class='small muted'></td></tr>
+</table>
+<h2 id=amendments>Amendments</h2><p class='small muted'>Support counts are for the amendment itself: on a motion to table, a Nay is a vote to keep the amendment alive.</p>
+<p>No floor amendments recorded.</p>
+<h2 id=votes>Record votes</h2>
+<div class=card id='rc-H-RV818'><h3>H-RV818 · House · 2025-04-29 · Pass 2nd rdg — <span class=pass>passed</span> 97–41, 2 PNV</h3>
+<p class=small>HB 128 was passed to engrossment by (Record 818): 97 Yeas, 41 Nays, 2 Present, not voting.<br><b>Yea = pass bill</b> · R 84–0 · D 13–41 · <a href='https://journals.house.texas.gov/hjrnl/89r/html/89RDAY52FINAL.HTM'>journal</a></p>
+<p class=names><b>Yea (97)</b> <span class=p-D><span title="Alma Allen (D-131)">Allen</span></span>, <span class=p-D><span title="Salman Bhojani (D-92)">Bhojani</span></span>, <span class=p-D><span title="Philip Cortez (D-117)">Cortez</span></span>, <span class=p-D><span title="Harold V. Dutton, Jr. (D-142)">Dutton</span></span>, <span class=p-D><span title="Lulu Flores (D-51)">Flores</span></span>, <span class=p-D><span title="R.D. &#x27;Bobby&#x27; Guerra (D-41)">Guerra</span></span>, <span class=p-D><span title="Oscar Longoria (D-35)">Longoria</span></span>, <span class=p-D><span title="Ray López (D-125)">Lopez, R.</span></span>, <span class=p-D><span title="Eddie Morales (D-74)">Morales, E.</span></span>, <span class=p-D><span title="Sergio Muñoz, Jr. (D-36)">Muñoz</span></span>, <span class=p-D><span title="Claudia Ordaz (D-79)">Ordaz</span></span>, <span class=p-D><span title="Vince Perez (D-77)">Perez, V.</span></span>, <span class=p-D><span title="Richard Peña Raymond (D-42)">Raymond</span></span>, <span class=p-R><span title="Daniel Alders (R-6)">Alders</span></span>, <span class=p-R><span title="Trent Ashby (R-9)">Ashby</span></span>, <span class=p-R><span title="Jeff Barry (R-29)">Barry</span></span>, <span class=p-R><span title="Cecil Bell, Jr. (R-3)">Bell, C.</span></span>, <span class=p-R><span title="Keith Bell (R-4)">Bell, K.</span></span>, <span class=p-R><span title="Greg Bonnen (R-24)">Bonnen</span></span>, <span class=p-R><span title="Benjamin Bumgarner (R-63)">Bumgarner</span></span>, <span class=p-R><span title="Angie Chen Button (R-112)">Button</span></span>, <span class=p-R><span title="Briscoe Cain (R-128)">Cain</span></span>, <span class=p-R><span title="Giovanni Capriglione (R-98)">Capriglione</span></span>, <span class=p-R><span title="David Cook (R-96)">Cook</span></span>, <span class=p-R><span title="Tom Craddick (R-82)">Craddick</span></span>, <span class=p-R><span title="Charles Cunningham (R-127)">Cunningham</span></span>, <span class=p-R><span title="Pat Curry (R-56)">Curry</span></span>, <span class=p-R><span title="Drew Darby (R-72)">Darby</span></span>, <span class=p-R><span title="Mano DeAyala (R-133)">DeAyala</span></span>, <span class=p-R><span title="Jay Dean (R-7)">Dean</span></span>, <span class=p-R><span title="Mark Dorazio (R-122)">Dorazio</span></span>, <span class=p-R><span title="Paul Dyson (R-14)">Dyson</span></span>, <span class=p-R><span title="Caroline Fairly (R-87)">Fairly</span></span>, <span class=p-R><span title="James Frank (R-69)">Frank</span></span>, <span class=p-R><span title="Gary Gates (R-28)">Gates</span></span>, <span class=p-R><span title="Stan Gerdes (R-17)">Gerdes</span></span>, <span class=p-R><span title="Charlie Geren (R-99)">Geren</span></span>, <span class=p-R><span title="Ryan Guillen (R-31)">Guillen</span></span>, <span class=p-R><span title="Sam Harless (R-126)">Harless</span></span>, <span class=p-R><span title="Cody Harris (R-8)">Harris</span></span>, <span class=p-R><span title="Caroline Harris Davila (R-52)">Harris Davila</span></span>, <span class=p-R><span title="Brian Harrison (R-10)">Harrison</span></span>, <span class=p-R><span title="Richard Hayes (R-57)">Hayes</span></span>, <span class=p-R><span title="Cole Hefner (R-5)">Hefner</span></span>, <span class=p-R><span title="Hillary Hickland (R-55)">Hickland</span></span>, <span class=p-R><span title="Janis Holt (R-18)">Holt</span></span>, <span class=p-R><span title="Andy Hopper (R-64)">Hopper</span></span>, <span class=p-R><span title="Lacey Hull (R-138)">Hull</span></span>, <span class=p-R><span title="Todd Hunter (R-32)">Hunter</span></span>, <span class=p-R><span title="Carrie Isaac (R-73)">Isaac</span></span>, <span class=p-R><span title="Helen Kerwin (R-58)">Kerwin</span></span>, <span class=p-R><span title="Ken King (R-88)">King</span></span>, <span class=p-R><span title="Stan Kitzman (R-85)">Kitzman</span></span>, <span class=p-R><span title="Marc LaHood (R-121)">LaHood</span></span>, <span class=p-R><span title="Stan Lambert (R-71)">Lambert</span></span>, <span class=p-R><span title="Jeff Leach (R-67)">Leach</span></span>, <span class=p-R><span title="Terri Leo Wilson (R-23)">Leo Wilson</span></span>, <span class=p-R><span title="Mitch Little (R-65)">Little</span></span>, <span class=p-R><span title="Janie Lopez (R-37)">Lopez, J.</span></span>, <span class=p-R><span title="AJ Louderback (R-30)">Louderback</span></span>, <span class=p-R><span title="David Lowe (R-91)">Lowe</span></span>, <span class=p-R><span title="J.M. Lozano (R-43)">Lozano</span></span>, <span class=p-R><span title="John Lujan (R-118)">Lujan</span></span>, <span class=p-R><span title="Shelley Luther (R-62)">Luther</span></span>, <span class=p-R><span title="Don McLaughlin, Jr. (R-80)">McLaughlin</span></span>, <span class=p-R><span title="John McQueeney (R-97)">McQueeney</span></span>, <span class=p-R><span title="Will Metcalf (R-16)">Metcalf</span></span>, <span class=p-R><span title="Morgan Meyer (R-108)">Meyer</span></span>, <span class=p-R><span title="Brent Money (R-2)">Money</span></span>, <span class=p-R><span title="Matt Morgan (R-26)">Morgan</span></span>, <span class=p-R><span title="Candy Noble (R-89)">Noble</span></span>, <span class=p-R><span title="Mike Olcott (R-60)">Olcott</span></span>, <span class=p-R><span title="Tom Oliverson (R-130)">Oliverson</span></span>, <span class=p-R><span title="Angelia Orr (R-13)">Orr</span></span>, <span class=p-R><span title="Jared Patterson (R-106)">Patterson</span></span>, <span class=p-R><span title="Dennis Paul (R-129)">Paul</span></span>, <span class=p-R><span title="Dade Phelan (R-21)">Phelan</span></span>, <span class=p-R><span title="Katrina Pierson (R-33)">Pierson</span></span>, <span class=p-R><span title="Keresa Richardson (R-61)">Richardson</span></span>, <span class=p-R><span title="Nate Schatzline (R-93)">Schatzline</span></span>, <span class=p-R><span title="Alan Schoolcraft (R-44)">Schoolcraft</span></span>, <span class=p-R><span title="Matt Shaheen (R-66)">Shaheen</span></span>, <span class=p-R><span title="Joanne Shofner (R-11)">Shofner</span></span>, <span class=p-R><span title="Shelby Slawson (R-59)">Slawson</span></span>, <span class=p-R><span title="John Smithee (R-86)">Smithee</span></span>, <span class=p-R><span title="David Spiller (R-68)">Spiller</span></span>, <span class=p-R><span title="Valoree Swanson (R-150)">Swanson</span></span>, <span class=p-R><span title="Carl H. Tepper (R-84)">Tepper</span></span>, <span class=p-R><span title="Tony Tinderholt (R-94)">Tinderholt</span></span>, <span class=p-R><span title="Steve Toth (R-15)">Toth</span></span>, <span class=p-R><span title="Ellen Troxclair (R-19)">Troxclair</span></span>, <span class=p-R><span title="Gary VanDeaver (R-1)">VanDeaver</span></span>, <span class=p-R><span title="Cody Vasut (R-25)">Vasut</span></span>, <span class=p-R><span title="Denise Villalobos (R-34)">Villalobos</span></span>, <span class=p-R><span title="Wes Virdell (R-53)">Virdell</span></span>, <span class=p-R><span title="Trey Wharton (R-12)">Wharton</span></span>, <span class=p-R><span title="Terry M. Wilson (R-20)">Wilson</span></span></p>
+<p class=names><b>Nay (41)</b> <span class=p-D><span title="Rafael Anchía (D-103)">Anchía</span></span>, <span class=p-D><span title="Diego Bernal (D-123)">Bernal</span></span>, <span class=p-D><span title="John Bryant (D-114)">Bryant</span></span>, <span class=p-D><span title="John H. Bucy III (D-136)">Bucy</span></span>, <span class=p-D><span title="Liz Campos (D-119)">Campos</span></span>, <span class=p-D><span title="Terry Canales (D-40)">Canales</span></span>, <span class=p-D><span title="Sheryl Cole (D-46)">Cole</span></span>, <span class=p-D><span title="Nicole Collier (D-95)">Collier</span></span>, <span class=p-D><span title="Aicha Davis (D-109)">Davis, A.</span></span>, <span class=p-D><span title="Yvonne Davis (D-111)">Davis, Y.</span></span>, <span class=p-D><span title="Cassandra Garcia Hernandez (D-115)">Garcia Hernandez</span></span>, <span class=p-D><span title="Josey Garcia (D-124)">Garcia, J.</span></span>, <span class=p-D><span title="Linda Garcia (D-107)">Garcia, L.</span></span>, <span class=p-D><span title="Jessica González (D-104)">González, J.</span></span>, <span class=p-D><span title="Vikki Goodwin (D-47)">Goodwin</span></span>, <span class=p-D><span title="Erin Elizabeth Gámez (D-38)">Gámez</span></span>, <span class=p-D><span title="Ana Hernandez (D-143)">Hernandez</span></span>, <span class=p-D><span title="Gina Hinojosa (D-49)">Hinojosa</span></span>, <span class=p-D><span title="Donna Howard (D-48)">Howard</span></span>, <span class=p-D><span title="Ann Johnson (D-134)">Johnson</span></span>, <span class=p-D><span title="Jolanda &#x27;Jo&#x27; Jones (D-147)">Jones, J.</span></span>, <span class=p-D><span title="Venton Jones (D-100)">Jones, V.</span></span>, <span class=p-D><span title="Christian Manuel (D-22)">Manuel</span></span>, <span class=p-D><span title="Armando Martinez (D-39)">Martinez</span></span>, <span class=p-D><span title="Trey Martinez Fischer (D-116)">Martinez Fischer</span></span>, <span class=p-D><span title="Terry Meza (D-105)">Meza</span></span>, <span class=p-D><span title="Penny Morales Shaw (D-148)">Morales Shaw</span></span>, <span class=p-D><span title="Christina Morales (D-145)">Morales, C.</span></span>, <span class=p-D><span title="Mihaela Plesa (D-70)">Plesa</span></span>, <span class=p-D><span title="Ron Reynolds (D-27)">Reynolds</span></span>, <span class=p-D><span title="Ana-María Rodríguez Ramos (D-102)">Rodríguez Ramos</span></span>, <span class=p-D><span title="Ramon Romero, Jr. (D-90)">Romero</span></span>, <span class=p-D><span title="Toni Rose (D-110)">Rose</span></span>, <span class=p-D><span title="Jon Rosenthal (D-135)">Rosenthal</span></span>, <span class=p-D><span title="James Talarico (D-50)">Talarico</span></span>, <span class=p-D><span title="Senfronia Thompson (D-141)">Thompson</span></span>, <span class=p-D><span title="Chris Turner (D-101)">Turner</span></span>, <span class=p-D><span title="Hubert Vo (D-149)">Vo</span></span>, <span class=p-D><span title="Charlene Ward Johnson (D-139)">Ward Johnson</span></span>, <span class=p-D><span title="Gene Wu (D-137)">Wu</span></span>, <span class=p-D><span title="Erin Zwiener (D-45)">Zwiener</span></span></p>
+<p class=names><b>Present, not voting (2)</b> <span class=p-R><span title="Dustin Burrows (R-83)">Burrows (Speaker)</span></span>, <span class=p-R><span title="Brooks Landgraf (R-81)">Landgraf</span></span></p>
+<p class=names><b>Absent, excused (1)</b> <span class=p-D><span title="Armando Walle (D-140)">Walle</span></span></p>
+<p class=names><b>Absent (9)</b> <span class=p-D><span title="Rhetta Bowers (D-113)">Bowers</span></span>, <span class=p-D><span title="Barbara Gervin-Hawkins (D-120)">Gervin-Hawkins</span></span>, <span class=p-D><span title="Mary González (D-75)">González, M.</span></span>, <span class=p-D><span title="Suleman Lalani (D-76)">Lalani</span></span>, <span class=p-D><span title="Joe Moody (D-78)">Moody</span></span>, <span class=p-D><span title="Mary Ann Perez (D-144)">Perez, M.</span></span>, <span class=p-D><span title="Lauren A. Simmons (D-146)">Simmons</span></span>, <span class=p-R><span title="Brad Buckley (R-54)">Buckley</span></span>, <span class=p-R><span title="Mike Schofield (R-132)">Schofield</span></span></p>
+<p class=small><b>Statements of vote:</b></p><ul class=small>
+<li>Flores: I was shown voting yes. I intended to vote no.</li>
+<li>Gervin-Hawkins: I was in the house but away from my desk. I would have voted no.</li>
+<li>R. Lopez: I was shown voting yes. I intended to vote no.</li>
+<li>M. Perez: I was in the house but away from my desk. I would have voted no.</li>
+</ul>
+</div>
+<div class=card id='rc-H-RV966'><h3>H-RV966 · House · 2025-04-30 · Pass 3rd rdg — <span class=pass>passed</span> 104–32, 2 PNV</h3>
+<p class=small>HB 128 was passed by (Record 966): 104 Yeas, 32 Nays, 2 Present, not voting.<br><b>Yea = pass bill</b> · R 83–0 · D 21–32 · <a href='https://journals.house.texas.gov/hjrnl/89r/html/89RDAY53FINAL.HTM'>journal</a></p>
+<p class=names><b>Yea (104)</b> <span class=p-D><span title="Salman Bhojani (D-92)">Bhojani</span></span>, <span class=p-D><span title="John H. Bucy III (D-136)">Bucy</span></span>, <span class=p-D><span title="Liz Campos (D-119)">Campos</span></span>, <span class=p-D><span title="Terry Canales (D-40)">Canales</span></span>, <span class=p-D><span title="Sheryl Cole (D-46)">Cole</span></span>, <span class=p-D><span title="Philip Cortez (D-117)">Cortez</span></span>, <span class=p-D><span title="Josey Garcia (D-124)">Garcia, J.</span></span>, <span class=p-D><span title="Linda Garcia (D-107)">Garcia, L.</span></span>, <span class=p-D><span title="R.D. &#x27;Bobby&#x27; Guerra (D-41)">Guerra</span></span>, <span class=p-D><span title="Erin Elizabeth Gámez (D-38)">Gámez</span></span>, <span class=p-D><span title="Donna Howard (D-48)">Howard</span></span>, <span class=p-D><span title="Ann Johnson (D-134)">Johnson</span></span>, <span class=p-D><span title="Oscar Longoria (D-35)">Longoria</span></span>, <span class=p-D><span title="Armando Martinez (D-39)">Martinez</span></span>, <span class=p-D><span title="Trey Martinez Fischer (D-116)">Martinez Fischer</span></span>, <span class=p-D><span title="Sergio Muñoz, Jr. (D-36)">Muñoz</span></span>, <span class=p-D><span title="Mary Ann Perez (D-144)">Perez, M.</span></span>, <span class=p-D><span title="Mihaela Plesa (D-70)">Plesa</span></span>, <span class=p-D><span title="Richard Peña Raymond (D-42)">Raymond</span></span>, <span class=p-D><span title="Toni Rose (D-110)">Rose</span></span>, <span class=p-D><span title="James Talarico (D-50)">Talarico</span></span>, <span class=p-R><span title="Daniel Alders (R-6)">Alders</span></span>, <span class=p-R><span title="Trent Ashby (R-9)">Ashby</span></span>, <span class=p-R><span title="Jeff Barry (R-29)">Barry</span></span>, <span class=p-R><span title="Cecil Bell, Jr. (R-3)">Bell, C.</span></span>, <span class=p-R><span title="Keith Bell (R-4)">Bell, K.</span></span>, <span class=p-R><span title="Greg Bonnen (R-24)">Bonnen</span></span>, <span class=p-R><span title="Brad Buckley (R-54)">Buckley</span></span>, <span class=p-R><span title="Benjamin Bumgarner (R-63)">Bumgarner</span></span>, <span class=p-R><span title="Briscoe Cain (R-128)">Cain</span></span>, <span class=p-R><span title="Giovanni Capriglione (R-98)">Capriglione</span></span>, <span class=p-R><span title="David Cook (R-96)">Cook</span></span>, <span class=p-R><span title="Tom Craddick (R-82)">Craddick</span></span>, <span class=p-R><span title="Charles Cunningham (R-127)">Cunningham</span></span>, <span class=p-R><span title="Pat Curry (R-56)">Curry</span></span>, <span class=p-R><span title="Drew Darby (R-72)">Darby</span></span>, <span class=p-R><span title="Mano DeAyala (R-133)">DeAyala</span></span>, <span class=p-R><span title="Jay Dean (R-7)">Dean</span></span>, <span class=p-R><span title="Mark Dorazio (R-122)">Dorazio</span></span>, <span class=p-R><span title="Paul Dyson (R-14)">Dyson</span></span>, <span class=p-R><span title="Caroline Fairly (R-87)">Fairly</span></span>, <span class=p-R><span title="James Frank (R-69)">Frank</span></span>, <span class=p-R><span title="Gary Gates (R-28)">Gates</span></span>, <span class=p-R><span title="Stan Gerdes (R-17)">Gerdes</span></span>, <span class=p-R><span title="Charlie Geren (R-99)">Geren</span></span>, <span class=p-R><span title="Ryan Guillen (R-31)">Guillen</span></span>, <span class=p-R><span title="Sam Harless (R-126)">Harless</span></span>, <span class=p-R><span title="Cody Harris (R-8)">Harris</span></span>, <span class=p-R><span title="Caroline Harris Davila (R-52)">Harris Davila</span></span>, <span class=p-R><span title="Brian Harrison (R-10)">Harrison</span></span>, <span class=p-R><span title="Richard Hayes (R-57)">Hayes</span></span>, <span class=p-R><span title="Cole Hefner (R-5)">Hefner</span></span>, <span class=p-R><span title="Hillary Hickland (R-55)">Hickland</span></span>, <span class=p-R><span title="Janis Holt (R-18)">Holt</span></span>, <span class=p-R><span title="Andy Hopper (R-64)">Hopper</span></span>, <span class=p-R><span title="Lacey Hull (R-138)">Hull</span></span>, <span class=p-R><span title="Todd Hunter (R-32)">Hunter</span></span>, <span class=p-R><span title="Carrie Isaac (R-73)">Isaac</span></span>, <span class=p-R><span title="Helen Kerwin (R-58)">Kerwin</span></span>, <span class=p-R><span title="Stan Kitzman (R-85)">Kitzman</span></span>, <span class=p-R><span title="Marc LaHood (R-121)">LaHood</span></span>, <span class=p-R><span title="Stan Lambert (R-71)">Lambert</span></span>, <span class=p-R><span title="Jeff Leach (R-67)">Leach</span></span>, <span class=p-R><span title="Terri Leo Wilson (R-23)">Leo Wilson</span></span>, <span class=p-R><span title="Mitch Little (R-65)">Little</span></span>, <span class=p-R><span title="Janie Lopez (R-37)">Lopez, J.</span></span>, <span class=p-R><span title="AJ Louderback (R-30)">Louderback</span></span>, <span class=p-R><span title="David Lowe (R-91)">Lowe</span></span>, <span class=p-R><span title="J.M. Lozano (R-43)">Lozano</span></span>, <span class=p-R><span title="John Lujan (R-118)">Lujan</span></span>, <span class=p-R><span title="Shelley Luther (R-62)">Luther</span></span>, <span class=p-R><span title="Don McLaughlin, Jr. (R-80)">McLaughlin</span></span>, <span class=p-R><span title="John McQueeney (R-97)">McQueeney</span></span>, <span class=p-R><span title="Will Metcalf (R-16)">Metcalf</span></span>, <span class=p-R><span title="Morgan Meyer (R-108)">Meyer</span></span>, <span class=p-R><span title="Brent Money (R-2)">Money</span></span>, <span class=p-R><span title="Matt Morgan (R-26)">Morgan</span></span>, <span class=p-R><span title="Candy Noble (R-89)">Noble</span></span>, <span class=p-R><span title="Mike Olcott (R-60)">Olcott</span></span>, <span class=p-R><span title="Tom Oliverson (R-130)">Oliverson</span></span>, <span class=p-R><span title="Angelia Orr (R-13)">Orr</span></span>, <span class=p-R><span title="Jared Patterson (R-106)">Patterson</span></span>, <span class=p-R><span title="Dennis Paul (R-129)">Paul</span></span>, <span class=p-R><span title="Dade Phelan (R-21)">Phelan</span></span>, <span class=p-R><span title="Katrina Pierson (R-33)">Pierson</span></span>, <span class=p-R><span title="Keresa Richardson (R-61)">Richardson</span></span>, <span class=p-R><span title="Nate Schatzline (R-93)">Schatzline</span></span>, <span class=p-R><span title="Mike Schofield (R-132)">Schofield</span></span>, <span class=p-R><span title="Matt Shaheen (R-66)">Shaheen</span></span>, <span class=p-R><span title="Joanne Shofner (R-11)">Shofner</span></span>, <span class=p-R><span title="Shelby Slawson (R-59)">Slawson</span></span>, <span class=p-R><span title="John Smithee (R-86)">Smithee</span></span>, <span class=p-R><span title="David Spiller (R-68)">Spiller</span></span>, <span class=p-R><span title="Valoree Swanson (R-150)">Swanson</span></span>, <span class=p-R><span title="Carl H. Tepper (R-84)">Tepper</span></span>, <span class=p-R><span title="Tony Tinderholt (R-94)">Tinderholt</span></span>, <span class=p-R><span title="Steve Toth (R-15)">Toth</span></span>, <span class=p-R><span title="Ellen Troxclair (R-19)">Troxclair</span></span>, <span class=p-R><span title="Gary VanDeaver (R-1)">VanDeaver</span></span>, <span class=p-R><span title="Cody Vasut (R-25)">Vasut</span></span>, <span class=p-R><span title="Denise Villalobos (R-34)">Villalobos</span></span>, <span class=p-R><span title="Wes Virdell (R-53)">Virdell</span></span>, <span class=p-R><span title="Trey Wharton (R-12)">Wharton</span></span>, <span class=p-R><span title="Terry M. Wilson (R-20)">Wilson</span></span></p>
+<p class=names><b>Nay (32)</b> <span class=p-D><span title="Alma Allen (D-131)">Allen</span></span>, <span class=p-D><span title="Rafael Anchía (D-103)">Anchía</span></span>, <span class=p-D><span title="Rhetta Bowers (D-113)">Bowers</span></span>, <span class=p-D><span title="John Bryant (D-114)">Bryant</span></span>, <span class=p-D><span title="Nicole Collier (D-95)">Collier</span></span>, <span class=p-D><span title="Aicha Davis (D-109)">Davis, A.</span></span>, <span class=p-D><span title="Lulu Flores (D-51)">Flores</span></span>, <span class=p-D><span title="Cassandra Garcia Hernandez (D-115)">Garcia Hernandez</span></span>, <span class=p-D><span title="Barbara Gervin-Hawkins (D-120)">Gervin-Hawkins</span></span>, <span class=p-D><span title="Jessica González (D-104)">González, J.</span></span>, <span class=p-D><span title="Vikki Goodwin (D-47)">Goodwin</span></span>, <span class=p-D><span title="Jolanda &#x27;Jo&#x27; Jones (D-147)">Jones, J.</span></span>, <span class=p-D><span title="Venton Jones (D-100)">Jones, V.</span></span>, <span class=p-D><span title="Suleman Lalani (D-76)">Lalani</span></span>, <span class=p-D><span title="Ray López (D-125)">Lopez, R.</span></span>, <span class=p-D><span title="Christian Manuel (D-22)">Manuel</span></span>, <span class=p-D><span title="Joe Moody (D-78)">Moody</span></span>, <span class=p-D><span title="Penny Morales Shaw (D-148)">Morales Shaw</span></span>, <span class=p-D><span title="Christina Morales (D-145)">Morales, C.</span></span>, <span class=p-D><span title="Eddie Morales (D-74)">Morales, E.</span></span>, <span class=p-D><span title="Claudia Ordaz (D-79)">Ordaz</span></span>, <span class=p-D><span title="Vince Perez (D-77)">Perez, V.</span></span>, <span class=p-D><span title="Ron Reynolds (D-27)">Reynolds</span></span>, <span class=p-D><span title="Ana-María Rodríguez Ramos (D-102)">Rodríguez Ramos</span></span>, <span class=p-D><span title="Ramon Romero, Jr. (D-90)">Romero</span></span>, <span class=p-D><span title="Jon Rosenthal (D-135)">Rosenthal</span></span>, <span class=p-D><span title="Lauren A. Simmons (D-146)">Simmons</span></span>, <span class=p-D><span title="Senfronia Thompson (D-141)">Thompson</span></span>, <span class=p-D><span title="Chris Turner (D-101)">Turner</span></span>, <span class=p-D><span title="Charlene Ward Johnson (D-139)">Ward Johnson</span></span>, <span class=p-D><span title="Gene Wu (D-137)">Wu</span></span>, <span class=p-D><span title="Erin Zwiener (D-45)">Zwiener</span></span></p>
+<p class=names><b>Present, not voting (2)</b> <span class=p-R><span title="Dustin Burrows (R-83)">Burrows (Speaker)</span></span>, <span class=p-R><span title="Brooks Landgraf (R-81)">Landgraf</span></span></p>
+<p class=names><b>Absent, excused (5)</b> <span class=p-D><span title="Diego Bernal (D-123)">Bernal</span></span>, <span class=p-D><span title="Gina Hinojosa (D-49)">Hinojosa</span></span>, <span class=p-D><span title="Hubert Vo (D-149)">Vo</span></span>, <span class=p-D><span title="Armando Walle (D-140)">Walle</span></span>, <span class=p-R><span title="Alan Schoolcraft (R-44)">Schoolcraft</span></span></p>
+<p class=names><b>Absent (7)</b> <span class=p-D><span title="Yvonne Davis (D-111)">Davis, Y.</span></span>, <span class=p-D><span title="Harold V. Dutton, Jr. (D-142)">Dutton</span></span>, <span class=p-D><span title="Mary González (D-75)">González, M.</span></span>, <span class=p-D><span title="Ana Hernandez (D-143)">Hernandez</span></span>, <span class=p-D><span title="Terry Meza (D-105)">Meza</span></span>, <span class=p-R><span title="Angie Chen Button (R-112)">Button</span></span>, <span class=p-R><span title="Ken King (R-88)">King</span></span></p>
+<p class=small><b>Statements of vote:</b></p><ul class=small>
+<li>Bernal: I was excused for important business in the district. I would have voted no.</li>
+<li>Bhojani: I was shown voting yes. I intended to vote no.</li>
+<li>Bucy: I was shown voting yes. I intended to vote no.</li>
+<li>Button: I was in the house but away from my desk. I would have voted yes.</li>
+<li>Campos: I was shown voting yes. I intended to vote no.</li>
+<li>Gámez: I was shown voting yes. I intended to vote no.</li>
+<li>J. Garcia: I was shown voting yes. I intended to vote no.</li>
+<li>Howard: I was shown voting yes. I intended to vote no.</li>
+<li>Johnson: I was shown voting yes. I intended to vote no.</li>
+<li>Plesa: I was shown voting yes. I intended to vote no.</li>
+<li>Rose: I was shown voting yes. I intended to vote no.</li>
+<li>Talarico: I was shown voting yes. I intended to vote no.</li>
+</ul>
+</div>
+<div class=card id='rc-S-2025-05-25-1'><h3>S-2025-05-25-1 · Senate · 2025-05-25 · Pass 2nd rdg — <span class=pass>passed</span> 29–2 (voice, deemed)</h3>
+<p class=small>HB 128 (Kolkhorst) was passed to third reading by a viva voce vote on the Local and Uncontested Calendar (29-2) &quot;Nays&quot; Cook, Eckhardt.<br><b>Yea = pass bill</b> · R 20–0 · D 9–2 · <a href='https://journals.senate.texas.gov/sjrnl/89r/html/89RSJ05-25-F1.HTM'>journal</a></p>
+<p class='small muted'>Voice vote. Under Senate practice every member present is deemed to have voted the stated way except those the journal lists; the names below follow that rule.</p>
+<p class=names><b>Yea (29)</b> <span class=p-D><span title="Carol Alvarado (D-6)">Alvarado</span></span>, <span class=p-D><span title="César Blanco (D-29)">Blanco</span></span>, <span class=p-D><span title="Roland Gutierrez (D-19)">Gutierrez</span></span>, <span class=p-D><span title="Juan &#x27;Chuy&#x27; Hinojosa (D-20)">J. Hinojosa</span></span>, <span class=p-D><span title="Nathan Johnson (D-16)">Johnson</span></span>, <span class=p-D><span title="José Menéndez (D-26)">Menéndez</span></span>, <span class=p-D><span title="Borris Miles (D-13)">Miles</span></span>, <span class=p-D><span title="Royce West (D-23)">West</span></span>, <span class=p-D><span title="Judith Zaffirini (D-21)">Zaffirini</span></span>, <span class=p-R><span title="Adam Hinojosa (R-27)">A. Hinojosa</span></span>, <span class=p-R><span title="Paul Bettencourt (R-7)">Bettencourt</span></span>, <span class=p-R><span title="Brian Birdwell (R-22)">Birdwell</span></span>, <span class=p-R><span title="Donna Campbell (R-25)">Campbell</span></span>, <span class=p-R><span title="Brandon Creighton (R-4)">Creighton</span></span>, <span class=p-R><span title="Pete Flores (R-24)">Flores</span></span>, <span class=p-R><span title="Brent Hagenbuch (R-30)">Hagenbuch</span></span>, <span class=p-R><span title="Bob Hall (R-2)">Hall</span></span>, <span class=p-R><span title="Kelly Hancock (R-9)">Hancock</span></span>, <span class=p-R><span title="Joan Huffman (R-17)">Huffman</span></span>, <span class=p-R><span title="Bryan Hughes (R-1)">Hughes</span></span>, <span class=p-R><span title="Phil King (R-10)">King</span></span>, <span class=p-R><span title="Lois W. Kolkhorst (R-18)">Kolkhorst</span></span>, <span class=p-R><span title="Mayes Middleton (R-11)">Middleton</span></span>, <span class=p-R><span title="Robert Nichols (R-3)">Nichols</span></span>, <span class=p-R><span title="Tan Parker (R-12)">Parker</span></span>, <span class=p-R><span title="Angela Paxton (R-8)">Paxton</span></span>, <span class=p-R><span title="Charles Perry (R-28)">Perry</span></span>, <span class=p-R><span title="Charles Schwertner (R-5)">Schwertner</span></span>, <span class=p-R><span title="Kevin Sparks (R-31)">Sparks</span></span></p>
+<p class=names><b>Nay (2)</b> <span class=p-D><span title="Molly Cook (D-15)">Cook</span></span>, <span class=p-D><span title="Sarah Eckhardt (D-14)">Eckhardt</span></span></p>
+</div>
+<div class=card id='rc-S-2025-05-25-2'><h3>S-2025-05-25-2 · Senate · 2025-05-25 · Pass 3rd rdg — <span class=pass>passed</span> 29–2 (voice, deemed)</h3>
+<p class=small>HB 128 (Kolkhorst) was finally passed by a viva voce vote on the Local and Uncontested Calendar (29-2) &quot;Nays&quot; Cook, Eckhardt.<br><b>Yea = pass bill</b> · R 20–0 · D 9–2 · <a href='https://journals.senate.texas.gov/sjrnl/89r/html/89RSJ05-25-F1.HTM'>journal</a></p>
+<p class='small muted'>Voice vote. Under Senate practice every member present is deemed to have voted the stated way except those the journal lists; the names below follow that rule.</p>
+<p class=names><b>Yea (29)</b> <span class=p-D><span title="Carol Alvarado (D-6)">Alvarado</span></span>, <span class=p-D><span title="César Blanco (D-29)">Blanco</span></span>, <span class=p-D><span title="Roland Gutierrez (D-19)">Gutierrez</span></span>, <span class=p-D><span title="Juan &#x27;Chuy&#x27; Hinojosa (D-20)">J. Hinojosa</span></span>, <span class=p-D><span title="Nathan Johnson (D-16)">Johnson</span></span>, <span class=p-D><span title="José Menéndez (D-26)">Menéndez</span></span>, <span class=p-D><span title="Borris Miles (D-13)">Miles</span></span>, <span class=p-D><span title="Royce West (D-23)">West</span></span>, <span class=p-D><span title="Judith Zaffirini (D-21)">Zaffirini</span></span>, <span class=p-R><span title="Adam Hinojosa (R-27)">A. Hinojosa</span></span>, <span class=p-R><span title="Paul Bettencourt (R-7)">Bettencourt</span></span>, <span class=p-R><span title="Brian Birdwell (R-22)">Birdwell</span></span>, <span class=p-R><span title="Donna Campbell (R-25)">Campbell</span></span>, <span class=p-R><span title="Brandon Creighton (R-4)">Creighton</span></span>, <span class=p-R><span title="Pete Flores (R-24)">Flores</span></span>, <span class=p-R><span title="Brent Hagenbuch (R-30)">Hagenbuch</span></span>, <span class=p-R><span title="Bob Hall (R-2)">Hall</span></span>, <span class=p-R><span title="Kelly Hancock (R-9)">Hancock</span></span>, <span class=p-R><span title="Joan Huffman (R-17)">Huffman</span></span>, <span class=p-R><span title="Bryan Hughes (R-1)">Hughes</span></span>, <span class=p-R><span title="Phil King (R-10)">King</span></span>, <span class=p-R><span title="Lois W. Kolkhorst (R-18)">Kolkhorst</span></span>, <span class=p-R><span title="Mayes Middleton (R-11)">Middleton</span></span>, <span class=p-R><span title="Robert Nichols (R-3)">Nichols</span></span>, <span class=p-R><span title="Tan Parker (R-12)">Parker</span></span>, <span class=p-R><span title="Angela Paxton (R-8)">Paxton</span></span>, <span class=p-R><span title="Charles Perry (R-28)">Perry</span></span>, <span class=p-R><span title="Charles Schwertner (R-5)">Schwertner</span></span>, <span class=p-R><span title="Kevin Sparks (R-31)">Sparks</span></span></p>
+<p class=names><b>Nay (2)</b> <span class=p-D><span title="Molly Cook (D-15)">Cook</span></span>, <span class=p-D><span title="Sarah Eckhardt (D-14)">Eckhardt</span></span></p>
+</div>
+<h2 id=matrix>Vote matrix</h2><p class='small muted'>One row per member, one column per record vote (click a column header for the vote). Color by the member's own vote, by whether they voted with the bill's sponsor in that chamber, or by whether they voted with their party's majority.</p>
+<h3>Senate</h3>
+<p class='small muted'>Sponsor here: Lois W. Kolkhorst.</p>
+<div data-matrix data-color=sponsor><div class=controls>Color by: <button data-mode=sponsor class=on>with sponsor</button><button data-mode=party>with party</button><button data-mode=vote>vote</button></div><div class=scroll><table class=matrix><tr><th class=name>Member</th><th>Pty</th><th>Dist</th><th class=num title='Share of Yea/Nay votes cast with the sponsor'>% spon</th><th class=num title='Share of Yea/Nay votes cast with own party majority'>% pty</th>
+<th class=rc title='Yea = pass bill: 29–2 (voice, deemed)'><a href='#rc-S-2025-05-25-1'>05-25 Pass 2nd rdg</a></th>
+<th class=rc title='Yea = pass bill: 29–2 (voice, deemed)'><a href='#rc-S-2025-05-25-2'>05-25 Pass 3rd rdg</a></th>
+</tr>
+<tr><td class=name><span title="Adam Hinojosa (R-27)">A. Hinojosa</span></td><td><span class="p-R">R</span></td><td class=num>27</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='A. Hinojosa: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='A. Hinojosa: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Paul Bettencourt (R-7)">Bettencourt</span></td><td><span class="p-R">R</span></td><td class=num>7</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Bettencourt: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Bettencourt: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Brian Birdwell (R-22)">Birdwell</span></td><td><span class="p-R">R</span></td><td class=num>22</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Birdwell: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Birdwell: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Donna Campbell (R-25)">Campbell</span></td><td><span class="p-R">R</span></td><td class=num>25</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Campbell: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Campbell: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Brandon Creighton (R-4)">Creighton</span></td><td><span class="p-R">R</span></td><td class=num>4</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Creighton: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Creighton: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Pete Flores (R-24)">Flores</span></td><td><span class="p-R">R</span></td><td class=num>24</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Flores: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Flores: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Brent Hagenbuch (R-30)">Hagenbuch</span></td><td><span class="p-R">R</span></td><td class=num>30</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Hagenbuch: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Hagenbuch: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Bob Hall (R-2)">Hall</span></td><td><span class="p-R">R</span></td><td class=num>2</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Hall: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Hall: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Kelly Hancock (R-9)">Hancock</span></td><td><span class="p-R">R</span></td><td class=num>9</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Hancock: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Hancock: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Joan Huffman (R-17)">Huffman</span></td><td><span class="p-R">R</span></td><td class=num>17</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Huffman: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Huffman: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Bryan Hughes (R-1)">Hughes</span></td><td><span class="p-R">R</span></td><td class=num>1</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Hughes: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Hughes: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Phil King (R-10)">King</span></td><td><span class="p-R">R</span></td><td class=num>10</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='King: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='King: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Mayes Middleton (R-11)">Middleton</span></td><td><span class="p-R">R</span></td><td class=num>11</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Middleton: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Middleton: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Robert Nichols (R-3)">Nichols</span></td><td><span class="p-R">R</span></td><td class=num>3</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Nichols: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Nichols: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Tan Parker (R-12)">Parker</span></td><td><span class="p-R">R</span></td><td class=num>12</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Parker: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Parker: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Angela Paxton (R-8)">Paxton</span></td><td><span class="p-R">R</span></td><td class=num>8</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Paxton: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Paxton: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Charles Perry (R-28)">Perry</span></td><td><span class="p-R">R</span></td><td class=num>28</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Perry: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Perry: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Charles Schwertner (R-5)">Schwertner</span></td><td><span class="p-R">R</span></td><td class=num>5</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Schwertner: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Schwertner: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Kevin Sparks (R-31)">Sparks</span></td><td><span class="p-R">R</span></td><td class=num>31</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Sparks: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Sparks: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Lois W. Kolkhorst (R-18)">Kolkhorst</span></td><td><span class="p-R">R</span></td><td class=num>18</td><td class=num></td><td class=num>100.0</td>
+<td class='v v-Y p-with' title='Kolkhorst: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y p-with' title='Kolkhorst: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Carol Alvarado (D-6)">Alvarado</span></td><td><span class="p-D">D</span></td><td class=num>6</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Alvarado: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Alvarado: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="César Blanco (D-29)">Blanco</span></td><td><span class="p-D">D</span></td><td class=num>29</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Blanco: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Blanco: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Roland Gutierrez (D-19)">Gutierrez</span></td><td><span class="p-D">D</span></td><td class=num>19</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Gutierrez: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Gutierrez: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Juan &#x27;Chuy&#x27; Hinojosa (D-20)">J. Hinojosa</span></td><td><span class="p-D">D</span></td><td class=num>20</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='J. Hinojosa: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='J. Hinojosa: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Nathan Johnson (D-16)">Johnson</span></td><td><span class="p-D">D</span></td><td class=num>16</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Johnson: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Johnson: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="José Menéndez (D-26)">Menéndez</span></td><td><span class="p-D">D</span></td><td class=num>26</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Menéndez: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Menéndez: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Borris Miles (D-13)">Miles</span></td><td><span class="p-D">D</span></td><td class=num>13</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Miles: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Miles: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Royce West (D-23)">West</span></td><td><span class="p-D">D</span></td><td class=num>23</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='West: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='West: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Judith Zaffirini (D-21)">Zaffirini</span></td><td><span class="p-D">D</span></td><td class=num>21</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Zaffirini: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Zaffirini: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Molly Cook (D-15)">Cook</span></td><td><span class="p-D">D</span></td><td class=num>15</td><td class=num>0.0</td><td class=num>0.0</td>
+<td class='v v-N s-against p-against' title='Cook: Nay — Pass 2nd rdg'>N</td>
+<td class='v v-N s-against p-against' title='Cook: Nay — Pass 3rd rdg'>N</td>
+</tr>
+<tr><td class=name><span title="Sarah Eckhardt (D-14)">Eckhardt</span></td><td><span class="p-D">D</span></td><td class=num>14</td><td class=num>0.0</td><td class=num>0.0</td>
+<td class='v v-N s-against p-against' title='Eckhardt: Nay — Pass 2nd rdg'>N</td>
+<td class='v v-N s-against p-against' title='Eckhardt: Nay — Pass 3rd rdg'>N</td>
+</tr>
+</table></div></div><p class='small muted'>Y yea · N nay · p present, not voting · e excused · a absent · · not listed · * member filed a statement of vote (e.g. "I intended to vote no"); hover for the text. The journal tally is the official vote.</p>
+<h3>House</h3>
+<p class='small muted'>Sponsor here: Angelia Orr.</p>
+<div data-matrix data-color=sponsor><div class=controls>Color by: <button data-mode=sponsor class=on>with sponsor</button><button data-mode=party>with party</button><button data-mode=vote>vote</button></div><div class=scroll><table class=matrix><tr><th class=name>Member</th><th>Pty</th><th>Dist</th><th class=num title='Share of Yea/Nay votes cast with the sponsor'>% spon</th><th class=num title='Share of Yea/Nay votes cast with own party majority'>% pty</th>
+<th class=rc title='Yea = pass bill: 97–41, 2 PNV'><a href='#rc-H-RV818'>04-29 Pass 2nd rdg</a></th>
+<th class=rc title='Yea = pass bill: 104–32, 2 PNV'><a href='#rc-H-RV966'>04-30 Pass 3rd rdg</a></th>
+</tr>
+<tr><td class=name><span title="Daniel Alders (R-6)">Alders</span></td><td><span class="p-R">R</span></td><td class=num>6</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Alders: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Alders: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Trent Ashby (R-9)">Ashby</span></td><td><span class="p-R">R</span></td><td class=num>9</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Ashby: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Ashby: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Jeff Barry (R-29)">Barry</span></td><td><span class="p-R">R</span></td><td class=num>29</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Barry: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Barry: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Cecil Bell, Jr. (R-3)">Bell, C.</span></td><td><span class="p-R">R</span></td><td class=num>3</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Bell, C.: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Bell, C.: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Keith Bell (R-4)">Bell, K.</span></td><td><span class="p-R">R</span></td><td class=num>4</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Bell, K.: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Bell, K.: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Greg Bonnen (R-24)">Bonnen</span></td><td><span class="p-R">R</span></td><td class=num>24</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Bonnen: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Bonnen: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Brad Buckley (R-54)">Buckley</span></td><td><span class="p-R">R</span></td><td class=num>54</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-ABS' title='Buckley: Absent — Pass 2nd rdg'>a</td>
+<td class='v v-Y s-with p-with' title='Buckley: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Benjamin Bumgarner (R-63)">Bumgarner</span></td><td><span class="p-R">R</span></td><td class=num>63</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Bumgarner: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Bumgarner: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Angie Chen Button (R-112)">Button</span></td><td><span class="p-R">R</span></td><td class=num>112</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Button: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-ABS' title='Button: Absent — Pass 3rd rdg. Statement of vote: I was in the house but away from my desk. I would have voted yes.'>a*</td>
+</tr>
+<tr><td class=name><span title="Briscoe Cain (R-128)">Cain</span></td><td><span class="p-R">R</span></td><td class=num>128</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Cain: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Cain: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Giovanni Capriglione (R-98)">Capriglione</span></td><td><span class="p-R">R</span></td><td class=num>98</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Capriglione: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Capriglione: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="David Cook (R-96)">Cook</span></td><td><span class="p-R">R</span></td><td class=num>96</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Cook: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Cook: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Tom Craddick (R-82)">Craddick</span></td><td><span class="p-R">R</span></td><td class=num>82</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Craddick: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Craddick: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Charles Cunningham (R-127)">Cunningham</span></td><td><span class="p-R">R</span></td><td class=num>127</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Cunningham: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Cunningham: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Pat Curry (R-56)">Curry</span></td><td><span class="p-R">R</span></td><td class=num>56</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Curry: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Curry: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Drew Darby (R-72)">Darby</span></td><td><span class="p-R">R</span></td><td class=num>72</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Darby: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Darby: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Mano DeAyala (R-133)">DeAyala</span></td><td><span class="p-R">R</span></td><td class=num>133</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='DeAyala: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='DeAyala: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Jay Dean (R-7)">Dean</span></td><td><span class="p-R">R</span></td><td class=num>7</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Dean: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Dean: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Mark Dorazio (R-122)">Dorazio</span></td><td><span class="p-R">R</span></td><td class=num>122</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Dorazio: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Dorazio: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Paul Dyson (R-14)">Dyson</span></td><td><span class="p-R">R</span></td><td class=num>14</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Dyson: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Dyson: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Caroline Fairly (R-87)">Fairly</span></td><td><span class="p-R">R</span></td><td class=num>87</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Fairly: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Fairly: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="James Frank (R-69)">Frank</span></td><td><span class="p-R">R</span></td><td class=num>69</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Frank: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Frank: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Gary Gates (R-28)">Gates</span></td><td><span class="p-R">R</span></td><td class=num>28</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Gates: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Gates: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Stan Gerdes (R-17)">Gerdes</span></td><td><span class="p-R">R</span></td><td class=num>17</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Gerdes: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Gerdes: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Charlie Geren (R-99)">Geren</span></td><td><span class="p-R">R</span></td><td class=num>99</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Geren: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Geren: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Ryan Guillen (R-31)">Guillen</span></td><td><span class="p-R">R</span></td><td class=num>31</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Guillen: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Guillen: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Sam Harless (R-126)">Harless</span></td><td><span class="p-R">R</span></td><td class=num>126</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Harless: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Harless: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Cody Harris (R-8)">Harris</span></td><td><span class="p-R">R</span></td><td class=num>8</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Harris: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Harris: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Caroline Harris Davila (R-52)">Harris Davila</span></td><td><span class="p-R">R</span></td><td class=num>52</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Harris Davila: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Harris Davila: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Brian Harrison (R-10)">Harrison</span></td><td><span class="p-R">R</span></td><td class=num>10</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Harrison: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Harrison: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Richard Hayes (R-57)">Hayes</span></td><td><span class="p-R">R</span></td><td class=num>57</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Hayes: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Hayes: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Cole Hefner (R-5)">Hefner</span></td><td><span class="p-R">R</span></td><td class=num>5</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Hefner: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Hefner: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Hillary Hickland (R-55)">Hickland</span></td><td><span class="p-R">R</span></td><td class=num>55</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Hickland: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Hickland: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Janis Holt (R-18)">Holt</span></td><td><span class="p-R">R</span></td><td class=num>18</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Holt: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Holt: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Andy Hopper (R-64)">Hopper</span></td><td><span class="p-R">R</span></td><td class=num>64</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Hopper: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Hopper: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Lacey Hull (R-138)">Hull</span></td><td><span class="p-R">R</span></td><td class=num>138</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Hull: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Hull: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Todd Hunter (R-32)">Hunter</span></td><td><span class="p-R">R</span></td><td class=num>32</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Hunter: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Hunter: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Carrie Isaac (R-73)">Isaac</span></td><td><span class="p-R">R</span></td><td class=num>73</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Isaac: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Isaac: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Helen Kerwin (R-58)">Kerwin</span></td><td><span class="p-R">R</span></td><td class=num>58</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Kerwin: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Kerwin: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Ken King (R-88)">King</span></td><td><span class="p-R">R</span></td><td class=num>88</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='King: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-ABS' title='King: Absent — Pass 3rd rdg'>a</td>
+</tr>
+<tr><td class=name><span title="Stan Kitzman (R-85)">Kitzman</span></td><td><span class="p-R">R</span></td><td class=num>85</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Kitzman: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Kitzman: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Marc LaHood (R-121)">LaHood</span></td><td><span class="p-R">R</span></td><td class=num>121</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='LaHood: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='LaHood: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Stan Lambert (R-71)">Lambert</span></td><td><span class="p-R">R</span></td><td class=num>71</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Lambert: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Lambert: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Jeff Leach (R-67)">Leach</span></td><td><span class="p-R">R</span></td><td class=num>67</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Leach: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Leach: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Terri Leo Wilson (R-23)">Leo Wilson</span></td><td><span class="p-R">R</span></td><td class=num>23</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Leo Wilson: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Leo Wilson: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Mitch Little (R-65)">Little</span></td><td><span class="p-R">R</span></td><td class=num>65</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Little: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Little: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Janie Lopez (R-37)">Lopez, J.</span></td><td><span class="p-R">R</span></td><td class=num>37</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Lopez, J.: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Lopez, J.: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="AJ Louderback (R-30)">Louderback</span></td><td><span class="p-R">R</span></td><td class=num>30</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Louderback: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Louderback: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="David Lowe (R-91)">Lowe</span></td><td><span class="p-R">R</span></td><td class=num>91</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Lowe: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Lowe: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="J.M. Lozano (R-43)">Lozano</span></td><td><span class="p-R">R</span></td><td class=num>43</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Lozano: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Lozano: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="John Lujan (R-118)">Lujan</span></td><td><span class="p-R">R</span></td><td class=num>118</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Lujan: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Lujan: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Shelley Luther (R-62)">Luther</span></td><td><span class="p-R">R</span></td><td class=num>62</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Luther: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Luther: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Don McLaughlin, Jr. (R-80)">McLaughlin</span></td><td><span class="p-R">R</span></td><td class=num>80</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='McLaughlin: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='McLaughlin: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="John McQueeney (R-97)">McQueeney</span></td><td><span class="p-R">R</span></td><td class=num>97</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='McQueeney: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='McQueeney: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Will Metcalf (R-16)">Metcalf</span></td><td><span class="p-R">R</span></td><td class=num>16</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Metcalf: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Metcalf: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Morgan Meyer (R-108)">Meyer</span></td><td><span class="p-R">R</span></td><td class=num>108</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Meyer: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Meyer: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Brent Money (R-2)">Money</span></td><td><span class="p-R">R</span></td><td class=num>2</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Money: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Money: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Matt Morgan (R-26)">Morgan</span></td><td><span class="p-R">R</span></td><td class=num>26</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Morgan: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Morgan: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Candy Noble (R-89)">Noble</span></td><td><span class="p-R">R</span></td><td class=num>89</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Noble: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Noble: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Mike Olcott (R-60)">Olcott</span></td><td><span class="p-R">R</span></td><td class=num>60</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Olcott: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Olcott: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Tom Oliverson (R-130)">Oliverson</span></td><td><span class="p-R">R</span></td><td class=num>130</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Oliverson: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Oliverson: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Jared Patterson (R-106)">Patterson</span></td><td><span class="p-R">R</span></td><td class=num>106</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Patterson: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Patterson: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Dennis Paul (R-129)">Paul</span></td><td><span class="p-R">R</span></td><td class=num>129</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Paul: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Paul: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Dade Phelan (R-21)">Phelan</span></td><td><span class="p-R">R</span></td><td class=num>21</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Phelan: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Phelan: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Katrina Pierson (R-33)">Pierson</span></td><td><span class="p-R">R</span></td><td class=num>33</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Pierson: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Pierson: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Keresa Richardson (R-61)">Richardson</span></td><td><span class="p-R">R</span></td><td class=num>61</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Richardson: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Richardson: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Nate Schatzline (R-93)">Schatzline</span></td><td><span class="p-R">R</span></td><td class=num>93</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Schatzline: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Schatzline: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Mike Schofield (R-132)">Schofield</span></td><td><span class="p-R">R</span></td><td class=num>132</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-ABS' title='Schofield: Absent — Pass 2nd rdg'>a</td>
+<td class='v v-Y s-with p-with' title='Schofield: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Alan Schoolcraft (R-44)">Schoolcraft</span></td><td><span class="p-R">R</span></td><td class=num>44</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Schoolcraft: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-EXC' title='Schoolcraft: Absent, excused — Pass 3rd rdg'>e</td>
+</tr>
+<tr><td class=name><span title="Matt Shaheen (R-66)">Shaheen</span></td><td><span class="p-R">R</span></td><td class=num>66</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Shaheen: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Shaheen: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Joanne Shofner (R-11)">Shofner</span></td><td><span class="p-R">R</span></td><td class=num>11</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Shofner: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Shofner: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Shelby Slawson (R-59)">Slawson</span></td><td><span class="p-R">R</span></td><td class=num>59</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Slawson: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Slawson: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="John Smithee (R-86)">Smithee</span></td><td><span class="p-R">R</span></td><td class=num>86</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Smithee: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Smithee: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="David Spiller (R-68)">Spiller</span></td><td><span class="p-R">R</span></td><td class=num>68</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Spiller: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Spiller: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Valoree Swanson (R-150)">Swanson</span></td><td><span class="p-R">R</span></td><td class=num>150</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Swanson: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Swanson: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Carl H. Tepper (R-84)">Tepper</span></td><td><span class="p-R">R</span></td><td class=num>84</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Tepper: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Tepper: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Tony Tinderholt (R-94)">Tinderholt</span></td><td><span class="p-R">R</span></td><td class=num>94</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Tinderholt: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Tinderholt: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Steve Toth (R-15)">Toth</span></td><td><span class="p-R">R</span></td><td class=num>15</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Toth: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Toth: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Ellen Troxclair (R-19)">Troxclair</span></td><td><span class="p-R">R</span></td><td class=num>19</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Troxclair: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Troxclair: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Gary VanDeaver (R-1)">VanDeaver</span></td><td><span class="p-R">R</span></td><td class=num>1</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='VanDeaver: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='VanDeaver: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Cody Vasut (R-25)">Vasut</span></td><td><span class="p-R">R</span></td><td class=num>25</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Vasut: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Vasut: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Denise Villalobos (R-34)">Villalobos</span></td><td><span class="p-R">R</span></td><td class=num>34</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Villalobos: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Villalobos: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Wes Virdell (R-53)">Virdell</span></td><td><span class="p-R">R</span></td><td class=num>53</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Virdell: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Virdell: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Trey Wharton (R-12)">Wharton</span></td><td><span class="p-R">R</span></td><td class=num>12</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Wharton: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Wharton: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Terry M. Wilson (R-20)">Wilson</span></td><td><span class="p-R">R</span></td><td class=num>20</td><td class=num>100.0</td><td class=num>100.0</td>
+<td class='v v-Y s-with p-with' title='Wilson: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-with' title='Wilson: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Dustin Burrows (R-83)">Burrows (Speaker)</span></td><td><span class="p-R">R</span></td><td class=num>83</td><td class=num></td><td class=num></td>
+<td class='v v-PNV' title='Burrows (Speaker): Present, not voting — Pass 2nd rdg'>p</td>
+<td class='v v-PNV' title='Burrows (Speaker): Present, not voting — Pass 3rd rdg'>p</td>
+</tr>
+<tr><td class=name><span title="Brooks Landgraf (R-81)">Landgraf</span></td><td><span class="p-R">R</span></td><td class=num>81</td><td class=num></td><td class=num></td>
+<td class='v v-PNV' title='Landgraf: Present, not voting — Pass 2nd rdg'>p</td>
+<td class='v v-PNV' title='Landgraf: Present, not voting — Pass 3rd rdg'>p</td>
+</tr>
+<tr><td class=name><span title="Angelia Orr (R-13)">Orr</span></td><td><span class="p-R">R</span></td><td class=num>13</td><td class=num></td><td class=num>100.0</td>
+<td class='v v-Y p-with' title='Orr: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y p-with' title='Orr: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Salman Bhojani (D-92)">Bhojani</span></td><td><span class="p-D">D</span></td><td class=num>92</td><td class=num>100.0</td><td class=num>0.0</td>
+<td class='v v-Y s-with p-against' title='Bhojani: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-against' title='Bhojani: Yea — Pass 3rd rdg. Statement of vote: I was shown voting yes. I intended to vote no.'>Y*</td>
+</tr>
+<tr><td class=name><span title="Philip Cortez (D-117)">Cortez</span></td><td><span class="p-D">D</span></td><td class=num>117</td><td class=num>100.0</td><td class=num>0.0</td>
+<td class='v v-Y s-with p-against' title='Cortez: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-against' title='Cortez: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Harold V. Dutton, Jr. (D-142)">Dutton</span></td><td><span class="p-D">D</span></td><td class=num>142</td><td class=num>100.0</td><td class=num>0.0</td>
+<td class='v v-Y s-with p-against' title='Dutton: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-ABS' title='Dutton: Absent — Pass 3rd rdg'>a</td>
+</tr>
+<tr><td class=name><span title="R.D. &#x27;Bobby&#x27; Guerra (D-41)">Guerra</span></td><td><span class="p-D">D</span></td><td class=num>41</td><td class=num>100.0</td><td class=num>0.0</td>
+<td class='v v-Y s-with p-against' title='Guerra: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-against' title='Guerra: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Oscar Longoria (D-35)">Longoria</span></td><td><span class="p-D">D</span></td><td class=num>35</td><td class=num>100.0</td><td class=num>0.0</td>
+<td class='v v-Y s-with p-against' title='Longoria: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-against' title='Longoria: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Sergio Muñoz, Jr. (D-36)">Muñoz</span></td><td><span class="p-D">D</span></td><td class=num>36</td><td class=num>100.0</td><td class=num>0.0</td>
+<td class='v v-Y s-with p-against' title='Muñoz: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-against' title='Muñoz: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Mary Ann Perez (D-144)">Perez, M.</span></td><td><span class="p-D">D</span></td><td class=num>144</td><td class=num>100.0</td><td class=num>0.0</td>
+<td class='v v-ABS' title='Perez, M.: Absent — Pass 2nd rdg. Statement of vote: I was in the house but away from my desk. I would have voted no.'>a*</td>
+<td class='v v-Y s-with p-against' title='Perez, M.: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Richard Peña Raymond (D-42)">Raymond</span></td><td><span class="p-D">D</span></td><td class=num>42</td><td class=num>100.0</td><td class=num>0.0</td>
+<td class='v v-Y s-with p-against' title='Raymond: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-Y s-with p-against' title='Raymond: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Alma Allen (D-131)">Allen</span></td><td><span class="p-D">D</span></td><td class=num>131</td><td class=num>50.0</td><td class=num>50.0</td>
+<td class='v v-Y s-with p-against' title='Allen: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-N s-against p-with' title='Allen: Nay — Pass 3rd rdg'>N</td>
+</tr>
+<tr><td class=name><span title="John H. Bucy III (D-136)">Bucy</span></td><td><span class="p-D">D</span></td><td class=num>136</td><td class=num>50.0</td><td class=num>50.0</td>
+<td class='v v-N s-against p-with' title='Bucy: Nay — Pass 2nd rdg'>N</td>
+<td class='v v-Y s-with p-against' title='Bucy: Yea — Pass 3rd rdg. Statement of vote: I was shown voting yes. I intended to vote no.'>Y*</td>
+</tr>
+<tr><td class=name><span title="Liz Campos (D-119)">Campos</span></td><td><span class="p-D">D</span></td><td class=num>119</td><td class=num>50.0</td><td class=num>50.0</td>
+<td class='v v-N s-against p-with' title='Campos: Nay — Pass 2nd rdg'>N</td>
+<td class='v v-Y s-with p-against' title='Campos: Yea — Pass 3rd rdg. Statement of vote: I was shown voting yes. I intended to vote no.'>Y*</td>
+</tr>
+<tr><td class=name><span title="Terry Canales (D-40)">Canales</span></td><td><span class="p-D">D</span></td><td class=num>40</td><td class=num>50.0</td><td class=num>50.0</td>
+<td class='v v-N s-against p-with' title='Canales: Nay — Pass 2nd rdg'>N</td>
+<td class='v v-Y s-with p-against' title='Canales: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Sheryl Cole (D-46)">Cole</span></td><td><span class="p-D">D</span></td><td class=num>46</td><td class=num>50.0</td><td class=num>50.0</td>
+<td class='v v-N s-against p-with' title='Cole: Nay — Pass 2nd rdg'>N</td>
+<td class='v v-Y s-with p-against' title='Cole: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Lulu Flores (D-51)">Flores</span></td><td><span class="p-D">D</span></td><td class=num>51</td><td class=num>50.0</td><td class=num>50.0</td>
+<td class='v v-Y s-with p-against' title='Flores: Yea — Pass 2nd rdg. Statement of vote: I was shown voting yes. I intended to vote no.'>Y*</td>
+<td class='v v-N s-against p-with' title='Flores: Nay — Pass 3rd rdg'>N</td>
+</tr>
+<tr><td class=name><span title="Josey Garcia (D-124)">Garcia, J.</span></td><td><span class="p-D">D</span></td><td class=num>124</td><td class=num>50.0</td><td class=num>50.0</td>
+<td class='v v-N s-against p-with' title='Garcia, J.: Nay — Pass 2nd rdg'>N</td>
+<td class='v v-Y s-with p-against' title='Garcia, J.: Yea — Pass 3rd rdg. Statement of vote: I was shown voting yes. I intended to vote no.'>Y*</td>
+</tr>
+<tr><td class=name><span title="Linda Garcia (D-107)">Garcia, L.</span></td><td><span class="p-D">D</span></td><td class=num>107</td><td class=num>50.0</td><td class=num>50.0</td>
+<td class='v v-N s-against p-with' title='Garcia, L.: Nay — Pass 2nd rdg'>N</td>
+<td class='v v-Y s-with p-against' title='Garcia, L.: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Erin Elizabeth Gámez (D-38)">Gámez</span></td><td><span class="p-D">D</span></td><td class=num>38</td><td class=num>50.0</td><td class=num>50.0</td>
+<td class='v v-N s-against p-with' title='Gámez: Nay — Pass 2nd rdg'>N</td>
+<td class='v v-Y s-with p-against' title='Gámez: Yea — Pass 3rd rdg. Statement of vote: I was shown voting yes. I intended to vote no.'>Y*</td>
+</tr>
+<tr><td class=name><span title="Donna Howard (D-48)">Howard</span></td><td><span class="p-D">D</span></td><td class=num>48</td><td class=num>50.0</td><td class=num>50.0</td>
+<td class='v v-N s-against p-with' title='Howard: Nay — Pass 2nd rdg'>N</td>
+<td class='v v-Y s-with p-against' title='Howard: Yea — Pass 3rd rdg. Statement of vote: I was shown voting yes. I intended to vote no.'>Y*</td>
+</tr>
+<tr><td class=name><span title="Ann Johnson (D-134)">Johnson</span></td><td><span class="p-D">D</span></td><td class=num>134</td><td class=num>50.0</td><td class=num>50.0</td>
+<td class='v v-N s-against p-with' title='Johnson: Nay — Pass 2nd rdg'>N</td>
+<td class='v v-Y s-with p-against' title='Johnson: Yea — Pass 3rd rdg. Statement of vote: I was shown voting yes. I intended to vote no.'>Y*</td>
+</tr>
+<tr><td class=name><span title="Ray López (D-125)">Lopez, R.</span></td><td><span class="p-D">D</span></td><td class=num>125</td><td class=num>50.0</td><td class=num>50.0</td>
+<td class='v v-Y s-with p-against' title='Lopez, R.: Yea — Pass 2nd rdg. Statement of vote: I was shown voting yes. I intended to vote no.'>Y*</td>
+<td class='v v-N s-against p-with' title='Lopez, R.: Nay — Pass 3rd rdg'>N</td>
+</tr>
+<tr><td class=name><span title="Armando Martinez (D-39)">Martinez</span></td><td><span class="p-D">D</span></td><td class=num>39</td><td class=num>50.0</td><td class=num>50.0</td>
+<td class='v v-N s-against p-with' title='Martinez: Nay — Pass 2nd rdg'>N</td>
+<td class='v v-Y s-with p-against' title='Martinez: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Trey Martinez Fischer (D-116)">Martinez Fischer</span></td><td><span class="p-D">D</span></td><td class=num>116</td><td class=num>50.0</td><td class=num>50.0</td>
+<td class='v v-N s-against p-with' title='Martinez Fischer: Nay — Pass 2nd rdg'>N</td>
+<td class='v v-Y s-with p-against' title='Martinez Fischer: Yea — Pass 3rd rdg'>Y</td>
+</tr>
+<tr><td class=name><span title="Eddie Morales (D-74)">Morales, E.</span></td><td><span class="p-D">D</span></td><td class=num>74</td><td class=num>50.0</td><td class=num>50.0</td>
+<td class='v v-Y s-with p-against' title='Morales, E.: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-N s-against p-with' title='Morales, E.: Nay — Pass 3rd rdg'>N</td>
+</tr>
+<tr><td class=name><span title="Claudia Ordaz (D-79)">Ordaz</span></td><td><span class="p-D">D</span></td><td class=num>79</td><td class=num>50.0</td><td class=num>50.0</td>
+<td class='v v-Y s-with p-against' title='Ordaz: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-N s-against p-with' title='Ordaz: Nay — Pass 3rd rdg'>N</td>
+</tr>
+<tr><td class=name><span title="Vince Perez (D-77)">Perez, V.</span></td><td><span class="p-D">D</span></td><td class=num>77</td><td class=num>50.0</td><td class=num>50.0</td>
+<td class='v v-Y s-with p-against' title='Perez, V.: Yea — Pass 2nd rdg'>Y</td>
+<td class='v v-N s-against p-with' title='Perez, V.: Nay — Pass 3rd rdg'>N</td>
+</tr>
+<tr><td class=name><span title="Mihaela Plesa (D-70)">Plesa</span></td><td><span class="p-D">D</span></td><td class=num>70</td><td class=num>50.0</td><td class=num>50.0</td>
+<td class='v v-N s-against p-with' title='Plesa: Nay — Pass 2nd rdg'>N</td>
+<td class='v v-Y s-with p-against' title='Plesa: Yea — Pass 3rd rdg. Statement of vote: I was shown voting yes. I intended to vote no.'>Y*</td>
+</tr>
+<tr><td class=name><span title="Toni Rose (D-110)">Rose</span></td><td><span class="p-D">D</span></td><td class=num>110</td><td class=num>50.0</td><td class=num>50.0</td>
+<td class='v v-N s-against p-with' title='Rose: Nay — Pass 2nd rdg'>N</td>
+<td class='v v-Y s-with p-against' title='Rose: Yea — Pass 3rd rdg. Statement of vote: I was shown voting yes. I intended to vote no.'>Y*</td>
+</tr>
+<tr><td class=name><span title="James Talarico (D-50)">Talarico</span></td><td><span class="p-D">D</span></td><td class=num>50</td><td class=num>50.0</td><td class=num>50.0</td>
+<td class='v v-N s-against p-with' title='Talarico: Nay — Pass 2nd rdg'>N</td>
+<td class='v v-Y s-with p-against' title='Talarico: Yea — Pass 3rd rdg. Statement of vote: I was shown voting yes. I intended to vote no.'>Y*</td>
+</tr>
+<tr><td class=name><span title="Rafael Anchía (D-103)">Anchía</span></td><td><span class="p-D">D</span></td><td class=num>103</td><td class=num>0.0</td><td class=num>100.0</td>
+<td class='v v-N s-against p-with' title='Anchía: Nay — Pass 2nd rdg'>N</td>
+<td class='v v-N s-against p-with' title='Anchía: Nay — Pass 3rd rdg'>N</td>
+</tr>
+<tr><td class=name><span title="Diego Bernal (D-123)">Bernal</span></td><td><span class="p-D">D</span></td><td class=num>123</td><td class=num>0.0</td><td class=num>100.0</td>
+<td class='v v-N s-against p-with' title='Bernal: Nay — Pass 2nd rdg'>N</td>
+<td class='v v-EXC' title='Bernal: Absent, excused — Pass 3rd rdg. Statement of vote: I was excused for important business in the district. I would have voted no.'>e*</td>
+</tr>
+<tr><td class=name><span title="Rhetta Bowers (D-113)">Bowers</span></td><td><span class="p-D">D</span></td><td class=num>113</td><td class=num>0.0</td><td class=num>100.0</td>
+<td class='v v-ABS' title='Bowers: Absent — Pass 2nd rdg'>a</td>
+<td class='v v-N s-against p-with' title='Bowers: Nay — Pass 3rd rdg'>N</td>
+</tr>
+<tr><td class=name><span title="John Bryant (D-114)">Bryant</span></td><td><span class="p-D">D</span></td><td class=num>114</td><td class=num>0.0</td><td class=num>100.0</td>
+<td class='v v-N s-against p-with' title='Bryant: Nay — Pass 2nd rdg'>N</td>
+<td class='v v-N s-against p-with' title='Bryant: Nay — Pass 3rd rdg'>N</td>
+</tr>
+<tr><td class=name><span title="Nicole Collier (D-95)">Collier</span></td><td><span class="p-D">D</span></td><td class=num>95</td><td class=num>0.0</td><td class=num>100.0</td>
+<td class='v v-N s-against p-with' title='Collier: Nay — Pass 2nd rdg'>N</td>
+<td class='v v-N s-against p-with' title='Collier: Nay — Pass 3rd rdg'>N</td>
+</tr>
+<tr><td class=name><span title="Aicha Davis (D-109)">Davis, A.</span></td><td><span class="p-D">D</span></td><td class=num>109</td><td class=num>0.0</td><td class=num>100.0</td>
+<td class='v v-N s-against p-with' title='Davis, A.: Nay — Pass 2nd rdg'>N</td>
+<td class='v v-N s-against p-with' title='Davis, A.: Nay — Pass 3rd rdg'>N</td>
+</tr>
+<tr><td class=name><span title="Yvonne Davis (D-111)">Davis, Y.</span></td><td><span class="p-D">D</span></td><td class=num>111</td><td class=num>0.0</td><td class=num>100.0</td>
+<td class='v v-N s-against p-with' title='Davis, Y.: Nay — Pass 2nd rdg'>N</td>
+<td class='v v-ABS' title='Davis, Y.: Absent — Pass 3rd rdg'>a</td>
+</tr>
+<tr><td class=name><span title="Cassandra Garcia Hernandez (D-115)">Garcia Hernandez</span></td><td><span class="p-D">D</span></td><td class=num>115</td><td class=num>0.0</td><td class=num>100.0</td>
+<td class='v v-N s-against p-with' title='Garcia Hernandez: Nay — Pass 2nd rdg'>N</td>
+<td class='v v-N s-against p-with' title='Garcia Hernandez: Nay — Pass 3rd rdg'>N</td>
+</tr>
+<tr><td class=name><span title="Barbara Gervin-Hawkins (D-120)">Gervin-Hawkins</span></td><td><span class="p-D">D</span></td><td class=num>120</td><td class=num>0.0</td><td class=num>100.0</td>
+<td class='v v-ABS' title='Gervin-Hawkins: Absent — Pass 2nd rdg. Statement of vote: I was in the house but away from my desk. I would have voted no.'>a*</td>
+<td class='v v-N s-against p-with' title='Gervin-Hawkins: Nay — Pass 3rd rdg'>N</td>
+</tr>
+<tr><td class=name><span title="Jessica González (D-104)">González, J.</span></td><td><span class="p-D">D</span></td><td class=num>104</td><td class=num>0.0</td><td class=num>100.0</td>
+<td class='v v-N s-against p-with' title='González, J.: Nay — Pass 2nd rdg'>N</td>
+<td class='v v-N s-against p-with' title='González, J.: Nay — Pass 3rd rdg'>N</td>
+</tr>
+<tr><td class=name><span title="Mary González (D-75)">González, M.</span></td><td><span class="p-D">D</span></td><td class=num>75</td><td class=num></td><td class=num></td>
+<td class='v v-ABS' title='González, M.: Absent — Pass 2nd rdg'>a</td>
+<td class='v v-ABS' title='González, M.: Absent — Pass 3rd rdg'>a</td>
+</tr>
+<tr><td class=name><span title="Vikki Goodwin (D-47)">Goodwin</span></td><td><span class="p-D">D</span></td><td class=num>47</td><td class=num>0.0</td><td class=num>100.0</td>
+<td class='v v-N s-against p-with' title='Goodwin: Nay — Pass 2nd rdg'>N</td>
+<td class='v v-N s-against p-with' title='Goodwin: Nay — Pass 3rd rdg'>N</td>
+</tr>
+<tr><td class=name><span title="Ana Hernandez (D-143)">Hernandez</span></td><td><span class="p-D">D</span></td><td class=num>143</td><td class=num>0.0</td><td class=num>100.0</td>
+<td class='v v-N s-against p-with' title='Hernandez: Nay — Pass 2nd rdg'>N</td>
+<td class='v v-ABS' title='Hernandez: Absent — Pass 3rd rdg'>a</td>
+</tr>
+<tr><td class=name><span title="Gina Hinojosa (D-49)">Hinojosa</span></td><td><span class="p-D">D</span></td><td class=num>49</td><td class=num>0.0</td><td class=num>100.0</td>
+<td class='v v-N s-against p-with' title='Hinojosa: Nay — Pass 2nd rdg'>N</td>
+<td class='v v-EXC' title='Hinojosa: Absent, excused — Pass 3rd rdg'>e</td>
+</tr>
+<tr><td class=name><span title="Jolanda &#x27;Jo&#x27; Jones (D-147)">Jones, J.</span></td><td><span class="p-D">D</span></td><td class=num>147</td><td class=num>0.0</td><td class=num>100.0</td>
+<td class='v v-N s-against p-with' title='Jones, J.: Nay — Pass 2nd rdg'>N</td>
+<td class='v v-N s-against p-with' title='Jones, J.: Nay — Pass 3rd rdg'>N</td>
+</tr>
+<tr><td class=name><span title="Venton Jones (D-100)">Jones, V.</span></td><td><span class="p-D">D</span></td><td class=num>100</td><td class=num>0.0</td><td class=num>100.0</td>
+<td class='v v-N s-against p-with' title='Jones, V.: Nay — Pass 2nd rdg'>N</td>
+<td class='v v-N s-against p-with' title='Jones, V.: Nay — Pass 3rd rdg'>N</td>
+</tr>
+<tr><td class=name><span title="Suleman Lalani (D-76)">Lalani</span></td><td><span class="p-D">D</span></td><td class=num>76</td><td class=num>0.0</td><td class=num>100.0</td>
+<td class='v v-ABS' title='Lalani: Absent — Pass 2nd rdg'>a</td>
+<td class='v v-N s-against p-with' title='Lalani: Nay — Pass 3rd rdg'>N</td>
+</tr>
+<tr><td class=name><span title="Christian Manuel (D-22)">Manuel</span></td><td><span class="p-D">D</span></td><td class=num>22</td><td class=num>0.0</td><td class=num>100.0</td>
+<td class='v v-N s-against p-with' title='Manuel: Nay — Pass 2nd rdg'>N</td>
+<td class='v v-N s-against p-with' title='Manuel: Nay — Pass 3rd rdg'>N</td>
+</tr>
+<tr><td class=name><span title="Terry Meza (D-105)">Meza</span></td><td><span class="p-D">D</span></td><td class=num>105</td><td class=num>0.0</td><td class=num>100.0</td>
+<td class='v v-N s-against p-with' title='Meza: Nay — Pass 2nd rdg'>N</td>
+<td class='v v-ABS' title='Meza: Absent — Pass 3rd rdg'>a</td>
+</tr>
+<tr><td class=name><span title="Joe Moody (D-78)">Moody</span></td><td><span class="p-D">D</span></td><td class=num>78</td><td class=num>0.0</td><td class=num>100.0</td>
+<td class='v v-ABS' title='Moody: Absent — Pass 2nd rdg'>a</td>
+<td class='v v-N s-against p-with' title='Moody: Nay — Pass 3rd rdg'>N</td>
+</tr>
+<tr><td class=name><span title="Penny Morales Shaw (D-148)">Morales Shaw</span></td><td><span class="p-D">D</span></td><td class=num>148</td><td class=num>0.0</td><td class=num>100.0</td>
+<td class='v v-N s-against p-with' title='Morales Shaw: Nay — Pass 2nd rdg'>N</td>
+<td class='v v-N s-against p-with' title='Morales Shaw: Nay — Pass 3rd rdg'>N</td>
+</tr>
+<tr><td class=name><span title="Christina Morales (D-145)">Morales, C.</span></td><td><span class="p-D">D</span></td><td class=num>145</td><td class=num>0.0</td><td class=num>100.0</td>
+<td class='v v-N s-against p-with' title='Morales, C.: Nay — Pass 2nd rdg'>N</td>
+<td class='v v-N s-against p-with' title='Morales, C.: Nay — Pass 3rd rdg'>N</td>
+</tr>
+<tr><td class=name><span title="Ron Reynolds (D-27)">Reynolds</span></td><td><span class="p-D">D</span></td><td class=num>27</td><td class=num>0.0</td><td class=num>100.0</td>
+<td class='v v-N s-against p-with' title='Reynolds: Nay — Pass 2nd rdg'>N</td>
+<td class='v v-N s-against p-with' title='Reynolds: Nay — Pass 3rd rdg'>N</td>
+</tr>
+<tr><td class=name><span title="Ana-María Rodríguez Ramos (D-102)">Rodríguez Ramos</span></td><td><span class="p-D">D</span></td><td class=num>102</td><td class=num>0.0</td><td class=num>100.0</td>
+<td class='v v-N s-against p-with' title='Rodríguez Ramos: Nay — Pass 2nd rdg'>N</td>
+<td class='v v-N s-against p-with' title='Rodríguez Ramos: Nay — Pass 3rd rdg'>N</td>
+</tr>
+<tr><td class=name><span title="Ramon Romero, Jr. (D-90)">Romero</span></td><td><span class="p-D">D</span></td><td class=num>90</td><td class=num>0.0</td><td class=num>100.0</td>
+<td class='v v-N s-against p-with' title='Romero: Nay — Pass 2nd rdg'>N</td>
+<td class='v v-N s-against p-with' title='Romero: Nay — Pass 3rd rdg'>N</td>
+</tr>
+<tr><td class=name><span title="Jon Rosenthal (D-135)">Rosenthal</span></td><td><span class="p-D">D</span></td><td class=num>135</td><td class=num>0.0</td><td class=num>100.0</td>
+<td class='v v-N s-against p-with' title='Rosenthal: Nay — Pass 2nd rdg'>N</td>
+<td class='v v-N s-against p-with' title='Rosenthal: Nay — Pass 3rd rdg'>N</td>
+</tr>
+<tr><td class=name><span title="Lauren A. Simmons (D-146)">Simmons</span></td><td><span class="p-D">D</span></td><td class=num>146</td><td class=num>0.0</td><td class=num>100.0</td>
+<td class='v v-ABS' title='Simmons: Absent — Pass 2nd rdg'>a</td>
+<td class='v v-N s-against p-with' title='Simmons: Nay — Pass 3rd rdg'>N</td>
+</tr>
+<tr><td class=name><span title="Senfronia Thompson (D-141)">Thompson</span></td><td><span class="p-D">D</span></td><td class=num>141</td><td class=num>0.0</td><td class=num>100.0</td>
+<td class='v v-N s-against p-with' title='Thompson: Nay — Pass 2nd rdg'>N</td>
+<td class='v v-N s-against p-with' title='Thompson: Nay — Pass 3rd rdg'>N</td>
+</tr>
+<tr><td class=name><span title="Chris Turner (D-101)">Turner</span></td><td><span class="p-D">D</span></td><td class=num>101</td><td class=num>0.0</td><td class=num>100.0</td>
+<td class='v v-N s-against p-with' title='Turner: Nay — Pass 2nd rdg'>N</td>
+<td class='v v-N s-against p-with' title='Turner: Nay — Pass 3rd rdg'>N</td>
+</tr>
+<tr><td class=name><span title="Hubert Vo (D-149)">Vo</span></td><td><span class="p-D">D</span></td><td class=num>149</td><td class=num>0.0</td><td class=num>100.0</td>
+<td class='v v-N s-against p-with' title='Vo: Nay — Pass 2nd rdg'>N</td>
+<td class='v v-EXC' title='Vo: Absent, excused — Pass 3rd rdg'>e</td>
+</tr>
+<tr><td class=name><span title="Armando Walle (D-140)">Walle</span></td><td><span class="p-D">D</span></td><td class=num>140</td><td class=num></td><td class=num></td>
+<td class='v v-EXC' title='Walle: Absent, excused — Pass 2nd rdg'>e</td>
+<td class='v v-EXC' title='Walle: Absent, excused — Pass 3rd rdg'>e</td>
+</tr>
+<tr><td class=name><span title="Charlene Ward Johnson (D-139)">Ward Johnson</span></td><td><span class="p-D">D</span></td><td class=num>139</td><td class=num>0.0</td><td class=num>100.0</td>
+<td class='v v-N s-against p-with' title='Ward Johnson: Nay — Pass 2nd rdg'>N</td>
+<td class='v v-N s-against p-with' title='Ward Johnson: Nay — Pass 3rd rdg'>N</td>
+</tr>
+<tr><td class=name><span title="Gene Wu (D-137)">Wu</span></td><td><span class="p-D">D</span></td><td class=num>137</td><td class=num>0.0</td><td class=num>100.0</td>
+<td class='v v-N s-against p-with' title='Wu: Nay — Pass 2nd rdg'>N</td>
+<td class='v v-N s-against p-with' title='Wu: Nay — Pass 3rd rdg'>N</td>
+</tr>
+<tr><td class=name><span title="Erin Zwiener (D-45)">Zwiener</span></td><td><span class="p-D">D</span></td><td class=num>45</td><td class=num>0.0</td><td class=num>100.0</td>
+<td class='v v-N s-against p-with' title='Zwiener: Nay — Pass 2nd rdg'>N</td>
+<td class='v v-N s-against p-with' title='Zwiener: Nay — Pass 3rd rdg'>N</td>
+</tr>
+</table></div></div><p class='small muted'>Y yea · N nay · p present, not voting · e excused · a absent · · not listed · * member filed a statement of vote (e.g. "I intended to vote no"); hover for the text. The journal tally is the official vote.</p>
+<h2 id=members>Members: who stuck with whom</h2>
+<h3>Senate</h3>
+<p class=small><b>Broke with their party's majority</b> (Yea/Nay votes only):</p><table><tr><th>Member</th><th>Pty</th><th>Times</th><th>On</th></tr>
+<tr><td><span title="Molly Cook (D-15)">Cook</span></td><td><span class="p-D">D</span></td><td>2 of 2</td><td class=small><a href='#rc-S-2025-05-25-1'>Pass 2nd rdg</a>, <a href='#rc-S-2025-05-25-2'>Pass 3rd rdg</a></td></tr>
+<tr><td><span title="Sarah Eckhardt (D-14)">Eckhardt</span></td><td><span class="p-D">D</span></td><td>2 of 2</td><td class=small><a href='#rc-S-2025-05-25-1'>Pass 2nd rdg</a>, <a href='#rc-S-2025-05-25-2'>Pass 3rd rdg</a></td></tr>
+</table>
+<p class=small><b>How often each member voted with the sponsor</b>:</p><table><tr><th>With sponsor</th><th>Members</th></tr>
+<tr><td>100%</td><td class=small><span class=p-D>D (9)</span>: <span title="Carol Alvarado (D-6)">Alvarado</span>, <span title="César Blanco (D-29)">Blanco</span>, <span title="Roland Gutierrez (D-19)">Gutierrez</span>, <span title="Juan &#x27;Chuy&#x27; Hinojosa (D-20)">J. Hinojosa</span>, <span title="Nathan Johnson (D-16)">Johnson</span>, <span title="José Menéndez (D-26)">Menéndez</span>, <span title="Borris Miles (D-13)">Miles</span>, <span title="Royce West (D-23)">West</span>, <span title="Judith Zaffirini (D-21)">Zaffirini</span><br><span class=p-R>R (19)</span>: <span title="Adam Hinojosa (R-27)">A. Hinojosa</span>, <span title="Paul Bettencourt (R-7)">Bettencourt</span>, <span title="Brian Birdwell (R-22)">Birdwell</span>, <span title="Donna Campbell (R-25)">Campbell</span>, <span title="Brandon Creighton (R-4)">Creighton</span>, <span title="Pete Flores (R-24)">Flores</span>, <span title="Brent Hagenbuch (R-30)">Hagenbuch</span>, <span title="Bob Hall (R-2)">Hall</span>, <span title="Kelly Hancock (R-9)">Hancock</span>, <span title="Joan Huffman (R-17)">Huffman</span>, <span title="Bryan Hughes (R-1)">Hughes</span>, <span title="Phil King (R-10)">King</span>, <span title="Mayes Middleton (R-11)">Middleton</span>, <span title="Robert Nichols (R-3)">Nichols</span>, <span title="Tan Parker (R-12)">Parker</span>, <span title="Angela Paxton (R-8)">Paxton</span>, <span title="Charles Perry (R-28)">Perry</span>, <span title="Charles Schwertner (R-5)">Schwertner</span>, <span title="Kevin Sparks (R-31)">Sparks</span></td></tr>
+<tr><td>0%</td><td class=small><span class=p-D>D (2)</span>: <span title="Molly Cook (D-15)">Cook</span>, <span title="Sarah Eckhardt (D-14)">Eckhardt</span></td></tr>
+</table>
+<p class=small><b>Identical voting records</b> (same vote, or same absence, on every record vote):</p><ul class=small>
+<li>29 members (9 D, 20 R): <span title="Adam Hinojosa (R-27)">A. Hinojosa</span>, <span title="Carol Alvarado (D-6)">Alvarado</span>, <span title="Paul Bettencourt (R-7)">Bettencourt</span>, <span title="Brian Birdwell (R-22)">Birdwell</span>, <span title="César Blanco (D-29)">Blanco</span>, <span title="Donna Campbell (R-25)">Campbell</span>, <span title="Brandon Creighton (R-4)">Creighton</span>, <span title="Pete Flores (R-24)">Flores</span>, <span title="Roland Gutierrez (D-19)">Gutierrez</span>, <span title="Brent Hagenbuch (R-30)">Hagenbuch</span>, <span title="Bob Hall (R-2)">Hall</span>, <span title="Kelly Hancock (R-9)">Hancock</span>, <span title="Joan Huffman (R-17)">Huffman</span>, <span title="Bryan Hughes (R-1)">Hughes</span>, <span title="Juan &#x27;Chuy&#x27; Hinojosa (D-20)">J. Hinojosa</span>, <span title="Nathan Johnson (D-16)">Johnson</span>, <span title="Phil King (R-10)">King</span>, <span title="Lois W. Kolkhorst (R-18)">Kolkhorst</span>, <span title="José Menéndez (D-26)">Menéndez</span>, <span title="Mayes Middleton (R-11)">Middleton</span>, <span title="Borris Miles (D-13)">Miles</span>, <span title="Robert Nichols (R-3)">Nichols</span>, <span title="Tan Parker (R-12)">Parker</span>, <span title="Angela Paxton (R-8)">Paxton</span>, <span title="Charles Perry (R-28)">Perry</span>, <span title="Charles Schwertner (R-5)">Schwertner</span>, <span title="Kevin Sparks (R-31)">Sparks</span>, <span title="Royce West (D-23)">West</span>, <span title="Judith Zaffirini (D-21)">Zaffirini</span></li>
+<li>2 members (2 D): <span title="Molly Cook (D-15)">Cook</span>, <span title="Sarah Eckhardt (D-14)">Eckhardt</span></li>
+</ul>
+<h3>House</h3>
+<p class=small><b>Broke with their party's majority</b> (Yea/Nay votes only):</p><table><tr><th>Member</th><th>Pty</th><th>Times</th><th>On</th></tr>
+<tr><td><span title="Salman Bhojani (D-92)">Bhojani</span></td><td><span class="p-D">D</span></td><td>2 of 2</td><td class=small><a href='#rc-H-RV818'>Pass 2nd rdg</a>, <a href='#rc-H-RV966'>Pass 3rd rdg</a></td></tr>
+<tr><td><span title="Philip Cortez (D-117)">Cortez</span></td><td><span class="p-D">D</span></td><td>2 of 2</td><td class=small><a href='#rc-H-RV818'>Pass 2nd rdg</a>, <a href='#rc-H-RV966'>Pass 3rd rdg</a></td></tr>
+<tr><td><span title="R.D. &#x27;Bobby&#x27; Guerra (D-41)">Guerra</span></td><td><span class="p-D">D</span></td><td>2 of 2</td><td class=small><a href='#rc-H-RV818'>Pass 2nd rdg</a>, <a href='#rc-H-RV966'>Pass 3rd rdg</a></td></tr>
+<tr><td><span title="Oscar Longoria (D-35)">Longoria</span></td><td><span class="p-D">D</span></td><td>2 of 2</td><td class=small><a href='#rc-H-RV818'>Pass 2nd rdg</a>, <a href='#rc-H-RV966'>Pass 3rd rdg</a></td></tr>
+<tr><td><span title="Sergio Muñoz, Jr. (D-36)">Muñoz</span></td><td><span class="p-D">D</span></td><td>2 of 2</td><td class=small><a href='#rc-H-RV818'>Pass 2nd rdg</a>, <a href='#rc-H-RV966'>Pass 3rd rdg</a></td></tr>
+<tr><td><span title="Richard Peña Raymond (D-42)">Raymond</span></td><td><span class="p-D">D</span></td><td>2 of 2</td><td class=small><a href='#rc-H-RV818'>Pass 2nd rdg</a>, <a href='#rc-H-RV966'>Pass 3rd rdg</a></td></tr>
+<tr><td><span title="Alma Allen (D-131)">Allen</span></td><td><span class="p-D">D</span></td><td>1 of 2</td><td class=small><a href='#rc-H-RV818'>Pass 2nd rdg</a></td></tr>
+<tr><td><span title="John H. Bucy III (D-136)">Bucy</span></td><td><span class="p-D">D</span></td><td>1 of 2</td><td class=small><a href='#rc-H-RV966'>Pass 3rd rdg</a></td></tr>
+<tr><td><span title="Liz Campos (D-119)">Campos</span></td><td><span class="p-D">D</span></td><td>1 of 2</td><td class=small><a href='#rc-H-RV966'>Pass 3rd rdg</a></td></tr>
+<tr><td><span title="Terry Canales (D-40)">Canales</span></td><td><span class="p-D">D</span></td><td>1 of 2</td><td class=small><a href='#rc-H-RV966'>Pass 3rd rdg</a></td></tr>
+<tr><td><span title="Sheryl Cole (D-46)">Cole</span></td><td><span class="p-D">D</span></td><td>1 of 2</td><td class=small><a href='#rc-H-RV966'>Pass 3rd rdg</a></td></tr>
+<tr><td><span title="Harold V. Dutton, Jr. (D-142)">Dutton</span></td><td><span class="p-D">D</span></td><td>1 of 1</td><td class=small><a href='#rc-H-RV818'>Pass 2nd rdg</a></td></tr>
+<tr><td><span title="Lulu Flores (D-51)">Flores</span></td><td><span class="p-D">D</span></td><td>1 of 2</td><td class=small><a href='#rc-H-RV818'>Pass 2nd rdg</a></td></tr>
+<tr><td><span title="Josey Garcia (D-124)">Garcia, J.</span></td><td><span class="p-D">D</span></td><td>1 of 2</td><td class=small><a href='#rc-H-RV966'>Pass 3rd rdg</a></td></tr>
+<tr><td><span title="Linda Garcia (D-107)">Garcia, L.</span></td><td><span class="p-D">D</span></td><td>1 of 2</td><td class=small><a href='#rc-H-RV966'>Pass 3rd rdg</a></td></tr>
+<tr><td><span title="Erin Elizabeth Gámez (D-38)">Gámez</span></td><td><span class="p-D">D</span></td><td>1 of 2</td><td class=small><a href='#rc-H-RV966'>Pass 3rd rdg</a></td></tr>
+<tr><td><span title="Donna Howard (D-48)">Howard</span></td><td><span class="p-D">D</span></td><td>1 of 2</td><td class=small><a href='#rc-H-RV966'>Pass 3rd rdg</a></td></tr>
+<tr><td><span title="Ann Johnson (D-134)">Johnson</span></td><td><span class="p-D">D</span></td><td>1 of 2</td><td class=small><a href='#rc-H-RV966'>Pass 3rd rdg</a></td></tr>
+<tr><td><span title="Ray López (D-125)">Lopez, R.</span></td><td><span class="p-D">D</span></td><td>1 of 2</td><td class=small><a href='#rc-H-RV818'>Pass 2nd rdg</a></td></tr>
+<tr><td><span title="Armando Martinez (D-39)">Martinez</span></td><td><span class="p-D">D</span></td><td>1 of 2</td><td class=small><a href='#rc-H-RV966'>Pass 3rd rdg</a></td></tr>
+<tr><td><span title="Trey Martinez Fischer (D-116)">Martinez Fischer</span></td><td><span class="p-D">D</span></td><td>1 of 2</td><td class=small><a href='#rc-H-RV966'>Pass 3rd rdg</a></td></tr>
+<tr><td><span title="Eddie Morales (D-74)">Morales, E.</span></td><td><span class="p-D">D</span></td><td>1 of 2</td><td class=small><a href='#rc-H-RV818'>Pass 2nd rdg</a></td></tr>
+<tr><td><span title="Claudia Ordaz (D-79)">Ordaz</span></td><td><span class="p-D">D</span></td><td>1 of 2</td><td class=small><a href='#rc-H-RV818'>Pass 2nd rdg</a></td></tr>
+<tr><td><span title="Mary Ann Perez (D-144)">Perez, M.</span></td><td><span class="p-D">D</span></td><td>1 of 1</td><td class=small><a href='#rc-H-RV966'>Pass 3rd rdg</a></td></tr>
+<tr><td><span title="Vince Perez (D-77)">Perez, V.</span></td><td><span class="p-D">D</span></td><td>1 of 2</td><td class=small><a href='#rc-H-RV818'>Pass 2nd rdg</a></td></tr>
+<tr><td><span title="Mihaela Plesa (D-70)">Plesa</span></td><td><span class="p-D">D</span></td><td>1 of 2</td><td class=small><a href='#rc-H-RV966'>Pass 3rd rdg</a></td></tr>
+<tr><td><span title="Toni Rose (D-110)">Rose</span></td><td><span class="p-D">D</span></td><td>1 of 2</td><td class=small><a href='#rc-H-RV966'>Pass 3rd rdg</a></td></tr>
+<tr><td><span title="James Talarico (D-50)">Talarico</span></td><td><span class="p-D">D</span></td><td>1 of 2</td><td class=small><a href='#rc-H-RV966'>Pass 3rd rdg</a></td></tr>
+</table>
+<p class=small><b>How often each member voted with the sponsor</b>:</p><table><tr><th>With sponsor</th><th>Members</th></tr>
+<tr><td>100%</td><td class=small><span class=p-D>D (8)</span>: <span title="Salman Bhojani (D-92)">Bhojani</span>, <span title="Philip Cortez (D-117)">Cortez</span>, <span title="Harold V. Dutton, Jr. (D-142)">Dutton</span>, <span title="R.D. &#x27;Bobby&#x27; Guerra (D-41)">Guerra</span>, <span title="Oscar Longoria (D-35)">Longoria</span>, <span title="Sergio Muñoz, Jr. (D-36)">Muñoz</span>, <span title="Mary Ann Perez (D-144)">Perez, M.</span>, <span title="Richard Peña Raymond (D-42)">Raymond</span><br><span class=p-R>R (85)</span>: <span title="Daniel Alders (R-6)">Alders</span>, <span title="Trent Ashby (R-9)">Ashby</span>, <span title="Jeff Barry (R-29)">Barry</span>, <span title="Cecil Bell, Jr. (R-3)">Bell, C.</span>, <span title="Keith Bell (R-4)">Bell, K.</span>, <span title="Greg Bonnen (R-24)">Bonnen</span>, <span title="Brad Buckley (R-54)">Buckley</span>, <span title="Benjamin Bumgarner (R-63)">Bumgarner</span>, <span title="Angie Chen Button (R-112)">Button</span>, <span title="Briscoe Cain (R-128)">Cain</span>, <span title="Giovanni Capriglione (R-98)">Capriglione</span>, <span title="David Cook (R-96)">Cook</span>, <span title="Tom Craddick (R-82)">Craddick</span>, <span title="Charles Cunningham (R-127)">Cunningham</span>, <span title="Pat Curry (R-56)">Curry</span>, <span title="Drew Darby (R-72)">Darby</span>, <span title="Mano DeAyala (R-133)">DeAyala</span>, <span title="Jay Dean (R-7)">Dean</span>, <span title="Mark Dorazio (R-122)">Dorazio</span>, <span title="Paul Dyson (R-14)">Dyson</span>, <span title="Caroline Fairly (R-87)">Fairly</span>, <span title="James Frank (R-69)">Frank</span>, <span title="Gary Gates (R-28)">Gates</span>, <span title="Stan Gerdes (R-17)">Gerdes</span>, <span title="Charlie Geren (R-99)">Geren</span>, <span title="Ryan Guillen (R-31)">Guillen</span>, <span title="Sam Harless (R-126)">Harless</span>, <span title="Cody Harris (R-8)">Harris</span>, <span title="Caroline Harris Davila (R-52)">Harris Davila</span>, <span title="Brian Harrison (R-10)">Harrison</span>, <span title="Richard Hayes (R-57)">Hayes</span>, <span title="Cole Hefner (R-5)">Hefner</span>, <span title="Hillary Hickland (R-55)">Hickland</span>, <span title="Janis Holt (R-18)">Holt</span>, <span title="Andy Hopper (R-64)">Hopper</span>, <span title="Lacey Hull (R-138)">Hull</span>, <span title="Todd Hunter (R-32)">Hunter</span>, <span title="Carrie Isaac (R-73)">Isaac</span>, <span title="Helen Kerwin (R-58)">Kerwin</span>, <span title="Ken King (R-88)">King</span>, <span title="Stan Kitzman (R-85)">Kitzman</span>, <span title="Marc LaHood (R-121)">LaHood</span>, <span title="Stan Lambert (R-71)">Lambert</span>, <span title="Jeff Leach (R-67)">Leach</span>, <span title="Terri Leo Wilson (R-23)">Leo Wilson</span>, <span title="Mitch Little (R-65)">Little</span>, <span title="Janie Lopez (R-37)">Lopez, J.</span>, <span title="AJ Louderback (R-30)">Louderback</span>, <span title="David Lowe (R-91)">Lowe</span>, <span title="J.M. Lozano (R-43)">Lozano</span>, <span title="John Lujan (R-118)">Lujan</span>, <span title="Shelley Luther (R-62)">Luther</span>, <span title="Don McLaughlin, Jr. (R-80)">McLaughlin</span>, <span title="John McQueeney (R-97)">McQueeney</span>, <span title="Will Metcalf (R-16)">Metcalf</span>, <span title="Morgan Meyer (R-108)">Meyer</span>, <span title="Brent Money (R-2)">Money</span>, <span title="Matt Morgan (R-26)">Morgan</span>, <span title="Candy Noble (R-89)">Noble</span>, <span title="Mike Olcott (R-60)">Olcott</span>, <span title="Tom Oliverson (R-130)">Oliverson</span>, <span title="Jared Patterson (R-106)">Patterson</span>, <span title="Dennis Paul (R-129)">Paul</span>, <span title="Dade Phelan (R-21)">Phelan</span>, <span title="Katrina Pierson (R-33)">Pierson</span>, <span title="Keresa Richardson (R-61)">Richardson</span>, <span title="Nate Schatzline (R-93)">Schatzline</span>, <span title="Mike Schofield (R-132)">Schofield</span>, <span title="Alan Schoolcraft (R-44)">Schoolcraft</span>, <span title="Matt Shaheen (R-66)">Shaheen</span>, <span title="Joanne Shofner (R-11)">Shofner</span>, <span title="Shelby Slawson (R-59)">Slawson</span>, <span title="John Smithee (R-86)">Smithee</span>, <span title="David Spiller (R-68)">Spiller</span>, <span title="Valoree Swanson (R-150)">Swanson</span>, <span title="Carl H. Tepper (R-84)">Tepper</span>, <span title="Tony Tinderholt (R-94)">Tinderholt</span>, <span title="Steve Toth (R-15)">Toth</span>, <span title="Ellen Troxclair (R-19)">Troxclair</span>, <span title="Gary VanDeaver (R-1)">VanDeaver</span>, <span title="Cody Vasut (R-25)">Vasut</span>, <span title="Denise Villalobos (R-34)">Villalobos</span>, <span title="Wes Virdell (R-53)">Virdell</span>, <span title="Trey Wharton (R-12)">Wharton</span>, <span title="Terry M. Wilson (R-20)">Wilson</span></td></tr>
+<tr><td>25–74%</td><td class=small><span class=p-D>D (20)</span>: <span title="Alma Allen (D-131)">Allen</span>, <span title="John H. Bucy III (D-136)">Bucy</span>, <span title="Liz Campos (D-119)">Campos</span>, <span title="Terry Canales (D-40)">Canales</span>, <span title="Sheryl Cole (D-46)">Cole</span>, <span title="Lulu Flores (D-51)">Flores</span>, <span title="Josey Garcia (D-124)">Garcia, J.</span>, <span title="Linda Garcia (D-107)">Garcia, L.</span>, <span title="Erin Elizabeth Gámez (D-38)">Gámez</span>, <span title="Donna Howard (D-48)">Howard</span>, <span title="Ann Johnson (D-134)">Johnson</span>, <span title="Ray López (D-125)">Lopez, R.</span>, <span title="Armando Martinez (D-39)">Martinez</span>, <span title="Trey Martinez Fischer (D-116)">Martinez Fischer</span>, <span title="Eddie Morales (D-74)">Morales, E.</span>, <span title="Claudia Ordaz (D-79)">Ordaz</span>, <span title="Vince Perez (D-77)">Perez, V.</span>, <span title="Mihaela Plesa (D-70)">Plesa</span>, <span title="Toni Rose (D-110)">Rose</span>, <span title="James Talarico (D-50)">Talarico</span></td></tr>
+<tr><td>0%</td><td class=small><span class=p-D>D (32)</span>: <span title="Rafael Anchía (D-103)">Anchía</span>, <span title="Diego Bernal (D-123)">Bernal</span>, <span title="Rhetta Bowers (D-113)">Bowers</span>, <span title="John Bryant (D-114)">Bryant</span>, <span title="Nicole Collier (D-95)">Collier</span>, <span title="Aicha Davis (D-109)">Davis, A.</span>, <span title="Yvonne Davis (D-111)">Davis, Y.</span>, <span title="Cassandra Garcia Hernandez (D-115)">Garcia Hernandez</span>, <span title="Barbara Gervin-Hawkins (D-120)">Gervin-Hawkins</span>, <span title="Jessica González (D-104)">González, J.</span>, <span title="Vikki Goodwin (D-47)">Goodwin</span>, <span title="Ana Hernandez (D-143)">Hernandez</span>, <span title="Gina Hinojosa (D-49)">Hinojosa</span>, <span title="Jolanda &#x27;Jo&#x27; Jones (D-147)">Jones, J.</span>, <span title="Venton Jones (D-100)">Jones, V.</span>, <span title="Suleman Lalani (D-76)">Lalani</span>, <span title="Christian Manuel (D-22)">Manuel</span>, <span title="Terry Meza (D-105)">Meza</span>, <span title="Joe Moody (D-78)">Moody</span>, <span title="Penny Morales Shaw (D-148)">Morales Shaw</span>, <span title="Christina Morales (D-145)">Morales, C.</span>, <span title="Ron Reynolds (D-27)">Reynolds</span>, <span title="Ana-María Rodríguez Ramos (D-102)">Rodríguez Ramos</span>, <span title="Ramon Romero, Jr. (D-90)">Romero</span>, <span title="Jon Rosenthal (D-135)">Rosenthal</span>, <span title="Lauren A. Simmons (D-146)">Simmons</span>, <span title="Senfronia Thompson (D-141)">Thompson</span>, <span title="Chris Turner (D-101)">Turner</span>, <span title="Hubert Vo (D-149)">Vo</span>, <span title="Charlene Ward Johnson (D-139)">Ward Johnson</span>, <span title="Gene Wu (D-137)">Wu</span>, <span title="Erin Zwiener (D-45)">Zwiener</span></td></tr>
+</table>
+<p class=small><b>Identical voting records</b> (same vote, or same absence, on every record vote):</p><ul class=small>
+<li>87 members (6 D, 81 R): <span title="Daniel Alders (R-6)">Alders</span>, <span title="Trent Ashby (R-9)">Ashby</span>, <span title="Jeff Barry (R-29)">Barry</span>, <span title="Cecil Bell, Jr. (R-3)">Bell, C.</span>, <span title="Keith Bell (R-4)">Bell, K.</span>, <span title="Salman Bhojani (D-92)">Bhojani</span>, <span title="Greg Bonnen (R-24)">Bonnen</span>, <span title="Benjamin Bumgarner (R-63)">Bumgarner</span>, <span title="Briscoe Cain (R-128)">Cain</span>, <span title="Giovanni Capriglione (R-98)">Capriglione</span>, <span title="David Cook (R-96)">Cook</span>, <span title="Philip Cortez (D-117)">Cortez</span>, <span title="Tom Craddick (R-82)">Craddick</span>, <span title="Charles Cunningham (R-127)">Cunningham</span>, <span title="Pat Curry (R-56)">Curry</span>, <span title="Drew Darby (R-72)">Darby</span>, <span title="Mano DeAyala (R-133)">DeAyala</span>, <span title="Jay Dean (R-7)">Dean</span>, <span title="Mark Dorazio (R-122)">Dorazio</span>, <span title="Paul Dyson (R-14)">Dyson</span>, <span title="Caroline Fairly (R-87)">Fairly</span>, <span title="James Frank (R-69)">Frank</span>, <span title="Gary Gates (R-28)">Gates</span>, <span title="Stan Gerdes (R-17)">Gerdes</span>, <span title="Charlie Geren (R-99)">Geren</span>, <span title="R.D. &#x27;Bobby&#x27; Guerra (D-41)">Guerra</span>, <span title="Ryan Guillen (R-31)">Guillen</span>, <span title="Sam Harless (R-126)">Harless</span>, <span title="Cody Harris (R-8)">Harris</span>, <span title="Caroline Harris Davila (R-52)">Harris Davila</span>, <span title="Brian Harrison (R-10)">Harrison</span>, <span title="Richard Hayes (R-57)">Hayes</span>, <span title="Cole Hefner (R-5)">Hefner</span>, <span title="Hillary Hickland (R-55)">Hickland</span>, <span title="Janis Holt (R-18)">Holt</span>, <span title="Andy Hopper (R-64)">Hopper</span>, <span title="Lacey Hull (R-138)">Hull</span>, <span title="Todd Hunter (R-32)">Hunter</span>, <span title="Carrie Isaac (R-73)">Isaac</span>, <span title="Helen Kerwin (R-58)">Kerwin</span>, <span title="Stan Kitzman (R-85)">Kitzman</span>, <span title="Marc LaHood (R-121)">LaHood</span>, <span title="Stan Lambert (R-71)">Lambert</span>, <span title="Jeff Leach (R-67)">Leach</span>, <span title="Terri Leo Wilson (R-23)">Leo Wilson</span>, <span title="Mitch Little (R-65)">Little</span>, <span title="Oscar Longoria (D-35)">Longoria</span>, <span title="Janie Lopez (R-37)">Lopez, J.</span>, <span title="AJ Louderback (R-30)">Louderback</span>, <span title="David Lowe (R-91)">Lowe</span>, <span title="J.M. Lozano (R-43)">Lozano</span>, <span title="John Lujan (R-118)">Lujan</span>, <span title="Shelley Luther (R-62)">Luther</span>, <span title="Don McLaughlin, Jr. (R-80)">McLaughlin</span>, <span title="John McQueeney (R-97)">McQueeney</span>, <span title="Will Metcalf (R-16)">Metcalf</span>, <span title="Morgan Meyer (R-108)">Meyer</span>, <span title="Brent Money (R-2)">Money</span>, <span title="Matt Morgan (R-26)">Morgan</span>, <span title="Sergio Muñoz, Jr. (D-36)">Muñoz</span>, <span title="Candy Noble (R-89)">Noble</span>, <span title="Mike Olcott (R-60)">Olcott</span>, <span title="Tom Oliverson (R-130)">Oliverson</span>, <span title="Angelia Orr (R-13)">Orr</span>, <span title="Jared Patterson (R-106)">Patterson</span>, <span title="Dennis Paul (R-129)">Paul</span>, <span title="Dade Phelan (R-21)">Phelan</span>, <span title="Katrina Pierson (R-33)">Pierson</span>, <span title="Richard Peña Raymond (D-42)">Raymond</span>, <span title="Keresa Richardson (R-61)">Richardson</span>, <span title="Nate Schatzline (R-93)">Schatzline</span>, <span title="Matt Shaheen (R-66)">Shaheen</span>, <span title="Joanne Shofner (R-11)">Shofner</span>, <span title="Shelby Slawson (R-59)">Slawson</span>, <span title="John Smithee (R-86)">Smithee</span>, <span title="David Spiller (R-68)">Spiller</span>, <span title="Valoree Swanson (R-150)">Swanson</span>, <span title="Carl H. Tepper (R-84)">Tepper</span>, <span title="Tony Tinderholt (R-94)">Tinderholt</span>, <span title="Steve Toth (R-15)">Toth</span>, <span title="Ellen Troxclair (R-19)">Troxclair</span>, <span title="Gary VanDeaver (R-1)">VanDeaver</span>, <span title="Cody Vasut (R-25)">Vasut</span>, <span title="Denise Villalobos (R-34)">Villalobos</span>, <span title="Wes Virdell (R-53)">Virdell</span>, <span title="Trey Wharton (R-12)">Wharton</span>, <span title="Terry M. Wilson (R-20)">Wilson</span></li>
+<li>21 members (21 D): <span title="Rafael Anchía (D-103)">Anchía</span>, <span title="John Bryant (D-114)">Bryant</span>, <span title="Nicole Collier (D-95)">Collier</span>, <span title="Aicha Davis (D-109)">Davis, A.</span>, <span title="Cassandra Garcia Hernandez (D-115)">Garcia Hernandez</span>, <span title="Jessica González (D-104)">González, J.</span>, <span title="Vikki Goodwin (D-47)">Goodwin</span>, <span title="Jolanda &#x27;Jo&#x27; Jones (D-147)">Jones, J.</span>, <span title="Venton Jones (D-100)">Jones, V.</span>, <span title="Christian Manuel (D-22)">Manuel</span>, <span title="Penny Morales Shaw (D-148)">Morales Shaw</span>, <span title="Christina Morales (D-145)">Morales, C.</span>, <span title="Ron Reynolds (D-27)">Reynolds</span>, <span title="Ana-María Rodríguez Ramos (D-102)">Rodríguez Ramos</span>, <span title="Ramon Romero, Jr. (D-90)">Romero</span>, <span title="Jon Rosenthal (D-135)">Rosenthal</span>, <span title="Senfronia Thompson (D-141)">Thompson</span>, <span title="Chris Turner (D-101)">Turner</span>, <span title="Charlene Ward Johnson (D-139)">Ward Johnson</span>, <span title="Gene Wu (D-137)">Wu</span>, <span title="Erin Zwiener (D-45)">Zwiener</span></li>
+<li>14 members (14 D): <span title="John H. Bucy III (D-136)">Bucy</span>, <span title="Liz Campos (D-119)">Campos</span>, <span title="Terry Canales (D-40)">Canales</span>, <span title="Sheryl Cole (D-46)">Cole</span>, <span title="Josey Garcia (D-124)">Garcia, J.</span>, <span title="Linda Garcia (D-107)">Garcia, L.</span>, <span title="Erin Elizabeth Gámez (D-38)">Gámez</span>, <span title="Donna Howard (D-48)">Howard</span>, <span title="Ann Johnson (D-134)">Johnson</span>, <span title="Armando Martinez (D-39)">Martinez</span>, <span title="Trey Martinez Fischer (D-116)">Martinez Fischer</span>, <span title="Mihaela Plesa (D-70)">Plesa</span>, <span title="Toni Rose (D-110)">Rose</span>, <span title="James Talarico (D-50)">Talarico</span></li>
+<li>6 members (6 D): <span title="Alma Allen (D-131)">Allen</span>, <span title="Lulu Flores (D-51)">Flores</span>, <span title="Ray López (D-125)">Lopez, R.</span>, <span title="Eddie Morales (D-74)">Morales, E.</span>, <span title="Claudia Ordaz (D-79)">Ordaz</span>, <span title="Vince Perez (D-77)">Perez, V.</span></li>
+<li>6 members (6 D): <span title="Diego Bernal (D-123)">Bernal</span>, <span title="Yvonne Davis (D-111)">Davis, Y.</span>, <span title="Ana Hernandez (D-143)">Hernandez</span>, <span title="Gina Hinojosa (D-49)">Hinojosa</span>, <span title="Terry Meza (D-105)">Meza</span>, <span title="Hubert Vo (D-149)">Vo</span></li>
+<li>5 members (5 D): <span title="Rhetta Bowers (D-113)">Bowers</span>, <span title="Barbara Gervin-Hawkins (D-120)">Gervin-Hawkins</span>, <span title="Suleman Lalani (D-76)">Lalani</span>, <span title="Joe Moody (D-78)">Moody</span>, <span title="Lauren A. Simmons (D-146)">Simmons</span></li>
+<li>4 members (1 D, 3 R): <span title="Angie Chen Button (R-112)">Button</span>, <span title="Harold V. Dutton, Jr. (D-142)">Dutton</span>, <span title="Ken King (R-88)">King</span>, <span title="Alan Schoolcraft (R-44)">Schoolcraft</span></li>
+<li>4 members (2 D, 2 R): <span title="Dustin Burrows (R-83)">Burrows (Speaker)</span>, <span title="Mary González (D-75)">González, M.</span>, <span title="Brooks Landgraf (R-81)">Landgraf</span>, <span title="Armando Walle (D-140)">Walle</span></li>
+</ul>
+<h2 id=text>Bill text</h2><p class='small muted'>In the full text, <ins>underlined</ins> is language the bill adds to current law and <del>struck</del> is language it removes (in the .txt copies: {+added+}, [-struck-]).</p><table><tr><th>Version</th><th>Official</th><th>Local copy</th><th>Other documents</th></tr>
+<tr><td>Introduced</td><td><a href='https://capitol.texas.gov/tlodocs/89R/billtext/html/HB00128I.htm'>HTML</a> · <a href='https://capitol.texas.gov/tlodocs/89R/billtext/pdf/HB00128I.pdf'>PDF</a></td><td><a href='text/01-introduced.txt'>text</a></td><td class=small><a href='https://capitol.texas.gov/tlodocs/89R/fiscalnotes/html/HB00128I.htm'>fiscalnotes</a></td></tr>
+<tr><td>House Committee Report</td><td><a href='https://capitol.texas.gov/tlodocs/89R/billtext/html/HB00128H.htm'>HTML</a> · <a href='https://capitol.texas.gov/tlodocs/89R/billtext/pdf/HB00128H.pdf'>PDF</a></td><td><a href='text/02-house-committee-report.txt'>text</a> · <a href='text/02-house-committee-report.diff'>diff vs previous</a></td><td class=small><a href='https://capitol.texas.gov/tlodocs/89R/analysis/html/HB00128H.htm'>analysis</a> · <a href='https://capitol.texas.gov/tlodocs/89R/witlistbill/html/HB00128H.htm'>witlistbill</a> · <a href='https://capitol.texas.gov/tlodocs/89R/summcomm/html/HB00128.htm'>summcomm</a></td></tr>
+<tr><td>Engrossed</td><td><a href='https://capitol.texas.gov/tlodocs/89R/billtext/html/HB00128E.htm'>HTML</a> · <a href='https://capitol.texas.gov/tlodocs/89R/billtext/pdf/HB00128E.pdf'>PDF</a></td><td><a href='text/03-engrossed.txt'>text</a> · <a href='text/03-engrossed.diff'>diff vs previous</a></td><td class=small><a href='https://capitol.texas.gov/tlodocs/89R/fiscalnotes/html/HB00128E.htm'>fiscalnotes</a> · <a href='https://capitol.texas.gov/tlodocs/89R/analysis/html/HB00128E.htm'>analysis</a></td></tr>
+<tr><td>Senate Committee Report</td><td><a href='https://capitol.texas.gov/tlodocs/89R/billtext/html/HB00128S.htm'>HTML</a> · <a href='https://capitol.texas.gov/tlodocs/89R/billtext/pdf/HB00128S.pdf'>PDF</a></td><td><a href='text/04-senate-committee-report.txt'>text</a> · <a href='text/04-senate-committee-report.diff'>diff vs previous</a></td><td class=small><a href='https://capitol.texas.gov/tlodocs/89R/witlistbill/html/HB00128S.htm'>witlistbill</a></td></tr>
+<tr><td>Enrolled</td><td><a href='https://capitol.texas.gov/tlodocs/89R/billtext/html/HB00128F.htm'>HTML</a> · <a href='https://capitol.texas.gov/tlodocs/89R/billtext/pdf/HB00128F.pdf'>PDF</a></td><td><a href='text/05-enrolled.txt'>text</a> · <a href='text/05-enrolled.diff'>diff vs previous</a></td><td class=small></td></tr>
+</table>
+<h3 id=changes>How the text changed</h3><p class='small muted'>Each version compared with the one before it, paragraph by paragraph, like a code review. Changed words are highlighted; unchanged stretches are folded (click to expand). <span class=mk>{+ +}</span> and <span class=mk>[- -]</span> are the bill's own marks for language it adds to or strikes from current law.</p>
+<details class=diff open><summary class=diffhead><span class=stat><span class=plus>+11</span> <span class=minus>−3</span> <i class=ba></i><i class=ba></i><i class=ba></i><i class=ba></i><i class=bd></i></span><b>Introduced (as filed)</b> → <b>Enrolled (final)</b><span class='muted small'> · paragraphs changed</span></summary><table class=difft><tr class=del><td class=ln>1</td><td class=ln></td><td class=sg>−</td><td class=tx>89R4427 CS-F</td></tr><tr class=del><td class=ln>2</td><td class=ln></td><td class=sg>−</td><td class=tx><span class=wdel>By: Orr </span>H.B. No. 128</td></tr><tr class=add><td class=ln></td><td class=ln>1</td><td class=sg>+</td><td class=tx>H.B. No. 128</td></tr><tr class=del><td class=ln>3</td><td class=ln></td><td class=sg>−</td><td class=tx>A BILL TO BE ENTITLED AN ACT</td></tr><tr class=add><td class=ln></td><td class=ln>2</td><td class=sg>+</td><td class=tx>AN ACT</td></tr><tr class=ctx><td class=ln>4</td><td class=ln>3</td><td class=sg></td><td class=tx>relating to certain sister-city agreements between governmental entities and foreign countries and communities.</td></tr><tr class=ctx><td class=ln>5</td><td class=ln>4</td><td class=sg></td><td class=tx>BE IT ENACTED BY THE LEGISLATURE OF THE STATE OF TEXAS:</td></tr><tr class=skip><td colspan=4><button type=button data-expand=d0>⋯ 17 unchanged paragraphs</button></td></tr><tr class='ctx hid d0'><td class=ln>6</td><td class=ln>5</td><td class=sg></td><td class=tx>SECTION 1. Title 7, Government Code, is amended by adding Chapter 795 to read as follows:</td></tr><tr class='ctx hid d0'><td class=ln>7</td><td class=ln>6</td><td class=sg></td><td class=tx><span class=mk>{+</span>CHAPTER 795. SISTER-CITY AGREEMENTS<span class=mk>+}</span></td></tr><tr class='ctx hid d0'><td class=ln>8</td><td class=ln>7</td><td class=sg></td><td class=tx><span class=mk>{+</span>Sec. 795.001. DEFINITIONS. In this chapter:<span class=mk>+}</span></td></tr><tr class='ctx hid d0'><td class=ln>9</td><td class=ln>8</td><td class=sg></td><td class=tx><span class=mk>{+</span>(1) &quot;Foreign adversary&quot; means:<span class=mk>+}</span></td></tr><tr class='ctx hid d0'><td class=ln>10</td><td class=ln>9</td><td class=sg></td><td class=tx><span class=mk>{+</span>(A) China, Iran, North Korea, or Russia; or<span class=mk>+}</span></td></tr><tr class='ctx hid d0'><td class=ln>11</td><td class=ln>10</td><td class=sg></td><td class=tx><span class=mk>{+</span>(B) a country that is a designated country for purposes of Chapter 2275.<span class=mk>+}</span></td></tr><tr class='ctx hid d0'><td class=ln>12</td><td class=ln>11</td><td class=sg></td><td class=tx><span class=mk>{+</span>(2) &quot;Governmental entity&quot; means a state agency or a political subdivision of this state.<span class=mk>+}</span></td></tr><tr class='ctx hid d0'><td class=ln>13</td><td class=ln>12</td><td class=sg></td><td class=tx><span class=mk>{+</span>(3) &quot;Sister-city agreement&quot; means an agreement that:<span class=mk>+}</span></td></tr><tr class='ctx hid d0'><td class=ln>14</td><td class=ln>13</td><td class=sg></td><td class=tx><span class=mk>{+</span>(A) is between a governmental entity and a country other than the United States or a community located in a country other than the United States;<span class=mk>+}</span></td></tr><tr class='ctx hid d0'><td class=ln>15</td><td class=ln>14</td><td class=sg></td><td class=tx><span class=mk>{+</span>(B) is recognized by a nonprofit organization exempt from federal income taxation under Section 501(c)(3), Internal Revenue Code of 1986, that serves as the national membership organization for individual sister cities, counties, and states across the United States; and<span class=mk>+}</span></td></tr><tr class='ctx hid d0'><td class=ln>16</td><td class=ln>15</td><td class=sg></td><td class=tx><span class=mk>{+</span>(C) reflects a commitment to foster and strengthen opportunities for cultural and educational exchange programs and tourism and to encourage other types of bilateral cooperation between the parties to the agreement.<span class=mk>+}</span></td></tr><tr class='ctx hid d0'><td class=ln>17</td><td class=ln>16</td><td class=sg></td><td class=tx><span class=mk>{+</span>(4) &quot;State agency&quot; has the meaning assigned by Section 751.001.<span class=mk>+}</span></td></tr><tr class='ctx hid d0'><td class=ln>18</td><td class=ln>17</td><td class=sg></td><td class=tx><span class=mk>{+</span>Sec. 795.002. STATE POLICY REGARDING AGREEMENTS. It is the policy of this state to encourage sister-city agreements between governmental entities and countries that are allies of the United States, including countries designated as major non-NATO allies under federal law and the Republic of China, commonly known as Taiwan, and communities located in those countries.<span class=mk>+}</span></td></tr><tr class='ctx hid d0'><td class=ln>19</td><td class=ln>18</td><td class=sg></td><td class=tx><span class=mk>{+</span>Sec. 795.003. CERTAIN AGREEMENTS PROHIBITED. A governmental entity may not establish, maintain, or renew a sister-city agreement with:<span class=mk>+}</span></td></tr><tr class='ctx hid d0'><td class=ln>20</td><td class=ln>19</td><td class=sg></td><td class=tx><span class=mk>{+</span>(1) a country that is a foreign adversary; or<span class=mk>+}</span></td></tr><tr class='ctx hid d0'><td class=ln>21</td><td class=ln>20</td><td class=sg></td><td class=tx><span class=mk>{+</span>(2) a community located in a country described by Subdivision (1).<span class=mk>+}</span></td></tr><tr class='ctx hid d0'><td class=ln>22</td><td class=ln>21</td><td class=sg></td><td class=tx><span class=mk>{+</span>Sec. 795.004. WITHDRAWAL FROM CERTAIN EXISTING AGREEMENTS. (a) A governmental entity that on September 1, 2025, is a party to a sister-city agreement described by Section 795.003 shall withdraw from the agreement not later than October 1, 2025.<span class=mk>+}</span></td></tr><tr class=ctx><td class=ln>23</td><td class=ln>22</td><td class=sg></td><td class=tx><span class=mk>{+</span>(b) This section expires January 1, 2027.<span class=mk>+}</span></td></tr><tr class=ctx><td class=ln>24</td><td class=ln>23</td><td class=sg></td><td class=tx>SECTION 2. This Act takes effect September 1, 2025.</td></tr><tr class=add><td class=ln></td><td class=ln>24</td><td class=sg>+</td><td class=tx>______________________________ ______________________________</td></tr><tr class=add><td class=ln></td><td class=ln>25</td><td class=sg>+</td><td class=tx>President of the Senate Speaker of the House</td></tr><tr class=add><td class=ln></td><td class=ln>26</td><td class=sg>+</td><td class=tx>I certify that H.B. No. 128 was passed by the House on April 30, 2025, by the following vote: Yeas 104, Nays 32, 2 present, not voting.</td></tr><tr class=add><td class=ln></td><td class=ln>27</td><td class=sg>+</td><td class=tx>______________________________ Chief Clerk of the House</td></tr><tr class=add><td class=ln></td><td class=ln>28</td><td class=sg>+</td><td class=tx>I certify that H.B. No. 128 was passed by the Senate on May 25, 2025, by the following vote: Yeas 29, Nays 2.</td></tr><tr class=add><td class=ln></td><td class=ln>29</td><td class=sg>+</td><td class=tx>______________________________ Secretary of the Senate APPROVED: _____________________</td></tr><tr class=add><td class=ln></td><td class=ln>30</td><td class=sg>+</td><td class=tx>Date</td></tr><tr class=add><td class=ln></td><td class=ln>31</td><td class=sg>+</td><td class=tx>_____________________</td></tr><tr class=add><td class=ln></td><td class=ln>32</td><td class=sg>+</td><td class=tx>Governor</td></tr></table></details>
+<details class=diff><summary class=diffhead><span class=stat><span class=plus>+1</span> <span class=minus>−1</span> <i class=ba></i><i class=ba></i><i class=bd></i><i class=bd></i><i class=bd></i></span><b>Introduced</b> → <b>House Committee Report</b><span class='muted small'> · paragraphs changed</span></summary><table class=difft><tr class=ctx><td class=ln>1</td><td class=ln>1</td><td class=sg></td><td class=tx>89R4427 CS-F</td></tr><tr class=del><td class=ln>2</td><td class=ln></td><td class=sg>−</td><td class=tx>By: Orr H.B. No. 128</td></tr><tr class=add><td class=ln></td><td class=ln>2</td><td class=sg>+</td><td class=tx>By: Orr<span class=wadd>, Hefner, McLaughlin, et al.</span> H.B. No. 128</td></tr><tr class=ctx><td class=ln>3</td><td class=ln>3</td><td class=sg></td><td class=tx>A BILL TO BE ENTITLED AN ACT</td></tr><tr class=ctx><td class=ln>4</td><td class=ln>4</td><td class=sg></td><td class=tx>relating to certain sister-city agreements between governmental entities and foreign countries and communities.</td></tr><tr class=skip><td colspan=4><button type=button data-expand=d1>⋯ 20 unchanged paragraphs</button></td></tr><tr class='ctx hid d1'><td class=ln>5</td><td class=ln>5</td><td class=sg></td><td class=tx>BE IT ENACTED BY THE LEGISLATURE OF THE STATE OF TEXAS:</td></tr><tr class='ctx hid d1'><td class=ln>6</td><td class=ln>6</td><td class=sg></td><td class=tx>SECTION 1. Title 7, Government Code, is amended by adding Chapter 795 to read as follows:</td></tr><tr class='ctx hid d1'><td class=ln>7</td><td class=ln>7</td><td class=sg></td><td class=tx><span class=mk>{+</span>CHAPTER 795. SISTER-CITY AGREEMENTS<span class=mk>+}</span></td></tr><tr class='ctx hid d1'><td class=ln>8</td><td class=ln>8</td><td class=sg></td><td class=tx><span class=mk>{+</span>Sec. 795.001. DEFINITIONS. In this chapter:<span class=mk>+}</span></td></tr><tr class='ctx hid d1'><td class=ln>9</td><td class=ln>9</td><td class=sg></td><td class=tx><span class=mk>{+</span>(1) &quot;Foreign adversary&quot; means:<span class=mk>+}</span></td></tr><tr class='ctx hid d1'><td class=ln>10</td><td class=ln>10</td><td class=sg></td><td class=tx><span class=mk>{+</span>(A) China, Iran, North Korea, or Russia; or<span class=mk>+}</span></td></tr><tr class='ctx hid d1'><td class=ln>11</td><td class=ln>11</td><td class=sg></td><td class=tx><span class=mk>{+</span>(B) a country that is a designated country for purposes of Chapter 2275.<span class=mk>+}</span></td></tr><tr class='ctx hid d1'><td class=ln>12</td><td class=ln>12</td><td class=sg></td><td class=tx><span class=mk>{+</span>(2) &quot;Governmental entity&quot; means a state agency or a political subdivision of this state.<span class=mk>+}</span></td></tr><tr class='ctx hid d1'><td class=ln>13</td><td class=ln>13</td><td class=sg></td><td class=tx><span class=mk>{+</span>(3) &quot;Sister-city agreement&quot; means an agreement that:<span class=mk>+}</span></td></tr><tr class='ctx hid d1'><td class=ln>14</td><td class=ln>14</td><td class=sg></td><td class=tx><span class=mk>{+</span>(A) is between a governmental entity and a country other than the United States or a community located in a country other than the United States;<span class=mk>+}</span></td></tr><tr class='ctx hid d1'><td class=ln>15</td><td class=ln>15</td><td class=sg></td><td class=tx><span class=mk>{+</span>(B) is recognized by a nonprofit organization exempt from federal income taxation under Section 501(c)(3), Internal Revenue Code of 1986, that serves as the national membership organization for individual sister cities, counties, and states across the United States; and<span class=mk>+}</span></td></tr><tr class='ctx hid d1'><td class=ln>16</td><td class=ln>16</td><td class=sg></td><td class=tx><span class=mk>{+</span>(C) reflects a commitment to foster and strengthen opportunities for cultural and educational exchange programs and tourism and to encourage other types of bilateral cooperation between the parties to the agreement.<span class=mk>+}</span></td></tr><tr class='ctx hid d1'><td class=ln>17</td><td class=ln>17</td><td class=sg></td><td class=tx><span class=mk>{+</span>(4) &quot;State agency&quot; has the meaning assigned by Section 751.001.<span class=mk>+}</span></td></tr><tr class='ctx hid d1'><td class=ln>18</td><td class=ln>18</td><td class=sg></td><td class=tx><span class=mk>{+</span>Sec. 795.002. STATE POLICY REGARDING AGREEMENTS. It is the policy of this state to encourage sister-city agreements between governmental entities and countries that are allies of the United States, including countries designated as major non-NATO allies under federal law and the Republic of China, commonly known as Taiwan, and communities located in those countries.<span class=mk>+}</span></td></tr><tr class='ctx hid d1'><td class=ln>19</td><td class=ln>19</td><td class=sg></td><td class=tx><span class=mk>{+</span>Sec. 795.003. CERTAIN AGREEMENTS PROHIBITED. A governmental entity may not establish, maintain, or renew a sister-city agreement with:<span class=mk>+}</span></td></tr><tr class='ctx hid d1'><td class=ln>20</td><td class=ln>20</td><td class=sg></td><td class=tx><span class=mk>{+</span>(1) a country that is a foreign adversary; or<span class=mk>+}</span></td></tr><tr class='ctx hid d1'><td class=ln>21</td><td class=ln>21</td><td class=sg></td><td class=tx><span class=mk>{+</span>(2) a community located in a country described by Subdivision (1).<span class=mk>+}</span></td></tr><tr class='ctx hid d1'><td class=ln>22</td><td class=ln>22</td><td class=sg></td><td class=tx><span class=mk>{+</span>Sec. 795.004. WITHDRAWAL FROM CERTAIN EXISTING AGREEMENTS. (a) A governmental entity that on September 1, 2025, is a party to a sister-city agreement described by Section 795.003 shall withdraw from the agreement not later than October 1, 2025.<span class=mk>+}</span></td></tr><tr class='ctx hid d1'><td class=ln>23</td><td class=ln>23</td><td class=sg></td><td class=tx><span class=mk>{+</span>(b) This section expires January 1, 2027.<span class=mk>+}</span></td></tr><tr class='ctx hid d1'><td class=ln>24</td><td class=ln>24</td><td class=sg></td><td class=tx>SECTION 2. This Act takes effect September 1, 2025.</td></tr></table></details>
+<details class=diff><summary class=diffhead><span class=stat><span class=plus>+0</span> <span class=minus>−0</span> </span><b>House Committee Report</b> → <b>Engrossed</b><span class='muted small'> · paragraphs changed</span></summary><table class=difft><tr><td class=ctxnote colspan=4>No text changes.</td></tr><tr class=skip><td colspan=4><button type=button data-expand=d2>⋯ 24 unchanged paragraphs</button></td></tr><tr class='ctx hid d2'><td class=ln>1</td><td class=ln>1</td><td class=sg></td><td class=tx>89R4427 CS-F</td></tr><tr class='ctx hid d2'><td class=ln>2</td><td class=ln>2</td><td class=sg></td><td class=tx>By: Orr, Hefner, McLaughlin, et al. H.B. No. 128</td></tr><tr class='ctx hid d2'><td class=ln>3</td><td class=ln>3</td><td class=sg></td><td class=tx>A BILL TO BE ENTITLED AN ACT</td></tr><tr class='ctx hid d2'><td class=ln>4</td><td class=ln>4</td><td class=sg></td><td class=tx>relating to certain sister-city agreements between governmental entities and foreign countries and communities.</td></tr><tr class='ctx hid d2'><td class=ln>5</td><td class=ln>5</td><td class=sg></td><td class=tx>BE IT ENACTED BY THE LEGISLATURE OF THE STATE OF TEXAS:</td></tr><tr class='ctx hid d2'><td class=ln>6</td><td class=ln>6</td><td class=sg></td><td class=tx>SECTION 1. Title 7, Government Code, is amended by adding Chapter 795 to read as follows:</td></tr><tr class='ctx hid d2'><td class=ln>7</td><td class=ln>7</td><td class=sg></td><td class=tx><span class=mk>{+</span>CHAPTER 795. SISTER-CITY AGREEMENTS<span class=mk>+}</span></td></tr><tr class='ctx hid d2'><td class=ln>8</td><td class=ln>8</td><td class=sg></td><td class=tx><span class=mk>{+</span>Sec. 795.001. DEFINITIONS. In this chapter:<span class=mk>+}</span></td></tr><tr class='ctx hid d2'><td class=ln>9</td><td class=ln>9</td><td class=sg></td><td class=tx><span class=mk>{+</span>(1) &quot;Foreign adversary&quot; means:<span class=mk>+}</span></td></tr><tr class='ctx hid d2'><td class=ln>10</td><td class=ln>10</td><td class=sg></td><td class=tx><span class=mk>{+</span>(A) China, Iran, North Korea, or Russia; or<span class=mk>+}</span></td></tr><tr class='ctx hid d2'><td class=ln>11</td><td class=ln>11</td><td class=sg></td><td class=tx><span class=mk>{+</span>(B) a country that is a designated country for purposes of Chapter 2275.<span class=mk>+}</span></td></tr><tr class='ctx hid d2'><td class=ln>12</td><td class=ln>12</td><td class=sg></td><td class=tx><span class=mk>{+</span>(2) &quot;Governmental entity&quot; means a state agency or a political subdivision of this state.<span class=mk>+}</span></td></tr><tr class='ctx hid d2'><td class=ln>13</td><td class=ln>13</td><td class=sg></td><td class=tx><span class=mk>{+</span>(3) &quot;Sister-city agreement&quot; means an agreement that:<span class=mk>+}</span></td></tr><tr class='ctx hid d2'><td class=ln>14</td><td class=ln>14</td><td class=sg></td><td class=tx><span class=mk>{+</span>(A) is between a governmental entity and a country other than the United States or a community located in a country other than the United States;<span class=mk>+}</span></td></tr><tr class='ctx hid d2'><td class=ln>15</td><td class=ln>15</td><td class=sg></td><td class=tx><span class=mk>{+</span>(B) is recognized by a nonprofit organization exempt from federal income taxation under Section 501(c)(3), Internal Revenue Code of 1986, that serves as the national membership organization for individual sister cities, counties, and states across the United States; and<span class=mk>+}</span></td></tr><tr class='ctx hid d2'><td class=ln>16</td><td class=ln>16</td><td class=sg></td><td class=tx><span class=mk>{+</span>(C) reflects a commitment to foster and strengthen opportunities for cultural and educational exchange programs and tourism and to encourage other types of bilateral cooperation between the parties to the agreement.<span class=mk>+}</span></td></tr><tr class='ctx hid d2'><td class=ln>17</td><td class=ln>17</td><td class=sg></td><td class=tx><span class=mk>{+</span>(4) &quot;State agency&quot; has the meaning assigned by Section 751.001.<span class=mk>+}</span></td></tr><tr class='ctx hid d2'><td class=ln>18</td><td class=ln>18</td><td class=sg></td><td class=tx><span class=mk>{+</span>Sec. 795.002. STATE POLICY REGARDING AGREEMENTS. It is the policy of this state to encourage sister-city agreements between governmental entities and countries that are allies of the United States, including countries designated as major non-NATO allies under federal law and the Republic of China, commonly known as Taiwan, and communities located in those countries.<span class=mk>+}</span></td></tr><tr class='ctx hid d2'><td class=ln>19</td><td class=ln>19</td><td class=sg></td><td class=tx><span class=mk>{+</span>Sec. 795.003. CERTAIN AGREEMENTS PROHIBITED. A governmental entity may not establish, maintain, or renew a sister-city agreement with:<span class=mk>+}</span></td></tr><tr class='ctx hid d2'><td class=ln>20</td><td class=ln>20</td><td class=sg></td><td class=tx><span class=mk>{+</span>(1) a country that is a foreign adversary; or<span class=mk>+}</span></td></tr><tr class='ctx hid d2'><td class=ln>21</td><td class=ln>21</td><td class=sg></td><td class=tx><span class=mk>{+</span>(2) a community located in a country described by Subdivision (1).<span class=mk>+}</span></td></tr><tr class='ctx hid d2'><td class=ln>22</td><td class=ln>22</td><td class=sg></td><td class=tx><span class=mk>{+</span>Sec. 795.004. WITHDRAWAL FROM CERTAIN EXISTING AGREEMENTS. (a) A governmental entity that on September 1, 2025, is a party to a sister-city agreement described by Section 795.003 shall withdraw from the agreement not later than October 1, 2025.<span class=mk>+}</span></td></tr><tr class='ctx hid d2'><td class=ln>23</td><td class=ln>23</td><td class=sg></td><td class=tx><span class=mk>{+</span>(b) This section expires January 1, 2027.<span class=mk>+}</span></td></tr><tr class='ctx hid d2'><td class=ln>24</td><td class=ln>24</td><td class=sg></td><td class=tx>SECTION 2. This Act takes effect September 1, 2025.</td></tr></table></details>
+<details class=diff><summary class=diffhead><span class=stat><span class=plus>+4</span> <span class=minus>−2</span> <i class=ba></i><i class=ba></i><i class=ba></i><i class=bd></i><i class=bd></i></span><b>Engrossed</b> → <b>Senate Committee Report</b><span class='muted small'> · paragraphs changed</span></summary><table class=difft><tr class=del><td class=ln>1</td><td class=ln></td><td class=sg>−</td><td class=tx>89R4427 CS-F</td></tr><tr class=del><td class=ln>2</td><td class=ln></td><td class=sg>−</td><td class=tx>By: Orr, <span class=wdel>Hefner, McLaughlin, </span>et al. H.B. No. 128</td></tr><tr class=add><td class=ln></td><td class=ln>1</td><td class=sg>+</td><td class=tx>By: Orr, et al.<span class=wadd> (Senate Sponsor - Kolkhorst)</span> H.B. No. 128</td></tr><tr class=add><td class=ln></td><td class=ln>2</td><td class=sg>+</td><td class=tx>(In the Senate - Received from the House April 30, 2025; May 5, 2025, read first time and referred to Committee on State Affairs; May 15, 2025, reported favorably by the following vote: Yeas 11, Nays 0; May 15, 2025, sent to printer.)</td></tr><tr class=add><td class=ln></td><td class=ln>3</td><td class=sg>+</td><td class=tx>Click here to see the committee vote</td></tr><tr class=ctx><td class=ln>3</td><td class=ln>4</td><td class=sg></td><td class=tx>A BILL TO BE ENTITLED AN ACT</td></tr><tr class=ctx><td class=ln>4</td><td class=ln>5</td><td class=sg></td><td class=tx>relating to certain sister-city agreements between governmental entities and foreign countries and communities.</td></tr><tr class=skip><td colspan=4><button type=button data-expand=d3>⋯ 18 unchanged paragraphs</button></td></tr><tr class='ctx hid d3'><td class=ln>5</td><td class=ln>6</td><td class=sg></td><td class=tx>BE IT ENACTED BY THE LEGISLATURE OF THE STATE OF TEXAS:</td></tr><tr class='ctx hid d3'><td class=ln>6</td><td class=ln>7</td><td class=sg></td><td class=tx>SECTION 1. Title 7, Government Code, is amended by adding Chapter 795 to read as follows:</td></tr><tr class='ctx hid d3'><td class=ln>7</td><td class=ln>8</td><td class=sg></td><td class=tx><span class=mk>{+</span>CHAPTER 795. SISTER-CITY AGREEMENTS<span class=mk>+}</span></td></tr><tr class='ctx hid d3'><td class=ln>8</td><td class=ln>9</td><td class=sg></td><td class=tx><span class=mk>{+</span>Sec. 795.001. DEFINITIONS. In this chapter:<span class=mk>+}</span></td></tr><tr class='ctx hid d3'><td class=ln>9</td><td class=ln>10</td><td class=sg></td><td class=tx><span class=mk>{+</span>(1) &quot;Foreign adversary&quot; means:<span class=mk>+}</span></td></tr><tr class='ctx hid d3'><td class=ln>10</td><td class=ln>11</td><td class=sg></td><td class=tx><span class=mk>{+</span>(A) China, Iran, North Korea, or Russia; or<span class=mk>+}</span></td></tr><tr class='ctx hid d3'><td class=ln>11</td><td class=ln>12</td><td class=sg></td><td class=tx><span class=mk>{+</span>(B) a country that is a designated country for purposes of Chapter 2275.<span class=mk>+}</span></td></tr><tr class='ctx hid d3'><td class=ln>12</td><td class=ln>13</td><td class=sg></td><td class=tx><span class=mk>{+</span>(2) &quot;Governmental entity&quot; means a state agency or a political subdivision of this state.<span class=mk>+}</span></td></tr><tr class='ctx hid d3'><td class=ln>13</td><td class=ln>14</td><td class=sg></td><td class=tx><span class=mk>{+</span>(3) &quot;Sister-city agreement&quot; means an agreement that:<span class=mk>+}</span></td></tr><tr class='ctx hid d3'><td class=ln>14</td><td class=ln>15</td><td class=sg></td><td class=tx><span class=mk>{+</span>(A) is between a governmental entity and a country other than the United States or a community located in a country other than the United States;<span class=mk>+}</span></td></tr><tr class='ctx hid d3'><td class=ln>15</td><td class=ln>16</td><td class=sg></td><td class=tx><span class=mk>{+</span>(B) is recognized by a nonprofit organization exempt from federal income taxation under Section 501(c)(3), Internal Revenue Code of 1986, that serves as the national membership organization for individual sister cities, counties, and states across the United States; and<span class=mk>+}</span></td></tr><tr class='ctx hid d3'><td class=ln>16</td><td class=ln>17</td><td class=sg></td><td class=tx><span class=mk>{+</span>(C) reflects a commitment to foster and strengthen opportunities for cultural and educational exchange programs and tourism and to encourage other types of bilateral cooperation between the parties to the agreement.<span class=mk>+}</span></td></tr><tr class='ctx hid d3'><td class=ln>17</td><td class=ln>18</td><td class=sg></td><td class=tx><span class=mk>{+</span>(4) &quot;State agency&quot; has the meaning assigned by Section 751.001.<span class=mk>+}</span></td></tr><tr class='ctx hid d3'><td class=ln>18</td><td class=ln>19</td><td class=sg></td><td class=tx><span class=mk>{+</span>Sec. 795.002. STATE POLICY REGARDING AGREEMENTS. It is the policy of this state to encourage sister-city agreements between governmental entities and countries that are allies of the United States, including countries designated as major non-NATO allies under federal law and the Republic of China, commonly known as Taiwan, and communities located in those countries.<span class=mk>+}</span></td></tr><tr class='ctx hid d3'><td class=ln>19</td><td class=ln>20</td><td class=sg></td><td class=tx><span class=mk>{+</span>Sec. 795.003. CERTAIN AGREEMENTS PROHIBITED. A governmental entity may not establish, maintain, or renew a sister-city agreement with:<span class=mk>+}</span></td></tr><tr class='ctx hid d3'><td class=ln>20</td><td class=ln>21</td><td class=sg></td><td class=tx><span class=mk>{+</span>(1) a country that is a foreign adversary; or<span class=mk>+}</span></td></tr><tr class='ctx hid d3'><td class=ln>21</td><td class=ln>22</td><td class=sg></td><td class=tx><span class=mk>{+</span>(2) a community located in a country described by Subdivision (1).<span class=mk>+}</span></td></tr><tr class='ctx hid d3'><td class=ln>22</td><td class=ln>23</td><td class=sg></td><td class=tx><span class=mk>{+</span>Sec. 795.004. WITHDRAWAL FROM CERTAIN EXISTING AGREEMENTS. (a) A governmental entity that on September 1, 2025, is a party to a sister-city agreement described by Section 795.003 shall withdraw from the agreement not later than October 1, 2025.<span class=mk>+}</span></td></tr><tr class=ctx><td class=ln>23</td><td class=ln>24</td><td class=sg></td><td class=tx><span class=mk>{+</span>(b) This section expires January 1, 2027.<span class=mk>+}</span></td></tr><tr class=ctx><td class=ln>24</td><td class=ln>25</td><td class=sg></td><td class=tx>SECTION 2. This Act takes effect September 1, 2025.</td></tr><tr class=add><td class=ln></td><td class=ln>26</td><td class=sg>+</td><td class=tx>* * * * *</td></tr></table></details>
+<details class=diff><summary class=diffhead><span class=stat><span class=plus>+11</span> <span class=minus>−5</span> <i class=ba></i><i class=ba></i><i class=ba></i><i class=bd></i><i class=bd></i></span><b>Senate Committee Report</b> → <b>Enrolled</b><span class='muted small'> · paragraphs changed</span></summary><table class=difft><tr class=del><td class=ln>1</td><td class=ln></td><td class=sg>−</td><td class=tx>By: Orr, et al. (Senate Sponsor - Kolkhorst) H.B. No. 128</td></tr><tr class=del><td class=ln>2</td><td class=ln></td><td class=sg>−</td><td class=tx>(In the Senate - Received from the House April 30, 2025; May 5, 2025, read first time and referred to Committee on State Affairs; May 15, 2025, reported favorably by the following vote: Yeas 11, Nays 0; May 15, 2025, sent to printer.)</td></tr><tr class=del><td class=ln>3</td><td class=ln></td><td class=sg>−</td><td class=tx>Click here to see the committee vote</td></tr><tr class=del><td class=ln>4</td><td class=ln></td><td class=sg>−</td><td class=tx>A BILL TO BE ENTITLED AN ACT</td></tr><tr class=add><td class=ln></td><td class=ln>1</td><td class=sg>+</td><td class=tx>H.B. No. 128</td></tr><tr class=add><td class=ln></td><td class=ln>2</td><td class=sg>+</td><td class=tx>AN ACT</td></tr><tr class=ctx><td class=ln>5</td><td class=ln>3</td><td class=sg></td><td class=tx>relating to certain sister-city agreements between governmental entities and foreign countries and communities.</td></tr><tr class=ctx><td class=ln>6</td><td class=ln>4</td><td class=sg></td><td class=tx>BE IT ENACTED BY THE LEGISLATURE OF THE STATE OF TEXAS:</td></tr><tr class=skip><td colspan=4><button type=button data-expand=d4>⋯ 17 unchanged paragraphs</button></td></tr><tr class='ctx hid d4'><td class=ln>7</td><td class=ln>5</td><td class=sg></td><td class=tx>SECTION 1. Title 7, Government Code, is amended by adding Chapter 795 to read as follows:</td></tr><tr class='ctx hid d4'><td class=ln>8</td><td class=ln>6</td><td class=sg></td><td class=tx><span class=mk>{+</span>CHAPTER 795. SISTER-CITY AGREEMENTS<span class=mk>+}</span></td></tr><tr class='ctx hid d4'><td class=ln>9</td><td class=ln>7</td><td class=sg></td><td class=tx><span class=mk>{+</span>Sec. 795.001. DEFINITIONS. In this chapter:<span class=mk>+}</span></td></tr><tr class='ctx hid d4'><td class=ln>10</td><td class=ln>8</td><td class=sg></td><td class=tx><span class=mk>{+</span>(1) &quot;Foreign adversary&quot; means:<span class=mk>+}</span></td></tr><tr class='ctx hid d4'><td class=ln>11</td><td class=ln>9</td><td class=sg></td><td class=tx><span class=mk>{+</span>(A) China, Iran, North Korea, or Russia; or<span class=mk>+}</span></td></tr><tr class='ctx hid d4'><td class=ln>12</td><td class=ln>10</td><td class=sg></td><td class=tx><span class=mk>{+</span>(B) a country that is a designated country for purposes of Chapter 2275.<span class=mk>+}</span></td></tr><tr class='ctx hid d4'><td class=ln>13</td><td class=ln>11</td><td class=sg></td><td class=tx><span class=mk>{+</span>(2) &quot;Governmental entity&quot; means a state agency or a political subdivision of this state.<span class=mk>+}</span></td></tr><tr class='ctx hid d4'><td class=ln>14</td><td class=ln>12</td><td class=sg></td><td class=tx><span class=mk>{+</span>(3) &quot;Sister-city agreement&quot; means an agreement that:<span class=mk>+}</span></td></tr><tr class='ctx hid d4'><td class=ln>15</td><td class=ln>13</td><td class=sg></td><td class=tx><span class=mk>{+</span>(A) is between a governmental entity and a country other than the United States or a community located in a country other than the United States;<span class=mk>+}</span></td></tr><tr class='ctx hid d4'><td class=ln>16</td><td class=ln>14</td><td class=sg></td><td class=tx><span class=mk>{+</span>(B) is recognized by a nonprofit organization exempt from federal income taxation under Section 501(c)(3), Internal Revenue Code of 1986, that serves as the national membership organization for individual sister cities, counties, and states across the United States; and<span class=mk>+}</span></td></tr><tr class='ctx hid d4'><td class=ln>17</td><td class=ln>15</td><td class=sg></td><td class=tx><span class=mk>{+</span>(C) reflects a commitment to foster and strengthen opportunities for cultural and educational exchange programs and tourism and to encourage other types of bilateral cooperation between the parties to the agreement.<span class=mk>+}</span></td></tr><tr class='ctx hid d4'><td class=ln>18</td><td class=ln>16</td><td class=sg></td><td class=tx><span class=mk>{+</span>(4) &quot;State agency&quot; has the meaning assigned by Section 751.001.<span class=mk>+}</span></td></tr><tr class='ctx hid d4'><td class=ln>19</td><td class=ln>17</td><td class=sg></td><td class=tx><span class=mk>{+</span>Sec. 795.002. STATE POLICY REGARDING AGREEMENTS. It is the policy of this state to encourage sister-city agreements between governmental entities and countries that are allies of the United States, including countries designated as major non-NATO allies under federal law and the Republic of China, commonly known as Taiwan, and communities located in those countries.<span class=mk>+}</span></td></tr><tr class='ctx hid d4'><td class=ln>20</td><td class=ln>18</td><td class=sg></td><td class=tx><span class=mk>{+</span>Sec. 795.003. CERTAIN AGREEMENTS PROHIBITED. A governmental entity may not establish, maintain, or renew a sister-city agreement with:<span class=mk>+}</span></td></tr><tr class='ctx hid d4'><td class=ln>21</td><td class=ln>19</td><td class=sg></td><td class=tx><span class=mk>{+</span>(1) a country that is a foreign adversary; or<span class=mk>+}</span></td></tr><tr class='ctx hid d4'><td class=ln>22</td><td class=ln>20</td><td class=sg></td><td class=tx><span class=mk>{+</span>(2) a community located in a country described by Subdivision (1).<span class=mk>+}</span></td></tr><tr class='ctx hid d4'><td class=ln>23</td><td class=ln>21</td><td class=sg></td><td class=tx><span class=mk>{+</span>Sec. 795.004. WITHDRAWAL FROM CERTAIN EXISTING AGREEMENTS. (a) A governmental entity that on September 1, 2025, is a party to a sister-city agreement described by Section 795.003 shall withdraw from the agreement not later than October 1, 2025.<span class=mk>+}</span></td></tr><tr class=ctx><td class=ln>24</td><td class=ln>22</td><td class=sg></td><td class=tx><span class=mk>{+</span>(b) This section expires January 1, 2027.<span class=mk>+}</span></td></tr><tr class=ctx><td class=ln>25</td><td class=ln>23</td><td class=sg></td><td class=tx>SECTION 2. This Act takes effect September 1, 2025.</td></tr><tr class=del><td class=ln>26</td><td class=ln></td><td class=sg>−</td><td class=tx>* * * * *</td></tr><tr class=add><td class=ln></td><td class=ln>24</td><td class=sg>+</td><td class=tx>______________________________ ______________________________</td></tr><tr class=add><td class=ln></td><td class=ln>25</td><td class=sg>+</td><td class=tx>President of the Senate Speaker of the House</td></tr><tr class=add><td class=ln></td><td class=ln>26</td><td class=sg>+</td><td class=tx>I certify that H.B. No. 128 was passed by the House on April 30, 2025, by the following vote: Yeas 104, Nays 32, 2 present, not voting.</td></tr><tr class=add><td class=ln></td><td class=ln>27</td><td class=sg>+</td><td class=tx>______________________________ Chief Clerk of the House</td></tr><tr class=add><td class=ln></td><td class=ln>28</td><td class=sg>+</td><td class=tx>I certify that H.B. No. 128 was passed by the Senate on May 25, 2025, by the following vote: Yeas 29, Nays 2.</td></tr><tr class=add><td class=ln></td><td class=ln>29</td><td class=sg>+</td><td class=tx>______________________________ Secretary of the Senate APPROVED: _____________________</td></tr><tr class=add><td class=ln></td><td class=ln>30</td><td class=sg>+</td><td class=tx>Date</td></tr><tr class=add><td class=ln></td><td class=ln>31</td><td class=sg>+</td><td class=tx>_____________________</td></tr><tr class=add><td class=ln></td><td class=ln>32</td><td class=sg>+</td><td class=tx>Governor</td></tr></table></details>
+<details><summary>Introduced (as filed) — full text</summary><div class=lawtext><p>89R4427 CS-F</p><p>By: Orr H.B. No. 128</p><p>A BILL TO BE ENTITLED AN ACT</p><p>relating to certain sister-city agreements between governmental entities and foreign countries and communities.</p><p>BE IT ENACTED BY THE LEGISLATURE OF THE STATE OF TEXAS:</p><p>SECTION 1. Title 7, Government Code, is amended by adding Chapter 795 to read as follows:</p><p><ins>CHAPTER 795. SISTER-CITY AGREEMENTS</ins></p><p><ins>Sec. 795.001. DEFINITIONS. In this chapter:</ins></p><p><ins>(1) &quot;Foreign adversary&quot; means:</ins></p><p><ins>(A) China, Iran, North Korea, or Russia; or</ins></p><p><ins>(B) a country that is a designated country for purposes of Chapter 2275.</ins></p><p><ins>(2) &quot;Governmental entity&quot; means a state agency or a political subdivision of this state.</ins></p><p><ins>(3) &quot;Sister-city agreement&quot; means an agreement that:</ins></p><p><ins>(A) is between a governmental entity and a country other than the United States or a community located in a country other than the United States;</ins></p><p><ins>(B) is recognized by a nonprofit organization exempt from federal income taxation under Section 501(c)(3), Internal Revenue Code of 1986, that serves as the national membership organization for individual sister cities, counties, and states across the United States; and</ins></p><p><ins>(C) reflects a commitment to foster and strengthen opportunities for cultural and educational exchange programs and tourism and to encourage other types of bilateral cooperation between the parties to the agreement.</ins></p><p><ins>(4) &quot;State agency&quot; has the meaning assigned by Section 751.001.</ins></p><p><ins>Sec. 795.002. STATE POLICY REGARDING AGREEMENTS. It is the policy of this state to encourage sister-city agreements between governmental entities and countries that are allies of the United States, including countries designated as major non-NATO allies under federal law and the Republic of China, commonly known as Taiwan, and communities located in those countries.</ins></p><p><ins>Sec. 795.003. CERTAIN AGREEMENTS PROHIBITED. A governmental entity may not establish, maintain, or renew a sister-city agreement with:</ins></p><p><ins>(1) a country that is a foreign adversary; or</ins></p><p><ins>(2) a community located in a country described by Subdivision (1).</ins></p><p><ins>Sec. 795.004. WITHDRAWAL FROM CERTAIN EXISTING AGREEMENTS. (a) A governmental entity that on September 1, 2025, is a party to a sister-city agreement described by Section 795.003 shall withdraw from the agreement not later than October 1, 2025.</ins></p><p><ins>(b) This section expires January 1, 2027.</ins></p><p>SECTION 2. This Act takes effect September 1, 2025.</p></div></details>
+<details><summary>Enrolled (final) — full text</summary><div class=lawtext><p>H.B. No. 128</p><p>AN ACT</p><p>relating to certain sister-city agreements between governmental entities and foreign countries and communities.</p><p>BE IT ENACTED BY THE LEGISLATURE OF THE STATE OF TEXAS:</p><p>SECTION 1. Title 7, Government Code, is amended by adding Chapter 795 to read as follows:</p><p><ins>CHAPTER 795. SISTER-CITY AGREEMENTS</ins></p><p><ins>Sec. 795.001. DEFINITIONS. In this chapter:</ins></p><p><ins>(1) &quot;Foreign adversary&quot; means:</ins></p><p><ins>(A) China, Iran, North Korea, or Russia; or</ins></p><p><ins>(B) a country that is a designated country for purposes of Chapter 2275.</ins></p><p><ins>(2) &quot;Governmental entity&quot; means a state agency or a political subdivision of this state.</ins></p><p><ins>(3) &quot;Sister-city agreement&quot; means an agreement that:</ins></p><p><ins>(A) is between a governmental entity and a country other than the United States or a community located in a country other than the United States;</ins></p><p><ins>(B) is recognized by a nonprofit organization exempt from federal income taxation under Section 501(c)(3), Internal Revenue Code of 1986, that serves as the national membership organization for individual sister cities, counties, and states across the United States; and</ins></p><p><ins>(C) reflects a commitment to foster and strengthen opportunities for cultural and educational exchange programs and tourism and to encourage other types of bilateral cooperation between the parties to the agreement.</ins></p><p><ins>(4) &quot;State agency&quot; has the meaning assigned by Section 751.001.</ins></p><p><ins>Sec. 795.002. STATE POLICY REGARDING AGREEMENTS. It is the policy of this state to encourage sister-city agreements between governmental entities and countries that are allies of the United States, including countries designated as major non-NATO allies under federal law and the Republic of China, commonly known as Taiwan, and communities located in those countries.</ins></p><p><ins>Sec. 795.003. CERTAIN AGREEMENTS PROHIBITED. A governmental entity may not establish, maintain, or renew a sister-city agreement with:</ins></p><p><ins>(1) a country that is a foreign adversary; or</ins></p><p><ins>(2) a community located in a country described by Subdivision (1).</ins></p><p><ins>Sec. 795.004. WITHDRAWAL FROM CERTAIN EXISTING AGREEMENTS. (a) A governmental entity that on September 1, 2025, is a party to a sister-city agreement described by Section 795.003 shall withdraw from the agreement not later than October 1, 2025.</ins></p><p><ins>(b) This section expires January 1, 2027.</ins></p><p>SECTION 2. This Act takes effect September 1, 2025.</p><p>______________________________ ______________________________</p><p>President of the Senate Speaker of the House</p><p>I certify that H.B. No. 128 was passed by the House on April 30, 2025, by the following vote: Yeas 104, Nays 32, 2 present, not voting.</p><p>______________________________ Chief Clerk of the House</p><p>I certify that H.B. No. 128 was passed by the Senate on May 25, 2025, by the following vote: Yeas 29, Nays 2.</p><p>______________________________ Secretary of the Senate APPROVED: _____________________</p><p>Date</p><p>_____________________</p><p>Governor</p></div></details>
+<h2 id=journal>Journal excerpts</h2><p class='small muted'>The floor proceedings on this bill as printed in each chamber's journal, including debate motions and voice votes that have no record vote.</p>
+<details class=journal><summary>2025-04-29 · House · HB 128 ON SECOND READING(by Orr, Hefner, McLaughlin, et al.) <span class=muted>(17 paragraphs)</span></summary>
+<p>HB 128 ON SECOND READING(by Orr, Hefner, McLaughlin, et al.)</p>
+<p>HB 128, A bill to be entitled An Act relating to certain sister-city agreements between governmental entities and foreign countries and communities.</p>
+<p>HB 128 was passed to engrossment by (Record 818): 97 Yeas, 41 Nays, 2 Present, not voting.</p>
+<p>Yeas — Alders; Allen; Ashby; Barry; Bell, C.; Bell, K.; Bhojani; Bonnen; Bumgarner; Button; Cain; Capriglione; Cook; Cortez; Craddick; Cunningham; Curry; Darby; Dean; DeAyala; Dorazio; Dutton; Dyson; Fairly; Flores; Frank; Gates; Gerdes; Geren; Guerra; Guillen; Harless; Harris; Harris Davila; Harrison; Hayes; Hefner; Hickland; Holt; Hopper; Hull; Hunter; Isaac; Kerwin; King; Kitzman; LaHood; Lambert; Leach; Leo Wilson; Little; Longoria; Lopez, J.; Lopez, R.; Louderback; Lowe; Lozano; Lujan; Luther; McLaughlin; McQueeney; Metcalf; Meyer; Money; Morales, E.; Morgan; Muñoz; Noble; Olcott; Oliverson; Ordaz; Orr; Patterson; Paul; Perez, V.; Phelan; Pierson; Raymond; Richardson; Schatzline; Schoolcraft; Shaheen; Shofner; Slawson; Smithee; Spiller; Swanson; Tepper; Tinderholt; Toth; Troxclair; VanDeaver; Vasut; Villalobos; Virdell; Wharton; Wilson.</p>
+<p>Nays — Anchía; Bernal; Bryant; Bucy; Campos; Canales; Cole; Collier; Davis, A.; Davis, Y.; Gámez; Garcia, J.; Garcia, L.; Garcia Hernandez; González, J.; Goodwin; Hernandez; Hinojosa; Howard; Johnson; Jones, J.; Jones, V.; Manuel; Martinez; Martinez Fischer; Meza; Morales, C.; Morales Shaw; Plesa; Reynolds; Rodríguez Ramos; Romero; Rose; Rosenthal; Talarico; Thompson; Turner; Vo; Ward Johnson; Wu; Zwiener.</p>
+<p>Present, not voting — Mr. Speaker; Landgraf(C).</p>
+<p>Absent, Excused, Committee Meeting — Walle.</p>
+<p>Absent — Bowers; Buckley; Gervin-Hawkins; González, M.; Lalani; Moody; Perez, M.; Schofield; Simmons.</p>
+<p>STATEMENTS OF VOTE</p>
+<p>When Record No. 818 was taken, I was shown voting yes. I intended to vote no.</p>
+<p>Flores</p>
+<p>When Record No. 818 was taken, I was in the house but away from my desk. I would have voted no.</p>
+<p>Gervin-Hawkins</p>
+<p>When Record No. 818 was taken, I was shown voting yes. I intended to vote no.</p>
+<p>R. Lopez</p>
+<p>When Record No. 818 was taken, I was in the house but away from my desk. I would have voted no.</p>
+<p>M. Perez</p>
+<p class=small><a href='https://journals.house.texas.gov/hjrnl/89r/html/89RDAY52FINAL.HTM'>Full journal</a></p></details>
+<details class=journal><summary>2025-04-30 · House · HB 128 ON THIRD READING(by Orr, Hefner, McLaughlin, et al.) <span class=muted>(35 paragraphs)</span></summary>
+<p>HB 128 ON THIRD READING(by Orr, Hefner, McLaughlin, et al.)</p>
+<p>HB 128, A bill to be entitled An Act relating to certain sister-city agreements between governmental entities and foreign countries and communities.</p>
+<p>HB 128 was passed by (Record 966): 104 Yeas, 32 Nays, 2 Present, not voting.</p>
+<p>Yeas — Alders; Ashby; Barry; Bell, C.; Bell, K.; Bhojani; Bonnen; Buckley; Bucy; Bumgarner; Cain; Campos; Canales; Capriglione; Cole; Cook; Cortez; Craddick; Cunningham; Curry; Darby; Dean; DeAyala; Dorazio; Dyson; Fairly; Frank; Gámez; Garcia, J.; Garcia, L.; Gates; Gerdes; Geren; Guerra; Guillen; Harless; Harris; Harris Davila; Harrison; Hayes; Hefner; Hickland; Holt; Hopper; Howard; Hull; Hunter; Isaac; Johnson; Kerwin; Kitzman; LaHood; Lambert; Leach; Leo Wilson; Little; Longoria; Lopez, J.; Louderback; Lowe; Lozano; Lujan; Luther; Martinez; Martinez Fischer; McLaughlin; McQueeney; Metcalf; Meyer; Money; Morgan; Muñoz; Noble; Olcott; Oliverson; Orr; Patterson; Paul; Perez, M.; Phelan; Pierson; Plesa; Raymond; Richardson; Rose; Schatzline; Schofield; Shaheen; Shofner; Slawson; Smithee; Spiller; Swanson; Talarico; Tepper; Tinderholt; Toth; Troxclair; VanDeaver; Vasut; Villalobos; Virdell; Wharton; Wilson.</p>
+<p>Nays — Allen; Anchía; Bowers; Bryant; Collier; Davis, A.; Flores; Garcia Hernandez; Gervin-Hawkins; González, J.; Goodwin; Jones, J.; Jones, V.; Lalani; Lopez, R.; Manuel; Moody; Morales, C.; Morales, E.; Morales Shaw; Ordaz; Perez, V.; Reynolds; Rodríguez Ramos; Romero; Rosenthal; Simmons; Thompson; Turner; Ward Johnson; Wu; Zwiener.</p>
+<p>Present, not voting — Mr. Speaker; Landgraf(C).</p>
+<p>Absent, Excused — Bernal; Hinojosa; Schoolcraft; Vo.</p>
+<p>Absent, Excused, Committee Meeting — Walle.</p>
+<p>Absent — Button; Davis, Y.; Dutton; González, M.; Hernandez; King; Meza.</p>
+<p>STATEMENTS OF VOTE</p>
+<p>When Record No. 966 was taken, I was excused for important business in the district. I would have voted no.</p>
+<p>Bernal</p>
+<p>When Record No. 966 was taken, I was shown voting yes. I intended to vote no.</p>
+<p>Bhojani</p>
+<p>When Record No. 966 was taken, I was shown voting yes. I intended to vote no.</p>
+<p>Bucy</p>
+<p>When Record No. 966 was taken, I was in the house but away from my desk. I would have voted yes.</p>
+<p>Button</p>
+<p>When Record No. 966 was taken, I was shown voting yes. I intended to vote no.</p>
+<p>Campos</p>
+<p>When Record No. 966 was taken, I was shown voting yes. I intended to vote no.</p>
+<p>Gámez</p>
+<p>When Record No. 966 was taken, I was shown voting yes. I intended to vote no.</p>
+<p>J. Garcia</p>
+<p>When Record No. 966 was taken, I was shown voting yes. I intended to vote no.</p>
+<p>Howard</p>
+<p>When Record No. 966 was taken, I was shown voting yes. I intended to vote no.</p>
+<p>Johnson</p>
+<p>When Record No. 966 was taken, I was shown voting yes. I intended to vote no.</p>
+<p>Plesa</p>
+<p>When Record No. 966 was taken, I was shown voting yes. I intended to vote no.</p>
+<p>Rose</p>
+<p>When Record No. 966 was taken, I was shown voting yes. I intended to vote no.</p>
+<p>Talarico</p>
+<p>(Harris in the chair)</p>
+<p class=small><a href='https://journals.house.texas.gov/hjrnl/89r/html/89RDAY53FINAL.HTM'>Full journal</a></p></details>
+</main><script>
+document.querySelectorAll('[data-matrix]').forEach(function(box){
+  box.querySelectorAll('.controls button').forEach(function(b){
+    b.addEventListener('click',function(){
+      box.dataset.color=b.dataset.mode;
+      box.querySelectorAll('.controls button').forEach(function(x){x.classList.toggle('on',x===b)});
+    });
+  });
+});
+
+document.addEventListener('click',function(e){
+  var b=e.target.closest('[data-expand]'); if(!b) return;
+  document.querySelectorAll('tr.'+b.dataset.expand).forEach(function(r){r.classList.remove('hid')});
+  b.closest('tr').remove();
+});
+</script></body></html>
