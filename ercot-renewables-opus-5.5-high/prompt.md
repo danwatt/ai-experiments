@@ -3,8 +3,8 @@
 - **Model:** claude-opus-5-5
 - **Effort:** high
 - **Session(s):** 17f610a7-f369-423d-87f9-412dab3dd19b
-- **Tokens:** input 196, output 87251, cache read 13412210, cache write 246719
-- **Cost (tokscale estimate):** $6.4
+- **Tokens:** input 240, output 130716, cache read 17546013, cache write 307913
+- **Cost (tokscale estimate):** $8.59
 
 ## You
 
@@ -197,6 +197,84 @@ I added the duck curve section to the ERCOT page. No new download was needed: th
 - `app.js` and `index.html` have the new section, plus a note on the method under "About the data".
 - In `demos.js` I changed only this demo's description. Another session's Tarrant line is also uncommitted there, and I left it alone.
 - `prompt.md` is regenerated; the estimated cost is now $6.21.
+
+## You
+
+Commit it
+
+## Claude
+
+Committed as `92d7c04` on master: "Add duck curve view to ERCOT renewables explorer". Not pushed.
+
+Commit has:
+- All changes in `ercot-renewables-opus-5.5-high/`: build script, the new `profiles.js`, page, JS, `prompt.md` (refreshed first) and 10 new screenshots.
+- Only this demo's description line in `demos.js`.
+
+Left uncommitted, from another session: its Tarrant line in `demos.js` and the `tarrant-judicial-rolloff/` folder.
+
+## You
+
+Lets do this.... lets focus just on the demand curve. Produce an annotated animation showing what all of this means.
+
+## Claude
+
+![screenshot 37](prompt-assets/037.jpg)
+
+![screenshot 38](prompt-assets/038.png)
+
+![screenshot 39](prompt-assets/039.png)
+
+![screenshot 40](prompt-assets/040.png)
+
+Story scenes 1–4 render correctly. Checking 5–7 now, after fixing where the wind label sits.
+
+![screenshot 41](prompt-assets/041.png)
+
+![screenshot 42](prompt-assets/042.png)
+
+![screenshot 43](prompt-assets/043.png)
+
+![screenshot 44](prompt-assets/044.png)
+
+![screenshot 45](prompt-assets/045.png)
+
+![screenshot 46](prompt-assets/046.png)
+
+Summer and dark mode work. Checking phone width.
+
+![screenshot 47](prompt-assets/047.jpg)
+
+![screenshot 48](prompt-assets/048.jpg)
+
+![screenshot 49](prompt-assets/049.png)
+
+![screenshot 50](prompt-assets/050.png)
+
+Phone layout clean now. Checking that autoplay advances and pause holds.
+
+Autoplay, pause and resume all behave. Linking it in.
+
+![screenshot 51](prompt-assets/051.png)
+
+![screenshot 52](prompt-assets/052.png)
+
+I built the animated explainer as a new page: `ercot-renewables-opus-5.5-high/duck.html`. It walks through the demand curve in 7 annotated steps, playing on its own with Back, Pause and Next buttons, a progress bar, and buttons to jump to any step. I checked it at desktop and phone widths, in light and dark mode, and confirmed autoplay advances and pause/resume hold. Nothing is committed yet.
+
+The steps, using spring numbers:
+1. **Demand in 2022:** the line draws itself in, with the overnight low (37.0 GW, 4 am) and the peak (52.2 GW, 5:45 pm) labelled.
+2. **Wind:** a band peels off the top. Wind is strongest at night.
+3. **Solar:** a midday bite out of what's left, peaking at 6.9 GW.
+4. **Net load:** the shaded area left over is what gas, coal and nuclear must supply. It shows its low, its peak and the evening ramp (+3.5 GW in 3 hours).
+5. **2022 → 2026:** the curve morphs year by year while the year label counts up, with 2022 kept as a dashed line. The low point moves from 3:45 am to 11 am, and the parts are labelled **belly**, **neck** (+13.9 GW in 3 hours) and **head** (41.2 GW).
+6. **Batteries:** a blue band shows charging at midday (3.2 GW) and discharging in the evening (5.3 GW). A dashed line shows the curve without batteries.
+7. **Flatter:** the evening ramp drops from 13.9 to 8.3 GW, the peak from 41.2 to 36.0 GW, and the midday low rises from 20.2 to 23.2 GW.
+
+- **Summer:** there's a Spring/Summer switch, and all the text comes from the data. Batteries matter even more in summer: the ramp falls from 15.8 to 7.3 GW, and the peak from 60.0 to 52.1 GW.
+- **Phones:** the chart shows only short labels; the full numbers are in the text above it.
+- **Reduced motion:** if the device asks for it, the page doesn't autoplay and steps change without animating.
+- **Library:** I used D3 7.9.0 for the animation and Bootstrap for the layout. The page shares the light/dark setting with the main page.
+
+The explorer's duck curve card now links to it ("Watch the animated explainer →"), and so does the landing-page card in `demos.js`. I regenerated `prompt.md`; the estimated cost is now $8.41.
 
 ## You
 
