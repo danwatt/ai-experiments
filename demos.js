@@ -1,0 +1,55 @@
+// Landing-page cards, rendered by index.html. One entry per card, grouped by section key `s` (see SECTIONS).
+// t: title, href: demo link, img: screenshot (null for none), d: description, links: [[label, href], ...].
+// model/effort left null where the repo doesn't record them. platform: shown in the Hex 2048 strip.
+window.DEMOS = [
+  // Hex 2048: same prompt, many models / platforms
+  { s: "2048", t: "Opus 5.5 · max", href: "games/2048-opus-5.5-max/", img: "screenshots/games/2048-opus-5.5-max.webp", d: "Hex 2048, highest effort.", model: "Opus 5.5", effort: "max", platform: "Browser" },
+  { s: "2048", t: "Opus 5.5 · high", href: "games/2048-opus-5.5-high/", img: "screenshots/games/2048-opus-5.5-high.webp", d: "Hex 2048.", model: "Opus 5.5", effort: "high", platform: "Browser" },
+  { s: "2048", t: "Sonnet 5.5 · high", href: "games/2048-sonnet-5.5-high/", img: "screenshots/games/2048-sonnet-5.5-high.webp", d: "Hex 2048.", model: "Sonnet 5.5", effort: "high", platform: "Browser" },
+  { s: "2048", t: "Haiku 5.5 · high", href: "games/2048-haiku-5.5-high/", img: "screenshots/games/2048-haiku-5.5-high.webp", d: "Hex 2048.", model: "Haiku 5.5", effort: "high", platform: "Browser" },
+  { s: "2048", t: "Astra 6 · medium", href: "games/2048-astra-6-medium/", img: "screenshots/games/2048-astra-6-medium.webp", d: "Hex / 2048.", model: "Astra 6", effort: "medium", platform: "Browser" },
+  { s: "2048", t: "Sol 6.1 · medium", href: "games/2048-sol-6.1-medium/", img: "screenshots/games/2048-sol-6.1-medium.webp", d: "HEX / 2048.", model: "GPT 6.1 Sol", effort: "medium", platform: "Browser" },
+  { s: "2048", t: "Hex 2048 · 3D", href: "games/hex2048-3d/", img: "screenshots/games/hex2048-3d.webp", d: "Hexagonal board rendered with Three.js.", model: null, effort: null, platform: "Three.js" },
+  { s: "2048", t: "Hex 2048 · QBasic", href: "games/2048-qbas-opus-5.5-high/", img: "screenshots/games/2048-qbas-opus-5.5-high.webp", d: "The .bas file compiled and run in the browser by a bundled copy of QBJS.", model: "Opus 5.5", effort: "high", platform: "QBasic", links: [["prompt", "games/2048-qbas-opus-5.5-high/prompt.html"], [".bas source", "games/2048-qbas-opus-5.5-high/2048-qbasic.bas"]] },
+  { s: "2048", t: "Hex 2048 · x86 assembly", href: "games/2048-asm-opus-5.5-high/", img: "screenshots/games/2048-asm-opus-5.5-high.webp", d: "A 2.8 KB DOS .COM in VGA mode 13h, running in DOSBox (js-dos).", model: "Opus 5.5", effort: "high", platform: "DOS", links: [["prompt", "games/2048-asm-opus-5.5-high/prompt.html"]] },
+  { s: "2048", t: "Hex 2048 · Game Boy", href: "games/2048-gba-opus-5.5-high/", img: "screenshots/games/2048-gba-opus-5.5-high.webp", d: "A 32 KB Game Boy ROM in SM83 assembly, running in a small hand-written JS emulator.", model: "Opus 5.5", effort: "high", platform: "Game Boy", links: [["prompt", "games/2048-gba-opus-5.5-high/prompt.html"], [".gb ROM", "games/2048-gba-opus-5.5-high/hex2048.gb"]] },
+  { s: "2048", t: "Hex 2048 · PlayStation", href: "games/2048-ps1-opus-5.5-high/", img: "screenshots/games/2048-ps1-opus-5.5-high.webp", d: "An 18 KB PS-EXE in bare-metal C (no SDK), running in PCSX-ReARMed via EmulatorJS.", model: "Opus 5.5", effort: "high", platform: "PlayStation", links: [["prompt", "games/2048-ps1-opus-5.5-high/prompt.html"], [".exe", "games/2048-ps1-opus-5.5-high/hex2048.exe"]] },
+  { s: "2048", t: "Hex 2048 · Atari Lynx", href: "games/2048-lynx-opus-5.5-high/", img: "screenshots/games/2048-lynx-opus-5.5-high.webp", d: "A 9 KB Lynx cart in cc65 C, drawn by Suzy hardware sprites, running in Handy via EmulatorJS.", model: "Opus 5.5", effort: "high", platform: "Atari Lynx", links: [["prompt", "games/2048-lynx-opus-5.5-high/prompt.html"], [".lnx ROM", "games/2048-lynx-opus-5.5-high/hex2048.lnx"]] },
+
+  // Games & toys
+  { s: "games", t: "Hex Bastion", href: "games/td-opus-5.5-high/", img: "screenshots/games/td-opus-5.5-high.webp", d: "Tower defense on a hex grid.", model: "Opus 5.5", effort: "high" },
+  { s: "games", t: "Hex Highlands TD", href: "games/3dtd-opus-5.5-uiltra/", img: "screenshots/games/3dtd-opus-5.5-uiltra.webp", d: "3D tower defense on a hex grid.", model: "Opus 5.5", effort: "ultra", links: [["prompt", "games/3dtd-opus-5.5-uiltra/prompt.html"]] },
+  { s: "games", t: "Fact Rocket", href: "games/fact-rocket/", img: "screenshots/games/fact-rocket.webp", d: "Fly a rocket by answering math facts.", model: null, effort: null, links: [["prompt", "games/fact-rocket/prompt.html"]] },
+  { s: "games", t: "Number Garden", href: "games/math-garden/", img: "screenshots/games/math-garden.webp", d: "A little practice, a lot of growth. Addition and subtraction rounds.", model: null, effort: null },
+  { s: "games", t: "Hohmann Works", href: "games/hohmann-works/", img: "screenshots/games/hohmann-works.webp", d: "Orbital logistics: build stations and orbits.", model: null, effort: null },
+  { s: "games", t: "Sixfold", href: "games/sixfold-opus-5.5-medium/", img: "screenshots/games/sixfold-opus-5.5-medium.webp", d: "6DOF tunnel shooter in a mine built from deformed cubes. Three.js.", model: "Opus 5.5", effort: "medium", links: [["prompt", "games/sixfold-opus-5.5-medium/prompt.html"]] },
+  { s: "games", t: "Hexahedron", href: "games/hexahedron-opus-5.5/", img: "screenshots/games/hexahedron-opus-5.5.webp", d: "6DOF mine run: red key, lava cavern, reactor, escape timer and an automap. Three.js.", model: "Opus 5.5", effort: null, links: [["prompt", "games/hexahedron-opus-5.5/prompt.html"]] },
+
+  // Worship planner mockups
+  { s: "worship", t: "Lectern", href: "worship-planner/", img: "screenshots/projects/worship-planner.webp", d: "Original planner.", model: null, effort: null, links: [["Fluent variant", "worship-planner/fluent.html"], ["prompt", "worship-planner/prompt.html"]] },
+  { s: "worship", t: "Selah", href: "worship-planner-sonnet-5.5/", img: "screenshots/projects/worship-planner-sonnet-5.5.webp", d: "Desktop mockup, Sonnet 5.5.", model: "Sonnet 5.5", effort: null, links: [["Mobile", "worship-planner-sonnet-5.5/mobile.html"], ["Fluent variant", "worship-planner-sonnet-5.5/fluent/index.html"], ["prompt", "worship-planner-sonnet-5.5/prompt.html"]] },
+  { s: "worship", t: "Gather", href: "worship-planner-astra-6/", img: "screenshots/projects/worship-planner-astra-6.webp", d: "Astra 6 prototype.", model: "Astra 6", effort: null, links: [["Fluent variant", "worship-planner-astra-6/fluent.html"]] },
+
+  // Data & analysis
+  { s: "data", t: "Gridshift · Texas Grid Renewables", href: "ercot-renewables-gpt-6.1-sol-high/", img: "screenshots/projects/ercot-renewables-gpt-6.1-sol-high.webp", d: "Monthly ERCOT generation by source, 2007–2026, with share and TWh views, annual summaries, and a seasonal heatmap.", model: "GPT 6.1 Sol", effort: "high", links: [["prompt", "ercot-renewables-gpt-6.1-sol-high/prompt.html"]] },
+  { s: "data", t: "How Wind and Solar Remade the Texas Grid", href: "ercot-renewables-opus-5.5-high/", img: "screenshots/projects/ercot-renewables-opus-5.5-high.webp", d: "ERCOT monthly generation by fuel, 2007–2026: stacked share/TWh mix, focus-month comparison, annual shares, seasonal heatmap. Bootstrap + Chart.js.", model: "Opus 5.5", effort: "high", links: [["prompt", "ercot-renewables-opus-5.5-high/prompt.html"]] },
+  { s: "data", t: "Pump & Poll", href: "election-gas-prices-gpt-6.1-sol-exh/dist/", img: "screenshots/projects/election-gas-prices-gpt-6.1-sol-exh.webp", d: "DFW election-year gas prices, inflation adjustments, and wage-based affordability.", model: "GPT 6.1 Sol", effort: "xhigh", links: [["prompt", "election-gas-prices-gpt-6.1-sol-exh/prompt.html"], ["hosted site", "https://dfw-election-gas-sol-exh.shorttest2025.chatgpt.site"]] },
+  { s: "data", t: "DFW Election-Day Gas Prices", href: "election-gas-prices-sonnet-5.5-high/", img: "screenshots/projects/election-gas-prices-sonnet-5.5-high.webp", d: "Election-day gas prices in DFW since 1978: inflation- and wage-adjusted, minutes of work per gallon or fill-up.", model: "Sonnet 5.5", effort: "high", links: [["prompt", "election-gas-prices-sonnet-5.5-high/prompt.html"]] },
+  { s: "data", t: "Tarrant County 2026 Election", href: "tarrant-2026/", img: "screenshots/projects/tarrant-2026.webp", d: "Election results, vote breakdowns, margin charts, and a precinct map.", model: null, effort: null },
+
+  // Tools
+  { s: "tools", t: "Overhead", href: "overhead-opus-5.5-high/", img: "screenshots/projects/overhead-opus-5.5-high.webp", d: "Live aircraft around you: 2D map, tilted 3D map, and sky dome. Runs a recorded demo here.", model: "Opus 5.5", effort: "high", links: [["prompt", "overhead-opus-5.5-high/prompt.html"], ["README", "overhead-opus-5.5-high/README.html"]] },
+  { s: "tools", t: "tx-lege", href: "tx-lege/demo/", img: null, d: "Full legislative history of a Texas bill: actions, versions, amendments. Shows sample reports here.", model: null, effort: null, links: [["prompt", "tx-lege/prompt.html"], ["README", "tx-lege/README.html"]] },
+
+  // Video & vision
+  { s: "vision", t: "Garden Map", href: "garden-map/", img: "screenshots/projects/garden-map.webp", d: "Plants identified from a walking video of a 50 ft back yard bed, placed on a top-down map.", model: null, effort: null, links: [["prompt", "garden-map/prompt.html"]] },
+];
+
+window.SECTIONS = {
+  "2048": { name: "Hex 2048 variants", blurb: "Same prompt, different models, effort levels and machines." },
+  games: { name: "Games & toys" },
+  worship: { name: "Worship planner mockups", blurb: "UI prototypes for a churches of Christ worship planner." },
+  data: { name: "Data & analysis" },
+  tools: { name: "Tools", blurb: "Python projects; the README says how to run them." },
+  vision: { name: "Video & vision" },
+};

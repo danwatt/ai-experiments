@@ -1,102 +1,161 @@
 <!doctype html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="dark">
   <title>AI Experiments</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2.0.6/css/pico.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
   <style>
-    header.container { padding-block: 3rem 1rem; }
-    section.container { padding-block: 1rem; }
-    article { margin-bottom: 0; height: 100%; }
-    article > header { margin-bottom: 0.5rem; }
-    article h3 { margin: 0; font-size: 1.15rem; }
-    article p { margin-bottom: 0; font-size: 0.9rem; }
-    article small { display: block; margin-top: 0.75rem; }
-    article small a { position: relative; z-index: 1; }
-    article a.stretched::after { content: ""; position: absolute; inset: 0; }
-    article { position: relative; }
-    .grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
-    .project-preview { display: block; width: 100%; aspect-ratio: 8 / 5; object-fit: cover; border-radius: var(--pico-border-radius); margin-bottom: 1rem; background: #161b22; }
+    :root {
+      --paper: #101318; --paper-2: #181c23; --ink: #e8ecf1; --ink-2: #98a2b1; --rule: #2a313c;
+      --accent: #5eead4; --card: #161a21;
+      --opus: #fbbf24; --sonnet: #c4b5fd; --haiku: #5eead4; --gpt: #93c5fd; --astra: #f9a8d4; --other: #94a3b8;
+      color-scheme: dark;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font: 15px/1.55 Inter, system-ui, sans-serif; }
+    a { color: inherit; }
+    .wrap { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+    @media (max-width: 600px) { .wrap { padding: 0 16px; } }
+
+    /* Masthead */
+    .mast { border-bottom: 3px double var(--rule); padding: 56px 0 28px; }
+    .kicker { font: 500 12px/1 "JetBrains Mono", monospace; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
+    h1 { font: 800 clamp(44px, 8vw, 96px)/.95 Fraunces, serif; letter-spacing: -.03em; margin: 14px 0 18px; }
+    h1 em { font-style: italic; font-weight: 400; color: var(--accent); }
+    .lede { max-width: 620px; font-size: 18px; color: var(--ink-2); margin: 0; }
+    .stats { display: flex; gap: 32px; flex-wrap: wrap; margin-top: 28px; font: 500 13px "JetBrains Mono", monospace; color: var(--ink-2); }
+    .stats b { display: block; font: 600 28px Fraunces, serif; color: var(--ink); }
+
+    /* Filmstrip hero */
+    .feature { padding-block: 40px 8px; }
+    img { height: auto; }
+    .feature-head { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; flex-wrap: wrap; }
+    .feature h2 { font: 600 30px/1.1 Fraunces, serif; margin: 0; }
+    .feature p { margin: 6px 0 0; color: var(--ink-2); }
+    .hint { font: 12px "JetBrains Mono", monospace; color: var(--ink-2); }
+    .strip { display: grid; grid-auto-flow: column; grid-auto-columns: 220px; gap: 14px; overflow-x: auto; padding: 20px 0 18px; scroll-snap-type: x mandatory; }
+    .frame { scroll-snap-align: start; text-decoration: none; background: var(--card); border: 1px solid var(--rule); border-radius: 6px; padding: 8px 8px 10px; transition: transform .15s, box-shadow .15s; }
+    .frame:hover { transform: translateY(-3px) rotate(-.4deg); box-shadow: 0 10px 24px -12px rgba(0,0,0,.35); }
+    .frame img { width: 100%; aspect-ratio: 8/5; object-fit: cover; border-radius: 3px; display: block; background: var(--paper-2); }
+    .frame .plat { font: 600 15px Fraunces, serif; margin-top: 8px; }
+    .frame .meta { font: 11px "JetBrains Mono", monospace; color: var(--ink-2); }
+
+    /* Filters */
+    .filters { position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--paper) 92%, transparent); backdrop-filter: blur(6px); border-block: 1px solid var(--rule); padding: 12px 0; margin-top: 24px; }
+    .filters .wrap { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .filters span { font: 500 12px "JetBrains Mono", monospace; color: var(--ink-2); margin-right: 4px; }
+    .chip { font: 500 13px Inter, sans-serif; border: 1px solid var(--rule); background: var(--card); color: var(--ink); padding: 5px 12px; border-radius: 999px; cursor: pointer; display: inline-flex; gap: 6px; align-items: center; }
+    .chip i { width: 8px; height: 8px; border-radius: 50%; background: var(--c, var(--other)); }
+    .chip[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+
+    /* Sections */
+    section.chapter { display: grid; grid-template-columns: 200px 1fr; gap: 32px; padding: 44px 0; border-bottom: 1px solid var(--rule); }
+    @media (max-width: 820px) { section.chapter { grid-template-columns: 1fr; gap: 16px; } }
+    .chapter-head { position: sticky; top: 72px; align-self: start; }
+    .num { font: 400 13px "JetBrains Mono", monospace; color: var(--accent); }
+    .chapter h2 { font: 600 26px/1.15 Fraunces, serif; margin: 6px 0 8px; }
+    .chapter-head p { margin: 0; font-size: 14px; color: var(--ink-2); }
+    .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 22px; }
+    .card { position: relative; background: var(--card); border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; transition: border-color .15s, transform .15s; }
+    .card:hover { border-color: var(--ink-2); transform: translateY(-2px); }
+    .card img, .card .noimg { width: 100%; aspect-ratio: 8/5; object-fit: cover; display: block; background: var(--paper-2); border-bottom: 1px solid var(--rule); }
+    .noimg { display: grid; place-items: center; font: 600 28px Fraunces, serif; color: var(--ink-2); }
+    .card .body { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+    .card h3 { font: 600 18px/1.2 Fraunces, serif; margin: 0; }
+    .card h3 a { text-decoration: none; }
+    .card h3 a::after { content: ""; position: absolute; inset: 0; }
+    .card p { margin: 0; font-size: 14px; color: var(--ink-2); }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: auto; padding-top: 8px; }
+    .tag { font: 500 11px "JetBrains Mono", monospace; padding: 2px 8px; border-radius: 4px; background: color-mix(in srgb, var(--c, var(--other)) 14%, transparent); color: var(--c, var(--other)); }
+    .links { font: 12px "JetBrains Mono", monospace; display: flex; gap: 12px; flex-wrap: wrap; }
+    .links a { position: relative; z-index: 1; color: var(--accent); text-decoration: none; }
+    .links a:hover { text-decoration: underline; }
+    .card[hidden], .chapter[hidden] { display: none; }
+
+    footer { padding: 40px 0 64px; font-size: 13px; color: var(--ink-2); }
+    code { font-family: "JetBrains Mono", monospace; font-size: .9em; }
   </style>
 </head>
 <body>
-  <header class="container">
-    <h1>AI Experiments</h1>
-    <p>Small projects built with different models and settings. Most are a single static page.</p>
+  <header class="mast">
+    <div class="wrap">
+      <div class="kicker">Lab notebook · one prompt at a time</div>
+      <h1>AI <em>Experiments</em></h1>
+      <p class="lede">Small projects built with different models and effort levels. Most are a single static page; many come with the full prompt that made them.</p>
+      <div class="stats" id="stats"></div>
+    </div>
   </header>
 
-  <main class="container">
-    <section>
-      <h2>Hex 2048 variants</h2>
-      <p>Same prompt, different models and effort levels.</p>
-      <div class="grid">
-        <article><img class="project-preview" src="screenshots/games/2048-opus-5.5-max.webp" alt="" loading="lazy" width="640" height="400"><header><h3><a class="stretched" href="games/2048-opus-5.5-max/">Opus 5.5 · max</a></h3></header><p>Hex 2048, highest effort.</p></article>
-        <article><img class="project-preview" src="screenshots/games/2048-opus-5.5-high.webp" alt="" loading="lazy" width="640" height="400"><header><h3><a class="stretched" href="games/2048-opus-5.5-high/">Opus 5.5 · high</a></h3></header><p>Hex 2048.</p></article>
-        <article><img class="project-preview" src="screenshots/games/2048-sonnet-5.5-high.webp" alt="" loading="lazy" width="640" height="400"><header><h3><a class="stretched" href="games/2048-sonnet-5.5-high/">Sonnet 5.5 · high</a></h3></header><p>Hex 2048.</p></article>
-        <article><img class="project-preview" src="screenshots/games/2048-haiku-5.5-high.webp" alt="" loading="lazy" width="640" height="400"><header><h3><a class="stretched" href="games/2048-haiku-5.5-high/">Haiku 5.5 · high</a></h3></header><p>Hex 2048.</p></article>
-        <article><img class="project-preview" src="screenshots/games/2048-astra-6-medium.webp" alt="" loading="lazy" width="640" height="400"><header><h3><a class="stretched" href="games/2048-astra-6-medium/">Astra 6 · medium</a></h3></header><p>Hex / 2048.</p></article>
-        <article><img class="project-preview" src="screenshots/games/2048-sol-6.1-medium.webp" alt="" loading="lazy" width="640" height="400"><header><h3><a class="stretched" href="games/2048-sol-6.1-medium/">Sol 6.1 · medium</a></h3></header><p>HEX / 2048.</p></article>
-        <article><img class="project-preview" src="screenshots/games/hex2048-3d.webp" alt="" loading="lazy" width="640" height="400"><header><h3><a class="stretched" href="games/hex2048-3d/">Hex 2048 · 3D</a></h3></header><p>Hexagonal board rendered with Three.js.</p></article>
-        <article><img class="project-preview" src="screenshots/games/2048-qbas-opus-5.5-high.webp" alt="" loading="lazy" width="640" height="400"><header><h3><a class="stretched" href="games/2048-qbas-opus-5.5-high/">Hex 2048 · QBasic</a></h3></header><p>The .bas file compiled and run in the browser by a bundled copy of QBJS.</p><small><a class="prompt" href="games/2048-qbas-opus-5.5-high/prompt.html">prompt</a> · <a class="prompt" href="games/2048-qbas-opus-5.5-high/2048-qbasic.bas">.bas source</a></small></article>
-        <article><img class="project-preview" src="screenshots/games/2048-asm-opus-5.5-high.webp" alt="" loading="lazy" width="640" height="400"><header><h3><a class="stretched" href="games/2048-asm-opus-5.5-high/">Hex 2048 · x86 assembly</a></h3></header><p>A 2.8 KB DOS .COM in VGA mode 13h, running in DOSBox (js-dos).</p><small><a class="prompt" href="games/2048-asm-opus-5.5-high/prompt.html">prompt</a></small></article>
-        <article><img class="project-preview" src="screenshots/games/2048-gba-opus-5.5-high.webp" alt="" loading="lazy" width="640" height="400"><header><h3><a class="stretched" href="games/2048-gba-opus-5.5-high/">Hex 2048 · Game Boy</a></h3></header><p>A 32 KB Game Boy ROM in SM83 assembly, running in a small hand-written JS emulator.</p><small><a class="prompt" href="games/2048-gba-opus-5.5-high/prompt.html">prompt</a> · <a class="prompt" href="games/2048-gba-opus-5.5-high/hex2048.gb">.gb ROM</a></small></article>
-        <article><img class="project-preview" src="screenshots/games/2048-ps1-opus-5.5-high.webp" alt="" loading="lazy" width="640" height="400"><header><h3><a class="stretched" href="games/2048-ps1-opus-5.5-high/">Hex 2048 · PlayStation</a></h3></header><p>An 18 KB PS-EXE in bare-metal C (no SDK), running in PCSX-ReARMed via EmulatorJS.</p><small><a class="prompt" href="games/2048-ps1-opus-5.5-high/prompt.html">prompt</a> · <a class="prompt" href="games/2048-ps1-opus-5.5-high/hex2048.exe">.exe</a></small></article>
-        <article><img class="project-preview" src="screenshots/games/2048-lynx-opus-5.5-high.webp" alt="" loading="lazy" width="640" height="400"><header><h3><a class="stretched" href="games/2048-lynx-opus-5.5-high/">Hex 2048 · Atari Lynx</a></h3></header><p>A 9 KB Lynx cart in cc65 C, drawn by Suzy hardware sprites, running in Handy via EmulatorJS.</p><small><a class="prompt" href="games/2048-lynx-opus-5.5-high/prompt.html">prompt</a> · <a class="prompt" href="games/2048-lynx-opus-5.5-high/hex2048.lnx">.lnx ROM</a></small></article>
+  <div class="wrap feature">
+    <div class="feature-head">
+      <div>
+        <h2>One prompt, many machines</h2>
+        <p>Hex 2048, rebuilt by different models — and ported down to the Game Boy, DOS, PlayStation and Lynx.</p>
       </div>
-    </section>
+      <span class="hint">scroll →</span>
+    </div>
+    <div class="strip" id="strip"></div>
+  </div>
 
-    <section>
-      <h2>Games &amp; toys</h2>
-      <div class="grid">
-        <article><img class="project-preview" src="screenshots/games/td-opus-5.5-high.webp" alt="" loading="lazy" width="640" height="400"><header><h3><a class="stretched" href="games/td-opus-5.5-high/">Hex Bastion</a></h3></header><p>Tower defense on a hex grid.</p></article>
-        <article><img class="project-preview" src="screenshots/games/3dtd-opus-5.5-uiltra.webp" alt="" loading="lazy" width="640" height="400"><header><h3><a class="stretched" href="games/3dtd-opus-5.5-uiltra/">Hex Highlands TD</a></h3></header><p>3D tower defense on a hex grid.</p><small><a class="prompt" href="games/3dtd-opus-5.5-uiltra/prompt.html">prompt</a></small></article>
-        <article><img class="project-preview" src="screenshots/games/fact-rocket.webp" alt="" loading="lazy" width="640" height="400"><header><h3><a class="stretched" href="games/fact-rocket/">Fact Rocket</a></h3></header><p>Fly a rocket by answering math facts.</p><small><a class="prompt" href="games/fact-rocket/prompt.html">prompt</a></small></article>
-        <article><img class="project-preview" src="screenshots/games/math-garden.webp" alt="" loading="lazy" width="640" height="400"><header><h3><a class="stretched" href="games/math-garden/">Number Garden</a></h3></header><p>A little practice, a lot of growth. Addition and subtraction rounds.</p></article>
-        <article><img class="project-preview" src="screenshots/games/hohmann-works.webp" alt="" loading="lazy" width="640" height="400"><header><h3><a class="stretched" href="games/hohmann-works/">Hohmann Works</a></h3></header><p>Orbital logistics: build stations and orbits.</p></article>
-        <article><img class="project-preview" src="screenshots/games/sixfold-opus-5.5-medium.webp" alt="" loading="lazy" width="640" height="400"><header><h3><a class="stretched" href="games/sixfold-opus-5.5-medium/">Sixfold</a></h3></header><p>6DOF tunnel shooter in a mine built from deformed cubes. Three.js.</p><small><a class="prompt" href="games/sixfold-opus-5.5-medium/prompt.html">prompt</a></small></article>
-        <article><img class="project-preview" src="screenshots/games/hexahedron-opus-5.5.webp" alt="" loading="lazy" width="640" height="400"><header><h3><a class="stretched" href="games/hexahedron-opus-5.5/">Hexahedron</a></h3></header><p>6DOF mine run: red key, lava cavern, reactor, escape timer and an automap. Three.js.</p><small><a class="prompt" href="games/hexahedron-opus-5.5/prompt.html">prompt</a></small></article>
-      </div>
-    </section>
+  <nav class="filters" aria-label="Filter by model"><div class="wrap" id="filters"><span>Model</span></div></nav>
 
-    <section>
-      <h2>Worship planner mockups</h2>
-      <p>UI prototypes for a churches of Christ worship planner.</p>
-      <div class="grid">
-        <article><img class="project-preview" src="screenshots/projects/worship-planner.webp" alt="" loading="lazy" width="640" height="400"><header><h3><a class="stretched" href="worship-planner/">Lectern</a></h3></header><p>Original planner.</p><small><a href="worship-planner/fluent.html">Fluent variant</a> · <a class="prompt" href="worship-planner/prompt.html">prompt</a></small></article>
-        <article><img class="project-preview" src="screenshots/projects/worship-planner-sonnet-5.5.webp" alt="" loading="lazy" width="640" height="400"><header><h3><a class="stretched" href="worship-planner-sonnet-5.5/">Selah</a></h3></header><p>Desktop mockup, Sonnet 5.5.</p><small><a href="worship-planner-sonnet-5.5/mobile.html">Mobile</a> · <a href="worship-planner-sonnet-5.5/fluent/index.html">Fluent variant</a> · <a class="prompt" href="worship-planner-sonnet-5.5/prompt.html">prompt</a></small></article>
-        <article><img class="project-preview" src="screenshots/projects/worship-planner-astra-6.webp" alt="" loading="lazy" width="640" height="400"><header><h3><a class="stretched" href="worship-planner-astra-6/">Gather</a></h3></header><p>Astra 6 prototype.</p><small><a href="worship-planner-astra-6/fluent.html">Fluent variant</a></small></article>
-      </div>
-    </section>
+  <main class="wrap" id="chapters"></main>
 
-    <section>
-      <h2>Data &amp; analysis</h2>
-      <div class="grid">
-        <article><img class="project-preview" src="screenshots/projects/ercot-renewables-gpt-6.1-sol-high.webp" alt="Gridshift’s charcoal control room interface with cyan and amber ERCOT generation charts" loading="lazy" width="640" height="400"><header><h3><a class="stretched" href="ercot-renewables-gpt-6.1-sol-high/">Gridshift · Texas Grid Renewables</a></h3></header><p>Monthly ERCOT generation by source, 2007–2026, with share and TWh views, annual summaries, and a seasonal heatmap. GPT 6.1 Sol · high.</p><small><a class="prompt" href="ercot-renewables-gpt-6.1-sol-high/prompt.html">prompt</a></small></article>
-        <article><img class="project-preview" src="screenshots/projects/ercot-renewables-opus-5.5-high.webp" alt="" loading="lazy" width="640" height="400"><header><h3><a class="stretched" href="ercot-renewables-opus-5.5-high/">How Wind and Solar Remade the Texas Grid</a></h3></header><p>ERCOT monthly generation by fuel, 2007–2026: stacked share/TWh mix, focus-month comparison, annual source-group shares, seasonal heatmap and data table. Bootstrap + Chart.js. Opus 5.5 · high.</p><small><a class="prompt" href="ercot-renewables-opus-5.5-high/prompt.html">prompt</a></small></article>
-        <article><img class="project-preview" src="screenshots/projects/election-gas-prices-gpt-6.1-sol-exh.webp" alt="Pump &amp; Poll's Texas roadside design with a vintage gasoline price board" loading="lazy" width="640" height="400"><header><h3><a class="stretched" href="election-gas-prices-gpt-6.1-sol-exh/dist/">Pump &amp; Poll</a></h3></header><p>DFW election-year gas prices, inflation adjustments, and wage-based affordability. GPT 6.1 Sol · xhigh.</p><small><a class="prompt" href="election-gas-prices-gpt-6.1-sol-exh/prompt.html">prompt</a> · <a href="https://dfw-election-gas-sol-exh.shorttest2025.chatgpt.site">hosted Site</a></small></article>
-        <article><img class="project-preview" src="screenshots/projects/election-gas-prices-sonnet-5.5-high.webp" alt="" loading="lazy" width="640" height="400"><header><h3><a class="stretched" href="election-gas-prices-sonnet-5.5-high/">DFW Election-Day Gas Prices (Sonnet 5.5)</a></h3></header><p>Election-day gas prices in DFW since 1978: inflation-adjusted, wage-adjusted, and minutes of work per gallon or fill-up, with preliminary estimates flagged.</p><small><a class="prompt" href="election-gas-prices-sonnet-5.5-high/prompt.html">prompt</a></small></article>
-        <article><img class="project-preview" src="screenshots/projects/tarrant-2026.webp" alt="" loading="lazy" width="640" height="400"><header><h3><a class="stretched" href="tarrant-2026/">Tarrant County 2026 Election Dashboard</a></h3></header><p>Election results, vote breakdowns, margin charts, and a precinct map.</p></article>
-      </div>
-    </section>
+  <footer class="wrap">Games live in <code>games/</code>. Prompt and README pages are rendered from Markdown by the Pages build (<code>scripts/render-md.sh</code>).</footer>
 
-    <section>
-      <h2>Tools</h2>
-      <p>Python projects; see the README for how to run.</p>
-      <div class="grid">
-        <article><img class="project-preview" src="screenshots/projects/overhead-opus-5.5-high.webp" alt="" loading="lazy" width="640" height="400"><header><h3><a class="stretched" href="overhead-opus-5.5-high/">Overhead</a></h3></header><p>Live aircraft around you: 2D map, tilted 3D map, and sky dome. Runs a recorded demo here; see the README to run it live.</p><small><a class="prompt" href="overhead-opus-5.5-high/prompt.html">prompt</a> · <a class="prompt" href="overhead-opus-5.5-high/README.html">README</a></small></article>
-        <article><header><h3><a class="stretched" href="tx-lege/demo/">tx-lege</a></h3></header><p>Full legislative history of a Texas bill: actions, versions, amendments. Shows sample reports here; see the README to run it on any bill.</p><small><a class="prompt" href="tx-lege/prompt.html">prompt</a> · <a class="prompt" href="tx-lege/README.html">README</a></small></article>
-      </div>
-    </section>
+  <script src="demos.js"></script>
+  <script>
+    const COLOR = { "Opus 5.5": "--opus", "Sonnet 5.5": "--sonnet", "Haiku 5.5": "--haiku", "GPT 6.1 Sol": "--gpt", "Astra 6": "--astra" };
+    const c = m => `var(${COLOR[m] || "--other"})`;
+    const esc = s => String(s).replace(/[&<>"]/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[ch]));
 
-    <section>
-      <h2>Video &amp; vision</h2>
-      <div class="grid">
-        <article><img class="project-preview" src="screenshots/projects/garden-map.webp" alt="" loading="lazy" width="640" height="400"><header><h3><a class="stretched" href="garden-map/">Garden Map</a></h3></header><p>Plants identified from a walking video of a 50 ft back yard bed, placed on a top-down map.</p><small><a class="prompt" href="garden-map/prompt.html">prompt</a></small></article>
-      </div>
-    </section>
-  </main>
-  <footer class="container"><small>Games live in <code>games/</code>. Prompt and README pages are rendered from Markdown by the Pages build (<code>scripts/render-md.sh</code>).</small></footer>
+    const models = [...new Set(DEMOS.map(d => d.model).filter(Boolean))];
+    const prompts = DEMOS.filter(d => (d.links || []).some(l => l[0] === "prompt")).length;
+    document.getElementById("stats").innerHTML =
+      `<div><b>${DEMOS.length}</b>demos</div><div><b>${models.length}</b>models</div><div><b>${prompts}</b>with prompts</div><div><b>${Object.keys(SECTIONS).length}</b>chapters</div>`;
+
+    document.getElementById("strip").innerHTML = DEMOS.filter(d => d.s === "2048").map(d => `
+      <a class="frame" href="${d.href}">
+        <img src="${d.img}" alt="" loading="lazy" width="640" height="400">
+        <div class="plat">${esc(d.platform === "Browser" ? d.model : d.platform)}</div>
+        <div class="meta">${esc([d.model, d.effort].filter(Boolean).join(" · ") || "—")}</div>
+      </a>`).join("");
+
+    const filters = document.getElementById("filters");
+    ["All", ...models].forEach((m, i) => {
+      const b = document.createElement("button");
+      b.className = "chip"; b.setAttribute("aria-pressed", i === 0);
+      b.innerHTML = (m === "All" ? "" : `<i style="--c:${c(m)}"></i>`) + esc(m);
+      b.onclick = () => {
+        filters.querySelectorAll(".chip").forEach(x => x.setAttribute("aria-pressed", x === b));
+        document.querySelectorAll(".card").forEach(card => card.hidden = m !== "All" && card.dataset.model !== m);
+        document.querySelectorAll(".chapter").forEach(ch => ch.hidden = !ch.querySelector(".card:not([hidden])"));
+      };
+      filters.appendChild(b);
+    });
+
+    document.getElementById("chapters").innerHTML = Object.entries(SECTIONS).map(([key, sec], i) => `
+      <section class="chapter">
+        <div class="chapter-head">
+          <div class="num">${String(i + 1).padStart(2, "0")}</div>
+          <h2>${esc(sec.name)}</h2>
+          ${sec.blurb ? `<p>${esc(sec.blurb)}</p>` : ""}
+        </div>
+        <div class="cards">${DEMOS.filter(d => d.s === key).map(d => `
+          <article class="card" data-model="${esc(d.model || "")}">
+            ${d.img ? `<img src="${d.img}" alt="" loading="lazy" width="640" height="400">` : `<div class="noimg">${esc(d.t)}</div>`}
+            <div class="body">
+              <h3><a href="${d.href}">${esc(d.t)}</a></h3>
+              <p>${esc(d.d)}</p>
+              ${d.links ? `<div class="links">${d.links.map(([l, h]) => `<a href="${h}">${esc(l)}</a>`).join("")}</div>` : ""}
+              <div class="tags">${d.model ? `<span class="tag" style="--c:${c(d.model)}">${esc(d.model)}</span>` : ""}${d.effort ? `<span class="tag">${esc(d.effort)}</span>` : ""}</div>
+            </div>
+          </article>`).join("")}
+        </div>
+      </section>`).join("");
+  </script>
 </body>
 </html>
