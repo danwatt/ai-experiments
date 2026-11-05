@@ -77,8 +77,7 @@
       "name": "overhead",
       "runtimeExecutable": "python3",
       "runtimeArgs": [
-        "overhead/server.py",
-        "8795"
+        "overhead-opus-5.5-high/server.py"
       ],
       "port": 8795
     },
@@ -201,6 +200,16 @@
         "ercot-renewables-opus-5.5-high"
       ],
       "port": 8815
+    },
+    {
+      "name": "site-root",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8817"
+      ],
+      "port": 8817
     }
   ]
 }

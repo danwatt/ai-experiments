@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101417">
+  <meta name="description" content="Explore nearly two decades of Texas electricity generation with real monthly ERCOT data, from 2007 onward.">
+  <title>Gridshift — The changing Texas energy mix</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <script src="data.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header class="site-header wrap">
+    <a class="brand" href="#" aria-label="Gridshift home"><svg class="brand-icon" viewBox="0 0 34 34" aria-hidden="true"><path d="M2 18h7l4-11 7 22 5-14h7"/></svg>GRIDSHIFT<span class="brand-divider"></span><span class="brand-caption">ERCOT / GENERATION ARCHIVE</span></a>
+    <nav aria-label="Main navigation"><a href="#explore"><span>01</span> Generation</a><a href="#seasonality"><span>02</span> Seasonality</a><a href="#methodology"><span>03</span> Source notes</a></nav>
+  </header>
+
+  <main class="wrap">
+    <section class="intro" aria-labelledby="page-title">
+      <div>
+        <div class="eyebrow">TEXAS INTERCONNECTION / FUEL ANALYSIS</div>
+        <h1 id="page-title">GENERATION <span>MIX.</span></h1>
+        <p class="intro-copy">Track the shift from fossil fuels to renewables. Actual ERCOT generation, month by month.</p>
+      </div>
+      <div class="intro-aside" aria-label="Data coverage">
+        <div class="archive-badge"><span class="status-dot"></span> HISTORICAL DATA / NOT LIVE</div>
+        <div><span class="eyebrow">OBSERVATION WINDOW</span><strong id="coverage-label">2007 — 2026</strong><span id="coverage-count">Monthly generation · Official data</span></div>
+      </div>
+    </section>
+
+    <section id="explore" class="explorer" aria-labelledby="explorer-title">
+      <div class="section-heading"><div><div class="eyebrow section-number">01 / GENERATION MONITOR</div><h2 id="explorer-title">Generation by source</h2></div><a class="download" id="download" href="ercot-monthly.csv" download><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2v10m-4-4 4 4 4-4M3 13v4h14v-4"/></svg> Export CSV</a></div>
+
+      <div class="chart-card">
+        <div class="toolbar">
+          <div class="segments" role="group" aria-label="Chart measure"><button data-metric="share" class="active" aria-pressed="true">Share of generation <span>%</span></button><button data-metric="energy" aria-pressed="false">Energy generated <span>TWh</span></button></div>
+          <div class="toolbar-right"><label class="select-label" for="aggregation">View</label><select id="aggregation" aria-label="Time aggregation"><option value="monthly">Monthly</option><option value="annual">Annual</option></select><span class="toolbar-divider"></span><div class="range-buttons" role="group" aria-label="Date range"><button data-range="5">5Y</button><button data-range="10">10Y</button><button data-range="all" class="active" aria-pressed="true">All years</button></div></div>
+        </div>
+        <div class="chart-layout">
+          <div class="main-chart">
+            <div class="plot-heading"><div><h3 id="plot-title">Monthly generation mix</h3><span id="plot-subtitle"></span></div><div class="date-controls"><label><span class="sr-only">Start year</span><select id="start-year" aria-label="Start year"></select></label><span>—</span><label><span class="sr-only">End year</span><select id="end-year" aria-label="End year"></select></label></div></div>
+            <div id="legend" class="legend" aria-label="Select a source to highlight"></div>
+            <div class="plot-container"><svg id="mix-chart" viewBox="0 0 960 340" role="img" aria-labelledby="chart-title chart-desc"><title id="chart-title">ERCOT monthly electricity generation mix</title><desc id="chart-desc">Stacked columns show each fuel’s contribution. Use the month selector below to inspect the exact values.</desc></svg><div id="chart-tooltip" class="chart-tooltip" hidden></div></div>
+            <div class="scrubber"><span id="range-start"></span><input id="month-slider" type="range" min="0" value="0" aria-label="Inspect a period"><span id="range-end"></span></div>
+            <div class="chart-hint"><span><span class="small-cross">＋</span> Hover or tap a column to explore. Use the slider or arrow keys for precision.</span><button id="reset-focus" hidden>Show all sources ↺</button></div>
+          </div>
+          <aside class="month-detail" aria-label="Selected period generation breakdown" aria-live="polite">
+            <div class="detail-top"><span class="eyebrow"><span class="status-dot"></span> PERIOD READOUT</span><div class="period-nav"><button id="previous-month" aria-label="Previous period">←</button><button id="next-month" aria-label="Next period">→</button></div></div>
+            <h3 id="detail-date"></h3><div class="detail-total"><strong id="detail-total"></strong><span>TWh generated</span></div>
+            <div class="renewable-callout"><span><i class="status-dot"></i> Renewable share</span><strong id="detail-renewable"></strong></div>
+            <div class="breakdown-head"><span>SOURCE</span><span>TWh</span><span>SHARE</span></div><div id="breakdown"></div>
+            <div class="detail-foot" id="detail-status"></div>
+          </aside>
+        </div>
+        <div class="chart-footer"><span>DATA TYPE / OBSERVED GENERATION</span><span id="source-range"></span></div>
+      </div>
+    </section>
+
+    <section class="stats" aria-label="The transition at a glance">
+      <article class="stat"><div class="stat-label">RENEWABLE SHARE <span class="stat-icon">↗</span></div><div class="stat-value"><span id="renew-start">—</span><span class="stat-arrow">→</span><strong id="renew-end">—</strong></div><div class="stat-bottom"><span id="renew-caption"></span><svg id="spark-renew" viewBox="0 0 130 34" aria-hidden="true"></svg></div></article>
+      <article class="stat"><div class="stat-label">SOLAR CONTRIBUTION <span class="stat-icon sun">☀</span></div><div class="stat-value"><strong id="solar-value">—</strong><span class="value-unit">of generation</span></div><div class="stat-bottom"><span id="solar-caption"></span><svg id="spark-solar" viewBox="0 0 130 34" aria-hidden="true"></svg></div></article>
+      <article class="stat"><div class="stat-label">COAL SHARE <span class="stat-icon">↘</span></div><div class="stat-value"><span id="coal-start">—</span><span class="stat-arrow">→</span><strong id="coal-end">—</strong></div><div class="stat-bottom"><span id="coal-caption"></span><svg id="spark-coal" viewBox="0 0 130 34" aria-hidden="true"></svg></div></article>
+    </section>
+
+    <section id="seasonality" class="season-section" aria-labelledby="season-title">
+      <div class="season-intro"><div class="eyebrow section-number">02 / SEASONALITY SCAN</div><h2 id="season-title">Monthly share<br>matrix</h2><p>One cell. One month. Brighter cells indicate a larger share of generation from the selected source.</p><p>Read across for seasonal variation. Read down for the long-term transition.</p><div class="heat-legend"><span>0%</span><i></i><span>60%+</span></div><div class="season-note"><span>↗</span><p>Select a cell to load its generation breakdown in the monitor.</p></div><label class="heat-select" for="heat-source">SOURCE CHANNEL<select id="heat-source"><option value="renewables">All renewables</option><option value="wind">Wind</option><option value="solar">Solar</option><option value="coal">Coal</option><option value="gas">Natural gas</option><option value="nuclear">Nuclear</option></select></label></div>
+      <div class="heatmap-card"><div class="heatmap-heading"><h3 id="heatmap-title">Renewable share, month by month</h3><span>% OF TOTAL GENERATION</span></div><div class="heatmap-scroll"><div id="heatmap" class="heatmap" role="group" aria-label="Monthly renewable share heatmap"></div></div><div class="heatmap-footer"><span id="heatmap-caption">Wind + solar + hydro + biomass</span><span>— No published data</span></div></div>
+    </section>
+
+    <section class="takeaway"><span class="takeaway-icon" aria-hidden="true">↗</span><div><div class="eyebrow">TREND SUMMARY / COMPLETE YEARS</div><h2 id="takeaway-title"></h2><p id="takeaway-text"></p></div><a href="#explore" aria-label="Back to the generation chart">Return to monitor ↑</a></section>
+
+    <section id="methodology" class="methodology" aria-labelledby="method-title"><div><div class="eyebrow section-number">03 / SOURCE NOTES</div><h2 id="method-title">Data &amp;<br>definitions</h2><a href="https://www.ercot.com/gridinfo/generation/index.html" target="_blank" rel="noopener">Explore ERCOT’s source reports ↗</a></div><div class="method-grid"><article><h3>From the source</h3><p id="source-description"></p></article><article><h3>What counts as renewable?</h3><p>Wind, solar, hydro, and separately reported biomass. Nuclear is a separate, low-carbon source. Natural gas combines ERCOT’s Gas and Gas-CC categories.</p></article><article><h3>Generation, not capacity</h3><p>Values show electricity actually generated, in GWh in the download and TWh on the charts. Shares use total generation excluding signed WSL (storage charging load). Storage is shown separately in the month detail.</p></article><article><h3>A few things to know</h3><p>ERCOT covers most, but not all, of Texas. This is a saved snapshot, not a live feed. Early reports do not separate every fuel; unreported solar and biomass are shown as zero and may be included in Other. Initial settlements can be revised.</p></article></div></section>
+  </main>
+  <footer class="site-footer wrap"><a class="brand" href="#">GRIDSHIFT <span class="footer-slash">//</span></a><span>INDEPENDENT ANALYSIS / ERCOT GENERATION ARCHIVE</span><span id="snapshot-date"></span></footer>
+  <noscript><p class="wrap">Enable JavaScript to explore the charts, or <a href="ercot-monthly.csv">download the monthly data</a>.</p></noscript>
+</body>
+</html>

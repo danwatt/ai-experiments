@@ -1,0 +1,10 @@
+{
+  "name": "ercot-renewables",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A static, interactive view of ERCOT monthly generation from 2007 onward.",
+  "scripts": {
+    "start": "python3 -m http.server 4174 --bind 127.0.0.1",
+    "test": "node --test data.test.cjs"
+  }
+}

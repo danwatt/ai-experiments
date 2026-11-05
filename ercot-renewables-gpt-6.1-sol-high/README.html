@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gridshift — The changing Texas energy mix</title>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif; max-width: 48rem; margin: 0 auto; padding: 2rem 1rem 4rem; }
+  img { max-width: 100%; height: auto; }
+  pre { overflow-x: auto; padding: .75rem; background: color-mix(in srgb, CanvasText 8%, transparent); border-radius: 6px; }
+  code { font-size: .9em; }
+  blockquote { margin-left: 0; padding-left: 1rem; border-left: 3px solid GrayText; color: GrayText; }
+  table { border-collapse: collapse; }
+  td, th { border: 1px solid GrayText; padding: .25rem .6rem; }
+</style>
+</head>
+<body>
+<p><a href="../">&larr; All experiments</a></p>
+<h1>Gridshift — The changing Texas energy mix</h1>
+<p>A single-page, buildless HTML/CSS/JavaScript visualization of <strong>237 actual months of ERCOT generation, January 2007–September 2026</strong>. The bundled snapshot was retrieved November 4, 2026. No API key, build step, JavaScript library, or backend is needed.</p>
+<p>The Grid Control Room theme uses charcoal instrument panels, condensed headings, monospaced readouts, cyan wind/renewable accents, and amber solar/selection accents. The generation monitor comes first, followed by long-term indicators and a cyan seasonal matrix. The archive is explicitly marked as historical, not live telemetry.</p>
+<p>Open <code>index.html</code> directly in a browser, or serve the folder:</p>
+<pre><code class="language-sh">npm start
+</code></pre>
+<p>Visit <a href="http://127.0.0.1:4174">http://127.0.0.1:4174</a>. Any static file server or static hosting service also works.</p>
+<h2>Interactions</h2>
+<ul>
+<li>Monthly stacked generation columns, with annual aggregation as an alternative.</li>
+<li>Toggle between percentage shares and electricity generated in TWh.</li>
+<li>All-history, 10-calendar-year, and 5-calendar-year presets, plus start/end year selectors.</li>
+<li>Hover or tap a column to inspect the complete eight-source breakdown. A keyboard-accessible slider and previous/next controls provide precise selection.</li>
+<li>Click a legend item to highlight a source. Other sources are dimmed; percentages retain the original total denominator.</li>
+<li>A 20-year × 12-month heatmap shows seasonal patterns. Switch among renewables, wind, solar, coal, gas, and nuclear; click a square to inspect the month above. Arrow keys navigate the heatmap spatially.</li>
+<li>Download all monthly observations as CSV. The export includes signed storage load and settlement status.</li>
+</ul>
+<h2>Official source data</h2>
+<p><a href="https://www.ercot.com/gridinfo/generation/index.html">ERCOT Generation / Fuel Mix Reports</a> publishes actual generation by fuel for each 15-minute settlement interval and includes monthly and annual summaries.</p>
+<p>Reports used for this snapshot:</p>
+<ul>
+<li><a href="https://www.ercot.com/files/docs/2021/03/10/FuelMixReport_PreviousYears.zip">2007–2024 historical workbook archive</a></li>
+<li><a href="https://www.ercot.com/files/docs/2025/02/07/IntGenbyFuel2025.xlsx">2025 Fuel Mix Report</a></li>
+<li><a href="https://www.ercot.com/files/docs/2026/02/09/IntGenbyFuel2026.xlsx">2026 Fuel Mix Report</a></li>
+</ul>
+<p><code>data.js</code> contains the browser-ready monthly snapshot, its source URLs, processing method, and SHA-256 hashes for each source workbook. <code>ercot-monthly.csv</code> contains the same numerical series for independent analysis. Raw workbooks are downloaded to a temporary cache, not bundled with the page.</p>
+<h2>Method and definitions</h2>
+<ul>
+<li><strong>2008–2026:</strong> use the reports’ published monthly summary values. Do not interpolate annual shares or synthesize monthly observations.</li>
+<li><strong>2007:</strong> the annual tab does not have monthly columns. Sum the published <strong>Daily MWH</strong> column of each month’s sheet by fuel, then divide by 1,000 to obtain GWh. Each fuel’s annual sum is checked against the annual summary tab.</li>
+<li><strong>Units:</strong> older reports (2008–2016) use MWh; newer summary tabs use GWh. All stored numerical energy values are normalized to GWh. Charts and month details divide by 1,000 again to display TWh.</li>
+<li><strong>Natural gas:</strong> combine <code>Gas</code> and <code>Gas-CC</code>. Older reports’ <code>Wnd</code> and <code>Oth</code> become Wind and Other.</li>
+<li><strong>Renewables:</strong> Wind + Solar + Hydro + separately reported Biomass. Nuclear remains a separate source. Early workbooks do not report solar and biomass separately, so the harmonized fields are zero then; some such generation may be part of Other. The early renewable series is therefore the identifiable renewable share, not an estimate of unclassified renewables.</li>
+<li><strong>Storage:</strong> preserve the signed <code>WSL</code> figure as <code>storageNet</code>. ERCOT includes this (generally negative storage charging load) in its published Total. The visualization’s generation denominator sums the eight primary generation categories and <strong>excludes WSL</strong>, rather than dividing generation by a total reduced by charging. Therefore generation shares can differ from those derived using ERCOT’s reported net Total. The detail panel reports WSL separately whenever nonzero. This is net storage load, not a measurement of gross battery discharge or charge efficiency.</li>
+<li><strong>Signed energy:</strong> a few historical Other values are slightly negative. Preserve them in the dataset and percentage calculations; the SVG uses a signed baseline for them. They are usually too small to distinguish at chart scale.</li>
+<li><strong>Annual shares:</strong> sum each source’s monthly GWh, then divide by annual generation. Never average monthly percentages. Headline comparisons use the latest <strong>complete</strong> year, 2025. The 2026 annual column covers <strong>January–September only</strong> and is labeled YTD.</li>
+<li><strong>Missing months:</strong> October–December 2026 have no published observations in this snapshot. They are hatched in the heatmap, omitted from the charts and CSV, and never treated as zero generation.</li>
+<li><strong>Settlement:</strong> an asterisk on a modern monthly summary column denotes Final settlements; unstarred published modern columns are Initial. September and August 2026 remain Initial in this snapshot. Older files without the modern indicator are labeled Historical.</li>
+<li><strong>Coverage:</strong> the ERCOT grid region, not the entirety of Texas; no emissions or installed capacity claims are inferred from generation.</li>
+</ul>
+<h2>Refreshing the snapshot</h2>
+<p>The page deliberately uses a saved snapshot. It does not make live API requests when opened. To regenerate the bundled files from ERCOT:</p>
+<pre><code class="language-sh">python3 -m pip install openpyxl xlrd
+python3 fetch-data.py --refresh
+</code></pre>
+<p>The script discovers the currently linked fuel-mix reports on ERCOT’s page, caches them in <code>/tmp/ercot-source</code>, extracts monthly values, checks them against published totals (including WSL reconciliation), and rewrites <code>data.js</code> and <code>ercot-monthly.csv</code>. Omit <code>--refresh</code> to reuse cached files. Source access requires an internet connection. Update the snapshot-specific month-count and final-month expectations in <code>data.test.cjs</code> when extending the data.</p>
+<h2>Verification</h2>
+<pre><code class="language-sh">npm test
+node --check app.js
+</code></pre>
+<p>The data checks verify contiguous monthly history, source/category reconciliation, renewable totals, gas category combination, exact source values, 2007 annual reconciliation, and settlement indicators. Browser checks cover desktop and narrow layouts, chart controls, source highlighting, month selection, heatmap navigation, annual YTD labels, and console errors.</p>
+<h2>Files</h2>
+<p><code>index.html</code>, <code>styles.css</code>, <code>app.js</code>, and <code>data.js</code> are the page. <code>favicon.svg</code> is a local vector icon. Google Fonts are optional visual enhancements; system fallbacks keep the page usable offline. Everything needed for data and interactions is bundled locally.</p>
+</body>
+</html>
