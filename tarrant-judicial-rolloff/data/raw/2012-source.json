@@ -1,0 +1,10 @@
+{
+  "year": 2012,
+  "archive_page": "https://www.tarrantcountytx.gov/en/elections/past-election-information/2012-archives/november-6--2012--joint-general-and-special-election-results.html",
+  "tally_url": "https://www.tarrantcountytx.gov/content/dam/main/elections/2012/Nov6/1112_Final_export_split.txt",
+  "cumulative_pdf": "https://www.tarrantcountytx.gov/content/dam/main/elections/2012/Nov6/results/cumulative.pdf",
+  "original_sha256": "8ea2b1de2480e159e1d5533845179f3aefdfc2d12ee16801a8ac5c80222d8488",
+  "tally_file": "data/raw/2012-tally.txt.gz",
+  "retrieved_utc": "2026-11-05T13:34:24.386503+00:00",
+  "tally_available": true
+}

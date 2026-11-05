@@ -1,0 +1,10 @@
+{
+  "year": 2014,
+  "archive_page": "https://www.tarrantcountytx.gov/en/elections/past-election-information/2014-archives/november-4--2014--general-and-special-elections.html",
+  "tally_url": "https://www.tarrantcountytx.gov/content/dam/main/elections/2014/Nov4/1114_Final.txt",
+  "cumulative_pdf": "https://www.tarrantcountytx.gov/content/dam/main/elections/2014/Nov4/cumulative.pdf",
+  "original_sha256": "54b1f2132fae13af633d1fefa265fe98f485711ef76202c4413260d3ae871818",
+  "tally_file": "data/raw/2014-tally.txt.gz",
+  "retrieved_utc": "2026-11-05T13:34:27.440253+00:00",
+  "tally_available": true
+}

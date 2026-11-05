@@ -1,0 +1,10 @@
+{
+  "year": 2016,
+  "archive_page": "https://www.tarrantcountytx.gov/en/elections/past-election-information/2016-archives/november-8--2016--joint-general-and-special-elections-results.html",
+  "tally_url": "https://www.tarrantcountytx.gov/content/dam/main/elections/2016/1116/1116_Final.txt",
+  "cumulative_pdf": "https://www.tarrantcountytx.gov/content/dam/main/elections/2016/1116/cumulative.pdf",
+  "original_sha256": "d53a1051c79fe42562ee3e2240fd6e26f8b1b7fad235c1418d7195d0d9ad036c",
+  "tally_file": "data/raw/2016-tally.txt.gz",
+  "retrieved_utc": "2026-11-05T13:33:41.803316+00:00",
+  "tally_available": true
+}

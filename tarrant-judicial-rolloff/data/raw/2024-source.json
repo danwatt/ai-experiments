@@ -1,0 +1,10 @@
+{
+  "year": 2024,
+  "archive_page": "https://www.tarrantcountytx.gov/en/elections/past-election-information/2024-archives/november-5--2024--general-election-results.html",
+  "tally_url": "https://www.tarrantcountytx.gov/content/dam/main/elections/2024/1124/reports/ENR_1124.zip",
+  "cumulative_pdf": "https://www.tarrantcountytx.gov/content/dam/main/elections/2024/1124/reports/cumulative.pdf",
+  "original_sha256": "3627a214cec59c72185acf6415f3d375bc17eaddc2503d4b61ad2609c8d8c7de",
+  "tally_file": "data/raw/2024-tally.txt.gz",
+  "retrieved_utc": "2026-11-05T13:32:58.857248+00:00",
+  "tally_available": true
+}

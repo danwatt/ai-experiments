@@ -1,6 +1,22 @@
 # Tarrant County 2026 — Election Intelligence Dashboard
 
-Offline, single-file HTML election analysis with 707 real precinct boundaries already embedded.
+Single-file HTML election analysis with 707 real precinct boundaries already embedded.
+Precinct data and analysis work offline; the optional basemap uses online tiles.
+
+## Basemap
+
+The precinct explorer defaults to **Stamen Toner Lite** beneath translucent precinct
+shading, with matching Web Mercator projection for boundaries and tiles. The basemap
+follows pan, zoom, precinct search, and resizing. Choose **Precinct boundaries** under
+Map color for an unfilled overlay, or **None (offline)** under Basemap to disable tiles.
+
+Stamen tiles are hosted by Stadia Maps. Local previews at `localhost` or `127.0.0.1`
+work without a key. For a published site, register its domain in a Stadia Maps account
+using [domain authentication](https://docs.stadiamaps.com/authentication/).
+If Stamen tiles fail, the map switches to a muted OpenStreetMap basemap and displays
+a notice. If both services fail, precinct data and selection remain usable.
+Attribution stays visible on the map. Offline HTML exports embed precinct data,
+but do not download or embed basemap tiles.
 
 The supplied HTML **does not contain precinct vote counts yet**. Clarity's detailed results
 are converted by the script below on your computer. **Do not publish a filled precinct map
@@ -22,7 +38,7 @@ data/precinct_results_2026.json.gz  (compact integer-array rows)
 scripts/embed_results.py      gzip bytes -> base64 script block
                 │
                 ▼
-dist/index.html               fully offline, embedded geometry + vote data
+dist/index.html               embedded geometry + vote data, optional online basemap
 ```
 
 ## Quick start

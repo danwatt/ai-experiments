@@ -1,0 +1,10 @@
+{
+  "year": 2018,
+  "archive_page": "https://www.tarrantcountytx.gov/en/elections/past-election-information/2018-archives/november-6--2018--joint-general-and-special-elections-results.html",
+  "tally_url": "https://www.tarrantcountytx.gov/content/dam/main/elections/2018/1118/1118_ENR.txt",
+  "cumulative_pdf": "https://www.tarrantcountytx.gov/content/dam/main/elections/2018/1118/cumulative.pdf",
+  "original_sha256": "2932e11a7eabe66ab4e920689ca2c8caa2ce14789c91a03826433f4c82479e05",
+  "tally_file": "data/raw/2018-tally.txt.gz",
+  "retrieved_utc": "2026-11-05T13:34:24.330731+00:00",
+  "tally_available": true
+}

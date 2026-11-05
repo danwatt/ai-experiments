@@ -1,0 +1,10 @@
+{
+  "year": 2020,
+  "archive_page": "https://www.tarrantcountytx.gov/en/elections/past-election-information/2020-archives/november-3--2020--joint-general-and-special-elections-results.html",
+  "tally_url": "https://www.tarrantcountytx.gov/content/dam/main/elections/2020/1120/reports/ENR12-2.txt",
+  "cumulative_pdf": "https://www.tarrantcountytx.gov/content/dam/main/elections/2020/1120/reports/cumulative.pdf",
+  "original_sha256": "0be5f7acd28dd25ab80bd2542b140e5202846598a7fa741532bce6b2799c70a5",
+  "tally_file": "data/raw/2020-tally.txt.gz",
+  "retrieved_utc": "2026-11-05T13:34:07.802233+00:00",
+  "tally_available": true
+}

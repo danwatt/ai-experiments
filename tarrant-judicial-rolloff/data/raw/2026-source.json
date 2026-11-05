@@ -1,0 +1,16 @@
+{
+  "year": 2026,
+  "archive_page": "https://www.tarrantcountytx.gov/en/elections/past-election-information/2026-archives/november-3--2026--joint-general-and-special-election-results.html",
+  "tally_url": "https://www.tarrantcountytx.gov/content/dam/main/elections/2026/1126/reports/ENR_1126.zip",
+  "cumulative_pdf": "https://www.tarrantcountytx.gov/content/dam/main/elections/2026/1126/reports/cumulative.pdf",
+  "original_sha256": "c8e3a5dcfcbef5bed05c8646467afd5e517840a47a9d3560bbd6101c19a8709a",
+  "tally_file": "data/raw/2026-tally.txt.gz",
+  "retrieved_utc": "2026-11-05T13:32:55.065479+00:00",
+  "tally_available": false,
+  "clarity_version": "385548",
+  "summary_url": "https://results.enr.clarityelections.com/TX/Tarrant/127297/385548/reports/summary.zip",
+  "summary_sha256": "4c77e37e074002adbabd028ebfc4a40f7f01adc03696f128bee4edfa6c72e0fd",
+  "detailxml_url": "https://results.enr.clarityelections.com/TX/Tarrant/127297/385548/reports/detailxml.zip",
+  "detailxml_sha256": "e90c80f62e970635789059ee30de2b5b5d19e124f12fc5345876abfbc0364e54",
+  "summary_json_url": "https://results.enr.clarityelections.com/TX/Tarrant/127297/385548/json/en/summary.json"
+}
