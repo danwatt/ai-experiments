@@ -189,6 +189,18 @@
         "election-gas-prices-sonnet-5.5-high"
       ],
       "port": 8811
+    },
+    {
+      "name": "ercot-renewables-opus",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8815",
+        "-d",
+        "ercot-renewables-opus-5.5-high"
+      ],
+      "port": 8815
     }
   ]
 }

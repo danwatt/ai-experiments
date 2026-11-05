@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en" data-bs-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Texas Grid Transition</title>
+  <meta name="description" content="Monthly ERCOT generation by fuel, 2007 to today: how wind and solar reshaped the Texas grid.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <script>
+    // apply the saved or OS theme before first paint
+    (function () {
+      var t = 'auto';
+      try { t = localStorage.getItem('ercot-theme') || 'auto'; } catch (e) {}
+      var dark = t === 'dark' || (t === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.setAttribute('data-bs-theme', dark ? 'dark' : 'light');
+    })();
+  </script>
+  <style>
+    :root {
+      --surface: #fcfcfb;
+      --plane: #f9f9f7;
+      --ink: #0b0b0b;
+      --ink-2: #52514e;
+      --muted: #898781;
+      --grid: #e1e0d9;
+      --axis: #c3c2b7;
+      --hairline: rgba(11, 11, 11, 0.10);
+      --up: #006300;
+      --s-wind: #1baf7a;
+      --s-solar: #eda100;
+      --s-hydro: #008300;
+      --s-nuclear: #6250d6;
+      --s-gas: #eb6834;
+      --s-other: #2a78d6;
+      --s-coal: #e34948;
+      --seq-0: #f3f7fd;
+      --seq-1: #cde2fb;
+      --seq-2: #9ec5f4;
+      --seq-3: #6da7ec;
+      --seq-4: #3987e5;
+      --seq-5: #256abf;
+      --seq-6: #184f95;
+      --seq-7: #0d366b;
+    }
+    [data-bs-theme="dark"] {
+      --surface: #1a1a19;
+      --plane: #0d0d0d;
+      --ink: #f0efec;
+      --ink-2: #c3c2b7;
+      --muted: #898781;
+      --grid: #2c2c2a;
+      --axis: #383835;
+      --hairline: rgba(255, 255, 255, 0.10);
+      --up: #0ca30c;
+      --s-wind: #199e70;
+      --s-solar: #c98500;
+      --s-hydro: #008300;
+      --s-nuclear: #9085e9;
+      --s-gas: #d95926;
+      --s-other: #3987e5;
+      --s-coal: #e66767;
+      --seq-0: #222b38;
+      --seq-1: #0d366b;
+      --seq-2: #104281;
+      --seq-3: #184f95;
+      --seq-4: #1c5cab;
+      --seq-5: #2a78d6;
+      --seq-6: #5598e7;
+      --seq-7: #9ec5f4;
+    }
+    body {
+      background: var(--plane);
+      color: var(--ink);
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    .card {
+      background: var(--surface);
+      border-color: var(--hairline);
+    }
+    .text-ink-2 { color: var(--ink-2) !important; }
+    .text-muted-ink { color: var(--muted) !important; }
+    .lede { max-width: 62ch; color: var(--ink-2); }
+    .stat-label { font-size: .8rem; color: var(--ink-2); text-transform: uppercase; letter-spacing: .04em; }
+    .stat-value { font-size: 2rem; font-weight: 600; line-height: 1.1; }
+    .stat-delta { font-size: .875rem; color: var(--ink-2); }
+    .stat-delta .up { color: var(--up); font-weight: 600; }
+    .chart-box { position: relative; height: 420px; }
+    .chart-box.short { height: 340px; }
+    @media (max-width: 575.98px) {
+      .chart-box { height: 340px; }
+      .chart-box.short { height: 300px; }
+      .stat-value { font-size: 1.6rem; }
+    }
+    .filters {
+      background: var(--plane);
+      border-bottom: 1px solid var(--hairline);
+    }
+    @media (min-width: 768px) {
+      .filters { position: sticky; top: 0; z-index: 10; }
+    }
+    .legend { display: flex; flex-wrap: wrap; gap: .25rem 1rem; font-size: .85rem; color: var(--ink-2); }
+    .legend span { display: inline-flex; align-items: center; gap: .4rem; }
+    .legend i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+    .legend i.faded { opacity: .35; }
+    .heat { width: 100%; font-size: .75rem; font-variant-numeric: tabular-nums; border-collapse: separate; border-spacing: 2px; }
+    .heat th { font-weight: 500; color: var(--ink-2); text-align: center; padding: 2px 4px; }
+    .heat th.yr { text-align: right; padding-right: 8px; }
+    .heat td { text-align: center; padding: 4px 2px; min-width: 2.6rem; border-radius: 4px; cursor: default; }
+    .heat td.na { background: transparent; color: var(--muted); }
+    .heat-scale { display: flex; align-items: center; gap: 2px; font-size: .75rem; color: var(--ink-2); }
+    .heat-scale i { width: 22px; height: 10px; display: inline-block; border-radius: 2px; }
+    .data-table { font-size: .8rem; font-variant-numeric: tabular-nums; }
+    .data-table th, .data-table td { white-space: nowrap; text-align: right; }
+    .data-table th:first-child, .data-table td:first-child { text-align: left; }
+    .data-table thead th { position: sticky; top: 0; background: var(--surface); }
+    .table-wrap { max-height: 480px; overflow: auto; }
+    .table { --bs-table-bg: var(--surface); --bs-table-color: var(--ink); }
+    .notes li { margin-bottom: .4rem; }
+    a { color: var(--s-other); }
+  </style>
+</head>
+<body>
+  <nav class="navbar border-bottom" style="background: var(--surface); border-color: var(--hairline) !important;">
+    <div class="container-xl px-3">
+      <span class="navbar-brand mb-0 h1 fs-6 fw-semibold">ERCOT fuel mix</span>
+      <div class="btn-group btn-group-sm" role="group" aria-label="Color theme">
+        <input type="radio" class="btn-check" name="theme" id="th-auto" value="auto" autocomplete="off">
+        <label class="btn btn-outline-secondary" for="th-auto">Auto</label>
+        <input type="radio" class="btn-check" name="theme" id="th-light" value="light" autocomplete="off">
+        <label class="btn btn-outline-secondary" for="th-light">Light</label>
+        <input type="radio" class="btn-check" name="theme" id="th-dark" value="dark" autocomplete="off">
+        <label class="btn btn-outline-secondary" for="th-dark">Dark</label>
+      </div>
+    </div>
+  </nav>
+
+  <header class="container-xl px-3 pt-4 pb-3">
+    <h1 class="h2 fw-semibold mb-2">How wind and solar remade the Texas grid</h1>
+    <p class="lede mb-0" id="lede">Monthly electricity generation on the ERCOT grid by fuel source, from ERCOT's own fuel mix reports.</p>
+  </header>
+
+  <section class="container-xl px-3 pb-3" aria-label="Headline figures">
+    <div class="row g-3" id="stats"></div>
+  </section>
+
+  <div class="filters py-2 mb-3">
+    <div class="container-xl px-3 d-flex flex-wrap align-items-end gap-3">
+      <div>
+        <label class="form-label small mb-1 text-ink-2" for="from">Years</label>
+        <div class="d-flex align-items-center gap-1">
+          <select class="form-select form-select-sm w-auto" id="from" aria-label="From year"></select>
+          <span class="text-ink-2 small">to</span>
+          <select class="form-select form-select-sm w-auto" id="to" aria-label="To year"></select>
+        </div>
+      </div>
+      <div class="btn-group btn-group-sm" role="group" aria-label="Range presets">
+        <button type="button" class="btn btn-outline-secondary" data-span="0">All</button>
+        <button type="button" class="btn btn-outline-secondary" data-span="10">10 yr</button>
+        <button type="button" class="btn btn-outline-secondary" data-span="5">5 yr</button>
+      </div>
+      <div class="btn-group btn-group-sm" role="group" aria-label="Units">
+        <input type="radio" class="btn-check" name="unit" id="u-share" value="share" autocomplete="off" checked>
+        <label class="btn btn-outline-secondary" for="u-share">Share %</label>
+        <input type="radio" class="btn-check" name="unit" id="u-gwh" value="gwh" autocomplete="off">
+        <label class="btn btn-outline-secondary" for="u-gwh">TWh</label>
+      </div>
+      <div>
+        <label class="form-label small mb-1 text-ink-2" for="focus">Focus month</label>
+        <div class="d-flex align-items-center gap-1">
+          <select class="form-select form-select-sm w-auto" id="focus"></select>
+          <span class="text-ink-2 small text-nowrap">vs</span>
+          <select class="form-select form-select-sm w-auto" id="cmp" aria-label="Compare with"></select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <main class="container-xl px-3 pb-5">
+    <div class="card mb-3">
+      <div class="card-body">
+        <h2 class="h5 mb-1">Monthly generation by source</h2>
+        <p class="small text-ink-2 mb-2" id="mix-sub">Share of each month's generation. Click a month to focus it below.</p>
+        <div class="legend mb-2" id="legend-mix"></div>
+        <div class="chart-box"><canvas id="mix" role="img" aria-label="Stacked area chart of monthly generation by fuel source"></canvas></div>
+      </div>
+    </div>
+
+    <div class="row g-3 mb-3">
+      <div class="col-lg-6">
+        <div class="card h-100">
+          <div class="card-body">
+            <h2 class="h5 mb-1" id="focus-title">Focus month</h2>
+            <p class="small text-ink-2 mb-2" id="focus-sub"></p>
+            <div class="legend mb-2" id="legend-focus"></div>
+            <div class="chart-box short"><canvas id="month" role="img" aria-label="Bar chart comparing the focus month with an earlier month"></canvas></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="card h-100">
+          <div class="card-body">
+            <h2 class="h5 mb-1">Annual share by source group</h2>
+            <p class="small text-ink-2 mb-2">Renewables = wind, solar, hydro and biomass. Gas = all natural-gas plants.</p>
+            <div class="legend mb-2" id="legend-annual"></div>
+            <div class="chart-box short"><canvas id="annual" role="img" aria-label="Line chart of annual generation share by source group"></canvas></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-3">
+      <div class="card-body">
+        <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-2">
+          <div>
+            <h2 class="h5 mb-1">Seasonality: share of generation by month</h2>
+            <p class="small text-ink-2 mb-0">Spring is the high season for wind and solar: strong wind, mild demand. Stronger color = larger share.</p>
+          </div>
+          <div class="btn-group btn-group-sm" role="group" aria-label="Heatmap metric" id="heat-metric">
+            <input type="radio" class="btn-check" name="hm" id="hm-ws" value="windsolar" autocomplete="off" checked>
+            <label class="btn btn-outline-secondary" for="hm-ws">Wind + solar</label>
+            <input type="radio" class="btn-check" name="hm" id="hm-solar" value="solar" autocomplete="off">
+            <label class="btn btn-outline-secondary" for="hm-solar">Solar</label>
+            <input type="radio" class="btn-check" name="hm" id="hm-coal" value="coal" autocomplete="off">
+            <label class="btn btn-outline-secondary" for="hm-coal">Coal</label>
+            <input type="radio" class="btn-check" name="hm" id="hm-gas" value="gas" autocomplete="off">
+            <label class="btn btn-outline-secondary" for="hm-gas">Gas</label>
+          </div>
+        </div>
+        <div class="table-responsive"><table class="heat" id="heat"></table></div>
+        <div class="heat-scale mt-2" id="heat-scale"></div>
+      </div>
+    </div>
+
+    <div class="card mb-3">
+      <div class="card-body">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+          <h2 class="h5 mb-0">Data table</h2>
+          <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#table-collapse" aria-expanded="false" aria-controls="table-collapse">Show table</button>
+            <button class="btn btn-sm btn-outline-secondary" type="button" id="csv">Download CSV</button>
+          </div>
+        </div>
+        <p class="small text-ink-2 mb-0">Monthly generation in GWh for the selected years, newest first.</p>
+        <div class="collapse" id="table-collapse">
+          <div class="table-wrap mt-2">
+            <table class="table table-sm table-hover data-table mb-0" id="table"></table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <h2 class="h5">About the data</h2>
+        <ul class="notes small text-ink-2 mb-0 ps-3">
+          <li>Source: ERCOT <a href="https://www.ercot.com/gridinfo/generation" rel="noopener">Fuel Mix Report</a> workbooks (<code>IntGenbyFuel</code>), 15-minute settlement generation summed to months. <span id="coverage"></span></li>
+          <li>Covers generation settled in the ERCOT market, roughly 90% of Texas load. Rooftop solar and generation consumed on site by industrial plants are not included.</li>
+          <li>ERCOT reported all natural gas as one fuel through 2008, then split out combined-cycle plants. Tooltips show the split where it exists.</li>
+          <li>"Other" before 2011 included biomass and small solar. Since about 2021 it is mostly battery discharge. Battery charging (ERCOT's <code>WSL</code>, negative) is left out of the shares and shown in the table.</li>
+          <li>Hydro and biomass are combined because each is under 0.5% of generation.</li>
+          <li>Rebuild the data with <code>python3 build_data.py</code>.</li>
+        </ul>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
