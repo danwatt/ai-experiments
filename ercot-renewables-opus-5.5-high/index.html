@@ -276,6 +276,42 @@
       </div>
     </div>
 
+    <div class="card mb-3" id="price-card">
+      <div class="card-body">
+        <h2 class="h5 mb-1">Wholesale electricity price, monthly</h2>
+        <p class="small text-ink-2 mb-2" id="price-sub"></p>
+        <div class="legend mb-2" id="legend-price"></div>
+        <p class="small text-muted-ink mb-0" id="price-empty" hidden>ERCOT's day-ahead price history starts in December 2010. Widen the year range to see it.</p>
+        <div class="chart-box short"><canvas id="price" role="img" aria-label="Line chart of monthly average and median wholesale electricity price"></canvas></div>
+      </div>
+    </div>
+
+    <div class="card mb-3" id="price-tod-card">
+      <div class="card-body">
+        <h2 class="h5 mb-1">Wholesale price by time of day</h2>
+        <p class="small text-ink-2 mb-2" id="price-tod-sub"></p>
+        <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+          <div class="btn-group btn-group-sm" role="group" aria-label="Price statistic">
+            <input type="radio" class="btn-check" name="ps" id="ps-median" value="median" autocomplete="off" checked>
+            <label class="btn btn-outline-secondary" for="ps-median">Typical (median)</label>
+            <input type="radio" class="btn-check" name="ps" id="ps-mean" value="mean" autocomplete="off">
+            <label class="btn btn-outline-secondary" for="ps-mean">Average</label>
+          </div>
+          <div class="btn-group btn-group-sm" role="group" aria-label="Period type">
+            <input type="radio" class="btn-check" name="pp" id="pp-year" value="year" autocomplete="off">
+            <label class="btn btn-outline-secondary" for="pp-year">Year</label>
+            <input type="radio" class="btn-check" name="pp" id="pp-season" value="season" autocomplete="off" checked>
+            <label class="btn btn-outline-secondary" for="pp-season">Season</label>
+            <input type="radio" class="btn-check" name="pp" id="pp-month" value="month" autocomplete="off">
+            <label class="btn btn-outline-secondary" for="pp-month">Month</label>
+          </div>
+          <select class="form-select form-select-sm w-auto" id="price-period" aria-label="Season or month"></select>
+        </div>
+        <div class="legend mb-2" id="legend-price-tod"></div>
+        <div class="chart-box"><canvas id="price-tod" role="img" aria-label="Line chart of wholesale price by hour of day, one line per year"></canvas></div>
+      </div>
+    </div>
+
     <div class="card mb-3">
       <div class="card-body">
         <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-2">
@@ -327,6 +363,7 @@
           <li>"Other" before 2011 included biomass and small solar. Since about 2021 it is mostly battery discharge. Battery charging (ERCOT's <code>WSL</code>, negative) is left out of the shares and shown in the table.</li>
           <li>Hydro and biomass are combined because each is under 0.5% of generation.</li>
           <li>The time-of-day charts average ERCOT's 15-minute intervals (interval ending, Central prevailing time) over every day in the period, from 2022 on. Demand is total settled generation minus battery charging. Batteries are ERCOT's "Other" (mostly battery discharge) plus <code>WSL</code> charging. Seasons are calendar-year months: winter is Jan, Feb and Dec of the same year. A year is shown only when every month of the period has data.</li>
+          <li>Prices are ERCOT's <a href="https://www.ercot.com/mp/data-products/data-product-details?id=NP4-180-ER" rel="noopener">day-ahead settlement point prices</a> at the hub average (<code>HB_HUBAVG</code>), hourly, in dollars per megawatt-hour. Monthly figures weight every hour equally. These are wholesale prices, not retail bills, and they move with natural gas prices as well as with the grid mix: 2022 was a year of expensive gas.</li>
           <li>Rebuild the data with <code>python3 build_data.py</code>.</li>
         </ul>
       </div>
@@ -337,6 +374,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
   <script src="data.js"></script>
   <script src="profiles.js"></script>
+  <script src="prices.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

@@ -55,7 +55,8 @@
   };
   const isDark = () => document.documentElement.getAttribute('data-bs-theme') === 'dark';
 
-  const state = { from: firstYear, to: lastYear, unit: 'share', focus: N - 1, cmp: 10, heat: 'windsolar', duck: 'net', duckType: 'season', duckSeason: 1, duckMonth: 3 };
+  const state = { from: firstYear, to: lastYear, unit: 'share', focus: N - 1, cmp: 10, heat: 'windsolar', duck: 'net', duckType: 'season', duckSeason: 1, duckMonth: 3,
+    priceStat: 'median', priceType: 'season', priceSeason: 2, priceMonth: 7 };
   const charts = {};
 
   function rangeIdx() {
@@ -436,16 +437,18 @@
   };
   const gw = (mw, d = 1) => (mw / 1000).toFixed(d) + ' GW';
 
-  function periodMonths() {
-    if (state.duckType === 'year') return [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
-    if (state.duckType === 'season') return SEASONS[state.duckSeason].months;
-    return [state.duckMonth];
+  const duckPeriod = () => ({ type: state.duckType, season: state.duckSeason, month: state.duckMonth });
+
+  function periodMonths(p = duckPeriod()) {
+    if (p.type === 'year') return [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+    if (p.type === 'season') return SEASONS[p.season].months;
+    return [p.month];
   }
 
-  function periodLabel() {
-    if (state.duckType === 'year') return 'Whole year';
-    if (state.duckType === 'season') return SEASONS[state.duckSeason].label;
-    return MONTH_NAMES[state.duckMonth];
+  function periodLabel(p = duckPeriod()) {
+    if (p.type === 'year') return 'Whole year';
+    if (p.type === 'season') return SEASONS[p.season].label;
+    return MONTH_NAMES[p.month];
   }
 
   // day-weighted average of one series over the period's months; null if any month is missing
@@ -469,10 +472,10 @@
     return pYears.map(y => ({ year: y, data: profile(y, ms, f) })).filter(s => s.data);
   }
 
-  function missingNote(shown) {
+  function missingNote(shown, months = P.months) {
     const missing = pYears.filter(y => !shown.some(s => s.year === y));
     if (!missing.length) return '';
-    const last = P.months[P.months.length - 1];
+    const last = months[months.length - 1];
     return ` ${missing.join(', ')} not shown: data ends ${MON[+last.slice(5, 7) - 1]} ${last.slice(0, 4)}.`;
   }
 
@@ -505,15 +508,17 @@
     x.grid = { display: false };
     x.ticks.stepSize = 3; x.ticks.maxRotation = 0; x.ticks.autoSkip = false;
     x.ticks.callback = function (v) { return v % (this.chart.width < 560 ? 6 : 3) === 0 ? clock(v) : ''; };
-    y.ticks.callback = v => (v / 1000).toLocaleString() + ' GW';
+    y.ticks.callback = opts.yTick || (v => (v / 1000).toLocaleString() + ' GW');
     Object.assign(y, opts.y || {});
+    const xs = opts.xs || HOURS;
+    const fmt = opts.fmt || gw;
     replace(id, {
       type: 'line',
       data: {
         datasets: series.map(s => {
           const c = yrColor(s.year);
           return {
-            label: String(s.year), data: s.data.map((v, j) => ({ x: HOURS[j], y: v })),
+            label: String(s.year), data: s.data.map((v, j) => ({ x: xs[j], y: v })),
             borderColor: c, backgroundColor: c, borderWidth: s.year === series[series.length - 1].year ? 3 : 2,
             pointRadius: 0, pointHoverRadius: 4, pointHoverBorderColor: css('--surface'), pointHoverBorderWidth: 2,
             pointStyle: 'circle', tension: 0.2
@@ -531,8 +536,8 @@
           tooltip: Object.assign(tooltipStyle(), {
             itemSort: (a, b) => +b.dataset.label - +a.dataset.label,
             callbacks: {
-              title: t => `${clock(t[0].parsed.x - 0.25)} – ${clock(t[0].parsed.x)}`,
-              label: t => `${t.dataset.label}: ${gw(t.parsed.y)}`
+              title: opts.title || (t => `${clock(t[0].parsed.x - 0.25)} – ${clock(t[0].parsed.x)}`),
+              label: t => `${t.dataset.label}: ${fmt(t.parsed.y)}`
             }
           })
         }
@@ -588,16 +593,141 @@
       </tr>`).join('')}</tbody>`;
   }
 
-  function fillDuckPeriod() {
-    const sel = document.getElementById('duck-period');
-    sel.hidden = state.duckType === 'year';
-    if (state.duckType === 'season') {
+  function fillPeriod(id, p) {
+    const sel = document.getElementById(id);
+    sel.hidden = p.type === 'year';
+    if (p.type === 'season') {
       sel.innerHTML = SEASONS.map((s, k) => `<option value="${k}">${s.label}</option>`).join('');
-      sel.value = String(state.duckSeason);
-    } else if (state.duckType === 'month') {
+      sel.value = String(p.season);
+    } else if (p.type === 'month') {
       sel.innerHTML = MONTH_NAMES.map((m, k) => `<option value="${k}">${m}</option>`).join('');
-      sel.value = String(state.duckMonth);
+      sel.value = String(p.month);
     }
+  }
+
+  function fillDuckPeriod() { fillPeriod('duck-period', duckPeriod()); }
+
+  // ---------- wholesale prices ----------
+
+  const PR = window.ERCOT_PRICES;
+  const SEASON_KEYS = ['winter', 'spring', 'summer', 'fall'];
+  const usd = (v, d = 0) => '$' + v.toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d });
+  const prLabel = m => MON[+m.slice(5, 7) - 1] + ' ' + m.slice(0, 4);
+
+  // months off the top of a capped axis get a marker and their value at the top edge
+  const offScale = {
+    id: 'offScale',
+    afterDatasetsDraw(chart, _, opts) {
+      if (!opts.cap) return;
+      const { ctx, chartArea: a } = chart;
+      ctx.save();
+      ctx.font = '600 11px system-ui, sans-serif'; ctx.textBaseline = 'top';
+      chart.data.datasets.forEach((ds, k) => {
+        if (chart.getDatasetMeta(k).hidden) return;
+        ds.data.forEach((v, i) => {
+          if (v <= opts.cap) return;
+          const px = chart.getDatasetMeta(k).data[i].x;
+          ctx.fillStyle = ds.borderColor;
+          ctx.beginPath(); ctx.moveTo(px - 5, a.top + 7); ctx.lineTo(px + 5, a.top + 7); ctx.lineTo(px, a.top); ctx.fill();
+          ctx.fillStyle = css('--ink-2');
+          const text = `${opts.labels[i]}: ${usd(v)}` + (chart.width < 560 ? '' : ' (off scale)');
+          const w = ctx.measureText(text).width;
+          // beside the marker on whichever side has room, else centred and kept inside the plot
+          ctx.textAlign = 'left';
+          const tx = px + 8 + w <= a.right ? px + 8 : px - 8 - w >= a.left ? px - 8 - w : Math.max(a.left, Math.min(px - w / 2, a.right - w));
+          ctx.fillText(text, tx, tx === px + 8 || tx === px - 8 - w ? a.top : a.top + 10);
+        });
+      });
+      ctx.restore();
+    }
+  };
+
+  function renderPrice() {
+    const idx = PR.months.map((m, i) => i).filter(i => +PR.months[i].slice(0, 4) >= state.from && +PR.months[i].slice(0, 4) <= state.to);
+    const empty = !idx.length;
+    document.getElementById('price-empty').hidden = !empty;
+    document.getElementById('price').parentElement.hidden = empty;
+    if (empty) { document.getElementById('price-sub').textContent = ''; return; }
+    const labels = idx.map(i => prLabel(PR.months[i]));
+    const series = [
+      { label: 'Average', data: idx.map(i => PR.mean[i]), color: css('--s-other') },
+      { label: 'Median', data: idx.map(i => PR.median[i]), color: css('--ink-2') }
+    ];
+    // one scarcity month (Winter Storm Uri) would flatten everything else, so cap the axis above it
+    const top = series[0].data.slice().sort((a, b) => b - a);
+    const cap = top.length > 1 && top[0] > 2.5 * top[1] ? Math.ceil(top[1] * 1.15 / 50) * 50 : null;
+    const years = state.to - state.from + 1;
+    const x = baseScales();
+    const y = baseScales();
+    x.grid = { display: false };
+    x.ticks = Object.assign(x.ticks, {
+      autoSkip: false, maxRotation: 0,
+      callback: function (v) {
+        const m = PR.months[idx[v]];
+        const step = Math.max(1, Math.ceil(years * 40 / this.width));
+        return m.endsWith('-01') && (+m.slice(0, 4) - state.from) % step === 0 ? m.slice(0, 4) : '';
+      }
+    });
+    Object.assign(y, { beginAtZero: true, max: cap || undefined });
+    y.ticks.callback = v => usd(v);
+    replace('price', {
+      type: 'line',
+      data: {
+        labels,
+        datasets: series.map(s => ({
+          label: s.label, data: s.data, borderColor: s.color, backgroundColor: s.color,
+          borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, pointHoverBorderColor: css('--surface'),
+          pointHoverBorderWidth: 2, pointStyle: 'circle', tension: 0
+        }))
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false, animation: false,
+        layout: { padding: { right: 64, top: cap ? 4 : 0 } },
+        interaction: { mode: 'index', intersect: false },
+        scales: { x, y },
+        plugins: {
+          legend: { display: false },
+          crosshair: {},
+          offScale: { cap, labels },
+          tooltip: Object.assign(tooltipStyle(), {
+            callbacks: {
+              label: t => `${t.dataset.label}: ${usd(t.parsed.y, 2)}/MWh`,
+              footer: t => `Highest hour: ${usd(PR.max[idx[t[0].dataIndex]])}/MWh`
+            }
+          })
+        }
+      },
+      plugins: [crosshair, yearLabels, offScale]
+    });
+    legend('legend-price', series.map(s => ({ label: s.label, color: s.color })));
+    document.querySelectorAll('#legend-price i').forEach(i => i.classList.add('line'));
+    document.getElementById('price-sub').textContent =
+      `Day-ahead price at ERCOT's hub average, ${prLabel(PR.months[idx[0]])} – ${prLabel(PR.months[idx[idx.length - 1]])}, in dollars per megawatt-hour. ` +
+      'The average includes rare scarcity hours; the median is a typical hour.' +
+      (cap ? ' The scale is capped so one extreme month does not flatten the rest.' : '');
+  }
+
+  const pricePeriod = () => ({ type: state.priceType, season: state.priceSeason, month: state.priceMonth });
+
+  function renderPriceTod() {
+    const p = pricePeriod();
+    const key = p.type === 'year' ? 'year' : p.type === 'season' ? SEASON_KEYS[p.season] : 'm' + p.month;
+    const series = pYears.filter(y => PR.tod[y] && PR.tod[y][key])
+      .map(y => ({ year: y, data: PR.tod[y][key][state.priceStat] }));
+    const typical = state.priceStat === 'median';
+    document.getElementById('price-tod-sub').textContent =
+      `${periodLabel(p)}. ${typical ? 'Median' : 'Average'} day-ahead hub price for each hour of the day` +
+      (typical ? ': a typical day, ignoring rare price spikes.' : ', including rare price spikes.') +
+      missingNote(series, PR.months);
+    timeChart('price-tod', series, {
+      xs: Array.from({ length: 24 }, (_, h) => h + 0.5),  // hour ending h+1, drawn mid-hour
+      fmt: v => usd(v, 2) + '/MWh',
+      yTick: v => usd(v),
+      y: { beginAtZero: true },
+      title: t => `${clock(t[0].parsed.x - 0.5)} – ${clock(t[0].parsed.x + 0.5)}`
+    });
+    legend('legend-price-tod', series.map(s => ({ label: String(s.year), color: yrColor(s.year) })));
+    document.querySelectorAll('#legend-price-tod i').forEach(i => i.classList.add('line'));
   }
 
   // ---------- heatmap ----------
@@ -695,6 +825,8 @@
     renderFocus();
     renderAnnual();
     renderDuck();
+    renderPrice();
+    renderPriceTod();
     renderHeat();
     renderTable();
   }
@@ -739,6 +871,17 @@
       renderDuck();
     });
     fillDuckPeriod();
+    document.querySelectorAll('input[name=ps]').forEach(r => r.addEventListener('change', () => {
+      state.priceStat = r.value; renderPriceTod();
+    }));
+    document.querySelectorAll('input[name=pp]').forEach(r => r.addEventListener('change', () => {
+      state.priceType = r.value; fillPeriod('price-period', pricePeriod()); renderPriceTod();
+    }));
+    document.getElementById('price-period').addEventListener('change', e => {
+      if (state.priceType === 'season') state.priceSeason = +e.target.value; else state.priceMonth = +e.target.value;
+      renderPriceTod();
+    });
+    fillPeriod('price-period', pricePeriod());
 
     const focus = document.getElementById('focus');
     focus.innerHTML = D.months.map((_, i) => i).reverse().map(i => `<option value="${i}">${label(i)}</option>`).join('');

@@ -3,8 +3,8 @@
 - **Model:** claude-opus-5-5
 - **Effort:** high
 - **Session(s):** 17f610a7-f369-423d-87f9-412dab3dd19b
-- **Tokens:** input 290, output 151304, cache read 23383156, cache write 343401
-- **Cost (tokscale estimate):** $10.45
+- **Tokens:** input 334, output 174648, cache read 29206514, cache write 381670
+- **Cost (tokscale estimate):** $12.39
 
 ## You
 
@@ -334,3 +334,68 @@ The explainer now has an optional voiceover in the Heart voice. It's off by defa
 ## You
 
 Commit it
+
+## Claude
+
+Committed as `c967593` on master: "Add optional voiceover to the ERCOT duck curve explainer". Not pushed.
+
+Commit has only this demo's files:
+- `build_voiceover.py`
+- the 14 `.webm` clips and `voiceover/voiceover.js` in `voiceover/`
+- the updated `duck.html` and `duck.js`
+- `prompt.md`, refreshed first, plus its screenshots
+
+Left uncommitted, from other sessions: the Tarrant line in `demos.js`, edits in `tarrant-2026/`, and the `tarrant-judicial-rolloff/` folder.
+
+## You
+
+Is there anything we can do to add a chart that shows the cost of electricity over the past N years? Especially if there is a way to show it as a time-of-day?
+
+## Claude
+
+Yes, both are possible, using ERCOT's wholesale prices. These come from the same site as the fuel mix data, are free, and need no login:
+
+| Report | Detail | Years | Size |
+|---|---|---|---|
+| Day-ahead market prices | hourly | 2010–2026 | about 2 MB per year |
+| Real-time market prices | 15-minute | 2010–2026 | about 14 MB per year |
+
+Both cover the trading hubs, including the hub average (`HB_HUBAVG`), and the load zones (Houston, North, South, West, Austin, San Antonio and others).
+
+**Quick test, spring 2025, day-ahead hub average, average $/MWh by hour:**
+
+```
+12am $28 · 4am $24 · 7am $35 · 11am $17 · 2pm $21 · 6pm $33 · 8pm $80 · 9pm $77 · 11pm $40
+```
+
+That's the duck again, this time in price: power is cheapest at midday when solar floods the grid, and most expensive around 8 pm when solar fades and other plants have to ramp up. That gap is the money batteries earn by charging at midday and discharging in the evening.
+
+**What I'd build in the explorer:**
+1. **Monthly wholesale price, 2011–now.** I'd show the median next to the mean, because scarcity spikes skew the average. February 2021 (Winter Storm Uri) had days stuck at the $9,000/MWh price cap and would flatten everything else, so it gets an annotation and the chart caps its scale.
+2. **Price by time of day, one line per year from 2022.** Same Year / Season / Month toggles as the duck chart, so the two can be read together. This one should show the midday price falling and the evening peak shifting.
+
+Prices and gigawatts stay on separate charts; I wouldn't put both on one chart with two axes.
+
+**Caveat:** these are wholesale prices, not what households pay. Retail rates in Texas (EIA's monthly residential cents per kWh) need a free EIA API key, and they have no time-of-day detail because most Texas retail plans charge a flat rate. Retail could be a third chart later if you get a key.
+
+I'd use the day-ahead prices for both charts: hourly is fine-grained enough for a time-of-day curve, and the files are a seventh the size of the real-time ones.
+
+## You
+
+Build both
+
+## Claude
+
+![screenshot 55](prompt-assets/055.jpg)
+
+![screenshot 56](prompt-assets/056.jpg)
+
+![screenshot 57](prompt-assets/057.jpg)
+
+![screenshot 58](prompt-assets/058.jpg)
+
+![screenshot 59](prompt-assets/059.jpg)
+
+![screenshot 60](prompt-assets/060.jpg)
+
+Both price charts are verified at phone width too. Updating the landing-page blurb and prompt.md.
