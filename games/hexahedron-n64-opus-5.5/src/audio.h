@@ -1,0 +1,8 @@
+#ifndef AUDIO_H
+#define AUDIO_H
+enum { SFX_LASER, SFX_SPREAD, SFX_MISSILE, SFX_BOOM, SFX_BIGBOOM, SFX_HIT, SFX_WALL, SFX_HURT, SFX_PICKUP, SFX_WEAPON,
+       SFX_KEY, SFX_DOOR, SFX_LOCKED, SFX_ESHOT, SFX_PLASMA, SFX_ALARM, SFX_MENU, SFX_START, SFX_EMPTY, SFX_SIZZLE };
+void audio_init(void);
+void audio_update(void);
+void sfx(int id);
+#endif

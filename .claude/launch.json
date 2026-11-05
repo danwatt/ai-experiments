@@ -210,6 +210,18 @@
         "8817"
       ],
       "port": 8817
+    },
+    {
+      "name": "hexahedron-n64",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8819",
+        "-d",
+        "games/hexahedron-n64-opus-5.5"
+      ],
+      "port": 8819
     }
   ]
 }
