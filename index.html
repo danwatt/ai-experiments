@@ -18,6 +18,7 @@
     article a.stretched::after { content: ""; position: absolute; inset: 0; }
     article { position: relative; }
     .grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+    .project-preview { display: block; width: 100%; aspect-ratio: 8 / 5; object-fit: cover; border-radius: var(--pico-border-radius); margin-bottom: 1rem; background: #161b22; }
   </style>
 </head>
 <body>
@@ -31,31 +32,31 @@
       <h2>Hex 2048 variants</h2>
       <p>Same prompt, different models and effort levels.</p>
       <div class="grid">
-        <article><header><h3><a class="stretched" href="games/2048-opus-5.5-max/">Opus 5.5 · max</a></h3></header><p>Hex 2048, highest effort.</p></article>
-        <article><header><h3><a class="stretched" href="games/2048-opus-5.5-high/">Opus 5.5 · high</a></h3></header><p>Hex 2048.</p></article>
-        <article><header><h3><a class="stretched" href="games/2048-sonnet-5.5-high/">Sonnet 5.5 · high</a></h3></header><p>Hex 2048.</p></article>
-        <article><header><h3><a class="stretched" href="games/2048-haiku-5.5-high/">Haiku 5.5 · high</a></h3></header><p>Hex 2048.</p></article>
-        <article><header><h3><a class="stretched" href="games/2048-astra-6-medium/">Astra 6 · medium</a></h3></header><p>Hex / 2048.</p></article>
-        <article><header><h3><a class="stretched" href="games/2048-sol-6.1-medium/">Sol 6.1 · medium</a></h3></header><p>HEX / 2048.</p></article>
-        <article><header><h3><a class="stretched" href="games/hex2048-3d/">Hex 2048 · 3D</a></h3></header><p>Hexagonal board rendered with Three.js.</p></article>
-        <article><header><h3><a class="stretched" href="games/2048-qbas-opus-5.5-high/">Hex 2048 · QBasic</a></h3></header><p>The .bas file compiled and run in the browser by a bundled copy of QBJS.</p><small><a class="prompt" href="games/2048-qbas-opus-5.5-high/prompt.html">prompt</a> · <a class="prompt" href="games/2048-qbas-opus-5.5-high/2048-qbasic.bas">.bas source</a></small></article>
-        <article><header><h3><a class="stretched" href="games/2048-asm-opus-5.5-high/">Hex 2048 · x86 assembly</a></h3></header><p>A 2.8 KB DOS .COM in VGA mode 13h, running in DOSBox (js-dos).</p><small><a class="prompt" href="games/2048-asm-opus-5.5-high/prompt.html">prompt</a></small></article>
-        <article><header><h3><a class="stretched" href="games/2048-gba-opus-5.5-high/">Hex 2048 · Game Boy</a></h3></header><p>A 32 KB Game Boy ROM in SM83 assembly, running in a small hand-written JS emulator.</p><small><a class="prompt" href="games/2048-gba-opus-5.5-high/prompt.html">prompt</a> · <a class="prompt" href="games/2048-gba-opus-5.5-high/hex2048.gb">.gb ROM</a></small></article>
-        <article><header><h3><a class="stretched" href="games/2048-ps1-opus-5.5-high/">Hex 2048 · PlayStation</a></h3></header><p>An 18 KB PS-EXE in bare-metal C (no SDK), running in PCSX-ReARMed via EmulatorJS.</p><small><a class="prompt" href="games/2048-ps1-opus-5.5-high/prompt.html">prompt</a> · <a class="prompt" href="games/2048-ps1-opus-5.5-high/hex2048.exe">.exe</a></small></article>
-        <article><header><h3><a class="stretched" href="games/2048-lynx-opus-5.5-high/">Hex 2048 · Atari Lynx</a></h3></header><p>A 9 KB Lynx cart in cc65 C, drawn by Suzy hardware sprites, running in Handy via EmulatorJS.</p><small><a class="prompt" href="games/2048-lynx-opus-5.5-high/prompt.html">prompt</a> · <a class="prompt" href="games/2048-lynx-opus-5.5-high/hex2048.lnx">.lnx ROM</a></small></article>
+        <article><img class="project-preview" src="screenshots/games/2048-opus-5.5-max.webp" alt="" loading="lazy" width="640" height="400"><header><h3><a class="stretched" href="games/2048-opus-5.5-max/">Opus 5.5 · max</a></h3></header><p>Hex 2048, highest effort.</p></article>
+        <article><img class="project-preview" src="screenshots/games/2048-opus-5.5-high.webp" alt="" loading="lazy" width="640" height="400"><header><h3><a class="stretched" href="games/2048-opus-5.5-high/">Opus 5.5 · high</a></h3></header><p>Hex 2048.</p></article>
+        <article><img class="project-preview" src="screenshots/games/2048-sonnet-5.5-high.webp" alt="" loading="lazy" width="640" height="400"><header><h3><a class="stretched" href="games/2048-sonnet-5.5-high/">Sonnet 5.5 · high</a></h3></header><p>Hex 2048.</p></article>
+        <article><img class="project-preview" src="screenshots/games/2048-haiku-5.5-high.webp" alt="" loading="lazy" width="640" height="400"><header><h3><a class="stretched" href="games/2048-haiku-5.5-high/">Haiku 5.5 · high</a></h3></header><p>Hex 2048.</p></article>
+        <article><img class="project-preview" src="screenshots/games/2048-astra-6-medium.webp" alt="" loading="lazy" width="640" height="400"><header><h3><a class="stretched" href="games/2048-astra-6-medium/">Astra 6 · medium</a></h3></header><p>Hex / 2048.</p></article>
+        <article><img class="project-preview" src="screenshots/games/2048-sol-6.1-medium.webp" alt="" loading="lazy" width="640" height="400"><header><h3><a class="stretched" href="games/2048-sol-6.1-medium/">Sol 6.1 · medium</a></h3></header><p>HEX / 2048.</p></article>
+        <article><img class="project-preview" src="screenshots/games/hex2048-3d.webp" alt="" loading="lazy" width="640" height="400"><header><h3><a class="stretched" href="games/hex2048-3d/">Hex 2048 · 3D</a></h3></header><p>Hexagonal board rendered with Three.js.</p></article>
+        <article><img class="project-preview" src="screenshots/games/2048-qbas-opus-5.5-high.webp" alt="" loading="lazy" width="640" height="400"><header><h3><a class="stretched" href="games/2048-qbas-opus-5.5-high/">Hex 2048 · QBasic</a></h3></header><p>The .bas file compiled and run in the browser by a bundled copy of QBJS.</p><small><a class="prompt" href="games/2048-qbas-opus-5.5-high/prompt.html">prompt</a> · <a class="prompt" href="games/2048-qbas-opus-5.5-high/2048-qbasic.bas">.bas source</a></small></article>
+        <article><img class="project-preview" src="screenshots/games/2048-asm-opus-5.5-high.webp" alt="" loading="lazy" width="640" height="400"><header><h3><a class="stretched" href="games/2048-asm-opus-5.5-high/">Hex 2048 · x86 assembly</a></h3></header><p>A 2.8 KB DOS .COM in VGA mode 13h, running in DOSBox (js-dos).</p><small><a class="prompt" href="games/2048-asm-opus-5.5-high/prompt.html">prompt</a></small></article>
+        <article><img class="project-preview" src="screenshots/games/2048-gba-opus-5.5-high.webp" alt="" loading="lazy" width="640" height="400"><header><h3><a class="stretched" href="games/2048-gba-opus-5.5-high/">Hex 2048 · Game Boy</a></h3></header><p>A 32 KB Game Boy ROM in SM83 assembly, running in a small hand-written JS emulator.</p><small><a class="prompt" href="games/2048-gba-opus-5.5-high/prompt.html">prompt</a> · <a class="prompt" href="games/2048-gba-opus-5.5-high/hex2048.gb">.gb ROM</a></small></article>
+        <article><img class="project-preview" src="screenshots/games/2048-ps1-opus-5.5-high.webp" alt="" loading="lazy" width="640" height="400"><header><h3><a class="stretched" href="games/2048-ps1-opus-5.5-high/">Hex 2048 · PlayStation</a></h3></header><p>An 18 KB PS-EXE in bare-metal C (no SDK), running in PCSX-ReARMed via EmulatorJS.</p><small><a class="prompt" href="games/2048-ps1-opus-5.5-high/prompt.html">prompt</a> · <a class="prompt" href="games/2048-ps1-opus-5.5-high/hex2048.exe">.exe</a></small></article>
+        <article><img class="project-preview" src="screenshots/games/2048-lynx-opus-5.5-high.webp" alt="" loading="lazy" width="640" height="400"><header><h3><a class="stretched" href="games/2048-lynx-opus-5.5-high/">Hex 2048 · Atari Lynx</a></h3></header><p>A 9 KB Lynx cart in cc65 C, drawn by Suzy hardware sprites, running in Handy via EmulatorJS.</p><small><a class="prompt" href="games/2048-lynx-opus-5.5-high/prompt.html">prompt</a> · <a class="prompt" href="games/2048-lynx-opus-5.5-high/hex2048.lnx">.lnx ROM</a></small></article>
       </div>
     </section>
 
     <section>
       <h2>Games &amp; toys</h2>
       <div class="grid">
-        <article><header><h3><a class="stretched" href="games/td-opus-5.5-high/">Hex Bastion</a></h3></header><p>Tower defense on a hex grid.</p></article>
-        <article><header><h3><a class="stretched" href="games/3dtd-opus-5.5-uiltra/">Hex Highlands TD</a></h3></header><p>3D tower defense on a hex grid.</p><small><a class="prompt" href="games/3dtd-opus-5.5-uiltra/prompt.html">prompt</a></small></article>
-        <article><header><h3><a class="stretched" href="games/fact-rocket/">Fact Rocket</a></h3></header><p>Fly a rocket by answering math facts.</p><small><a class="prompt" href="games/fact-rocket/prompt.html">prompt</a></small></article>
-        <article><header><h3><a class="stretched" href="games/math-garden/">Number Garden</a></h3></header><p>A little practice, a lot of growth. Addition and subtraction rounds.</p></article>
-        <article><header><h3><a class="stretched" href="games/hohmann-works/">Hohmann Works</a></h3></header><p>Orbital logistics: build stations and orbits.</p></article>
-        <article><header><h3><a class="stretched" href="games/sixfold-opus-5.5-medium/">Sixfold</a></h3></header><p>6DOF tunnel shooter in a mine built from deformed cubes. Three.js.</p><small><a class="prompt" href="games/sixfold-opus-5.5-medium/prompt.html">prompt</a></small></article>
-        <article><header><h3><a class="stretched" href="games/hexahedron-opus-5.5/">Hexahedron</a></h3></header><p>6DOF mine run: red key, lava cavern, reactor, escape timer and an automap. Three.js.</p><small><a class="prompt" href="games/hexahedron-opus-5.5/prompt.html">prompt</a></small></article>
+        <article><img class="project-preview" src="screenshots/games/td-opus-5.5-high.webp" alt="" loading="lazy" width="640" height="400"><header><h3><a class="stretched" href="games/td-opus-5.5-high/">Hex Bastion</a></h3></header><p>Tower defense on a hex grid.</p></article>
+        <article><img class="project-preview" src="screenshots/games/3dtd-opus-5.5-uiltra.webp" alt="" loading="lazy" width="640" height="400"><header><h3><a class="stretched" href="games/3dtd-opus-5.5-uiltra/">Hex Highlands TD</a></h3></header><p>3D tower defense on a hex grid.</p><small><a class="prompt" href="games/3dtd-opus-5.5-uiltra/prompt.html">prompt</a></small></article>
+        <article><img class="project-preview" src="screenshots/games/fact-rocket.webp" alt="" loading="lazy" width="640" height="400"><header><h3><a class="stretched" href="games/fact-rocket/">Fact Rocket</a></h3></header><p>Fly a rocket by answering math facts.</p><small><a class="prompt" href="games/fact-rocket/prompt.html">prompt</a></small></article>
+        <article><img class="project-preview" src="screenshots/games/math-garden.webp" alt="" loading="lazy" width="640" height="400"><header><h3><a class="stretched" href="games/math-garden/">Number Garden</a></h3></header><p>A little practice, a lot of growth. Addition and subtraction rounds.</p></article>
+        <article><img class="project-preview" src="screenshots/games/hohmann-works.webp" alt="" loading="lazy" width="640" height="400"><header><h3><a class="stretched" href="games/hohmann-works/">Hohmann Works</a></h3></header><p>Orbital logistics: build stations and orbits.</p></article>
+        <article><img class="project-preview" src="screenshots/games/sixfold-opus-5.5-medium.webp" alt="" loading="lazy" width="640" height="400"><header><h3><a class="stretched" href="games/sixfold-opus-5.5-medium/">Sixfold</a></h3></header><p>6DOF tunnel shooter in a mine built from deformed cubes. Three.js.</p><small><a class="prompt" href="games/sixfold-opus-5.5-medium/prompt.html">prompt</a></small></article>
+        <article><img class="project-preview" src="screenshots/games/hexahedron-opus-5.5.webp" alt="" loading="lazy" width="640" height="400"><header><h3><a class="stretched" href="games/hexahedron-opus-5.5/">Hexahedron</a></h3></header><p>6DOF mine run: red key, lava cavern, reactor, escape timer and an automap. Three.js.</p><small><a class="prompt" href="games/hexahedron-opus-5.5/prompt.html">prompt</a></small></article>
       </div>
     </section>
 
@@ -63,16 +64,17 @@
       <h2>Worship planner mockups</h2>
       <p>UI prototypes for a churches of Christ worship planner.</p>
       <div class="grid">
-        <article><header><h3><a class="stretched" href="worship-planner/">Lectern</a></h3></header><p>Original planner.</p><small><a href="worship-planner/fluent.html">Fluent variant</a> · <a class="prompt" href="worship-planner/prompt.html">prompt</a></small></article>
-        <article><header><h3><a class="stretched" href="worship-planner-sonnet-5.5/">Selah</a></h3></header><p>Desktop mockup, Sonnet 5.5.</p><small><a href="worship-planner-sonnet-5.5/mobile.html">Mobile</a> · <a href="worship-planner-sonnet-5.5/fluent/index.html">Fluent variant</a> · <a class="prompt" href="worship-planner-sonnet-5.5/prompt.html">prompt</a></small></article>
-        <article><header><h3><a class="stretched" href="worship-planner-astra-6/">Gather</a></h3></header><p>Astra 6 prototype.</p><small><a href="worship-planner-astra-6/fluent.html">Fluent variant</a></small></article>
+        <article><img class="project-preview" src="screenshots/projects/worship-planner.webp" alt="" loading="lazy" width="640" height="400"><header><h3><a class="stretched" href="worship-planner/">Lectern</a></h3></header><p>Original planner.</p><small><a href="worship-planner/fluent.html">Fluent variant</a> · <a class="prompt" href="worship-planner/prompt.html">prompt</a></small></article>
+        <article><img class="project-preview" src="screenshots/projects/worship-planner-sonnet-5.5.webp" alt="" loading="lazy" width="640" height="400"><header><h3><a class="stretched" href="worship-planner-sonnet-5.5/">Selah</a></h3></header><p>Desktop mockup, Sonnet 5.5.</p><small><a href="worship-planner-sonnet-5.5/mobile.html">Mobile</a> · <a href="worship-planner-sonnet-5.5/fluent/index.html">Fluent variant</a> · <a class="prompt" href="worship-planner-sonnet-5.5/prompt.html">prompt</a></small></article>
+        <article><img class="project-preview" src="screenshots/projects/worship-planner-astra-6.webp" alt="" loading="lazy" width="640" height="400"><header><h3><a class="stretched" href="worship-planner-astra-6/">Gather</a></h3></header><p>Astra 6 prototype.</p><small><a href="worship-planner-astra-6/fluent.html">Fluent variant</a></small></article>
       </div>
     </section>
 
     <section>
       <h2>Data &amp; analysis</h2>
       <div class="grid">
-        <article><header><h3><a class="stretched" href="tarrant-2026/">Tarrant County 2026 Election Dashboard</a></h3></header><p>Election results, vote breakdowns, margin charts, and a precinct map.</p></article>
+        <article><img class="project-preview" src="screenshots/projects/election-gas-prices-gpt-6.1-sol-exh.webp" alt="Pump &amp; Poll's Texas roadside design with a vintage gasoline price board" loading="lazy" width="640" height="400"><header><h3><a class="stretched" href="election-gas-prices-gpt-6.1-sol-exh/dist/">Pump &amp; Poll</a></h3></header><p>DFW election-year gas prices, inflation adjustments, and wage-based affordability. GPT 6.1 Sol · xhigh.</p><small><a class="prompt" href="election-gas-prices-gpt-6.1-sol-exh/prompt.html">prompt</a> · <a href="https://dfw-election-gas-sol-exh.shorttest2025.chatgpt.site">hosted Site</a></small></article>
+        <article><img class="project-preview" src="screenshots/projects/tarrant-2026.webp" alt="" loading="lazy" width="640" height="400"><header><h3><a class="stretched" href="tarrant-2026/">Tarrant County 2026 Election Dashboard</a></h3></header><p>Election results, vote breakdowns, margin charts, and a precinct map.</p></article>
       </div>
     </section>
 
@@ -80,7 +82,7 @@
       <h2>Tools</h2>
       <p>Python projects; see the README for how to run.</p>
       <div class="grid">
-        <article><header><h3><a class="stretched" href="overhead-opus-5.5-high/README.html">Overhead</a></h3></header><p>Live aircraft around you: 2D map, tilted 3D map, and sky dome.</p><small><a class="prompt" href="overhead-opus-5.5-high/prompt.html">prompt</a></small></article>
+        <article><img class="project-preview" src="screenshots/projects/overhead-opus-5.5-high.webp" alt="" loading="lazy" width="640" height="400"><header><h3><a class="stretched" href="overhead-opus-5.5-high/README.html">Overhead</a></h3></header><p>Live aircraft around you: 2D map, tilted 3D map, and sky dome.</p><small><a class="prompt" href="overhead-opus-5.5-high/prompt.html">prompt</a></small></article>
         <article><header><h3><a class="stretched" href="tx-lege/README.html">tx-lege</a></h3></header><p>Full legislative history of a Texas bill: actions, versions, amendments.</p><small><a class="prompt" href="tx-lege/prompt.html">prompt</a></small></article>
       </div>
     </section>
@@ -88,7 +90,7 @@
     <section>
       <h2>Video &amp; vision</h2>
       <div class="grid">
-        <article><header><h3><a class="stretched" href="garden-map/">Garden Map</a></h3></header><p>Plants identified from a walking video of a 50 ft back yard bed, placed on a top-down map.</p><small><a class="prompt" href="garden-map/prompt.html">prompt</a></small></article>
+        <article><img class="project-preview" src="screenshots/projects/garden-map.webp" alt="" loading="lazy" width="640" height="400"><header><h3><a class="stretched" href="garden-map/">Garden Map</a></h3></header><p>Plants identified from a walking video of a 50 ft back yard bed, placed on a top-down map.</p><small><a class="prompt" href="garden-map/prompt.html">prompt</a></small></article>
       </div>
     </section>
   </main>
