@@ -39,7 +39,7 @@ window.DEMOS = [
 
   // Tools
   { s: "tools", t: "Overhead", href: "overhead-opus-5.5-high/", img: "screenshots/projects/overhead-opus-5.5-high.webp", d: "Live aircraft around you: 2D map, tilted 3D map, and sky dome. Runs a recorded demo here.", model: "Opus 5.5", effort: "high", links: [["prompt", "overhead-opus-5.5-high/prompt.html"], ["README", "overhead-opus-5.5-high/README.html"]] },
-  { s: "tools", t: "tx-lege", href: "tx-lege/demo/", img: null, d: "Full legislative history of a Texas bill: actions, versions, amendments. Shows sample reports here.", model: null, effort: null, links: [["prompt", "tx-lege/prompt.html"], ["README", "tx-lege/README.html"]] },
+  { s: "tools", t: "tx-lege", href: "tx-lege/demo/", img: "screenshots/projects/tx-lege.webp", d: "Full legislative history of a Texas bill: actions, versions, amendments. Shows sample reports here.", model: null, effort: null, links: [["prompt", "tx-lege/prompt.html"], ["README", "tx-lege/README.html"]] },
 
   // Video & vision
   { s: "vision", t: "Garden Map", href: "garden-map/", img: "screenshots/projects/garden-map.webp", d: "Plants identified from a walking video of a 50 ft back yard bed, placed on a top-down map.", model: null, effort: null, links: [["prompt", "garden-map/prompt.html"]] },
@@ -48,7 +48,7 @@ window.DEMOS = [
 window.SECTIONS = {
   "2048": { name: "Hex 2048 variants", blurb: "Same prompt, different models, effort levels and machines." },
   games: { name: "Games & toys" },
-  worship: { name: "Worship planner mockups", blurb: "UI prototypes for a churches of Christ worship planner." },
+  worship: { name: "Worship planner mockups", blurb: "UI prototypes for a worship planner, spawned out of an idea from some friends." },
   data: { name: "Data & analysis" },
   tools: { name: "Tools", blurb: "Python projects; the README says how to run them." },
   vision: { name: "Video & vision" },

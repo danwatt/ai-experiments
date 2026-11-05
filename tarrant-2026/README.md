@@ -1,52 +1,120 @@
-# Tarrant County 2026 Election Dashboard
+# Tarrant County 2026 — Election Intelligence Dashboard
 
-Self-contained election analysis dashboard with precinct-map import support.
+Offline, single-file HTML election analysis with 707 real precinct boundaries already embedded.
 
-## Files
+The supplied HTML **does not contain precinct vote counts yet**. Clarity's detailed results
+are converted by the script below on your computer. **Do not publish a filled precinct map
+until the generated manifest has been checked** against the report and its timestamp.
 
-- `index.html` — standalone offline HTML dashboard; **TopoJSON, GeoJSON, ZIP, KML/KMZ** import, vote breakdowns, margin charts and analyses.
-- `scripts/build_precincts.py` — downloads or reuses the Texas Legislative Council's 2026 precinct shapefile, selects **Tarrant County** and writes **TopoJSON** by default.
-- `scripts/geojson_to_topojson.py` — dependency-free converter for a **GeoJSON file you have already generated**. Creates shared arcs and quantized/delta-encoded coordinates.
-- `data/tarrant_precincts_2026.topojson` — generated from your local shapefile or GeoJSON (not included in this archive; source data lives on your Mac).
+## Data pipeline
 
-## Convert the GeoJSON you've already created
-
-From your existing project directory:
-
-```sh
-cd ~/git/ai-experiments/tarrant-2026
-uv run python scripts/geojson_to_topojson.py data/tarrant_precincts_2026.geojson
+```text
+Clarity detailxml.zip (preferred) or detailxlsx.zip (fallback)
+                │
+                ▼
+scripts/build_results.py      streamed XML/XLSX -> precinct, race, candidate, method
+                │
+                ├── data/precinct_results_manifest.json  (diagnostics/reconciliation)
+                ▼
+data/precinct_results_2026.json.gz  (compact integer-array rows)
+                │
+                ▼
+scripts/embed_results.py      gzip bytes -> base64 script block
+                │
+                ▼
+dist/index.html               fully offline, embedded geometry + vote data
 ```
 
-This outputs `data/tarrant_precincts_2026.topojson`. Your original GeoJSON is left untouched. No additional packages are needed for this conversion.
+## Quick start
 
-Alternatively, rerun the full builder (reuses the already-downloaded source ZIP; needs `pyshp` and `pyproj`):
+From `~/git/ai-experiments/tarrant-2026`:
 
-```sh
-uv run python scripts/build_precincts.py
+```bash
+# Downloads the Clarity structured XML feed if the provider offers it;
+# otherwise tries the linked detailxlsx.zip report. Both are cached.
+uv run python scripts/build_results.py --inspect
+
+# Verify data/precinct_results_manifest.json and its unmatched-cell counts.
+# Once verified, package the vote rows into a standalone HTML file:
+uv run python scripts/embed_results.py
+open dist/index.html
 ```
 
-The builder now **defaults to TopoJSON**. To regenerate GeoJSON instead:
+If you already downloaded the archive to your Mac, skip network access:
 
-```sh
-uv run python scripts/build_precincts.py --format geojson
+```bash
+uv run python scripts/build_results.py --source ~/Downloads/detailxlsx.zip --inspect
+uv run python scripts/embed_results.py
+open dist/index.html
 ```
 
-Or convert your existing GeoJSON using the builder:
+If it is a very large archive, leave the ZIP under `data/source/` and pass its path;
+we never copy the full XML into the HTML. For repeat builds, the original ZIP is cached.
 
-```sh
-uv run python scripts/build_precincts.py --from-geojson data/tarrant_precincts_2026.geojson
+### What the parser expects
+
+1. **Clarity structured detail XML**: `ElectionResult → Contest → Choice → VoteType → Precinct`,
+   as documented by the OpenElections Clarify project.
+2. **SpreadsheetML XML or XLSX**: a tabular sheet with explicit columns for
+   `precinct`, `contest`/`race`, `candidate`, and either `votes` + `method`,
+   or `total`, `mail`, `early`, `day` columns.
+
+If the XLSX is a *formatted, cross-tabbed report*, rather than a tabular sheet,
+`build_results.py` refuses to fabricate matches. It records initial worksheet
+rows and unmatched names in `data/precinct_results_manifest.json` to help create
+an exact adapter for that specific export. **Upload the actual ZIP if this happens.**
+
+The converter deliberately matches candidate names and dashboard contest titles
+conservatively, excludes unrelated races and non-geographic totals, and rejects
+duplicate precinct/candidate/method combinations to avoid double counting.
+It only generates the compact file when at least one precinct result matches.
+
+## Compact file format
+
+Each array is:
+
+```json
+["4050", 7, 1, 120, 12, 90, 18]
 ```
 
-The converter quantizes coordinates to a million-step grid (sub-meter precision over Tarrant County), and deduplicates matching shared boundary arcs. It does **not** simplify polygons; map rendering applies a light visual simplification after import. To adjust precision, use `--quantization 2000000` (larger grid = finer coordinates, generally larger file).
+The example above is **illustrative, not a real precinct tally**. Positions are
+`[precinct, contest_id, candidate_index, total, mail, early, election_day]`.
+Nullable vote-method counts remain `null` when unknown; zero is a reported zero.
+The `.json.gz` also contains `schema`, `source`, and `rows` fields.
+`gzip` removes repeated JSON structure, while candidate and contest names remain
+in the HTML's existing embedded election metadata.
 
-## Load TopoJSON into the HTML
+Alternatively, without rebuilding the page, **Load precinct vote totals** accepts
+CSV, JSON, or the generated `.json.gz`. Once imported, use **Save offline HTML**;
+that export also gzip-compresses rows inside the HTML.
 
-Open `index.html` in your browser, go to **Precinct Explorer**, click **Load boundaries**, and select `data/tarrant_precincts_2026.topojson`. No server or JavaScript libraries are required. To embed the loaded boundaries in a single offline HTML file, click **Save offline HTML**. Imported precinct candidate results (CSV/JSON) remain a separate dataset; TopoJSON contains boundaries, **not votes**.
+## Validation and interpretation
 
-## Sources and cautions
+- `data/precinct_results_manifest.json` reports accepted cells, unmatched
+  precincts/contests/candidates, geographic coverage, and a sample of differences
+  between aggregated precinct counts and the dashboard's older countywide snapshot.
+- The existing headline/race tables are from the **Nov 4, 2026, 2:37 a.m.**
+  cumulative snapshot. The detailed source may be **newer**. Do not assume
+  those two report timestamps match. The new data only powers the precinct explorer.
+- TopoJSON boundaries are from the **2026 primary precinct** file. Validate
+  identifiers against the general-election report; if boundaries changed, reconcile
+  them before interpreting the map.
+- No votes are estimated or assigned from geography or voter history.
+- Source archives are retained under `data/source/` and excluded from Git by default.
+- The built `dist/index.html` needs **no server, external JS, libraries, or API keys**.
+  The browser uses native `DecompressionStream` for the embedded gzipped vote rows.
 
-- Official source: [Texas Legislative Council 2026 Primary Election Voting Precincts](https://data.capitol.texas.gov/dataset/precincts)
-- Download: [Precincts26P.zip](https://data.capitol.texas.gov/dataset/d04c72b9-16c4-4ab2-8c6d-c666d41e04b7/resource/33ec5b30-ee4d-424f-9769-57b87cb5e311/download/precincts26p.zip)
-- The GIS source describes **2026 primary-election** precincts. Before joining November 3, 2026 general-election results, verify that the precinct IDs and boundaries were unchanged.
-- Source field `PREC` is preserved, and a normalized `precinct` property is included. Geometry is WGS84 longitude/latitude after transformation. Retain source attribution when republishing.
+## Source references
+
+- [Tarrant County November 3, 2026 election reports](https://www.tarrantcountytx.gov/en/elections/past-election-information/2026-archives/november-3--2026--joint-general-and-special-election-results.html)
+- [Clarity XLSX detail ZIP supplied for this project](https://results.enr.clarityelections.com/TX/Tarrant/127297/385548/reports/detailxlsx.zip)
+- [OpenElections Clarify XML parser/schema](https://github.com/openelections/clarify)
+- [Texas Legislative Council precinct GIS](https://data.capitol.texas.gov/dataset/precincts)
+
+## Tests
+
+```bash
+uv run python -m unittest discover -s tests -v
+```
+
+Tests use synthetic precinct tallies and never ship those figures in `index.html`.

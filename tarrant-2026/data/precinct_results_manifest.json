@@ -1,0 +1,278 @@
+{
+  "source": "/Users/danwatt/git/ai-experiments/tarrant-2026/data/source/detailxml.zip",
+  "source_format": "Clarity detailed XML",
+  "archive_entry": "detail.xml",
+  "archive_files": [
+    "detail.xml"
+  ],
+  "geometry_precincts": 707,
+  "result_precincts": 707,
+  "result_races": 87,
+  "result_rows": 83772,
+  "matched_source_cells": 251316,
+  "total_source_cells": 592752,
+  "unmatched": {
+    "unrecognized precinct": 315357,
+    "contest not on dashboard": 26079
+  },
+  "diagnostics": {
+    "precinct": [
+      "1005 - F99",
+      "1006 - F99",
+      "1008 - F99",
+      "1010 - F99",
+      "1011 - F99",
+      "1012 - F99",
+      "1013 - F99",
+      "1019 - F99",
+      "1025 - F99",
+      "1030 - F99",
+      "1031 - F99",
+      "1056 - F99"
+    ],
+    "contest": [
+      "City of Benbrook Member of the Council, Place 2",
+      "City of Benbrook Member of the Council, Place 4",
+      "City of Benbrook Member of the Council, Place 6",
+      "City of Forest Hill City Council, Council Member Place 2 (Unexpired Term)",
+      "City of Forest Hill Proposition A",
+      "City of Forest Hill Proposition B",
+      "City of Forest Hill Proposition C",
+      "City of Forest Hill Proposition D",
+      "City of Forest Hill Proposition E",
+      "City of North Richland Hills Proposition A",
+      "Eagle Mountain-Saginaw Independent School District Proposition A",
+      "Eagle Mountain-Saginaw Independent School District Proposition B",
+      "Keller Independent School District Proposition A",
+      "Keller Independent School District Proposition B",
+      "Keller Independent School District Proposition C",
+      "Keller Independent School District Proposition D",
+      "Keller Independent School District Proposition E",
+      "Keller Independent School District Trustee, Place 4 - Three-Year Term",
+      "Keller Independent School District Trustee, Place 5 - Three-Year Term",
+      "Keller Independent School District Trustee, Place 6 - (Unexpired Term)",
+      "Tarrant Appraisal District Board of Directors - At-Large  Place 3",
+      "Tarrant Appraisal District Board of Directors - At-Large Place 1",
+      "Tarrant Appraisal District Board of Directors - At-Large Place 2",
+      "Town of Flower Mound Proposition A"
+    ]
+  },
+  "countywide_snapshot_differences": {
+    "count": 124,
+    "examples": [
+      {
+        "race": "United States Senator",
+        "candidate": "Ken Paxton",
+        "original_countywide": 287783,
+        "new_precinct_sum": 287375,
+        "difference": -408
+      },
+      {
+        "race": "United States Senator",
+        "candidate": "James Talarico",
+        "original_countywide": 427879,
+        "new_precinct_sum": 426484,
+        "difference": -1395
+      },
+      {
+        "race": "United States Senator",
+        "candidate": "Ted Brown",
+        "original_countywide": 12597,
+        "new_precinct_sum": 12581,
+        "difference": -16
+      },
+      {
+        "race": "United States Senator",
+        "candidate": "Avery Ayers",
+        "original_countywide": 132,
+        "new_precinct_sum": 130,
+        "difference": -2
+      },
+      {
+        "race": "United States Senator",
+        "candidate": "Jade Simmons",
+        "original_countywide": 154,
+        "new_precinct_sum": 152,
+        "difference": -2
+      },
+      {
+        "race": "United States Representative, District 12",
+        "candidate": "Craig Goldman",
+        "original_countywide": 100050,
+        "new_precinct_sum": 100042,
+        "difference": -8
+      },
+      {
+        "race": "United States Representative, District 12",
+        "candidate": "Angela 'Heli' Rodriguez Prilliman",
+        "original_countywide": 115880,
+        "new_precinct_sum": 115790,
+        "difference": -90
+      },
+      {
+        "race": "Governor",
+        "candidate": "Greg Abbott",
+        "original_countywide": 307297,
+        "new_precinct_sum": 306892,
+        "difference": -405
+      },
+      {
+        "race": "Governor",
+        "candidate": "Gina Hinojosa",
+        "original_countywide": 410931,
+        "new_precinct_sum": 409944,
+        "difference": -987
+      },
+      {
+        "race": "Governor",
+        "candidate": "Pat Dixon",
+        "original_countywide": 10913,
+        "new_precinct_sum": 10898,
+        "difference": -15
+      },
+      {
+        "race": "Governor",
+        "candidate": "Edward Earl Giles",
+        "original_countywide": 33,
+        "new_precinct_sum": 32,
+        "difference": -1
+      },
+      {
+        "race": "Lieutenant Governor",
+        "candidate": "Dan Patrick",
+        "original_countywide": 305214,
+        "new_precinct_sum": 304809,
+        "difference": -405
+      },
+      {
+        "race": "Lieutenant Governor",
+        "candidate": "Vikki Goodwin",
+        "original_countywide": 403724,
+        "new_precinct_sum": 402769,
+        "difference": -955
+      },
+      {
+        "race": "Lieutenant Governor",
+        "candidate": "Anthony Cristo",
+        "original_countywide": 10889,
+        "new_precinct_sum": 10869,
+        "difference": -20
+      },
+      {
+        "race": "Lieutenant Governor",
+        "candidate": "Kevin McCormick",
+        "original_countywide": 6219,
+        "new_precinct_sum": 6200,
+        "difference": -19
+      },
+      {
+        "race": "Attorney General",
+        "candidate": "Mayes Middleton",
+        "original_countywide": 307316,
+        "new_precinct_sum": 306924,
+        "difference": -392
+      },
+      {
+        "race": "Attorney General",
+        "candidate": "Nathan Johnson",
+        "original_countywide": 406594,
+        "new_precinct_sum": 405618,
+        "difference": -976
+      },
+      {
+        "race": "Attorney General",
+        "candidate": "Tom Oxford",
+        "original_countywide": 11507,
+        "new_precinct_sum": 11486,
+        "difference": -21
+      },
+      {
+        "race": "Comptroller of Public Accounts",
+        "candidate": "Don Huffines",
+        "original_countywide": 310449,
+        "new_precinct_sum": 310042,
+        "difference": -407
+      },
+      {
+        "race": "Comptroller of Public Accounts",
+        "candidate": "Sarah Eckhardt",
+        "original_countywide": 398080,
+        "new_precinct_sum": 397139,
+        "difference": -941
+      },
+      {
+        "race": "Comptroller of Public Accounts",
+        "candidate": "V. Alonzo Echavarria-Garza",
+        "original_countywide": 11193,
+        "new_precinct_sum": 11173,
+        "difference": -20
+      },
+      {
+        "race": "Comptroller of Public Accounts",
+        "candidate": "Shehla Faizi",
+        "original_countywide": 3999,
+        "new_precinct_sum": 3984,
+        "difference": -15
+      },
+      {
+        "race": "Commissioner of the General Land Office",
+        "candidate": "Dawn Buckingham",
+        "original_countywide": 312342,
+        "new_precinct_sum": 311934,
+        "difference": -408
+      },
+      {
+        "race": "Commissioner of the General Land Office",
+        "candidate": "Benjamin Flores",
+        "original_countywide": 398322,
+        "new_precinct_sum": 397357,
+        "difference": -965
+      },
+      {
+        "race": "Commissioner of the General Land Office",
+        "candidate": "Neill Snider",
+        "original_countywide": 10850,
+        "new_precinct_sum": 10841,
+        "difference": -9
+      },
+      {
+        "race": "Commissioner of Agriculture",
+        "candidate": "Nate Sheets",
+        "original_countywide": 309723,
+        "new_precinct_sum": 309323,
+        "difference": -400
+      },
+      {
+        "race": "Commissioner of Agriculture",
+        "candidate": "Clayton Tucker",
+        "original_countywide": 398161,
+        "new_precinct_sum": 397200,
+        "difference": -961
+      },
+      {
+        "race": "Commissioner of Agriculture",
+        "candidate": "Austin R. Kelly",
+        "original_countywide": 13054,
+        "new_precinct_sum": 13032,
+        "difference": -22
+      },
+      {
+        "race": "Railroad Commissioner",
+        "candidate": "Bo French",
+        "original_countywide": 299130,
+        "new_precinct_sum": 298736,
+        "difference": -394
+      },
+      {
+        "race": "Railroad Commissioner",
+        "candidate": "Jon Rosenthal",
+        "original_countywide": 407510,
+        "new_precinct_sum": 406555,
+        "difference": -955
+      }
+    ],
+    "note": "Expected if new precinct report is later than the HTML snapshot or not all geographic precincts were matched."
+  },
+  "data_schema": "rows [precinct,contest_id,candidate_index,total,mail,early,day]",
+  "source_report_status": "unverified - compare with snapshot cumulative report before interpretation"
+}
