@@ -3,8 +3,8 @@
 - **Model:** claude-opus-5-5
 - **Effort:** high
 - **Session(s):** 17f610a7-f369-423d-87f9-412dab3dd19b
-- **Tokens:** input 240, output 130716, cache read 17546013, cache write 307913
-- **Cost (tokscale estimate):** $8.59
+- **Tokens:** input 290, output 151304, cache read 23383156, cache write 343401
+- **Cost (tokscale estimate):** $10.45
 
 ## You
 
@@ -275,6 +275,61 @@ The steps, using spring numbers:
 - **Library:** I used D3 7.9.0 for the animation and Bootstrap for the layout. The page shares the light/dark setting with the main page.
 
 The explorer's duck curve card now links to it ("Watch the animated explainer →"), and so does the landing-page card in `demos.js`. I regenerated `prompt.md`; the estimated cost is now $8.41.
+
+## You
+
+Commit it
+
+## Claude
+
+Committed as `abc87bf` on master: "Add animated duck curve explainer to ERCOT renewables demo". Not pushed.
+
+The commit includes:
+- `duck.html` and `duck.js`, the new explainer page
+- the explainer link added to the explorer page
+- `prompt.md`, refreshed first, plus its new screenshots
+- in `demos.js`, only the new "duck curve explainer" link
+
+Left uncommitted, from another session: its Tarrant line in `demos.js` and the `tarrant-judicial-rolloff/` folder.
+
+## You
+
+Lets add a voiceover. I have voicebox running locally at `http://127.0.0.1:17493`. Use the `Heart` voice. Make the voiceover optional. Compress as opus, mono, voice profile.
+
+## Claude
+
+Voicebox has a `Heart` preset on the kokoro engine, and ffmpeg has libopus. Testing how it reads times and numbers first.
+
+Voicebox works: about 11 s to render 14 s of speech, and 24 kbps Opus is about 44 KB per clip. Writing the narration builder.
+
+Fourteen clips, 888 KB in total, mono Opus at 24 kbps. Wiring the optional voiceover into playback.
+
+Voiceover plays and drives the progress bar. Checking that pause holds and the next step starts when the clip ends.
+
+![screenshot 53](prompt-assets/053.jpg)
+
+![screenshot 54](prompt-assets/054.jpg)
+
+The explainer now has an optional voiceover in the Heart voice. It's off by default and turned on with the "Voiceover" button next to Back / Pause / Next. I tested it in the built-in browser (Chromium) only; I haven't tried Safari. I also couldn't listen to the clips, so how Heart pronounces the times (like "5:45") and the decimals is unchecked. Nothing is committed yet.
+
+**Audio:**
+- 14 clips: 7 steps, for spring and for summer.
+- 13–28 seconds each, about 2.5 minutes of narration per season.
+- 888 KB in total, in `voiceover/`.
+- Encoded as you asked: Opus, mono, 24 kbps, with ffmpeg's speech (VoIP) setting, in `.webm` files.
+
+**Script:** the narration is written for listening rather than read from the captions. Numbers are rounded ("about 14 gigawatts") and times are spoken ("5:45 in the evening"). The figures come from the same averages the chart uses.
+
+**How it plays:**
+- Turning it on starts playback from the beginning of the current step's clip.
+- While it's on, each step moves on a moment after its clip ends, and the progress bar follows the audio.
+- Pause and Play pause and resume the audio. Back, Next, the step buttons and the Spring/Summer switch all change the clip.
+- Turning it off goes back to the timed captions.
+- If the browser can't play the audio, the button changes to "Voiceover unavailable" and the page carries on silently.
+
+**To rebuild:** `python3 build_voiceover.py` calls Voicebox at `127.0.0.1:17493` and deletes each generation from Voicebox's history after downloading it. Re-run it after `build_data.py` so the spoken numbers stay in sync with the data.
+
+**Other changes:** I added a credit line to "Reading the chart" that links to Voicebox, and regenerated `prompt.md` (the estimated cost is now $10.26).
 
 ## You
 

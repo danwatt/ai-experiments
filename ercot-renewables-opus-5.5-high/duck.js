@@ -393,10 +393,15 @@
   function startDwell(ms) {
     clearTimeout(timer);
     dwellLeft = ms;
+    if (voiceOn) { afterVoice(); return; }
     if (!playing) return;
     dwellStart = performance.now();
     setBar(100 * (1 - ms / dwellTotal), ms);
-    timer = setTimeout(() => { if (idx < SCENES.length - 1) go(idx + 1); else finish(); }, ms);
+    timer = setTimeout(advance, ms);
+  }
+
+  function advance() {
+    if (idx < SCENES.length - 1) go(idx + 1); else finish();
   }
 
   function finish() {
@@ -414,6 +419,7 @@
     ghost = scene.ghost ? scene.ghost(D) : null;
     setCaption(scene);
     renderSteps();
+    cueVoice();
     frame.draw = opts.drawIn ? 0 : 1;
     const target = Object.assign(scene.frame(D), { draw: 1 });
     const dur = opts.instant ? 0 : opts.drawIn ? 2200 : scene.dur || 1400;
@@ -432,7 +438,8 @@
     if (playing) {
       playing = false;
       clearTimeout(timer);
-      if (settled) {
+      voice.pause();
+      if (settled && !voiceOn) {
         dwellLeft = Math.max(0, dwellLeft - (performance.now() - dwellStart));
         setBar(100 * (1 - dwellLeft / dwellTotal));
       }
@@ -441,8 +448,75 @@
     }
     playing = true;
     playBtn.textContent = 'Pause';
-    if (settled) startDwell(dwellLeft);
+    if (voiceOn) {
+      if (voice.ended) afterVoice(); else voice.play().catch(playFailed);
+    } else if (settled) startDwell(dwellLeft);
   }
+
+  // ---------- voiceover (optional) ----------
+
+  const VO = window.DUCK_VOICEOVER;
+  const voBtn = document.getElementById('vo');
+  const voice = new Audio();
+  voice.preload = 'auto';
+  let voiceOn = false;
+
+  // one narration clip per scene; while it is on, the narration sets the pace
+  function cueVoice() {
+    voice.pause();
+    const clip = VO && VO[D.season.name] && VO[D.season.name][idx];
+    if (!voiceOn || !clip) return;
+    voice.src = clip.file;
+    if (playing) voice.play().catch(playFailed);
+  }
+
+  // move on a beat after the clip ends, once the scene's animation has settled
+  function afterVoice() {
+    clearTimeout(timer);
+    if (playing && settled && voice.ended) timer = setTimeout(advance, 900);
+  }
+
+  function playFailed(e) {
+    if (e && e.name === 'NotAllowedError') { if (playing) togglePlay(); return; }  // browser blocked autoplay
+    voiceUnavailable();
+  }
+
+  function voiceUnavailable() {
+    voiceOn = false;
+    voBtn.disabled = true;
+    setVoiceButton();
+    voBtn.lastChild.textContent = ' Voiceover unavailable';
+    if (settled) startDwell(dwellTotal);
+  }
+
+  function setVoiceButton() {
+    voBtn.setAttribute('aria-pressed', String(voiceOn));
+    voBtn.classList.toggle('btn-secondary', voiceOn);
+    voBtn.classList.toggle('btn-outline-secondary', !voiceOn);
+    voBtn.lastChild.textContent = voiceOn ? ' Voiceover on' : ' Voiceover off';
+  }
+
+  voice.addEventListener('ended', afterVoice);
+  voice.addEventListener('error', () => { if (voiceOn) voiceUnavailable(); });
+  voice.addEventListener('timeupdate', () => {
+    if (voiceOn && voice.duration) setBar(100 * voice.currentTime / voice.duration);
+  });
+
+  voBtn.hidden = !VO;
+  voBtn.addEventListener('click', () => {
+    voiceOn = !voiceOn;
+    setVoiceButton();
+    clearTimeout(timer);
+    if (voiceOn) {
+      // turning narration on also starts playback, from the top of this step's clip
+      if (!playing) { playing = true; playBtn.textContent = 'Pause'; }
+      cueVoice();
+      if (settled && voice.ended) afterVoice();
+    } else {
+      voice.pause();
+      if (settled) startDwell(dwellTotal);
+    }
+  });
 
   function load(season) {
     D = build(season);
