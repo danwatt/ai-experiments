@@ -177,6 +177,18 @@
         "games/2048-lynx-opus-5.5-high"
       ],
       "port": 8809
+    },
+    {
+      "name": "election-gas",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8811",
+        "-d",
+        "election-gas-prices-sonnet-5.5-high"
+      ],
+      "port": 8811
     }
   ]
 }
