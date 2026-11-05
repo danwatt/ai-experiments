@@ -41,6 +41,11 @@
       --seq-5: #256abf;
       --seq-6: #184f95;
       --seq-7: #0d366b;
+      --yr-0: #6da7ec;
+      --yr-1: #3987e5;
+      --yr-2: #256abf;
+      --yr-3: #184f95;
+      --yr-4: #0d366b;
     }
     [data-bs-theme="dark"] {
       --surface: #1a1a19;
@@ -67,6 +72,11 @@
       --seq-5: #2a78d6;
       --seq-6: #5598e7;
       --seq-7: #9ec5f4;
+      --yr-0: #1c5cab;
+      --yr-1: #3987e5;
+      --yr-2: #6da7ec;
+      --yr-3: #9ec5f4;
+      --yr-4: #cde2fb;
     }
     body {
       background: var(--plane);
@@ -116,6 +126,10 @@
     .table-wrap { max-height: 480px; overflow: auto; }
     .table { --bs-table-bg: var(--surface); --bs-table-color: var(--ink); }
     .notes li { margin-bottom: .4rem; }
+    .legend i.line { height: 3px; width: 16px; border-radius: 2px; }
+    .shape-table td, .shape-table th { white-space: nowrap; text-align: right; font-variant-numeric: tabular-nums; }
+    .shape-table th:first-child, .shape-table td:first-child { text-align: left; }
+    .shape-table .sub { color: var(--muted); font-size: .75rem; }
     a { color: var(--s-other); }
   </style>
 </head>
@@ -208,6 +222,57 @@
       </div>
     </div>
 
+    <div class="card mb-3" id="duck-card">
+      <div class="card-body">
+        <h2 class="h5 mb-1">The duck curve: an average day, hour by hour</h2>
+        <p class="small text-ink-2 mb-2" id="duck-sub"></p>
+        <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+          <div class="btn-group btn-group-sm" role="group" aria-label="What to plot">
+            <input type="radio" class="btn-check" name="dm" id="dm-demand" value="demand" autocomplete="off">
+            <label class="btn btn-outline-secondary" for="dm-demand">Demand</label>
+            <input type="radio" class="btn-check" name="dm" id="dm-net" value="net" autocomplete="off" checked>
+            <label class="btn btn-outline-secondary" for="dm-net">− wind &amp; solar</label>
+            <input type="radio" class="btn-check" name="dm" id="dm-resid" value="resid" autocomplete="off">
+            <label class="btn btn-outline-secondary" for="dm-resid">− batteries too</label>
+          </div>
+          <div class="btn-group btn-group-sm" role="group" aria-label="Period type">
+            <input type="radio" class="btn-check" name="dp" id="dp-year" value="year" autocomplete="off">
+            <label class="btn btn-outline-secondary" for="dp-year">Year</label>
+            <input type="radio" class="btn-check" name="dp" id="dp-season" value="season" autocomplete="off" checked>
+            <label class="btn btn-outline-secondary" for="dp-season">Season</label>
+            <input type="radio" class="btn-check" name="dp" id="dp-month" value="month" autocomplete="off">
+            <label class="btn btn-outline-secondary" for="dp-month">Month</label>
+          </div>
+          <select class="form-select form-select-sm w-auto" id="duck-period" aria-label="Season or month"></select>
+        </div>
+        <div class="legend mb-2" id="legend-duck"></div>
+        <div class="chart-box"><canvas id="duck" role="img" aria-label="Line chart of average power by time of day, one line per year"></canvas></div>
+      </div>
+    </div>
+
+    <div class="row g-3 mb-3">
+      <div class="col-lg-6">
+        <div class="card h-100">
+          <div class="card-body">
+            <h2 class="h5 mb-1">Batteries by time of day</h2>
+            <p class="small text-ink-2 mb-2" id="batt-sub">Net battery output: above zero is discharging to the grid, below zero is charging.</p>
+            <div class="chart-box short"><canvas id="batt" role="img" aria-label="Line chart of average net battery output by time of day, one line per year"></canvas></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="card h-100">
+          <div class="card-body">
+            <h2 class="h5 mb-1">Shape of the average day</h2>
+            <p class="small text-ink-2 mb-2" id="shape-sub"></p>
+            <div class="table-responsive">
+              <table class="table table-sm shape-table mb-0" id="shape"></table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="card mb-3">
       <div class="card-body">
         <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-2">
@@ -258,6 +323,7 @@
           <li>ERCOT reported all natural gas as one fuel through 2008, then split out combined-cycle plants. Tooltips show the split where it exists.</li>
           <li>"Other" before 2011 included biomass and small solar. Since about 2021 it is mostly battery discharge. Battery charging (ERCOT's <code>WSL</code>, negative) is left out of the shares and shown in the table.</li>
           <li>Hydro and biomass are combined because each is under 0.5% of generation.</li>
+          <li>The time-of-day charts average ERCOT's 15-minute intervals (interval ending, Central prevailing time) over every day in the period, from 2022 on. Demand is total settled generation minus battery charging. Batteries are ERCOT's "Other" (mostly battery discharge) plus <code>WSL</code> charging. Seasons are calendar-year months: winter is Jan, Feb and Dec of the same year. A year is shown only when every month of the period has data.</li>
           <li>Rebuild the data with <code>python3 build_data.py</code>.</li>
         </ul>
       </div>
@@ -267,6 +333,7 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
   <script src="data.js"></script>
+  <script src="profiles.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

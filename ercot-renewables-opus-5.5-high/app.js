@@ -55,7 +55,7 @@
   };
   const isDark = () => document.documentElement.getAttribute('data-bs-theme') === 'dark';
 
-  const state = { from: firstYear, to: lastYear, unit: 'share', focus: N - 1, cmp: 10, heat: 'windsolar' };
+  const state = { from: firstYear, to: lastYear, unit: 'share', focus: N - 1, cmp: 10, heat: 'windsolar', duck: 'net', duckType: 'season', duckSeason: 1, duckMonth: 3 };
   const charts = {};
 
   function rangeIdx() {
@@ -412,6 +412,194 @@
     }
   }
 
+  // ---------- duck curve (time of day) ----------
+
+  const P = window.ERCOT_PROFILES;
+  const SEASONS = [
+    { label: 'Winter (Dec, Jan, Feb)', months: [11, 0, 1] },
+    { label: 'Spring (Mar–May)', months: [2, 3, 4] },
+    { label: 'Summer (Jun–Aug)', months: [5, 6, 7] },
+    { label: 'Fall (Sep–Nov)', months: [8, 9, 10] }
+  ];
+  const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  const DUCK = {
+    demand: { label: 'Demand', sub: 'Average power demand by time of day.' },
+    net: { label: 'Net of wind & solar', sub: 'Demand minus wind and solar: what every other source has to cover. Solar carves the midday belly; the evening neck is the ramp when the sun sets.' },
+    resid: { label: 'Net of wind, solar & batteries', sub: 'Demand minus wind, solar and net battery output: what gas, coal and nuclear have to cover. Batteries charge in the belly and discharge into the neck, flattening the curve.' }
+  };
+  const pYears = [...new Set(P.months.map(m => +m.slice(0, 4)))];
+  const yrColor = y => css('--yr-' + Math.min(4, Math.max(0, 4 - (pYears[pYears.length - 1] - y))));
+  const HOURS = Array.from({ length: 96 }, (_, j) => (j + 1) / 4);  // interval ending, in hours
+  const clock = h => {
+    const hh = Math.floor(h) % 24, mm = Math.round((h % 1) * 60);
+    return `${hh % 12 || 12}${mm ? ':' + String(mm).padStart(2, '0') : ''} ${hh < 12 ? 'am' : 'pm'}`;
+  };
+  const gw = (mw, d = 1) => (mw / 1000).toFixed(d) + ' GW';
+
+  function periodMonths() {
+    if (state.duckType === 'year') return [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+    if (state.duckType === 'season') return SEASONS[state.duckSeason].months;
+    return [state.duckMonth];
+  }
+
+  function periodLabel() {
+    if (state.duckType === 'year') return 'Whole year';
+    if (state.duckType === 'season') return SEASONS[state.duckSeason].label;
+    return MONTH_NAMES[state.duckMonth];
+  }
+
+  // day-weighted average of one series over the period's months; null if any month is missing
+  function profile(y, ms, f) {
+    const idx = ms.map(m => P.months.indexOf(y + '-' + String(m + 1).padStart(2, '0')));
+    if (idx.some(i => i < 0)) return null;
+    const days = idx.reduce((a, i) => a + P.days[i], 0);
+    return HOURS.map((_, j) => idx.reduce((a, i) => a + f(i, j) * P.days[i], 0) / days);
+  }
+
+  const S = P.series;
+  const METRIC = {
+    demand: (i, j) => S.demand[i][j],
+    net: (i, j) => S.demand[i][j] - S.wind[i][j] - S.solar[i][j],
+    resid: (i, j) => S.demand[i][j] - S.wind[i][j] - S.solar[i][j] - S.storage[i][j],
+    storage: (i, j) => S.storage[i][j]
+  };
+
+  function duckSeries(f) {
+    const ms = periodMonths();
+    return pYears.map(y => ({ year: y, data: profile(y, ms, f) })).filter(s => s.data);
+  }
+
+  function missingNote(shown) {
+    const missing = pYears.filter(y => !shown.some(s => s.year === y));
+    if (!missing.length) return '';
+    const last = P.months[P.months.length - 1];
+    return ` ${missing.join(', ')} not shown: data ends ${MON[+last.slice(5, 7) - 1]} ${last.slice(0, 4)}.`;
+  }
+
+  // year beside each line's last point, nudged apart so labels never overlap
+  const yearLabels = {
+    id: 'yearLabels',
+    afterDatasetsDraw(chart) {
+      const { ctx } = chart;
+      const pts = chart.data.datasets.map((ds, k) => {
+        const meta = chart.getDatasetMeta(k);
+        if (meta.hidden) return null;
+        const el = meta.data[meta.data.length - 1];
+        return { x: el.x, y: el.y, text: ds.label, color: ds.borderColor };
+      }).filter(Boolean).sort((a, b) => a.y - b.y);
+      for (let k = 1; k < pts.length; k++) if (pts[k].y - pts[k - 1].y < 13) pts[k].y = pts[k - 1].y + 13;
+      ctx.save();
+      ctx.font = '600 11px system-ui, sans-serif'; ctx.textBaseline = 'middle';
+      pts.forEach(p => {
+        ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x + 8, p.y, 3.5, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = css('--ink-2'); ctx.fillText(p.text, p.x + 15, p.y);
+      });
+      ctx.restore();
+    }
+  };
+
+  function timeChart(id, series, opts) {
+    const x = baseScales();
+    const y = baseScales();
+    x.type = 'linear'; x.min = 0; x.max = 24;
+    x.grid = { display: false };
+    x.ticks.stepSize = 3; x.ticks.maxRotation = 0; x.ticks.autoSkip = false;
+    x.ticks.callback = function (v) { return v % (this.chart.width < 560 ? 6 : 3) === 0 ? clock(v) : ''; };
+    y.ticks.callback = v => (v / 1000).toLocaleString() + ' GW';
+    Object.assign(y, opts.y || {});
+    replace(id, {
+      type: 'line',
+      data: {
+        datasets: series.map(s => {
+          const c = yrColor(s.year);
+          return {
+            label: String(s.year), data: s.data.map((v, j) => ({ x: HOURS[j], y: v })),
+            borderColor: c, backgroundColor: c, borderWidth: s.year === series[series.length - 1].year ? 3 : 2,
+            pointRadius: 0, pointHoverRadius: 4, pointHoverBorderColor: css('--surface'), pointHoverBorderWidth: 2,
+            pointStyle: 'circle', tension: 0.2
+          };
+        })
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false, animation: false,
+        layout: { padding: { right: 44 } },
+        interaction: { mode: 'index', intersect: false },
+        scales: { x, y },
+        plugins: {
+          legend: { display: false },
+          crosshair: {},
+          tooltip: Object.assign(tooltipStyle(), {
+            itemSort: (a, b) => +b.dataset.label - +a.dataset.label,
+            callbacks: {
+              title: t => `${clock(t[0].parsed.x - 0.25)} – ${clock(t[0].parsed.x)}`,
+              label: t => `${t.dataset.label}: ${gw(t.parsed.y)}`
+            }
+          })
+        }
+      },
+      plugins: [crosshair, yearLabels].concat(opts.plugins || [])
+    });
+  }
+
+  // a solid line at zero, so charging and discharging read against it
+  const zeroLine = {
+    id: 'zeroLine',
+    beforeDatasetsDraw(chart) {
+      const { ctx, chartArea: a } = chart;
+      const py = chart.scales.y.getPixelForValue(0);
+      if (py < a.top || py > a.bottom) return;
+      ctx.save(); ctx.strokeStyle = css('--axis'); ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(a.left, py); ctx.lineTo(a.right, py); ctx.stroke(); ctx.restore();
+    }
+  };
+
+  function renderDuck() {
+    const series = duckSeries(METRIC[state.duck]);
+    const note = missingNote(series);
+    document.getElementById('duck-sub').textContent = `${periodLabel()}. ${DUCK[state.duck].sub}${note}`;
+    timeChart('duck', series, {});
+    legend('legend-duck', series.map(s => ({ label: String(s.year), color: yrColor(s.year) })));
+    document.querySelectorAll('#legend-duck i').forEach(i => i.classList.add('line'));
+
+    const batt = duckSeries(METRIC.storage);
+    document.getElementById('batt-sub').textContent =
+      `${periodLabel()}. Net battery output: above zero is discharging to the grid, below zero is charging.${missingNote(batt)}`;
+    timeChart('batt', batt, { plugins: [zeroLine] });
+
+    // peak, low and steepest 3-hour rise of the plotted curve, per year
+    const rows = series.map(s => {
+      const v = s.data;
+      let hi = 0, lo = 0, ramp = -Infinity, rampAt = 0;
+      v.forEach((x, j) => { if (x > v[hi]) hi = j; if (x < v[lo]) lo = j; });
+      for (let j = 0; j + 12 < v.length; j++) if (v[j + 12] - v[j] > ramp) { ramp = v[j + 12] - v[j]; rampAt = j; }
+      return { year: s.year, hi, lo, v, ramp, rampAt };
+    });
+    const at = j => `<div class="sub">${clock(HOURS[j])}</div>`;
+    document.getElementById('shape-sub').textContent =
+      `${DUCK[state.duck].label} · ${periodLabel()}. The steepest 3-hour rise is the ramp other plants must climb.`;
+    document.getElementById('shape').innerHTML = `
+      <thead><tr><th>Year</th><th>Low</th><th>Peak</th><th>Peak − low</th><th>Steepest 3-hr rise</th></tr></thead>
+      <tbody>${rows.slice().reverse().map(r => `<tr>
+        <td><span class="legend"><span><i style="background:${yrColor(r.year)}"></i>${r.year}</span></span></td>
+        <td>${gw(r.v[r.lo])}${at(r.lo)}</td>
+        <td>${gw(r.v[r.hi])}${at(r.hi)}</td>
+        <td>${gw(r.v[r.hi] - r.v[r.lo])}</td>
+        <td>${gw(r.ramp)}<div class="sub">${clock(HOURS[r.rampAt])} – ${clock(HOURS[r.rampAt + 12])}</div></td>
+      </tr>`).join('')}</tbody>`;
+  }
+
+  function fillDuckPeriod() {
+    const sel = document.getElementById('duck-period');
+    sel.hidden = state.duckType === 'year';
+    if (state.duckType === 'season') {
+      sel.innerHTML = SEASONS.map((s, k) => `<option value="${k}">${s.label}</option>`).join('');
+      sel.value = String(state.duckSeason);
+    } else if (state.duckType === 'month') {
+      sel.innerHTML = MONTH_NAMES.map((m, k) => `<option value="${k}">${m}</option>`).join('');
+      sel.value = String(state.duckMonth);
+    }
+  }
+
   // ---------- heatmap ----------
 
   function renderHeat() {
@@ -506,6 +694,7 @@
     renderMix();
     renderFocus();
     renderAnnual();
+    renderDuck();
     renderHeat();
     renderTable();
   }
@@ -539,6 +728,17 @@
     document.querySelectorAll('input[name=hm]').forEach(r => r.addEventListener('change', () => {
       state.heat = r.value; renderHeat();
     }));
+    document.querySelectorAll('input[name=dm]').forEach(r => r.addEventListener('change', () => {
+      state.duck = r.value; renderDuck();
+    }));
+    document.querySelectorAll('input[name=dp]').forEach(r => r.addEventListener('change', () => {
+      state.duckType = r.value; fillDuckPeriod(); renderDuck();
+    }));
+    document.getElementById('duck-period').addEventListener('change', e => {
+      if (state.duckType === 'season') state.duckSeason = +e.target.value; else state.duckMonth = +e.target.value;
+      renderDuck();
+    });
+    fillDuckPeriod();
 
     const focus = document.getElementById('focus');
     focus.innerHTML = D.months.map((_, i) => i).reverse().map(i => `<option value="${i}">${label(i)}</option>`).join('');
