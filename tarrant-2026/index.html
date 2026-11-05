@@ -148,7 +148,7 @@ main{padding:26px 0 70px}.stats{display:grid;grid-template-columns:repeat(4,1fr)
     <div class="map-toolbar">
      <div class="field" style="flex:2;min-width:180px"><label for="map-contest">Race to shade / analyze</label><select id="map-contest"></select></div>
      <div class="field"><label for="map-shading">Map color</label><select id="map-shading"><option value="margin">D vs. R margin</option><option value="votes">Contest vote count</option><option value="coverage">Result coverage</option><option value="outline">Precinct boundaries</option></select></div>
-     <div class="field"><label for="map-basemap">Basemap</label><select id="map-basemap"><option value="toner">Stamen Toner Lite</option><option value="osm">OpenStreetMap</option><option value="none">None (offline)</option></select></div>
+     <div class="field"><label for="map-basemap">Basemap</label><select id="map-basemap"><option value="osm">OpenStreetMap</option><option value="none">None (offline)</option></select></div>
      <div class="field"><label for="map-search">Find precinct</label><input id="map-search" type="search" list="map-precinct-options" placeholder="e.g. 1001"><datalist id="map-precinct-options"></datalist></div>
      <button type="button" class="mini-btn" id="map-find">Find</button>
     </div>
@@ -464,10 +464,9 @@ let projector=null,mapProjection=null;
 // Normalized Web Mercator coordinates keep precincts aligned with XYZ map tiles.
 function mercator([lon,lat]){const phi=Math.max(-85.05112878,Math.min(85.05112878,lat))*Math.PI/180;return [(lon+180)/360,(1-Math.asinh(Math.tan(phi))/Math.PI)/2];}
 const basemaps={
- toner:{url:(z,x,y)=>`https://tiles.stadiamaps.com/tiles/stamen_toner_lite/${z}/${x}/${y}.png`,attribution:'&copy; <a href="https://stadiamaps.com/" target="_blank" rel="noopener noreferrer">Stadia Maps</a> &copy; <a href="https://stamen.com/" target="_blank" rel="noopener noreferrer">Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank" rel="noopener noreferrer">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap contributors</a>'},
  osm:{url:(z,x,y)=>`https://tile.openstreetmap.org/${z}/${x}/${y}.png`,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap contributors</a>'}
 };
-let basemap='toner',basemapFallback=false,basemapUnavailable=false,basemapFrame=0;
+let basemap='osm',basemapFallback=false,basemapUnavailable=false,basemapFrame=0;
 function scheduleBasemap(){if(!basemapFrame)basemapFrame=requestAnimationFrame(()=>{basemapFrame=0;renderBasemap();});}
 function renderBasemap(){
  const layer=$('#precinct-basemap'),attribution=$('#map-attribution'),status=$('#map-basemap-status'),provider=basemaps[basemap];
