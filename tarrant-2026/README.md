@@ -5,22 +5,19 @@ Precinct data and analysis work offline; the optional basemap uses online tiles.
 
 ## Basemap
 
-The precinct explorer defaults to **Stamen Toner Lite** beneath translucent precinct
+The precinct explorer defaults to **OpenStreetMap** beneath translucent precinct
 shading, with matching Web Mercator projection for boundaries and tiles. The basemap
 follows pan, zoom, precinct search, and resizing. Choose **Precinct boundaries** under
 Map color for an unfilled overlay, or **None (offline)** under Basemap to disable tiles.
 
-Stamen tiles are hosted by Stadia Maps. Local previews at `localhost` or `127.0.0.1`
-work without a key. For a published site, register its domain in a Stadia Maps account
-using [domain authentication](https://docs.stadiamaps.com/authentication/).
-If Stamen tiles fail, the map switches to a muted OpenStreetMap basemap and displays
-a notice. If both services fail, precinct data and selection remain usable.
+Stamen tiles are disabled. If OpenStreetMap tiles fail, a notice appears and
+precinct data and selection remain usable.
 Attribution stays visible on the map. Offline HTML exports embed precinct data,
 but do not download or embed basemap tiles.
 
-The supplied HTML **does not contain precinct vote counts yet**. Clarity's detailed results
-are converted by the script below on your computer. **Do not publish a filled precinct map
-until the generated manifest has been checked** against the report and its timestamp.
+The served `index.html` embeds precinct vote counts. To update those counts,
+convert Clarity's detailed results with the script below. **Check the generated
+manifest** against the report and its timestamp before publishing new data.
 
 ## Data pipeline
 
@@ -38,7 +35,7 @@ data/precinct_results_2026.json.gz  (compact integer-array rows)
 scripts/embed_results.py      gzip bytes -> base64 script block
                 │
                 ▼
-dist/index.html               embedded geometry + vote data, optional online basemap
+index.html                    served page with embedded geometry + vote data
 ```
 
 ## Quick start
@@ -53,7 +50,7 @@ uv run python scripts/build_results.py --inspect
 # Verify data/precinct_results_manifest.json and its unmatched-cell counts.
 # Once verified, package the vote rows into a standalone HTML file:
 uv run python scripts/embed_results.py
-open dist/index.html
+open index.html
 ```
 
 If you already downloaded the archive to your Mac, skip network access:
@@ -61,8 +58,12 @@ If you already downloaded the archive to your Mac, skip network access:
 ```bash
 uv run python scripts/build_results.py --source ~/Downloads/detailxlsx.zip --inspect
 uv run python scripts/embed_results.py
-open dist/index.html
+open index.html
 ```
+
+The embed step updates the input HTML in place by default, so the `tarrant-2026/`
+link serves the vote data too. To create an additional packaged copy, run
+`uv run python scripts/embed_results.py --output dist/index.html`.
 
 If it is a very large archive, leave the ZIP under `data/source/` and pass its path;
 we never copy the full XML into the HTML. For repeat builds, the original ZIP is cached.
@@ -117,7 +118,7 @@ that export also gzip-compresses rows inside the HTML.
   them before interpreting the map.
 - No votes are estimated or assigned from geography or voter history.
 - Source archives are retained under `data/source/` and excluded from Git by default.
-- The built `dist/index.html` needs **no server, external JS, libraries, or API keys**.
+- The served `index.html` needs **no server, external JS, libraries, or API keys** for precinct analysis.
   The browser uses native `DecompressionStream` for the embedded gzipped vote rows.
 
 ## Source references

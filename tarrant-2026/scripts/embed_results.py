@@ -13,8 +13,10 @@ def main():
     ap=argparse.ArgumentParser(description=__doc__)
     ap.add_argument('--html',type=Path,default=ROOT/'index.html')
     ap.add_argument('--data',type=Path,default=ROOT/'data/precinct_results_2026.json.gz')
-    ap.add_argument('--output',type=Path,default=ROOT/'dist/index.html')
+    ap.add_argument('--output',type=Path,help='Output HTML; defaults to updating --html in place (the served index.html).')
     a=ap.parse_args()
+    if a.output is None:
+        a.output=a.html
     raw=a.data.read_bytes()
     obj=json.loads(gzip.decompress(raw))
     if not obj.get('rows'):

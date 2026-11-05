@@ -1,7 +1,9 @@
 """Standard-library fixture tests; these are illustrative numbers, not real 2026 precinct results."""
 import gzip
+import base64
 import io
 import json
+import re
 from pathlib import Path
 import subprocess
 import sys
@@ -100,5 +102,19 @@ class ParseTests(unittest.TestCase):
         self.assertEqual(build_results.precinct_id('4050.0'),'4050')
         self.assertIsNone(build_results.precinct_id('County Total'))
         self.assertIsNone(build_results.precinct_id('4050 plus 4051'))
+
+    def test_embed_updates_served_html_by_default(self):
+        with tempfile.TemporaryDirectory() as directory:
+            directory=Path(directory)
+            page=directory/'index.html'
+            page.write_text((ROOT/'index.html').read_text())
+            payload={'source':'Fixture','rows':[['4050',7,0,10,None,8,2]]}
+            data=directory/'votes.json.gz'
+            data.write_bytes(gzip.compress(json.dumps(payload).encode(),mtime=0))
+            subprocess.run([sys.executable,str(ROOT/'scripts/embed_results.py'),
+                            '--html',str(page),'--data',str(data)],check=True,capture_output=True)
+            blocks=re.findall(r'<script id="embedded-precinct-results-gzip" type="text/plain">(.*?)</script>',page.read_text(),re.S)
+            self.assertEqual(len(blocks),1)
+            self.assertEqual(json.loads(gzip.decompress(base64.b64decode(blocks[0]))),payload)
 
 if __name__=='__main__':unittest.main()
