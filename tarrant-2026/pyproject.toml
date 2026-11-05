@@ -1,0 +1,12 @@
+[project]
+name = "tarrant-2026"
+version = "0.1.0"
+description = "Self-contained 2026 Tarrant County election dashboard and precinct boundary tooling"
+requires-python = ">=3.10"
+dependencies = [
+  "pyshp>=2.3,<3",
+  "pyproj>=3.6,<4",
+]
+
+[tool.uv]
+package = false
