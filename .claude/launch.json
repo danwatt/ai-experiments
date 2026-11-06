@@ -160,10 +160,10 @@
         "-m",
         "http.server",
         "8791",
-        "-d",
+        "8813",
         "games/2048-ps1-opus-5.5-high"
       ],
-      "port": 8791
+      "port": 8813
     },
     {
       "name": "2048-lynx",
