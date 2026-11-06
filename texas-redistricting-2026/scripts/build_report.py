@@ -49,6 +49,8 @@ def main():
     summary = json.loads((OUT / 'analysis_summary.json').read_text())
     model = json.loads((OUT / 'estimate_summary.json').read_text())
     actual = read_csv('house_2026_actual_districts.csv')
+    download_urls = {plan: json.loads((ROOT / 'data' / 'raw' / (plan + '.zip.source.json')).read_text())['url']
+                     for plan in ['planc2193', 'planc2333']}
     estimates = read_csv('house_2026_old_map_estimates.csv')
     complete = [r for r in estimates if r['status'] != 'PENDING']
     pending = [r for r in estimates if r['status'] == 'PENDING']
@@ -117,7 +119,7 @@ def main():
 <li><strong>Counterfactual behavior:</strong> an election actually held under old boundaries could have different candidates, campaigns, turnout, and voter choices. This exercise cannot recover those changes.</li></ul>
 <details><summary>Counties with major-party votes still requiring finer geographic returns</summary><p>Counts below include only county/new-district cells that span multiple old districts. They do not include precinct splits already modeled.</p><div class="scroll"><table><thead><tr><th>County</th><th>Votes needing precinct detail</th></tr></thead><tbody>{missing_rows}</tbody></table></div></details>
 <h2>Downloads</h2>
-<div class="downloads"><a href="data/raw/planc2193.zip" download>Old-map shapefile</a><a href="data/raw/planc2333.zip" download>New-map shapefile</a><a href="data/processed/house_2026_county_candidates.csv" download>2026 House county votes</a><a href="data/processed/house_2026_actual_districts.csv" download>Actual district totals</a><a href="data/processed/house_2026_old_map_estimates.csv" download>Old-map estimates and pending districts</a><a href="data/processed/precinct_source_reconciliation.csv" download>Precinct-source reconciliation</a><a href="data/processed/house_2026_old_map_bounds.csv" download>Conservative vote bounds</a><a href="data/processed/estimate_vote_conservation.csv" download>Vote-conservation checks</a></div>
+<div class="downloads"><a href="{escape(download_urls['planc2193'], quote=True)}" download>Old-map shapefile</a><a href="{escape(download_urls['planc2333'], quote=True)}" download>New-map shapefile</a><a href="data/processed/house_2026_county_candidates.csv" download>2026 House county votes</a><a href="data/processed/house_2026_actual_districts.csv" download>Actual district totals</a><a href="data/processed/house_2026_old_map_estimates.csv" download>Old-map estimates and pending districts</a><a href="data/processed/precinct_source_reconciliation.csv" download>Precinct-source reconciliation</a><a href="data/processed/house_2026_old_map_bounds.csv" download>Conservative vote bounds</a><a href="data/processed/estimate_vote_conservation.csv" download>Vote-conservation checks</a></div>
 <p><a href="README.md">Methods, sources, and reproduction instructions</a></p>
 <footer>All election returns are unofficial. This report uses the state feed version {escape(summary['state_feed_version'])}; source timestamps and retrieval hashes are retained alongside each download. Prepared November 5, 2026.</footer>
 </main></body></html>'''

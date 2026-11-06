@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Texas congressional maps: 2026 House vote reconstruction</title>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif; max-width: 48rem; margin: 0 auto; padding: 2rem 1rem 4rem; }
+  img { max-width: 100%; height: auto; }
+  pre { overflow-x: auto; padding: .75rem; background: color-mix(in srgb, CanvasText 8%, transparent); border-radius: 6px; }
+  code { font-size: .9em; }
+  blockquote { margin-left: 0; padding-left: 1rem; border-left: 3px solid GrayText; color: GrayText; }
+  table { border-collapse: collapse; }
+  td, th { border: 1px solid GrayText; padding: .25rem .6rem; }
+</style>
+</head>
+<body>
+<p><a href="../">&larr; All experiments</a></p>
+<h1>Texas congressional maps: 2026 House vote reconstruction</h1>
+<p>Open <strong><a href="report.html">report.html</a></strong> for the maps, results, caveats, and download links.</p>
+<p>See <strong><a href="FOLLOW_UP.md">FOLLOW_UP.md</a></strong> for the remaining county-data queue, known source
+issues, and the steps for retrying downloads in coming days and weeks.</p>
+<p>This is a <strong>November 5, 2026 snapshot</strong>, using <strong>November 2026 U.S. House votes only</strong>.
+All returns are unofficial. It retabulates party votes geographically; it does not
+predict which candidates would have run or how voters would have behaved under a
+different map.</p>
+<h2>What is ready</h2>
+<ul>
+<li>Official shapefiles for the previous <strong>PLANC2193</strong> and the 2025 <strong>PLANC2333</strong> plans.</li>
+<li>Their complete 2020 Census-block equivalency files: <strong>668,757 identical block IDs</strong>.</li>
+<li>Official 2026 House candidate totals for <strong>all 254 counties and all 38 districts</strong>.</li>
+<li>Downloaded precinct returns for <strong>Bastrop, Bexar, Denton, Harris, Tarrant, Travis,
+and Williamson</strong>. Only reconciled county/district/party cells are used.</li>
+<li>The latest published statewide precinct geography, <strong>2026 primary</strong>, plus the
+2024 general vintage for reference.</li>
+<li>Census block geography and 2020 population/voting-age population for split-unit estimates.</li>
+<li>Auditable CSVs, vote-conservation checks, and a self-contained HTML report.</li>
+</ul>
+<h2>Current result</h2>
+<p>The observed new-map House snapshot contains <strong>9,780,054 votes</strong>, with <strong>24 Republican
+and 14 Democratic district leads</strong>.</p>
+<p>Following the requested approach, <strong>missing major-party precinct data is not modeled</strong>.
+There are <strong>eight reportable provisional old-map estimates</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>Old district</th>
+<th>Estimated party lead</th>
+<th align="right">Estimated two-party margin</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>10</td>
+<td>Republican</td>
+<td align="right">R +9.03</td>
+</tr>
+<tr>
+<td>12</td>
+<td>Republican</td>
+<td align="right">R +6.29</td>
+</tr>
+<tr>
+<td>18</td>
+<td>Democratic</td>
+<td align="right">D +60.98</td>
+</tr>
+<tr>
+<td>19</td>
+<td>Republican</td>
+<td align="right">R +38.97</td>
+</tr>
+<tr>
+<td>27</td>
+<td>Republican</td>
+<td align="right">R +13.20</td>
+</tr>
+<tr>
+<td>29</td>
+<td>Democratic</td>
+<td align="right">D +59.21</td>
+</tr>
+<tr>
+<td>37</td>
+<td>Democratic</td>
+<td align="right">D +59.08</td>
+</tr>
+<tr>
+<td>38</td>
+<td>Republican</td>
+<td align="right">R +4.76</td>
+</tr>
+</tbody></table>
+<p><strong>The other 30 old districts remain pending. There is no statewide old-map seat count.</strong>
+The 5 Republican / 3 Democratic leads above are an incomplete subset, not a projection
+for the delegation. They cannot establish the redraw&#39;s statewide seat effect.</p>
+<p>All eight retain the same leading party under voting-age-population, total-population,
+and area allocations. Old TX-38 is the closest of the eight: approximately R +4.75
+to R +4.76 across those scenarios. This is a sensitivity comparison, <strong>not a confidence
+interval</strong>. It excludes other sources of error, including unverified November precinct
+changes and the six-year gap between Census population and election turnout.</p>
+<h2>How precincts enter the calculation</h2>
+<p>Congressional districts and voting precincts are different geographies. County officials
+can change precincts independently of redistricting. A precinct may keep its shape and
+change congressional district; it can also be split by the old map&#39;s boundaries.</p>
+<ol>
+<li>Join both plans by <strong>2020 Census block ID</strong>, never by district number alone.</li>
+<li>For each county/new-district reporting cell, identify the possible old districts.
+If there is only one, all that cell&#39;s votes can be assigned without a precinct model.</li>
+<li>Where precinct returns are available, require their county/new-district/party sums
+to equal the state snapshot exactly. Other cells remain at county detail.</li>
+<li>Normalize numeric precinct formatting within each county. Do not strip suffixes,
+match across counties, or assume an old precinct number identifies a current shape.</li>
+<li>Intersect a reporting precinct with its actual new district and then the old map.
+Single-old-district pieces are assigned directly.</li>
+<li>For split pieces, allocate each party&#39;s actual votes in proportion to Census
+voting-age population. Inhabited blocks are assigned to primary precincts by an
+interior point; official block files supply their old/new congressional districts.
+This treats the party vote as uniform within the reporting unit after population
+weighting. Total population and land area provide sensitivity scenarios.</li>
+<li>Keep missing county detail unresolved. A district with missing major-party county
+detail remains pending even when the votes already located suggest a leader.</li>
+</ol>
+<p>The model allocates <strong>6,236,936</strong> votes to old districts and retains <strong>3,543,118</strong> votes
+without an allocation. Those figures sum to the actual statewide House count in every
+scenario. Approximately <strong>2,371 split-unit votes</strong> use an area fallback because the
+population crosswalk provides no applicable weight.</p>
+<h2>Checks and limits</h2>
+<ul>
+<li>Every state&#39;s-feed House candidate total equals the sum of its county rows.</li>
+<li>All 38 district major-party totals agree with the state&#39;s separate HTML summary.</li>
+<li>Each parsed precinct source is checked against its own choice/method totals.</li>
+<li>Each county/district/party cell must match the state snapshot to be used at precinct detail.
+Bexar&#39;s major-party totals do not yet match and stay unresolved. Minor-party and write-in
+label/snapshot differences in other counties are also retained as uncertainty.</li>
+<li><strong>412 votes</strong> have unmatched precinct labels, including F99 suffixes. No geographic
+interpretation is invented for them.</li>
+<li><strong>79 accepted votes</strong> conflict with the primary precinct/new-district geometry and
+are left unresolved.</li>
+<li>All positive old-map polygon overlaps are retained for conservative bounds, even tiny
+slivers. Bounds may therefore be much wider than plausible errors. They are not
+statistical intervals and district-specific maxima cannot be summed.</li>
+<li>The primary precinct map still needs confirmation against November boundaries.</li>
+<li>Census weights represent <strong>2020 residents</strong>, not 2026 voters. They cannot measure
+within-precinct party differences, new development, or turnout changes.</li>
+<li>No 2024 election vote is used in the 2026 reconstruction. The legislature&#39;s downloaded
+2024 two-plan comparison is reference material only.</li>
+</ul>
+<h2>Files</h2>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Content</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>data/raw/planc2193.zip</code>, <code>planc2333.zip</code></td>
+<td>Original official district shapefiles</td>
+</tr>
+<tr>
+<td><code>data/raw/planc2193_blk.zip</code>, <code>planc2333_blk.zip</code></td>
+<td>Official block-to-district assignments</td>
+</tr>
+<tr>
+<td><code>data/raw/precincts26p.zip</code></td>
+<td>Latest published statewide precinct shapes; primary vintage</td>
+</tr>
+<tr>
+<td><code>data/raw/blocks.zip</code>, <code>blocks_pop.zip</code></td>
+<td>Census geography and demographic allocation weights</td>
+</tr>
+<tr>
+<td><code>data/processed/house_2026_county_candidates.csv</code></td>
+<td>All official county House candidate totals</td>
+</tr>
+<tr>
+<td><code>data/processed/house_2026_actual_districts.csv</code></td>
+<td>Observed new-map district totals</td>
+</tr>
+<tr>
+<td><code>data/processed/house_2026_old_map_estimates.csv</code></td>
+<td>Estimated old-map votes and explicit pending status</td>
+</tr>
+<tr>
+<td><code>data/processed/house_2026_old_map_bounds.csv</code></td>
+<td>Conservative geography-based vote envelopes</td>
+</tr>
+<tr>
+<td><code>data/processed/precinct_source_reconciliation.csv</code></td>
+<td>Source snapshot differences and cells accepted/rejected</td>
+</tr>
+<tr>
+<td><code>data/processed/accepted_house_precincts.csv</code></td>
+<td>Only precinct vote cells that match the state snapshot</td>
+</tr>
+<tr>
+<td><code>data/processed/retabulation_units.csv</code></td>
+<td>Each actual vote unit and possible old districts</td>
+</tr>
+<tr>
+<td><code>data/processed/estimated_vote_allocations.csv</code></td>
+<td>Fractional estimated assignments and fallback flags</td>
+</tr>
+<tr>
+<td><code>data/processed/estimate_vote_conservation.csv</code></td>
+<td>Actual = allocated + unallocated, for every scenario</td>
+</tr>
+<tr>
+<td><code>data/processed/remaining_county_work.csv</code></td>
+<td>Strict unresolved geography, including modeled splits</td>
+</tr>
+<tr>
+<td><code>data/raw/*.source.json</code></td>
+<td>Download URL, retrieval time, size, SHA-256</td>
+</tr>
+</tbody></table>
+<p><code>PCTKEY</code> in the normalized analysis is <code>county-FIPS:precinct</code>, with numeric leading
+zeroes removed from the precinct portion only. Original precinct labels are preserved.</p>
+<h2>Reproduce</h2>
+<p>From this directory:</p>
+<pre><code class="language-sh">python3 -m venv .venv
+.venv/bin/pip install -r requirements.txt
+.venv/bin/python scripts/fetch_sources.py --county-indexes
+.venv/bin/python scripts/analyze.py
+.venv/bin/python scripts/estimate.py
+.venv/bin/python scripts/build_report.py
+</code></pre>
+<p>Existing sources are cached. <code>fetch_sources.py --refresh --county-indexes</code> re-downloads
+mutable sources and can change the snapshot. County vendor indexes are incomplete;
+failed/index-missing downloads are recorded, not interpreted as absence of results.
+Some published county reports may require additional collection and parsers.</p>
+<p>The population-weight cache is keyed to source hashes and the required precincts.
+The large Census block shapefile is streamed rather than loaded into memory as one map.</p>
+<p>The optional <code>--model-missing-counties</code> estimator mode is <strong>not used in this report</strong>;
+it would impose a separate and much weaker within-county population-allocation model.</p>
+<h2>Primary sources</h2>
+<ul>
+<li><a href="https://data.capitol.texas.gov/dataset/planc2193">Old congressional plan, PLANC2193</a></li>
+<li><a href="https://data.capitol.texas.gov/dataset/planc2333">2025 congressional plan, PLANC2333</a></li>
+<li><a href="https://redistricting.capitol.texas.gov/">Texas redistricting plans in effect</a></li>
+<li><a href="https://data.capitol.texas.gov/dataset/precincts">Texas precinct boundaries and vintage descriptions</a></li>
+<li><a href="https://data.capitol.texas.gov/dataset/2020-census-geography">2020 Census geography and population</a></li>
+<li><a href="https://goelect.txelections.civixapps.com/ivis-enr-ui/races">Texas Secretary of State results</a></li>
+<li><a href="https://electionresults.sos.state.tx.us/results.html">Separate state HTML summary</a></li>
+<li><a href="https://www.tarrantcountytx.gov/en/elections/past-election-information/2026-archives/november-3--2026--joint-general-and-special-election-results.html">Tarrant County November 2026 sources</a></li>
+<li><a href="https://app.harrisvotes.com/electionresults/electionday">Harris County live results</a></li>
+<li><a href="https://votetravis.gov/current-election-information/election-results-and-reconciliation-forms/">Travis County results directory</a></li>
+<li><a href="https://gov.bexar.org/">Bexar County election links</a></li>
+</ul>
+<p>Discovery included an independent statewide precinct compilation, but its data downloads
+were inaccessible. None of that compiler&#39;s estimates or vote data enter this report.</p>
+</body>
+</html>
