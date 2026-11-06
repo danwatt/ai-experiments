@@ -1,0 +1,241 @@
+county_fips,county,precinct,pctkey,district,party,candidate,votes
+439,Tarrant,2310 - F99,439:2310 - F99,6,REP,Jake Ellzey,1
+439,Tarrant,2401 - F99,439:2401 - F99,6,REP,Jake Ellzey,1
+439,Tarrant,2028 - F99,439:2028 - F99,6,DEM,Danny Minton,1
+439,Tarrant,2052 - F99,439:2052 - F99,6,DEM,Danny Minton,5
+439,Tarrant,2112 - F99,439:2112 - F99,6,DEM,Danny Minton,1
+439,Tarrant,2147 - F99,439:2147 - F99,6,DEM,Danny Minton,1
+439,Tarrant,2161 - F99,439:2161 - F99,6,DEM,Danny Minton,1
+439,Tarrant,2171 - F99,439:2171 - F99,6,DEM,Danny Minton,5
+439,Tarrant,2174 - F99,439:2174 - F99,6,DEM,Danny Minton,1
+439,Tarrant,2181 - F99,439:2181 - F99,6,DEM,Danny Minton,3
+439,Tarrant,2205 - F99,439:2205 - F99,6,DEM,Danny Minton,7
+439,Tarrant,2220 - F99,439:2220 - F99,6,DEM,Danny Minton,1
+439,Tarrant,2223 - F99,439:2223 - F99,6,DEM,Danny Minton,1
+439,Tarrant,2229 - F99,439:2229 - F99,6,DEM,Danny Minton,1
+439,Tarrant,2266 - F99,439:2266 - F99,6,DEM,Danny Minton,1
+439,Tarrant,2307 - F99,439:2307 - F99,6,DEM,Danny Minton,3
+439,Tarrant,2310 - F99,439:2310 - F99,6,DEM,Danny Minton,1
+439,Tarrant,2313 - F99,439:2313 - F99,6,DEM,Danny Minton,3
+439,Tarrant,2319 - F99,439:2319 - F99,6,DEM,Danny Minton,1
+439,Tarrant,2356 - F99,439:2356 - F99,6,DEM,Danny Minton,1
+439,Tarrant,2357 - F99,439:2357 - F99,6,DEM,Danny Minton,1
+439,Tarrant,2358 - F99,439:2358 - F99,6,DEM,Danny Minton,1
+439,Tarrant,2425 - F99,439:2425 - F99,6,DEM,Danny Minton,4
+439,Tarrant,2426 - F99,439:2426 - F99,6,DEM,Danny Minton,1
+439,Tarrant,2468 - F99,439:2468 - F99,6,DEM,Danny Minton,1
+439,Tarrant,2505 - F99,439:2505 - F99,6,DEM,Danny Minton,1
+439,Tarrant,2506 - F99,439:2506 - F99,6,DEM,Danny Minton,1
+439,Tarrant,2522 - F99,439:2522 - F99,6,DEM,Danny Minton,2
+439,Tarrant,2524 - F99,439:2524 - F99,6,DEM,Danny Minton,1
+439,Tarrant,2535 - F99,439:2535 - F99,6,DEM,Danny Minton,1
+439,Tarrant,2556 - F99,439:2556 - F99,6,DEM,Danny Minton,2
+439,Tarrant,2636 - F99,439:2636 - F99,6,DEM,Danny Minton,1
+439,Tarrant,2712 - F99,439:2712 - F99,6,DEM,Danny Minton,1
+439,Tarrant,2727 - F99,439:2727 - F99,6,DEM,Danny Minton,1
+439,Tarrant,4043 - F99,439:4043 - F99,12,REP,Craig Goldman,1
+439,Tarrant,4095 - F99,439:4095 - F99,12,REP,Craig Goldman,1
+439,Tarrant,4116 - F99,439:4116 - F99,12,REP,Craig Goldman,1
+439,Tarrant,4144 - F99,439:4144 - F99,12,REP,Craig Goldman,1
+439,Tarrant,4290 - F99,439:4290 - F99,12,REP,Craig Goldman,1
+439,Tarrant,4711 - F99,439:4711 - F99,12,REP,Craig Goldman,1
+439,Tarrant,4733 - F99,439:4733 - F99,12,REP,Craig Goldman,1
+439,Tarrant,4830 - F99,439:4830 - F99,12,REP,Craig Goldman,1
+439,Tarrant,1019 - F99,439:1019 - F99,12,DEM,Angela 'Heli' Rodriguez Prilliman,1
+439,Tarrant,1096 - F99,439:1096 - F99,12,DEM,Angela 'Heli' Rodriguez Prilliman,4
+439,Tarrant,1233 - F99,439:1233 - F99,12,DEM,Angela 'Heli' Rodriguez Prilliman,1
+439,Tarrant,1608 - F99,439:1608 - F99,12,DEM,Angela 'Heli' Rodriguez Prilliman,2
+439,Tarrant,2070 - F99,439:2070 - F99,12,DEM,Angela 'Heli' Rodriguez Prilliman,1
+439,Tarrant,2111 - F99,439:2111 - F99,12,DEM,Angela 'Heli' Rodriguez Prilliman,2
+439,Tarrant,2129 - F99,439:2129 - F99,12,DEM,Angela 'Heli' Rodriguez Prilliman,1
+439,Tarrant,2133 - F99,439:2133 - F99,12,DEM,Angela 'Heli' Rodriguez Prilliman,3
+439,Tarrant,2135 - F99,439:2135 - F99,12,DEM,Angela 'Heli' Rodriguez Prilliman,1
+439,Tarrant,2155 - F99,439:2155 - F99,12,DEM,Angela 'Heli' Rodriguez Prilliman,1
+439,Tarrant,2179 - F99,439:2179 - F99,12,DEM,Angela 'Heli' Rodriguez Prilliman,1
+439,Tarrant,2206 - F99,439:2206 - F99,12,DEM,Angela 'Heli' Rodriguez Prilliman,1
+439,Tarrant,2230 - F99,439:2230 - F99,12,DEM,Angela 'Heli' Rodriguez Prilliman,3
+439,Tarrant,2296 - F99,439:2296 - F99,12,DEM,Angela 'Heli' Rodriguez Prilliman,2
+439,Tarrant,2337 - F99,439:2337 - F99,12,DEM,Angela 'Heli' Rodriguez Prilliman,2
+439,Tarrant,2339 - F99,439:2339 - F99,12,DEM,Angela 'Heli' Rodriguez Prilliman,1
+439,Tarrant,2342 - F99,439:2342 - F99,12,DEM,Angela 'Heli' Rodriguez Prilliman,1
+439,Tarrant,2377 - F99,439:2377 - F99,12,DEM,Angela 'Heli' Rodriguez Prilliman,2
+439,Tarrant,2423 - F99,439:2423 - F99,12,DEM,Angela 'Heli' Rodriguez Prilliman,3
+439,Tarrant,2456 - F99,439:2456 - F99,12,DEM,Angela 'Heli' Rodriguez Prilliman,4
+439,Tarrant,4015 - F99,439:4015 - F99,12,DEM,Angela 'Heli' Rodriguez Prilliman,1
+439,Tarrant,4044 - F99,439:4044 - F99,12,DEM,Angela 'Heli' Rodriguez Prilliman,1
+439,Tarrant,4045 - F99,439:4045 - F99,12,DEM,Angela 'Heli' Rodriguez Prilliman,1
+439,Tarrant,4046 - F99,439:4046 - F99,12,DEM,Angela 'Heli' Rodriguez Prilliman,1
+439,Tarrant,4053 - F99,439:4053 - F99,12,DEM,Angela 'Heli' Rodriguez Prilliman,1
+439,Tarrant,4069 - F99,439:4069 - F99,12,DEM,Angela 'Heli' Rodriguez Prilliman,2
+439,Tarrant,4081 - F99,439:4081 - F99,12,DEM,Angela 'Heli' Rodriguez Prilliman,1
+439,Tarrant,4086 - F99,439:4086 - F99,12,DEM,Angela 'Heli' Rodriguez Prilliman,1
+439,Tarrant,4094 - F99,439:4094 - F99,12,DEM,Angela 'Heli' Rodriguez Prilliman,1
+439,Tarrant,4095 - F99,439:4095 - F99,12,DEM,Angela 'Heli' Rodriguez Prilliman,1
+439,Tarrant,4108 - F99,439:4108 - F99,12,DEM,Angela 'Heli' Rodriguez Prilliman,1
+439,Tarrant,4116 - F99,439:4116 - F99,12,DEM,Angela 'Heli' Rodriguez Prilliman,1
+439,Tarrant,4117 - F99,439:4117 - F99,12,DEM,Angela 'Heli' Rodriguez Prilliman,1
+439,Tarrant,4122 - F99,439:4122 - F99,12,DEM,Angela 'Heli' Rodriguez Prilliman,1
+439,Tarrant,4124 - F99,439:4124 - F99,12,DEM,Angela 'Heli' Rodriguez Prilliman,3
+439,Tarrant,4128 - F99,439:4128 - F99,12,DEM,Angela 'Heli' Rodriguez Prilliman,1
+439,Tarrant,4130 - F99,439:4130 - F99,12,DEM,Angela 'Heli' Rodriguez Prilliman,4
+439,Tarrant,4137 - F99,439:4137 - F99,12,DEM,Angela 'Heli' Rodriguez Prilliman,1
+439,Tarrant,4144 - F99,439:4144 - F99,12,DEM,Angela 'Heli' Rodriguez Prilliman,1
+439,Tarrant,4163 - F99,439:4163 - F99,12,DEM,Angela 'Heli' Rodriguez Prilliman,2
+439,Tarrant,4178 - F99,439:4178 - F99,12,DEM,Angela 'Heli' Rodriguez Prilliman,1
+439,Tarrant,4182 - F99,439:4182 - F99,12,DEM,Angela 'Heli' Rodriguez Prilliman,3
+439,Tarrant,4203 - F99,439:4203 - F99,12,DEM,Angela 'Heli' Rodriguez Prilliman,1
+439,Tarrant,4250 - F99,439:4250 - F99,12,DEM,Angela 'Heli' Rodriguez Prilliman,1
+439,Tarrant,4252 - F99,439:4252 - F99,12,DEM,Angela 'Heli' Rodriguez Prilliman,2
+439,Tarrant,4298 - F99,439:4298 - F99,12,DEM,Angela 'Heli' Rodriguez Prilliman,3
+439,Tarrant,4338 - F99,439:4338 - F99,12,DEM,Angela 'Heli' Rodriguez Prilliman,1
+439,Tarrant,4344 - F99,439:4344 - F99,12,DEM,Angela 'Heli' Rodriguez Prilliman,1
+439,Tarrant,4350 - F99,439:4350 - F99,12,DEM,Angela 'Heli' Rodriguez Prilliman,3
+439,Tarrant,4369 - F99,439:4369 - F99,12,DEM,Angela 'Heli' Rodriguez Prilliman,1
+439,Tarrant,4371 - F99,439:4371 - F99,12,DEM,Angela 'Heli' Rodriguez Prilliman,2
+439,Tarrant,4493 - F99,439:4493 - F99,12,DEM,Angela 'Heli' Rodriguez Prilliman,1
+439,Tarrant,4531 - F99,439:4531 - F99,12,DEM,Angela 'Heli' Rodriguez Prilliman,1
+439,Tarrant,4534 - F99,439:4534 - F99,12,DEM,Angela 'Heli' Rodriguez Prilliman,1
+439,Tarrant,4634 - F99,439:4634 - F99,12,DEM,Angela 'Heli' Rodriguez Prilliman,1
+439,Tarrant,4684 - F99,439:4684 - F99,12,DEM,Angela 'Heli' Rodriguez Prilliman,1
+439,Tarrant,4844 - F99,439:4844 - F99,12,DEM,Angela 'Heli' Rodriguez Prilliman,1
+439,Tarrant,4128 - FSC,439:4128 - FSC,12,DEM,Angela 'Heli' Rodriguez Prilliman,1
+439,Tarrant,3114 - F99,439:3114 - F99,24,REP,Beth Van Duyne,1
+439,Tarrant,3176 - F99,439:3176 - F99,24,REP,Beth Van Duyne,2
+439,Tarrant,3183 - F99,439:3183 - F99,24,REP,Beth Van Duyne,1
+439,Tarrant,3248 - F99,439:3248 - F99,24,REP,Beth Van Duyne,1
+439,Tarrant,3260 - F99,439:3260 - F99,24,REP,Beth Van Duyne,2
+439,Tarrant,3331 - F99,439:3331 - F99,24,REP,Beth Van Duyne,1
+439,Tarrant,3372 - F99,439:3372 - F99,24,REP,Beth Van Duyne,1
+439,Tarrant,3389 - F99,439:3389 - F99,24,REP,Beth Van Duyne,1
+439,Tarrant,3396 - F99,439:3396 - F99,24,REP,Beth Van Duyne,1
+439,Tarrant,3465 - F99,439:3465 - F99,24,REP,Beth Van Duyne,1
+439,Tarrant,3510 - F99,439:3510 - F99,24,REP,Beth Van Duyne,3
+439,Tarrant,3516 - F99,439:3516 - F99,24,REP,Beth Van Duyne,1
+439,Tarrant,3517 - F99,439:3517 - F99,24,REP,Beth Van Duyne,1
+439,Tarrant,3538 - F99,439:3538 - F99,24,REP,Beth Van Duyne,1
+439,Tarrant,3637 - F99,439:3637 - F99,24,REP,Beth Van Duyne,2
+439,Tarrant,3054 - FSS,439:3054 - FSS,24,REP,Beth Van Duyne,1
+439,Tarrant,3140 - FSC,439:3140 - FSC,24,REP,Beth Van Duyne,1
+439,Tarrant,3035 - F99,439:3035 - F99,24,DEM,Kevin Burge,10
+439,Tarrant,3036 - F99,439:3036 - F99,24,DEM,Kevin Burge,3
+439,Tarrant,3049 - F99,439:3049 - F99,24,DEM,Kevin Burge,2
+439,Tarrant,3072 - F99,439:3072 - F99,24,DEM,Kevin Burge,1
+439,Tarrant,3114 - F99,439:3114 - F99,24,DEM,Kevin Burge,6
+439,Tarrant,3139 - F99,439:3139 - F99,24,DEM,Kevin Burge,2
+439,Tarrant,3156 - F99,439:3156 - F99,24,DEM,Kevin Burge,1
+439,Tarrant,3157 - F99,439:3157 - F99,24,DEM,Kevin Burge,1
+439,Tarrant,3164 - F99,439:3164 - F99,24,DEM,Kevin Burge,1
+439,Tarrant,3166 - F99,439:3166 - F99,24,DEM,Kevin Burge,2
+439,Tarrant,3176 - F99,439:3176 - F99,24,DEM,Kevin Burge,2
+439,Tarrant,3193 - F99,439:3193 - F99,24,DEM,Kevin Burge,1
+439,Tarrant,3194 - F99,439:3194 - F99,24,DEM,Kevin Burge,1
+439,Tarrant,3209 - F99,439:3209 - F99,24,DEM,Kevin Burge,1
+439,Tarrant,3212 - F99,439:3212 - F99,24,DEM,Kevin Burge,3
+439,Tarrant,3216 - F99,439:3216 - F99,24,DEM,Kevin Burge,6
+439,Tarrant,3248 - F99,439:3248 - F99,24,DEM,Kevin Burge,3
+439,Tarrant,3254 - F99,439:3254 - F99,24,DEM,Kevin Burge,2
+439,Tarrant,3260 - F99,439:3260 - F99,24,DEM,Kevin Burge,3
+439,Tarrant,3321 - F99,439:3321 - F99,24,DEM,Kevin Burge,1
+439,Tarrant,3322 - F99,439:3322 - F99,24,DEM,Kevin Burge,2
+439,Tarrant,3323 - F99,439:3323 - F99,24,DEM,Kevin Burge,5
+439,Tarrant,3325 - F99,439:3325 - F99,24,DEM,Kevin Burge,1
+439,Tarrant,3333 - F99,439:3333 - F99,24,DEM,Kevin Burge,1
+439,Tarrant,3334 - F99,439:3334 - F99,24,DEM,Kevin Burge,1
+439,Tarrant,3335 - F99,439:3335 - F99,24,DEM,Kevin Burge,1
+439,Tarrant,3336 - F99,439:3336 - F99,24,DEM,Kevin Burge,2
+439,Tarrant,3365 - F99,439:3365 - F99,24,DEM,Kevin Burge,1
+439,Tarrant,3367 - F99,439:3367 - F99,24,DEM,Kevin Burge,1
+439,Tarrant,3368 - F99,439:3368 - F99,24,DEM,Kevin Burge,1
+439,Tarrant,3372 - F99,439:3372 - F99,24,DEM,Kevin Burge,1
+439,Tarrant,3385 - F99,439:3385 - F99,24,DEM,Kevin Burge,10
+439,Tarrant,3387 - F99,439:3387 - F99,24,DEM,Kevin Burge,1
+439,Tarrant,3389 - F99,439:3389 - F99,24,DEM,Kevin Burge,2
+439,Tarrant,3390 - F99,439:3390 - F99,24,DEM,Kevin Burge,1
+439,Tarrant,3391 - F99,439:3391 - F99,24,DEM,Kevin Burge,1
+439,Tarrant,3396 - F99,439:3396 - F99,24,DEM,Kevin Burge,1
+439,Tarrant,3421 - F99,439:3421 - F99,24,DEM,Kevin Burge,1
+439,Tarrant,3443 - F99,439:3443 - F99,24,DEM,Kevin Burge,4
+439,Tarrant,3486 - F99,439:3486 - F99,24,DEM,Kevin Burge,1
+439,Tarrant,3509 - F99,439:3509 - F99,24,DEM,Kevin Burge,2
+439,Tarrant,3510 - F99,439:3510 - F99,24,DEM,Kevin Burge,1
+439,Tarrant,3511 - F99,439:3511 - F99,24,DEM,Kevin Burge,1
+439,Tarrant,3516 - F99,439:3516 - F99,24,DEM,Kevin Burge,1
+439,Tarrant,3517 - F99,439:3517 - F99,24,DEM,Kevin Burge,3
+439,Tarrant,3527 - F99,439:3527 - F99,24,DEM,Kevin Burge,2
+439,Tarrant,3538 - F99,439:3538 - F99,24,DEM,Kevin Burge,3
+439,Tarrant,3539 - F99,439:3539 - F99,24,DEM,Kevin Burge,1
+439,Tarrant,3545 - F99,439:3545 - F99,24,DEM,Kevin Burge,2
+439,Tarrant,3552 - F99,439:3552 - F99,24,DEM,Kevin Burge,1
+439,Tarrant,3558 - F99,439:3558 - F99,24,DEM,Kevin Burge,7
+439,Tarrant,3588 - F99,439:3588 - F99,24,DEM,Kevin Burge,3
+439,Tarrant,3647 - F99,439:3647 - F99,24,DEM,Kevin Burge,1
+439,Tarrant,3648 - F99,439:3648 - F99,24,DEM,Kevin Burge,2
+439,Tarrant,3698 - F99,439:3698 - F99,24,DEM,Kevin Burge,1
+439,Tarrant,3706 - F99,439:3706 - F99,24,DEM,Kevin Burge,1
+439,Tarrant,3720 - F99,439:3720 - F99,24,DEM,Kevin Burge,1
+439,Tarrant,3725 - F99,439:3725 - F99,24,DEM,Kevin Burge,1
+439,Tarrant,3728 - F99,439:3728 - F99,24,DEM,Kevin Burge,1
+439,Tarrant,4261 - F99,439:4261 - F99,24,DEM,Kevin Burge,1
+439,Tarrant,4528 - F99,439:4528 - F99,24,DEM,Kevin Burge,5
+439,Tarrant,4570 - F99,439:4570 - F99,24,DEM,Kevin Burge,1
+439,Tarrant,4374 - FSS,439:4374 - FSS,24,DEM,Kevin Burge,1
+439,Tarrant,1170 - F99,439:1170 - F99,25,REP,Roger Williams,1
+439,Tarrant,2105 - F99,439:2105 - F99,25,REP,Roger Williams,1
+439,Tarrant,2219 - F99,439:2219 - F99,25,REP,Roger Williams,2
+439,Tarrant,2303 - F99,439:2303 - F99,25,REP,Roger Williams,1
+439,Tarrant,1104 - F99,439:1104 - F99,25,DEM,Dione Sims,1
+439,Tarrant,1119 - F99,439:1119 - F99,25,DEM,Dione Sims,3
+439,Tarrant,1146 - F99,439:1146 - F99,25,DEM,Dione Sims,2
+439,Tarrant,1151 - F99,439:1151 - F99,25,DEM,Dione Sims,2
+439,Tarrant,1170 - F99,439:1170 - F99,25,DEM,Dione Sims,5
+439,Tarrant,1207 - F99,439:1207 - F99,25,DEM,Dione Sims,2
+439,Tarrant,1224 - F99,439:1224 - F99,25,DEM,Dione Sims,1
+439,Tarrant,1238 - F99,439:1238 - F99,25,DEM,Dione Sims,3
+439,Tarrant,1257 - F99,439:1257 - F99,25,DEM,Dione Sims,1
+439,Tarrant,1265 - F99,439:1265 - F99,25,DEM,Dione Sims,1
+439,Tarrant,1300 - F99,439:1300 - F99,25,DEM,Dione Sims,1
+439,Tarrant,1347 - F99,439:1347 - F99,25,DEM,Dione Sims,3
+439,Tarrant,1378 - F99,439:1378 - F99,25,DEM,Dione Sims,1
+439,Tarrant,1380 - F99,439:1380 - F99,25,DEM,Dione Sims,2
+439,Tarrant,1404 - F99,439:1404 - F99,25,DEM,Dione Sims,2
+439,Tarrant,1463 - F99,439:1463 - F99,25,DEM,Dione Sims,2
+439,Tarrant,1467 - F99,439:1467 - F99,25,DEM,Dione Sims,1
+439,Tarrant,1490 - F99,439:1490 - F99,25,DEM,Dione Sims,2
+439,Tarrant,1537 - F99,439:1537 - F99,25,DEM,Dione Sims,3
+439,Tarrant,1610 - F99,439:1610 - F99,25,DEM,Dione Sims,1
+439,Tarrant,1641 - F99,439:1641 - F99,25,DEM,Dione Sims,1
+439,Tarrant,1714 - F99,439:1714 - F99,25,DEM,Dione Sims,5
+439,Tarrant,2003 - F99,439:2003 - F99,25,DEM,Dione Sims,1
+439,Tarrant,2004 - F99,439:2004 - F99,25,DEM,Dione Sims,1
+439,Tarrant,2022 - F99,439:2022 - F99,25,DEM,Dione Sims,2
+439,Tarrant,2024 - F99,439:2024 - F99,25,DEM,Dione Sims,1
+439,Tarrant,2026 - F99,439:2026 - F99,25,DEM,Dione Sims,2
+439,Tarrant,2055 - F99,439:2055 - F99,25,DEM,Dione Sims,2
+439,Tarrant,2105 - F99,439:2105 - F99,25,DEM,Dione Sims,2
+439,Tarrant,2142 - F99,439:2142 - F99,25,DEM,Dione Sims,2
+439,Tarrant,2219 - F99,439:2219 - F99,25,DEM,Dione Sims,1
+439,Tarrant,2228 - F99,439:2228 - F99,25,DEM,Dione Sims,2
+439,Tarrant,2264 - F99,439:2264 - F99,25,DEM,Dione Sims,3
+439,Tarrant,2271 - F99,439:2271 - F99,25,DEM,Dione Sims,2
+439,Tarrant,2303 - F99,439:2303 - F99,25,DEM,Dione Sims,1
+439,Tarrant,2317 - F99,439:2317 - F99,25,DEM,Dione Sims,1
+439,Tarrant,2704 - F99,439:2704 - F99,25,DEM,Dione Sims,1
+439,Tarrant,2861 - F99,439:2861 - F99,25,DEM,Dione Sims,1
+439,Tarrant,3199 - F99,439:3199 - F99,25,DEM,Dione Sims,1
+439,Tarrant,3442 - F99,439:3442 - F99,25,DEM,Dione Sims,1
+439,Tarrant,1484 - F99,439:1484 - F99,30,REP,Everett Jackson,1
+439,Tarrant,1030 - F99,439:1030 - F99,30,DEM,Frederick D. Haynes III,1
+439,Tarrant,1031 - F99,439:1031 - F99,30,DEM,Frederick D. Haynes III,1
+439,Tarrant,1379 - F99,439:1379 - F99,30,DEM,Frederick D. Haynes III,1
+439,Tarrant,1413 - F99,439:1413 - F99,30,DEM,Frederick D. Haynes III,1
+439,Tarrant,1453 - F99,439:1453 - F99,30,DEM,Frederick D. Haynes III,1
+439,Tarrant,1541 - F99,439:1541 - F99,30,DEM,Frederick D. Haynes III,1
+439,Tarrant,1613 - F99,439:1613 - F99,30,DEM,Frederick D. Haynes III,1
+439,Tarrant,2235 - F99,439:2235 - F99,30,DEM,Frederick D. Haynes III,3
+439,Tarrant,2267 - F99,439:2267 - F99,30,DEM,Frederick D. Haynes III,1
+439,Tarrant,2268 - F99,439:2268 - F99,30,DEM,Frederick D. Haynes III,1
+439,Tarrant,2354 - F99,439:2354 - F99,30,DEM,Frederick D. Haynes III,1
+439,Tarrant,2448 - F99,439:2448 - F99,30,DEM,Frederick D. Haynes III,3
+439,Tarrant,2553 - F99,439:2553 - F99,30,DEM,Frederick D. Haynes III,2
+439,Tarrant,2708 - F99,439:2708 - F99,30,DEM,Frederick D. Haynes III,2
+439,Tarrant,2726 - F99,439:2726 - F99,30,DEM,Frederick D. Haynes III,1

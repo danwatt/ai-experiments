@@ -1,0 +1,6 @@
+{
+  "url": "https://api.census.gov/data/2020/dec/pl?get=NAME&for=county:*&in=state:48",
+  "retrieved_utc": "2026-11-05T21:47:26.933574+00:00",
+  "bytes": 8764,
+  "sha256": "fa405c10899a64c6c279683a4d90183d0e42a49a400852fb47978d5d68160489"
+}

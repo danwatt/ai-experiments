@@ -1,0 +1,13 @@
+{
+  "model_missing_counties": false,
+  "modeled_party_leads": {
+    "PENDING": 30,
+    "REP": 5,
+    "DEM": 3
+  },
+  "allocation_sensitive_districts": [],
+  "close_districts": [
+    38
+  ],
+  "warning": "Allocation scenarios are assumptions, not confidence intervals. Estimates hold actual 2026 House voting behavior fixed. 2020 population may misrepresent 2026 growth and turnout. Primary precinct geography needs November validation. A district with unlocated votes can show an estimated party lead only if those unlocated votes cannot reverse it under that allocation scenario."
+}

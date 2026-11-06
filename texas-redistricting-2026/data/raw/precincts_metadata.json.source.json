@@ -1,0 +1,6 @@
+{
+  "url": "https://data.capitol.texas.gov/api/3/action/package_show?id=precincts",
+  "retrieved_utc": "2026-11-05T21:01:00.848937+00:00",
+  "bytes": 14000,
+  "sha256": "9fce8457b6d48f23f99887510f9d73ca4a01df9b8b6e5fe079c418ed1dd99c5a"
+}

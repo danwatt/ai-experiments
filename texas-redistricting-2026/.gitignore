@@ -1,0 +1,5 @@
+.venv/
+__pycache__/
+data/raw/*.zip
+data/raw/*civix_main.js
+data/raw/discovery_*

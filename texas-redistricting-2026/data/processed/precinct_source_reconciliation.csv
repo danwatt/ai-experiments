@@ -1,0 +1,68 @@
+county_fips,county,new_district,party,state_votes,precinct_votes,state_minus_precinct,use_for_retabulation,source,source_updated
+439,Tarrant,6,DEM,43733,43733,0,True,tarrant_2026_detailxml.zip,11/4/2026 2:53:24 AM CST
+439,Tarrant,6,REP,41599,41599,0,True,tarrant_2026_detailxml.zip,11/4/2026 2:53:24 AM CST
+439,Tarrant,12,DEM,115880,115880,0,True,tarrant_2026_detailxml.zip,11/4/2026 2:53:24 AM CST
+439,Tarrant,12,REP,100050,100050,0,True,tarrant_2026_detailxml.zip,11/4/2026 2:53:24 AM CST
+439,Tarrant,24,DEM,99804,99804,0,True,tarrant_2026_detailxml.zip,11/4/2026 2:53:24 AM CST
+439,Tarrant,24,REP,119793,119793,0,True,tarrant_2026_detailxml.zip,11/4/2026 2:53:24 AM CST
+439,Tarrant,25,DEM,95419,95419,0,True,tarrant_2026_detailxml.zip,11/4/2026 2:53:24 AM CST
+439,Tarrant,25,REP,38272,38272,0,True,tarrant_2026_detailxml.zip,11/4/2026 2:53:24 AM CST
+439,Tarrant,30,DEM,51800,51800,0,True,tarrant_2026_detailxml.zip,11/4/2026 2:53:24 AM CST
+439,Tarrant,30,REP,18081,18081,0,True,tarrant_2026_detailxml.zip,11/4/2026 2:53:24 AM CST
+121,Denton,4,DEM,19409,19409,0,True,clarity_121_385491_detailxml.zip,11/4/2026 1:24:17 AM CST
+121,Denton,4,REP,20437,20437,0,True,clarity_121_385491_detailxml.zip,11/4/2026 1:24:17 AM CST
+121,Denton,13,DEM,37067,37067,0,True,clarity_121_385491_detailxml.zip,11/4/2026 1:24:17 AM CST
+121,Denton,13,REP,22085,22085,0,True,clarity_121_385491_detailxml.zip,11/4/2026 1:24:17 AM CST
+121,Denton,26,DEM,139056,139056,0,True,clarity_121_385491_detailxml.zip,11/4/2026 1:24:17 AM CST
+121,Denton,26,LIB,3694,3694,0,True,clarity_121_385491_detailxml.zip,11/4/2026 1:24:17 AM CST
+121,Denton,26,REP,149668,149668,0,True,clarity_121_385491_detailxml.zip,11/4/2026 1:24:17 AM CST
+021,Bastrop,10,DEM,357,357,0,True,clarity_021_384953_detailxml.zip,11/3/2026 9:55:51 PM CST
+021,Bastrop,10,REP,303,303,0,True,clarity_021_384953_detailxml.zip,11/3/2026 9:55:51 PM CST
+021,Bastrop,27,DEM,18593,18593,0,True,clarity_021_384953_detailxml.zip,11/3/2026 9:55:51 PM CST
+021,Bastrop,27,REP,17261,17261,0,True,clarity_021_384953_detailxml.zip,11/3/2026 9:55:51 PM CST
+021,Bastrop,27,WRITEIN,5,53,-48,False,clarity_021_384953_detailxml.zip,11/3/2026 9:55:51 PM CST
+453,Travis,10,DEM,76151,76151,0,True,clarity_453_385566_detailxml.zip,11/4/2026 3:34:48 AM CST
+453,Travis,10,REP,51508,51508,0,True,clarity_453_385566_detailxml.zip,11/4/2026 3:34:48 AM CST
+453,Travis,11,DEM,44570,44570,0,True,clarity_453_385566_detailxml.zip,11/4/2026 3:34:48 AM CST
+453,Travis,11,REP,19731,19731,0,True,clarity_453_385566_detailxml.zip,11/4/2026 3:34:48 AM CST
+453,Travis,27,DEM,27969,27969,0,True,clarity_453_385566_detailxml.zip,11/4/2026 3:34:48 AM CST
+453,Travis,27,REP,8937,8937,0,True,clarity_453_385566_detailxml.zip,11/4/2026 3:34:48 AM CST
+453,Travis,27,WRITEIN,1,24,-23,False,clarity_453_385566_detailxml.zip,11/4/2026 3:34:48 AM CST
+453,Travis,37,DEM,254957,254957,0,True,clarity_453_385566_detailxml.zip,11/4/2026 3:34:48 AM CST
+453,Travis,37,REP,49469,49469,0,True,clarity_453_385566_detailxml.zip,11/4/2026 3:34:48 AM CST
+491,Williamson,11,DEM,8059,8059,0,True,clarity_491_385435_detailxml.zip,11/4/2026 12:52:39 AM CST
+491,Williamson,11,REP,2607,2607,0,True,clarity_491_385435_detailxml.zip,11/4/2026 12:52:39 AM CST
+491,Williamson,17,DEM,70895,70895,0,True,clarity_491_385435_detailxml.zip,11/4/2026 12:52:39 AM CST
+491,Williamson,17,REP,40681,40681,0,True,clarity_491_385435_detailxml.zip,11/4/2026 12:52:39 AM CST
+491,Williamson,31,DEM,74042,74042,0,True,clarity_491_385435_detailxml.zip,11/4/2026 12:52:39 AM CST
+491,Williamson,31,GRE,2076,2076,0,True,clarity_491_385435_detailxml.zip,11/4/2026 12:52:39 AM CST
+491,Williamson,31,REP,76545,76545,0,True,clarity_491_385435_detailxml.zip,11/4/2026 12:52:39 AM CST
+029,Bexar,20,DEM,149397,149367,30,False,bexar_2026_385501_detailxml.zip,11/4/2026 1:30:04 AM CST
+029,Bexar,20,REP,43097,43095,2,False,bexar_2026_385501_detailxml.zip,11/4/2026 1:30:04 AM CST
+029,Bexar,21,DEM,79678,79649,29,False,bexar_2026_385501_detailxml.zip,11/4/2026 1:30:04 AM CST
+029,Bexar,21,REP,51791,51789,2,False,bexar_2026_385501_detailxml.zip,11/4/2026 1:30:04 AM CST
+029,Bexar,23,DEM,91520,91502,18,False,bexar_2026_385501_detailxml.zip,11/4/2026 1:30:04 AM CST
+029,Bexar,23,IND,5865,5865,0,True,bexar_2026_385501_detailxml.zip,11/4/2026 1:30:04 AM CST
+029,Bexar,23,REP,70945,70940,5,False,bexar_2026_385501_detailxml.zip,11/4/2026 1:30:04 AM CST
+029,Bexar,35,DEM,102021,102003,18,False,bexar_2026_385501_detailxml.zip,11/4/2026 1:30:04 AM CST
+029,Bexar,35,REP,55062,55061,1,False,bexar_2026_385501_detailxml.zip,11/4/2026 1:30:04 AM CST
+201,Harris,2,DEM,82145,82145,0,True,harris_2026_summary.json,2026-11-04T14:39:00Z
+201,Harris,2,REP,70563,70563,0,True,harris_2026_summary.json,2026-11-04T14:39:00Z
+201,Harris,7,DEM,120223,120223,0,True,harris_2026_summary.json,2026-11-04T14:39:00Z
+201,Harris,7,GRE,2119,2119,0,True,harris_2026_summary.json,2026-11-04T14:39:00Z
+201,Harris,7,REP,47199,47199,0,True,harris_2026_summary.json,2026-11-04T14:39:00Z
+201,Harris,8,DEM,75237,75237,0,True,harris_2026_summary.json,2026-11-04T14:39:00Z
+201,Harris,8,REP,35481,35481,0,True,harris_2026_summary.json,2026-11-04T14:39:00Z
+201,Harris,9,DEM,89752,89752,0,True,harris_2026_summary.json,2026-11-04T14:39:00Z
+201,Harris,9,REP,55354,55354,0,True,harris_2026_summary.json,2026-11-04T14:39:00Z
+201,Harris,18,DEM,149642,149642,0,True,harris_2026_summary.json,2026-11-04T14:39:00Z
+201,Harris,18,REP,22259,22259,0,True,harris_2026_summary.json,2026-11-04T14:39:00Z
+201,Harris,22,DEM,30714,30714,0,True,harris_2026_summary.json,2026-11-04T14:39:00Z
+201,Harris,22,REP,24481,24481,0,True,harris_2026_summary.json,2026-11-04T14:39:00Z
+201,Harris,29,DEM,133989,133989,0,True,harris_2026_summary.json,2026-11-04T14:39:00Z
+201,Harris,29,REP,33619,33619,0,True,harris_2026_summary.json,2026-11-04T14:39:00Z
+201,Harris,36,DEM,54169,54169,0,True,harris_2026_summary.json,2026-11-04T14:39:00Z
+201,Harris,36,REP,42125,42125,0,True,harris_2026_summary.json,2026-11-04T14:39:00Z
+201,Harris,38,DEM,144397,144397,0,True,harris_2026_summary.json,2026-11-04T14:39:00Z
+201,Harris,38,GRE,3443,3443,0,True,harris_2026_summary.json,2026-11-04T14:39:00Z
+201,Harris,38,REP,157261,157261,0,True,harris_2026_summary.json,2026-11-04T14:39:00Z

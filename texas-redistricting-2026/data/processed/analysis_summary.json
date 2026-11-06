@@ -1,0 +1,37 @@
+{
+  "election": "November 3, 2026 U.S. House only",
+  "results_status": "unofficial",
+  "new_plan": "PLANC2333",
+  "old_plan": "PLANC2193",
+  "state_feed_version": "enr/53815/117/",
+  "state_feed_last_updated_raw": "Nov 04, 2026 22:48:37",
+  "house_votes": 9780054,
+  "actual_new_map_party_leads": {
+    "REP": 24,
+    "DEM": 14
+  },
+  "county_to_state_reconciliation": "All candidate totals match exactly across all 38 districts",
+  "html_summary_districts_with_differences": 0,
+  "precinct_counties_downloaded": 7,
+  "precinct_counties_used": 7,
+  "precinct_reconciliation": "Only cells with an exact county/new-district/party match to the state feed are used; other cells retain county-level uncertainty",
+  "geometry": {
+    "blocks_per_plan": 668757,
+    "blocks_changing_district": 192131,
+    "counties_changing_district": 73
+  },
+  "partial_retabulation": {
+    "uniquely_assigned_votes": 4795651,
+    "unresolved_vote_locations": 4984403,
+    "old_map_robust_leads": {
+      "REP": 5,
+      "UNRESOLVED": 31,
+      "DEM": 2
+    },
+    "matched_precincts_with_house_votes": 2718,
+    "unmatched_precinct_label_votes": 412,
+    "votes_with_incompatible_primary_geometry": 79,
+    "unresolved_counties": 27
+  },
+  "limitation": "The statewide old-map result is not yet determined. Bounds use county/new-district totals and reconciled county precinct returns. Precinct geometry is 2026-primary vintage and needs general-election confirmation. Bounds condition on the geographic compatibility of that vintage; no surface-area vote allocation is used."
+}

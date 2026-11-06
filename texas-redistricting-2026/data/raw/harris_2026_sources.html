@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-us">
+<head>
+<script type="text/javascript">!function(T,l,y){var S=T.location,u="script",k="instrumentationKey",D="ingestionendpoint",C="disableExceptionTracking",E="ai.device.",I="toLowerCase",b="crossOrigin",w="POST",e="appInsightsSDK",t=y.name||"appInsights";(y.name||T[e])&&(T[e]=t);var n=T[t]||function(d){var g=!1,f=!1,m={initialize:!0,queue:[],sv:"4",version:2,config:d};function v(e,t){var n={},a="Browser";return n[E+"id"]=a[I](),n[E+"type"]=a,n["ai.operation.name"]=S&&S.pathname||"_unknown_",n["ai.internal.sdkVersion"]="javascript:snippet_"+(m.sv||m.version),{time:function(){var e=new Date;function t(e){var t=""+e;return 1===t.length&&(t="0"+t),t}return e.getUTCFullYear()+"-"+t(1+e.getUTCMonth())+"-"+t(e.getUTCDate())+"T"+t(e.getUTCHours())+":"+t(e.getUTCMinutes())+":"+t(e.getUTCSeconds())+"."+((e.getUTCMilliseconds()/1e3).toFixed(3)+"").slice(2,5)+"Z"}(),iKey:e,name:"Microsoft.ApplicationInsights."+e.replace(/-/g,"")+"."+t,sampleRate:100,tags:n,data:{baseData:{ver:2}}}}var h=d.url||y.src;if(h){function a(e){var t,n,a,i,r,o,s,c,p,l,u;g=!0,m.queue=[],f||(f=!0,t=h,s=function(){var e={},t=d.connectionString;if(t)for(var n=t.split(";"),a=0;a<n.length;a++){var i=n[a].split("=");2===i.length&&(e[i[0][I]()]=i[1])}if(!e[D]){var r=e.endpointsuffix,o=r?e.location:null;e[D]="https://"+(o?o+".":"")+"dc."+(r||"services.visualstudio.com")}return e}(),c=s[k]||d[k]||"",p=s[D],l=p?p+"/v2/track":config.endpointUrl,(u=[]).push((n="SDK LOAD Failure: Failed to load Application Insights SDK script (See stack for details)",a=t,i=l,(o=(r=v(c,"Exception")).data).baseType="ExceptionData",o.baseData.exceptions=[{typeName:"SDKLoadFailed",message:n.replace(/\./g,"-"),hasFullStack:!1,stack:n+"\nSnippet failed to load ["+a+"] -- Telemetry is disabled\nHelp Link: https://go.microsoft.com/fwlink/?linkid=2128109\nHost: "+(S&&S.pathname||"_unknown_")+"\nEndpoint: "+i,parsedStack:[]}],r)),u.push(function(e,t,n,a){var i=v(c,"Message"),r=i.data;r.baseType="MessageData";var o=r.baseData;return o.message='AI (Internal): 99 message:"'+("SDK LOAD Failure: Failed to load Application Insights SDK script (See stack for details) ("+n+")").replace(/\"/g,"")+'"',o.properties={endpoint:a},i}(0,0,t,l)),function(e,t){if(JSON){var n=T.fetch;if(n&&!y.useXhr)n(t,{method:w,body:JSON.stringify(e),mode:"cors"});else if(XMLHttpRequest){var a=new XMLHttpRequest;a.open(w,t),a.setRequestHeader("Content-type","application/json"),a.send(JSON.stringify(e))}}}(u,l))}function i(e,t){f||setTimeout(function(){!t&&m.core||a()},500)}var e=function(){var n=l.createElement(u);n.src=h;var e=y[b];return!e&&""!==e||"undefined"==n[b]||(n[b]=e),n.onload=i,n.onerror=a,n.onreadystatechange=function(e,t){"loaded"!==n.readyState&&"complete"!==n.readyState||i(0,t)},n}();y.ld<0?l.getElementsByTagName("head")[0].appendChild(e):setTimeout(function(){l.getElementsByTagName(u)[0].parentNode.appendChild(e)},y.ld||0)}try{m.cookie=l.cookie}catch(p){}function t(e){for(;e.length;)!function(t){m[t]=function(){var e=arguments;g||m.queue.push(function(){m[t].apply(m,e)})}}(e.pop())}var n="track",r="TrackPage",o="TrackEvent";t([n+"Event",n+"PageView",n+"Exception",n+"Trace",n+"DependencyData",n+"Metric",n+"PageViewPerformance","start"+r,"stop"+r,"start"+o,"stop"+o,"addTelemetryInitializer","setAuthenticatedUserContext","clearAuthenticatedUserContext","flush"]),m.SeverityLevel={Verbose:0,Information:1,Warning:2,Error:3,Critical:4};var s=(d.extensionConfig||{}).ApplicationInsightsAnalytics||{};if(!0!==d[C]&&!0!==s[C]){method="onerror",t(["_"+method]);var c=T[method];T[method]=function(e,t,n,a,i){var r=c&&c(e,t,n,a,i);return!0!==r&&m["_"+method]({message:e,url:t,lineNumber:n,columnNumber:a,error:i}),r},d.autoExceptionInstrumented=!0}return m}(y.cfg);(T[t]=n).queue&&0===n.queue.length&&n.trackPageView({})}(window,document,{
+src: "https://az416426.vo.msecnd.net/scripts/b/ai.2.min.js",
+cfg: { 
+    connectionString: 'InstrumentationKey=569c5c0d-6815-4a98-8146-82fd87887a0f;IngestionEndpoint=https://southcentralus-3.in.applicationinsights.azure.com/;LiveEndpoint=https://southcentralus.livediagnostics.monitor.azure.com/'
+}});
+    </script>    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="format-detection" content="telephone=no">
+    <meta name="robots" content="noindex" />
+
+    <title>Election Day Results - Election Division</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Open+Sans:400,300,600&subset=cyrillic,latin" />
+    <link rel="stylesheet" href="/lib/Unify/assets/css/style.css" />
+    <link rel="stylesheet" href="/css/font-awesome.css" />
+    <link rel="stylesheet" href="/css/bootstrap.css" />
+
+    
+<link rel="stylesheet" href="/css/electionResultsCustom.css?v=12" />
+<style>
+    label {
+        color: #000;
+    }
+
+    .topbar p, .topbar p a, h4.g-color-white {
+        color: #fff;
+    }
+
+    #map1 {
+        width: 100%;
+        height: 600px;
+    }
+
+    .dropdown-submenu.last-menu > .dropdown-menu {
+        left: -100% !important;
+    }
+
+    .checkmark {
+        color: #009900;
+    }
+
+
+
+    @-webkit-keyframes anti {
+        0% {
+            opacity: 1;
+            -webkit-transform: rotate(0deg);
+        }
+
+        85% {
+            opacity: 1;
+            -webkit-transform: rotate(0deg);
+        }
+
+        100% {
+            opacity: 1;
+            -webkit-transform: rotate(-90deg);
+        }
+    }
+
+    @-moz-keyframes anti {
+        0% {
+            opacity: 1;
+            -moz-transform: rotate(0deg);
+        }
+
+        85% {
+            opacity: 1;
+            -moz-transform: rotate(0deg);
+        }
+
+        100% {
+            opacity: 1;
+            -moz-transform: rotate(-90deg);
+        }
+    }
+
+    @-o-keyframes anti {
+        0% {
+            opacity: 1;
+            -o-transform: rotate(0deg);
+        }
+
+        85% {
+            opacity: 1;
+            -o-transform: rotate(0deg);
+        }
+
+        100% {
+            opacity: 1;
+            -o-transform: rotate(-90deg);
+        }
+    }
+
+    @keyframes anti {
+        0% {
+            opacity: 1;
+            transform: rotate(0deg);
+        }
+
+        85% {
+            opacity: 1;
+            transform: rotate(0deg);
+        }
+
+        100% {
+            opacity: 1;
+            transform: rotate(-90deg);
+        }
+    }
+
+    /*        .results-wrapper {
+                        margin-top: 120px;
+                    }
+
+                    @media only screen and (max-width: 991px) {
+                        .results-wrapper {
+                            margin-top: 20px;
+                        }
+                    }
+            */
+    [ng:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+        display: none !important;
+    }
+
+    #contestSelect {
+        width: auto;
+    }
+
+    .yellow-star {
+        color: gold;
+    }
+
+    .fa-star, .fa-star-o {
+        cursor: pointer;
+    }
+
+    .loadingMask {
+        display: block;
+        position: fixed;
+        margin-top: 126px;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        top: 0;
+        width: 100%;
+        background: rgba(255, 255, 255, 1);
+        z-index: 999;
+        text-align: center;
+        font: 700 20px/26px "Open Sans", sans-serif;
+        letter-spacing: 0.2px;
+    }
+
+    .outer {
+        display: table;
+        position: absolute;
+        height: 100%;
+        width: 100%;
+    }
+
+    .middle {
+        display: table-cell;
+        vertical-align: middle;
+    }
+
+    .inner {
+        margin-left: auto;
+        margin-right: auto;
+        width: 400px;
+        /*whatever width you want*/
+    }
+
+
+</style>
+
+
+    <style>
+        .transparent-infobar {
+            padding: 0;
+        }
+
+        .bg-color-transblue {
+            background-color: rgba(0,40,104,0.9) !important;
+            vertical-align: text-top;
+        }
+
+        li.other-menu {
+            display: none;
+        }
+
+        @media (min-width: 992px) and (max-width: 1718px) {
+            li.other-menu {
+                display: block;
+            }
+
+            li.hidden-menu {
+                display: none;
+            }
+        }
+    </style>
+        <!-- Google Tag Manager -->
+        <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+            })(window,document,'script','dataLayer','GTM-WGM72SN');</script>
+        <!-- End Google Tag Manager -->
+</head>
+<body style="overflow-y: scroll;">
+     <!-- Google Tag Manager (noscript) -->
+        <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WGM72SN"
+        height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+     <!-- End Google Tag Manager (noscript) -->
+
+    <div class="header-fixed">
+        <div class="wrapper">
+            <div>
+                
+<div class="ElectionResultsWrap">
+    <div ng-app="ElectionResultsApp">
+        <div class="wrapper results-wrapper" ng-controller="ContestController as vm">
+            <div class="loadingMask" ng-show="isLoading < 2" style="height: {{ vm.innerHeight }}px;">
+                <div class="outer">
+                    <div class="middle">
+                        <div class="inner">
+                            <p><i class="fa fa-spinner fa-spin" style="font-size:20px"></i> Loading...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--=== Content ===-->
+            <div id="electionResults" class="container-fluid" ng-cloak>
+                
+                <h1>{{ vm.ElectionDate }}: {{ vm.ElectionTitle }}</h1>
+                <h2 ng-show="vm.IsOfficial != 1">Unofficial Election Results</h2>
+                <h2 ng-show="vm.IsOfficial == 1">Official Election Results</h2>
+                <h5><a style="padding: 0;" href="https://appfiles.harrisvotes.com/harrisvotes/prd/Data/1126/cumulative.pdf" target="_blank">Election Cumulative Report</a></h5>
+                <br />
+                <div class="tab-v2">
+                    <ul class="nav nav-tabs">
+                        <li class="active" id="resultsTab"><a href="#results" data-toggle="tab" ng-click="vm.ToggleTab('results')">Results</a></li>
+                        <li id="favoritesTab"><a href="#favorites" data-toggle="tab" ng-click="vm.ToggleTab('favorites')">Favorites <span ng-cloak>({{ vm.faveCount }})</span></a></li>
+                        <li id="vcReportingTab"><a href="#vcReporting" data-toggle="tab" data-target="#vcReporting">Status</a></li>
+                        <li class="pull-right small"></li>
+                        <li class="pull-right small" ng-cloak>Last updated: {{ vm.CreatedDate }}</li>
+                    </ul>
+
+                    <div class="tab-content">
+                        <div style="color: #111; border-bottom: 1px solid #002868; margin-bottom: 1em; font-size: 1em;">
+                                <strong>{{ vm.VotingCentersCount | number }} of {{ vm.VotingCentersTotal | number }} Voting Centers Reporting</strong>
+                            </div>
+                        <div id="results" class="tab-pane fade active in">
+                        
+                            <div ng-cloak ng-repeat="contest in vm.contests">
+                                <div class="panel panel-cco-blue" id="contestPanel-{{ contest.i }}" style="border: none; box-shadow: none;">
+                                    <div class="panel-heading" data-toggle="collapse" style="background-color:#002868;" data-target="#panelBody-{{ contest.i }}-disabled">
+                                        <h3 class="panel-title contest-title" style="color: #fff; font-weight: bold;">
+                                            <i class="fa" ng-class="{ 'fa-star': contest.f, 'fa-star-o': !contest.f, 'yellow-star': contest.f }" id="starIcon-{{ contest.i }}" ng-click="vm.ToggleFavorite(contest)"></i>
+                                            {{ contest.t }}
+                                        </h3>
+                                    </div>
+                                    <div class="panel-body collapse in" id="panelBody-{{ contest.i }}">
+
+                                        <div class="tab-v2">
+                                            <ul class="nav nav-tabs" >
+                                                <li class="active"><a href="#summary-{{ contest.i }}" data-toggle="tab"><i class="fa fa-1x fa-list-ul" title="Summary"></i></a></li>
+                                                <li><a href="#chartTab-{{ contest.i }}" data-toggle="tab" data-target="#chartTab-{{ contest.i }}"><i class="fa fa-1x fa-bar-chart" title="Chart"></i></a></li>
+                                                <li><a href="#detail-{{ contest.i }}" data-toggle="tab"><i class="fa fa-1x fa-table" title="Detail"></i></a></li>
+                                                <li><a href="#precinctVoting-{{ contest.i }}" data-toggle="tab" data-target="#precinctVoting-{{ contest.i }}"><i class="fa fa-1x fa-home" title="Precinct Reporting"></i></a></li>
+                                                <li><a href="#VotersTurnOut-{{ contest.i }}" data-toggle="tab" data-target="#VotersTurnOut-{{ contest.i }}"><i class="fa fa-1x fa-check-square-o" title="Voter Turn Out"></i></a></li>
+                                            </ul>
+                                            <div class="tab-content">
+                                                <div id="summary-{{ contest.i }}" class="tab-pane fade active in">
+                                                    <table class="table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th style="border-bottom: 1px solid #002868;">Choice {{contest.vf > 0 ? "(Vote for " + contest.vf + ")" : ""}}</th>
+                                                                <th style="border-bottom: 1px solid #002868;" class="text-center">Votes</th>
+                                                                <th style="border-bottom: 1px solid #002868;" class="text-center">Percent</th>
+                                                                <th style="border-bottom: 1px solid #002868;"></th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody style="border-bottom: 1px solid #002868;">
+                                                            <tr ng-repeat="ca in contest.ca track by $index">
+                                                                <td style="border: none; width: 40%;">{{ contest.ca[$index] }}</td>
+                                                                <td style="border: none; width: 75px;" class="text-right">{{ contest.tv[$index] | number }}</td>
+                                                                <td style="border: none; width: 75px;" class="text-right">{{ contest.pct[$index] }}</td>
+                                                                <td style="border: none;">
+                                                                    <div class="progress" style="margin: 0px;">
+                                                                        <div class="progress-bar progress-bar-info" ng-style="{ width: contest.pct[$index], backgroundColor: '#BF0A30'}"></div>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                        <tfoot style="border-top: 1px solid #002868;">
+                                                            <tr>
+                                                                <th style="border-top: 1px solid #002868;">Total</th>
+                                                                <th style="border-top: 1px solid #002868;" class="text-right">{{ contest.cv[3] | number }}</th>
+                                                                <th style="border-top: 1px solid #002868;"></th>
+                                                                <th style="border-top: 1px solid #002868;"></th>
+                                                            </tr>
+                                                        </tfoot>
+                                                    </table>
+                                                </div>
+                                                <div id="chartTab-{{ contest.i }}" class="tab-pane fade">
+                                                    <div id="chart-{{ contest.i }}" class="chart" ng-style="{ height: (contest.ca.length * 54 + 105) + 'px'}"></div>
+                                                </div>
+                                                <div id="detail-{{ contest.i }}" class="tab-pane fade" style="overflow: auto;">
+                                                    <table class="table table-striped">
+                                                        <thead>
+                                                            <tr>
+                                                                <th style="width: 40%;">Choice</th>
+                                                                <th class="text-right">Ballot By Mail</th>
+                                                                <th class="text-right">Early Voting</th>
+                                                                <th class="text-right">Election Day</th>
+                                                                <th class="text-right">Total</th>
+                                                                <th class="text-right" style="padding-right: 20px;">Percent</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr ng-repeat="ca in contest.ca track by $index">
+                                                                <td>{{ contest.ca[$index] }}</td>
+                                                                <td class="text-right">{{ contest.ab[$index] | number }}</td>
+                                                                <td class="text-right">{{ contest.ev[$index] | number }}</td>
+                                                                <td class="text-right">{{ contest.ed[$index] | number }}</td>
+                                                                <td class="text-right">{{ contest.tv[$index] | number }}</td>
+                                                                <td class="text-right" style="padding-right: 20px;">{{ contest.pct[$index] }}</td>
+                                                            </tr>
+                                                        </tbody>
+                                                        <tfoot>
+                                                            <tr>
+                                                                <th>Cast Votes</th>
+                                                                <th class="text-right">{{ contest.cv[0] | number }}</th>
+                                                                <th class="text-right">{{ contest.cv[1] | number }}</th>
+                                                                <th class="text-right">{{ contest.cv[2] | number }}</th>
+                                                                <th class="text-right">{{ contest.cv[3] | number }}</th>
+                                                                <th></th>
+                                                            </tr>
+                                                        </tfoot>
+                                                    </table>
+                                                </div>
+                                                <div id="precinctVoting-{{ contest.i }}" class="tab-pane fade" style="height: 375px; overflow: auto;"></div>
+                                                <div id="VotersTurnOut-{{ contest.i }}" class="tab-pane fade" style="height: 375px; overflow: auto;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="favorites" class="tab-pane fade">
+                            <div class="row" ng-hide="vm.hasFavorites(vm.contests)">
+                                <div class="col-md-12 text-center text-info">
+                                    <strong>Keep an eye on the contest(s) most important to you. Return to "Results" tab and click the star icon next to a contest's title to add to your favorites.</strong><br /><br />
+                                    <img src="/images/electionfave002.gif" />
+                                </div>
+                            </div>
+                            <div ng-cloak ng-repeat="contest in vm.contests | filter: { f: true }">
+                                <div class="panel panel-cco-blue" id="contestPanel-{{ contest.i }}" style="border: none; box-shadow: none;">
+                                    <div class="panel-heading" data-toggle="collapse" style="background-color:#002868;" data-target="#panelBody-{{ contest.i }}-disabled">
+                                        <h3 class="panel-title contest-title" style="color: #fff; font-weight: bold;">
+                                            <i class="fa" ng-class="{ 'fa-star': contest.f, 'fa-star-o': !contest.f, 'yellow-star': contest.f }" id="starIcon-{{ contest.i }}" ng-click="vm.ToggleFavorite(contest)"></i>
+                                            {{ contest.t }}
+                                        </h3>
+                                    </div>
+                                    <div class="panel-body collapse in" id="panelBody-{{ contest.i }}">
+                                        <div class="tab-v2">
+                                            <ul class="nav nav-tabs" >
+                                                <li class="active"><a href="#favSummary-{{ contest.i }}" data-toggle="tab"><i class="fa fa-1x fa-list-ul" title="Summary"></i></a></li>
+                                                <li><a href="#favChartTab-{{ contest.i }}" data-toggle="tab" data-target="#favChartTab-{{ contest.i }}"><i class="fa fa-1x fa-bar-chart" title="Chart"></i></a></li>
+                                                <li><a href="#favDetail-{{ contest.i }}" data-toggle="tab"><i class="fa fa-1x fa-table" title="Detail"></i></a></li>
+                                                <li><a href="#favPrecinctVoting-{{ contest.i }}" data-toggle="tab" data-target="#favPrecinctVoting-{{ contest.i }}"><i class="fa fa-1x fa-home" title="Precinct Reporting"></i></a></li>
+                                                <li><a href="#favVotersTurnOut-{{ contest.i }}" data-toggle="tab" data-target="#favVotersTurnOut-{{ contest.i }}"><i class="fa fa-1x fa-check-square-o" title="Voter Turn Out"></i></a></li>
+                                            </ul>
+                                            <div class="tab-content">
+                                                <div id="favSummary-{{ contest.i }}" class="tab-pane fade active in">
+                                                    <table class="table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th style="border-bottom: 1px solid #002868;">Choice {{contest.vf > 0 ? "(Vote for " + contest.vf + ")" : ""}}</th>
+                                                                <th style="border-bottom: 1px solid #002868;" class="text-center">Votes</th>
+                                                                <th style="border-bottom: 1px solid #002868;" class="text-center">Percent</th>
+                                                                <th style="border-bottom: 1px solid #002868;"></th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody style="border-bottom: 1px solid #002868;">
+                                                            <tr ng-repeat="ca in contest.ca track by $index">
+                                                                <td style="border: none; width: 40%;">{{ contest.ca[$index] }}</td>
+                                                                <td style="border: none; width: 75px;" class="text-center">{{ contest.tv[$index] | number }}</td>
+                                                                <td style="border: none; width: 75px;" class="text-center">{{ contest.pct[$index] }}</td>
+                                                                <td style="border: none;">
+                                                                    <div class="progress" style="margin: 0px;">
+                                                                        <div class="progress-bar progress-bar-info" ng-style="{ width: contest.pct[$index], backgroundColor: '#BF0A30'}"></div>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                        <tfoot style="border-top: 1px solid #002868;">
+                                                            <tr>
+                                                                <th style="border-top: 1px solid #002868;">Total</th>
+                                                                <th style="border-top: 1px solid #002868;" class="text-center">{{ contest.cv[3] | number }}</th>
+                                                                <th style="border-top: 1px solid #002868;"></th>
+                                                                <th style="border-top: 1px solid #002868;"></th>
+                                                            </tr>
+                                                        </tfoot>
+                                                    </table>
+                                                </div>
+                                                <div id="favChartTab-{{ contest.i }}" class="tab-pane fade">
+                                                    <div id="favChart-{{ contest.i }}" class="chart" ng-style="{ height: (contest.ca.length * 54 + 105) + 'px'}"></div>
+                                                </div>
+                                                <div id="favDetail-{{ contest.i }}" class="tab-pane fade">
+                                                    <table class="table table-striped">
+                                                        <thead>
+                                                            <tr>
+                                                                <th style="width: 40%;">Choice</th>
+                                                                <th class="text-right">Ballot By Mail</th>
+                                                                <th class="text-right">Early Voting</th>
+                                                                <th class="text-right">Election Day</th>
+                                                                <th class="text-right">Total</th>
+                                                                <th class="text-right" style="padding-right: 20px;">Percent</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr ng-repeat="ca in contest.ca track by $index">
+                                                                <td>{{ contest.ca[$index] }}</td>
+                                                                <td class="text-right">{{ contest.ab[$index] | number }}</td>
+                                                                <td class="text-right">{{ contest.ev[$index] | number }}</td>
+                                                                <td class="text-right">{{ contest.ed[$index] | number }}</td>
+                                                                <td class="text-right">{{ contest.tv[$index] | number }}</td>
+                                                                <td class="text-right" style="padding-right: 20px;">{{ contest.pct[$index] }}</td>
+                                                            </tr>
+                                                        </tbody>
+                                                        <tfoot>
+                                                            <tr>
+                                                                <th>Cast Votes</th>
+                                                                <th class="text-right">{{ contest.cv[0] | number }}</th>
+                                                                <th class="text-right">{{ contest.cv[1] | number }}</th>
+                                                                <th class="text-right">{{ contest.cv[2] | number }}</th>
+                                                                <th class="text-right">{{ contest.cv[3] | number }}</th>
+                                                                <th></th>
+                                                            </tr>
+                                                        </tfoot>
+                                                    </table>
+                                                </div>
+                                                <div id="favPrecinctVoting-{{ contest.i }}" class="tab-pane fade" style="height: 375px; overflow: auto;"></div>
+                                                <div id="favVotersTurnOut-{{ contest.i }}" class="tab-pane fade" style="height: 375px; overflow: auto;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="vcReporting" class="tab-pane fade">
+                            <div id="votingCentersGauge">
+                            </div>
+                            <span id="pieChartInfoText" style="position: absolute; text-align: center; margin: 0 10px;">
+                                <span style="font-size: 24px">{{ vm.VotingCentersReporting }}</span>
+                                <br />
+                                <span style="font-size: 12px">{{ vm.VotingCentersCount }} of {{ vm.VotingCentersTotal }}</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="/lib/jquery/dist/jquery.min.js"></script>
+    <script src="/js/site.js?v=LHnCpDfJOAyLk-UP6kTCBm2exqoXXB99N-aElhwPyD4"></script>
+
+    <script src="/js/bootstrap.js"></script>
+    <script src="/js/respond.js"></script>
+
+    <script src="/js/angular.min.js"></script>
+    <script src="/js/bootbox.min.js"></script>
+
+    
+<script src="/js/highCharts/highcharts.js"></script>
+<script src="/js/highCharts/highcharts-more.js"></script>
+<script src="/js/highCharts/modules/solid-gauge.js"></script>
+
+<script src="/js/moment.min.js"></script>
+<script src="/js/angular-cookies.js"></script>
+
+<script type="text/javascript">
+    Array.max = function (array) {
+        return Math.max.apply(Math, array);
+    };
+    Array.min = function (array) {
+        return Math.min.apply(Math, array);
+    };
+
+    var electionCode = '1126';
+    var dnnPrefix = 'https://appfiles.harrisvotes.com/harrisvotes/prd';
+    var cacheTime = (new Date(new Date().setSeconds(0, 0))).getTime();
+    angular.module("ElectionResultsApp", ['ngCookies'])
+        .controller("ContestController", ['$scope', '$http', '$timeout', '$filter', '$cookies', function ($scope, $http, $timeout, $filter, $cookies) {
+            var vm = this;
+            vm.faveCount = 0;
+            $scope.isLoading = 0;
+            vm.innerHeight = window.outerHeight;
+
+            $http.get(dnnPrefix + '/Data/' + electionCode + '/resultsbyballot.json?nocache=' + cacheTime, { timeout: 3000 })
+                .then(function success(response) {
+                    vm.contests = response.data.contests;
+                    angular.forEach(vm.contests, function (contest) {
+                        contest.f = false;
+                    });
+
+                    var favoritesCookie = vm.ReadCookie('favorites');
+
+                    if (favoritesCookie) {
+                        var favorites = JSON.parse(favoritesCookie);
+
+                        angular.forEach(vm.contests, function (contest) {
+                            if (favorites.indexOf(contest.i) >= 0) {
+                                contest.f = true;
+                            }
+                        });
+                    }
+
+                    vm.ElectionTitle = response.data.et;
+                    vm.ElectionDate = response.data.edt;
+                    vm.CreatedDate = moment(response.data.dt).format('MMMM DD, YYYY hh:mm a');
+                    vm.IsOfficial = response.data.o;
+                    vm.VotingCentersCount = response.data.vc;
+                    vm.VotingCentersTotal = response.data.vt;
+
+                    if (vm.VotingCentersCount == vm.VotingCentersTotal) {
+                        vm.VotingCentersReporting = '100%';
+                    }
+                    else {
+                        vm.VotingCentersReporting = $filter('number')(100 * (vm.VotingCentersCount / vm.VotingCentersTotal), 2) + '%';
+                    }
+
+                    vm.faveCount = $filter('filter')(vm.contests, { f: true }).length;
+
+                    $scope.isLoading += 1;
+                }, function error(response) {
+                    //alert('Error retrieving contest details.');
+                    bootbox.alert('Error retrieving contest details.');
+                    $scope.isLoading += 1;
+                });
+
+            $http.get(dnnPrefix +'/Data/' + electionCode + '/pr.json?nocache=' + cacheTime)
+                .then(function success(response) {
+                    vm.pr = response.data;
+                    vm.RegisteredVoters = vm.pr.rv;
+                    vm.BallotCast = vm.pr.bc;
+                    vm.TurnOut = vm.pr.to;
+                    $scope.isLoading += 1;
+                }, function error(response) {
+                    //alert('Error retrieving precinct data.');
+                    bootbox.alert('Error retrieving precinct data.');
+                    $scope.isLoading += 1;
+
+                });
+
+
+            vm.ToggleTab = function (tab) {
+                vm.WriteCookie('activeTab', tab);
+            }
+
+            vm.ToggleFavorite = function (contest) {
+                var favorites = [];
+                $('#starIcon-' + contest.i).toggleClass('fa-star-o').toggleClass('fa-star').toggleClass('yellow-star');
+                contest.f = !contest.f;
+
+                angular.forEach(vm.contests, function (contest) {
+                    if (contest.f) {
+                        favorites.push(contest.i);
+                    }
+                });
+
+                vm.WriteCookie('favorites', JSON.stringify(favorites));
+                vm.faveCount = $filter('filter')(vm.contests, { f: true }).length;
+            }
+
+            vm.hasFavorites = function (arr) {
+                if (arr) {
+                    return arr.some(function (obj) {
+                        return obj.f === true;
+                    });
+                }
+            };
+
+            vm.WriteCookie = function (name, cookie) {
+                //$cookies.put(name, cookie); //, { expires: "Tue, 01 Jan 2019 00:00:00 UTC" });
+                document.cookie = ''+name+'='+cookie+'; path=/; samesite=none; Secure';
+            }
+
+            vm.ReadCookie = function (name) {
+                if ($cookies.get(name)) {
+                    return $cookies.get(name);
+                }
+            }
+
+            var activeTab = vm.ReadCookie('activeTab');
+            if (activeTab) {
+                $('#resultsTab').removeClass('active');
+                $('#favoritesTab').removeClass('active');
+                $('#vcReportingTab').removeClass('active');
+                $('#results').removeClass('active').removeClass('in');
+                $('#favorites').removeClass('active').removeClass('in');
+                $('#vcReporting').removeClass('active').removeClass('in');
+
+                $('#' + activeTab + 'Tab').addClass('active');
+                $('#' + activeTab).addClass('active').addClass('in');
+            }
+
+            function RenderChart(target, contest) {
+                Highcharts.chart(target.substring(1), {
+                    chart: {
+                        type: 'bar',
+                        style: { fontFamily: '"Open Sans", "Sans serif"' }
+                    },
+                    tooltip: {
+                        headerFormat: '',
+                        valueSuffix: ' votes'
+                    },
+                    credits: {
+                        enabled: true,
+                        href: null,
+                        text: '(click on legends to toggle visibility)',
+                        position: {
+                            align: 'center'
+                        }
+                    },
+                    title: '',
+                    xAxis: {
+                        categories: contest.ca,
+                        tickLength: 5
+                    },
+                    yAxis: {
+                        min: 0,
+                        minTickInterval: 1,
+                        gridLineDashStyle: 'ShortDot',
+                        title: {
+                            text: ''
+                        },
+                        labels: {
+                            rotation: -45
+                        }
+                    },
+                    legend: {
+                        reversed: true,
+                        borderWidth: 1,
+                        borderRadius: 4
+                    },
+                    colors: ['#7E8890', '#002868', '#BF0A30'],
+                    //colors: ['#7E8890', '#16416f', '#C8473C'],
+                    plotOptions: {
+                        series: {
+                            stacking: 'normal',
+                            borderWidth: 0,
+                            pointWidth: 27,
+                        }
+                    },
+                    series: [
+                        {
+                            name: 'Ballot By Mail',
+                            data: contest.ab
+                        },
+                        {
+                            name: 'Early Voting',
+                            data: contest.ev
+                        },
+                        {
+                            name: 'Election Day',
+                            data: contest.ed
+                        }
+                    ]
+                });
+            }
+
+            function GetPrecinctVotesData(contestId) {
+                 $http.get(dnnPrefix + '/Data/' + electionCode + '/pv-' + contestId + '.json?nocache=' + cacheTime)
+                    .then(function success(response) {
+                        vm.pv = response.data;
+                        RenderPrecinctVoting(contestId);
+                        RenderVotersTurnOut(contestId);
+                    }, function error(response) {
+                        //alert('Error retrieving precinct voting data.');
+                        bootbox.alert('Error retrieving precinct voting data.');
+                    });
+            }
+
+            function RenderPrecinctVoting(contestId) {
+                var target = "#precinctVoting-" + contestId;
+                var favTarget = "#favPrecinctVoting-" + contestId;
+                var table = document.createElement("table");
+                var thead = document.createElement("thead");
+                var tr = document.createElement("tr");
+                var th = document.createElement("th");
+                var tbody = document.createElement("tbody");
+                var node = document.createTextNode("Precinct");
+                th.appendChild(node);
+                tr.appendChild(th);
+
+                var contest = $filter('filter')(vm.contests, { 'i': parseInt(contestId) }, true);
+                angular.forEach(contest[0].ca, function (ca) {
+                    th = document.createElement("th");
+                    th.setAttribute("style", "text-align: right; min-width: 150px;");
+                    node = document.createTextNode(ca);
+                    th.appendChild(node);
+                    tr.appendChild(th);
+                })
+
+                th = document.createElement("th");
+                th.setAttribute("style", "text-align: right; min-width: 100px; padding-right: 20px;");
+                node = document.createTextNode("Total");
+                th.appendChild(node);
+                tr.appendChild(th);
+
+                thead.appendChild(tr);
+                table.appendChild(thead);
+
+                angular.forEach(vm.pv.p, function (value, key) {
+                    tr = document.createElement("tr");
+                    var td = document.createElement("td");
+                    var checkmark = document.createElement("span");
+                    checkmark.setAttribute("class", "checkmark");
+                    checkmark.innerHTML = " &#10004;";
+                    node = document.createTextNode(value);
+                    td.appendChild(node);
+
+                    if ($filter('number')(vm.pv.s[key]) == 1) {
+                        //td.appendChild(checkmark);
+                    }
+                    tr.appendChild(td);
+
+                    angular.forEach(vm.pv.v[key], function (value) {
+                        node = document.createTextNode($filter('number')(value));
+                        td = document.createElement("td");
+                        td.style.textAlign = "right";
+                        td.appendChild(node);
+                        tr.appendChild(td);
+                    })
+
+                    node = document.createTextNode($filter('number')(vm.pv.t[key]));
+                    td = document.createElement("td");
+                    td.setAttribute("style", "text-align: right; padding-right: 20px;");
+                    td.appendChild(node);
+                    tr.appendChild(td);
+                    tbody.appendChild(tr);
+                })
+
+                table.appendChild(tbody);
+
+                var tfoot = document.createElement("tfoot");
+                tr = document.createElement("tr");
+                th = document.createElement("th");
+                node = document.createTextNode("Total");
+                th.appendChild(node);
+                tr.appendChild(th);
+
+                angular.forEach(contest[0].tv, function (tv) {
+                    th = document.createElement("th");
+                    th.setAttribute("style", "text-align: right;");
+                    node = document.createTextNode($filter('number')(tv));
+                    th.appendChild(node);
+                    tr.appendChild(th);
+                })
+
+                th = document.createElement("th");
+                th.setAttribute("style", "text-align: right; padding-right: 20px;");
+                node = document.createTextNode($filter('number')(contest[0].cv[3]));
+                th.appendChild(node);
+                tr.appendChild(th);
+
+                tfoot.appendChild(tr)
+                table.appendChild(tfoot);
+                table.className = "table table-striped";
+                table.setAttribute("style", "table-layout: fixed; min-width: 100%; width: auto;");
+
+                $(target).html("");
+                $(favTarget).html("");
+                $(target).append(table);
+                $(favTarget).append(table.cloneNode(true));
+            }
+
+            function RenderVotersTurnOut(contestId) {
+                var target = "#VotersTurnOut-" + contestId;
+                var favTarget = "#favVotersTurnOut-" + contestId;
+                var table = document.createElement("table");
+                var thead = document.createElement("thead");
+                var tr = document.createElement("tr");
+                var th = document.createElement("th");
+                var tbody = document.createElement("tbody");
+                var node = document.createTextNode("Precinct");
+                th.appendChild(node);
+                tr.appendChild(th);
+
+                th = document.createElement("th");
+                th.style.textAlign = "center";
+                th.setAttribute("style", "text-align: right;");
+                var node = document.createTextNode("Registered Voters");
+                th.appendChild(node);
+                tr.appendChild(th);
+
+                th = document.createElement("th");
+                th.style.textAlign = "center";
+                th.setAttribute("style", "text-align: right;");
+                var node = document.createTextNode("Ballots Cast");
+                th.appendChild(node);
+                tr.appendChild(th);
+
+                th = document.createElement("th");
+                th.style.textAlign = "center";
+                th.setAttribute("style", "text-align: right; padding-right: 20px;");
+                var node = document.createTextNode("Turn Out");
+                th.appendChild(node);
+                tr.appendChild(th);
+
+                thead.appendChild(tr);
+                table.appendChild(thead);
+
+                var rvCount = 0;
+                var bcCount = 0;
+
+                angular.forEach(vm.pv.p, function (value, key) {
+                    tr = document.createElement("tr");
+                    var td = document.createElement("td");
+                    node = document.createTextNode(value);
+                    var checkmark = document.createElement("span");
+                    checkmark.setAttribute("class", "checkmark");
+                    checkmark.innerHTML = " &#10004;";
+                    node = document.createTextNode(value);
+                    td.appendChild(node);
+
+                    if ($filter('number')(vm.pv.s[key]) == 1) {
+                        //td.appendChild(checkmark);
+                    }
+                    tr.appendChild(td);
+
+                    rvCount += vm.pv.rv[key];
+                    node = document.createTextNode($filter('number')(vm.pv.rv[key]));
+                    td = document.createElement("td");
+                    td.setAttribute("style", "text-align: right;");
+                    td.appendChild(node);
+                    tr.appendChild(td);
+
+                    bcCount += vm.pv.bc[key];
+                    node = document.createTextNode($filter('number')(vm.pv.bc[key]));
+                    td = document.createElement("td");
+                    td.setAttribute("style", "text-align: right;");
+                    td.appendChild(node);
+                    tr.appendChild(td);
+
+                    var turnOut = "0.00%";
+                    if (vm.pv.rv[key] != 0) {
+                        turnOut = $filter('number')(vm.pv.bc[key] / vm.pv.rv[key] * 100, 2) + '%';
+                    }
+                    else if (vm.pv.bc[key] > 0) {
+                        turnOut = $filter('number')(vm.pv.bc[key] * 100, 2) + '%';
+                    }
+
+                    node = document.createTextNode(turnOut);
+                    td = document.createElement("td");
+                    td.setAttribute("style", "text-align: right; padding-right: 20px;");
+                    td.appendChild(node);
+                    tr.appendChild(td);
+
+                    tbody.appendChild(tr);
+                })
+
+                table.appendChild(tbody);
+
+                var tfoot = document.createElement("tfoot");
+                tr = document.createElement("tr");
+                th = document.createElement("th");
+                node = document.createTextNode("Total");
+                th.appendChild(node);
+                tr.appendChild(th);
+
+                th = document.createElement("th");
+                th.setAttribute("style", "text-align: right;");
+                node = document.createTextNode($filter('number')(rvCount));
+                th.appendChild(node);
+                tr.appendChild(th);
+
+                th = document.createElement("th");
+                th.setAttribute("style", "text-align: right;");
+                node = document.createTextNode($filter('number')(bcCount));
+                th.appendChild(node);
+                tr.appendChild(th);
+
+                th = document.createElement("th");
+                th.setAttribute("style", "text-align: right; padding-right: 20px;");
+                node = document.createTextNode($filter('number')(bcCount / rvCount * 100, 2) + '%');
+                th.appendChild(node);
+                tr.appendChild(th);
+
+                tfoot.appendChild(tr)
+                table.appendChild(tfoot);
+                table.className = "table table-striped";
+
+                $(target).html("");
+                $(favTarget).html("");
+                $(target).append(table);
+                $(favTarget).append(table.cloneNode(true));
+            }
+
+
+            jQuery(document).ready(function () {
+                //App.init();
+                Highcharts.setOptions({
+                    lang: {
+                        thousandsSep: ','
+                    }
+                });
+
+                $(document).on('shown.bs.tab', 'a[href*="#chartTab"]', function () {
+                    var target = $(this).attr('data-target');
+                    var contestId = target.substring(10);
+                    target = '#chart-' + contestId;
+
+                    if ($(target).html() == '') {
+                        var contest = $filter('filter')(vm.contests, { 'i': parseInt(contestId) }, true);
+                        RenderChart(target, contest[0]);
+                    }
+                });
+
+                $(document).on('shown.bs.tab', 'a[href*="#precinctVoting"]', function () {
+                    var target = $(this).attr('data-target');
+                    var contestId = target.substring(16);
+
+                    if ($(target).html() == '' || !vm.pv || vm.pv.i != parseInt(contestId)) {
+                            GetPrecinctVotesData(contestId);
+                    }
+                });
+
+                $(document).on('shown.bs.tab', 'a[href*="#VotersTurnOut"]', function () {
+                    var target = $(this).attr('data-target');
+                    var contestId = target.substring(15);
+
+                    if ($(target).html() == '' || !vm.pv || vm.pv.i != parseInt(contestId)) {
+                            GetPrecinctVotesData(contestId);
+                    }
+                });
+
+                $(document).on('shown.bs.tab', 'a[href*="#favChartTab"]', function () {
+                    var target = $(this).attr('data-target');
+                    var contestId = target.substring(13);
+                    target = '#favChart-' + contestId;
+
+                    if ($(target).html() == '') {
+                        var contest = $filter('filter')(vm.contests, { 'i': parseInt(contestId) }, true);
+                        RenderChart(target, contest[0]);
+                    }
+                });
+
+                $(document).on('shown.bs.tab', 'a[href*="#favPrecinctVoting"]', function () {
+                    var target = $(this).attr('data-target');
+                    var contestId = target.substring(19);
+
+                    if ($(target).html() == '' || !vm.pv || vm.pv.i != parseInt(contestId)) {
+                            GetPrecinctVotesData(contestId);
+                    }
+                });
+
+                $(document).on('shown.bs.tab', 'a[href*="#favVotersTurnOut"]', function () {
+                    var target = $(this).attr('data-target');
+                    var contestId = target.substring(18);
+
+                    if ($(target).html() == '' || !vm.pv || vm.pv.i != parseInt(contestId)) {
+                            GetPrecinctVotesData(contestId);
+                    }
+                });
+
+                $(document).on('shown.bs.tab', 'a[href*="#vcReporting"]', function () {
+                    var chart = new Highcharts.Chart({
+                        chart: {
+                            renderTo: 'votingCentersGauge',
+                            type: 'solidgauge',
+                            height: 400,
+                        },
+                        credits: {
+                            enabled: false
+                        },
+                        title:
+                        {
+                            text: 'Voting Centers Reporting',
+                        },
+                        tooltip: 'none',
+                        pane: {
+                            startAngle: 0,
+                            endAngle: 360,
+                            background: [{ // Track for Move
+                                outerRadius: '75%',
+                                innerRadius: '50%',
+                                backgroundColor: Highcharts.Color(Highcharts.getOptions().colors[1]).setOpacity(0.1).get(), //'rgba(0, 39, 102, 0.1)',
+                                borderWidth: 0
+                            }]
+                        },
+                        yAxis: {
+                            min: 0,
+                            max: 100,
+                            lineWidth: 0,
+                            tickPositions: []
+                        },
+
+                        plotOptions: {
+                            solidgauge: {
+                                dataLabels: {
+                                    enabled: false
+                                },
+                                linecap: 'round',
+                                stickyTracking: false,
+                                rounded: true
+                            }
+                        },
+
+                        series: [{
+                            name: 'Voting Centers Reporting',
+                            data: [{
+                                color: Highcharts.getOptions().colors[2], //'#002868',
+                                radius: '75%',
+                                innerRadius: '50%',
+                                y: vm.VotingCentersCount / vm.VotingCentersTotal * 100
+                            }]
+                        }]
+                    }, function (chart) {
+                        var textX = chart.renderTo.offsetLeft + (chart.plotWidth  * 0.5);
+                        var textY = chart.renderTo.offsetTop  + (chart.plotHeight * 0.5);
+                        var span = $('#pieChartInfoText');
+                        //span.css('left', textX + (span.width() * -1));
+                        span.css('top', (span.height() * -0.5) + textY + 55);
+
+                        span.css('width', chart.plotWidth);
+                    });
+                });
+
+            });
+        }]);
+</script>
+
+
+
+    <script type="text/javascript">
+        jQuery(document).ready(function () {
+            //App.init();
+            $(window).scroll(function () {
+                if ($(window).scrollTop() >= 100)
+                    $('#topbar').hide();
+                if ($(window).scrollTop() < 100) {
+                    $('#topbar').show();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
