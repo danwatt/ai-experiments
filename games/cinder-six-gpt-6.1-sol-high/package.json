@@ -1,0 +1,14 @@
+{
+  "name": "cinder-six",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A six-degree-of-freedom Three.js mine shooter",
+  "scripts": {
+    "dev": "node server.mjs",
+    "start": "node server.mjs",
+    "test": "node tests/smoke.cjs",
+    "check": "node --check main.js && node --check level.js"
+  },
+  "devDependencies": { "playwright": "^1.56.1" }
+}

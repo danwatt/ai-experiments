@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#080f13">
+  <meta name="description" content="Cinder Six — a six-degree-of-freedom mine shooter built with Three.js.">
+  <title>Cinder Six · A six-axis descent</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%23ff7a45' d='M32 3 58 18v28L32 61 6 46V18Zm0 9L14 23v18l18 11 18-11V23Z'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <canvas id="world" aria-label="Three-dimensional flight game"></canvas>
+  <div id="vignette"></div><div id="damage"></div>
+  <header id="topbar">
+    <a class="wordmark" href="./" aria-label="Cinder Six home"><span class="hex">⬡</span> CINDER<span>SIX</span><small>DEEP SPACE OPERATIONS</small></a>
+    <div class="sector"><i></i><span id="roomName">01 / INSERTION DOCK</span><small id="depth">DEPTH −1,200 M</small></div>
+    <div class="topright"><span id="timer">00:00</span><button id="sound" aria-label="Toggle sound">AUDIO ON</button><button id="helpButton">? <span>FLIGHT MANUAL</span></button></div>
+  </header>
+  <main id="menu" class="overlay">
+    <div class="intro">
+      <div class="eyebrow"><span></span> SINGLE-PLAYER FLIGHT DEMO <b>01</b></div>
+      <h1>NO UP.<br>NO DOWN.<br><em>JUST DEEPER.</em></h1>
+      <p class="lede">Six axes. Fourteen chambers. One way out.<br>Take your ship into the heart of a hostile mining station.</p>
+      <button class="primary" id="start">ENTER THE MINE <span>↗</span></button>
+      <div class="launchmeta"><span>WEBGL / THREE.JS</span><span>~ 5–10 MIN</span><span>KEYBOARD + MOUSE</span></div>
+    </div>
+    <aside class="briefing"><div class="paneltop"><span>MISSION BRIEF / CS–06</span><i>● LIVE</i></div>
+      <h2>A cold start.<br>A hot extraction.</h2>
+      <ol><li><b>01</b><div>Find the red access key<small>Smelter vault. Keep clear of the lava.</small></div></li><li><b>02</b><div>Destroy the reactor<small>Past the red security bulkhead.</small></div></li><li><b>03</b><div>Reach the extraction gate<small>The clock starts when the core goes.</small></div></li></ol>
+      <div class="briefbottom"><span class="keycap">TAB</span><span>Your automap remembers<br>only what you have seen.</span></div>
+    </aside>
+    <footer class="menuf T"><span>INERTIAL DAMPING: ACTIVE</span><span>6 DOF <i>✳</i> FULL FREEDOM OF MOVEMENT</span><span>EXPERIMENTAL BUILD / 001</span></footer>
+  </main>
+  <div id="hud" hidden>
+    <div id="objective"><span class="tiny">CURRENT DIRECTIVE</span><div id="objectiveText">Locate the red key · Smelter vault</div></div>
+    <div class="flightmark leftmark"><span>06</span><i></i><small>AXIS FREE</small></div><div class="flightmark rightmark"><span id="speed">0</span><i></i><small>M / S</small></div>
+    <div id="reticle"><i></i><i></i><i></i><i></i><span></span></div><div id="hitmarker">×</div>
+    <div id="target"></div><div id="prompt"></div><div id="toast" role="status"></div>
+    <div id="escape" hidden><span>CORE MELTDOWN</span><b id="countdown">90</b><small>FOLLOW THE GREEN BEACONS TO EXTRACTION</small></div>
+    <div class="bottomhud">
+      <div class="stat shieldstat"><span class="tiny">SHIP INTEGRITY</span><div><b id="health">100</b><small>%</small><span id="keyStatus">KEY —</span></div><div class="bar"><i id="healthBar"></i></div></div>
+      <div class="weaponstat"><span class="tiny">ACTIVE WEAPON <span class="keycap">1 / 2</span></span><b id="weaponName">PULSE CANNON</b><small id="weaponInfo">STANDARD ISSUE / UNLIMITED</small></div>
+      <div class="stat energystat"><span class="tiny">AFTERBURNER</span><div><b id="energy">100</b><small>%</small><span>SHIFT</span></div><div class="bar"><i id="energyBar"></i></div></div>
+    </div>
+    <div class="hudfooter"><span>WASD MOVE · SPACE / C VERTICAL · Q / E ROLL</span><span>F DOOR · TAB MAP · ESC PAUSE</span><span id="explored">EXPLORED 0 / 14</span></div>
+  </div>
+  <section id="mapOverlay" class="sheet" hidden>
+    <div class="sheethead"><div class="eyebrow">ONBOARD CARTOGRAPHY</div><h2>THE MINE<span> / AUTOMAP</span></h2><button id="closeMap">RETURN TO FLIGHT <span class="keycap">TAB</span></button></div>
+    <canvas id="mapCanvas" aria-label="Explored mine map. Drag to rotate and scroll to zoom."></canvas>
+    <div id="maplabels"></div><div class="maplegend"><span><i class="visited"></i>TRAVERSED</span><span><i class="seen"></i>IN SIGHT</span><span><i class="ship"></i>YOUR SHIP</span><span><i class="locked"></i>SEALED DOOR</span></div>
+    <div class="mapnote">DRAG TO ORBIT · SCROLL TO ZOOM · UNSEEN SPACE IS HIDDEN <span id="mapStats"></span></div>
+  </section>
+  <section id="pause" class="sheet modal" hidden><div class="eyebrow">FLIGHT SUSPENDED</div><h2 id="pauseTitle">HOLDING POSITION.</h2><p id="pauseText">Take a breath. The mine can wait.</p><button class="primary" id="resume">RESUME FLIGHT <span>↗</span></button><button class="secondary" id="restart">RESTART MISSION</button><button class="secondary" id="pauseHelp">FLIGHT MANUAL</button></section>
+  <section id="help" class="sheet manual" hidden><div class="eyebrow">PILOT REFERENCE / CS–06</div><h2>SIX AXES. ZERO GRAVITY.</h2><p>Your ship flies in the direction you face. There is no fixed up.</p><div class="controlgrid"><span><kbd>W A S D</kbd> Thrust / strafe</span><span><kbd>MOUSE</kbd> Pitch / yaw</span><span><kbd>SPACE / C</kbd> Rise / descend</span><span><kbd>Q / E</kbd> Roll left / right</span><span><kbd>SHIFT</kbd> Afterburner</span><span><kbd>CLICK</kbd> Fire weapon</span><span><kbd>F</kbd> Open nearby door</span><span><kbd>1 / 2</kbd> Switch weapon</span><span><kbd>TAB / M</kbd> Automap</span><span><kbd>ESC</kbd> Pause / release mouse</span><span><kbd>↑ ↓ ← →</kbd> Keyboard pitch / yaw</span><span><kbd>X</kbd> Keyboard fire</span></div><p>Fly through pickups to collect them. Shoot regular doors to open them. Red doors require the red key. Collect the plasma lance in the armory. Destroy the core, then follow green markers through the exhaust gallery to extraction.</p><div class="enemyguide"><span><b class="cyan">SCOUT</b>Fast hunter · pulse bolts</span><span><b class="orange">SENTRY</b>Strafing guard · burst fire</span><span><b class="pink">BRUTE</b>Armored pursuer · heavy orbs</span></div><div class="settings"><label>LOOK SENSITIVITY <input type="range" id="sensitivity" min="0.3" max="2" value="1" step="0.1"></label><label><input type="checkbox" id="invert"> INVERT VERTICAL LOOK</label></div><button class="primary" id="closeHelp">GOT IT <span>↗</span></button></section>
+  <div id="loading">INITIALIZING FLIGHT SYSTEMS <span>...</span></div>
+  <script type="module" src="main.js"></script>
+</body>
+</html>

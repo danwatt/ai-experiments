@@ -17,6 +17,7 @@ window.DEMOS = [
   { s: "2048", t: "Hex 2048 · Atari Lynx", href: "games/2048-lynx-opus-5.5-high/", img: "screenshots/games/2048-lynx-opus-5.5-high.webp", d: "A 9 KB Lynx cart in cc65 C, drawn by Suzy hardware sprites, running in Handy via EmulatorJS.", model: "Opus 5.5", effort: "high", platform: "Atari Lynx", links: [["prompt", "games/2048-lynx-opus-5.5-high/prompt.html"], [".lnx ROM", "games/2048-lynx-opus-5.5-high/hex2048.lnx"]] },
 
   // Games & toys
+  { s: "games", t: "Cinder Six", href: "games/cinder-six-gpt-6.1-sol-high/", img: "screenshots/games/cinder-six-gpt-6.1-sol-high.webp", d: "A 6DOF Three.js mine shooter: 14 rooms, three robot types, lava, a red-key reactor lock, and an exploration automap.", model: "GPT 6.1 Sol", effort: "high", links: [["prompt", "games/cinder-six-gpt-6.1-sol-high/prompt.html"], ["README", "games/cinder-six-gpt-6.1-sol-high/README.html"]] },
   { s: "games", t: "Hex Bastion", href: "games/td-opus-5.5-high/", img: "screenshots/games/td-opus-5.5-high.webp", d: "Tower defense on a hex grid.", model: "Opus 5.5", effort: "high" },
   { s: "games", t: "Hex Highlands TD", href: "games/3dtd-opus-5.5-uiltra/", img: "screenshots/games/3dtd-opus-5.5-uiltra.webp", d: "3D tower defense on a hex grid.", model: "Opus 5.5", effort: "ultra", links: [["prompt", "games/3dtd-opus-5.5-uiltra/prompt.html"]] },
   { s: "games", t: "Fact Rocket", href: "games/fact-rocket/", img: "screenshots/games/fact-rocket.webp", d: "Fly a rocket by answering math facts.", model: null, effort: null, links: [["prompt", "games/fact-rocket/prompt.html"]] },
