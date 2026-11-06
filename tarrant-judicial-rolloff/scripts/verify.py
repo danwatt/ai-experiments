@@ -3,6 +3,7 @@ from pathlib import Path
 import re
 import subprocess
 import pandas as pd
+from analyze import write_zipped_csv
 
 ROOT=Path(__file__).resolve().parents[1]
 
@@ -11,7 +12,7 @@ def norm(s):
     return re.sub(r'[^a-z0-9]','',s.lower())
 
 def main():
-    contests=pd.read_csv(ROOT/'outputs/contests.csv')
+    contests=pd.read_csv(ROOT/'outputs/contests.csv.zip')
     checks=[]
     for year,g in contests.groupby('year'):
         pdf=ROOT/f'data/raw/{year}-cumulative.pdf'
@@ -38,7 +39,7 @@ def main():
             checks.append(dict(year=year,contest=c.contest,check='PDF named-candidate vote total',
                                pdf_value=value,export_value=c.named_candidate_votes,result='pass' if ok else 'DIFFERENCE'))
     out=pd.DataFrame(checks)
-    out.to_csv(ROOT/'outputs/verification.csv',index=False)
+    write_zipped_csv(out,ROOT/'outputs/verification.csv.zip')
     print(out.groupby(['year','result']).size().to_string())
     print(out[out.result!='pass'].to_string(index=False))
     assert not (out.result=='DIFFERENCE').any()

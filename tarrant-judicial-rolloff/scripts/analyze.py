@@ -10,6 +10,13 @@ import xml.etree.ElementTree as ET
 import numpy as np
 import pandas as pd
 
+def write_zipped_csv(table, path, **to_csv_args):
+    """Write table as path (a .csv.zip holding one CSV) with a fixed timestamp so rebuilds don't churn git."""
+    info = zipfile.ZipInfo(path.name.removesuffix('.zip'), date_time=(1980, 1, 1, 0, 0, 0))
+    info.compress_type = zipfile.ZIP_DEFLATED
+    with zipfile.ZipFile(path, 'w') as z:
+        z.writestr(info, table.to_csv(index=False, **to_csv_args), compresslevel=9)
+
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / 'data'
 RAW = DATA / 'raw'
@@ -212,7 +219,7 @@ def main():
     summary=pd.DataFrame(summaries)
     tables={'contests':contests,'candidates':pd.DataFrame(candidates),'comparisons':comparisons,
             'year_summary':summary,'precinct_uncontested':pd.DataFrame(precincts),'precinct_relationships':relations}
-    for name,table in tables.items():table.to_csv(OUT/f'{name}.csv',index=False,float_format='%.8f')
+    for name,table in tables.items():write_zipped_csv(table,OUT/f'{name}.csv.zip',float_format='%.8f')
     payload={k:json.loads(v.to_json(orient='records')) for k,v in tables.items() if k!='precinct_uncontested'}
     payload['snapshot']=timestamp
     current_precincts=tables['precinct_uncontested'].query('year==2026 and category=="local_trial"')

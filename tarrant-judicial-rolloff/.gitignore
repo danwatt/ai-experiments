@@ -1,2 +1,11 @@
 __pycache__/
 *.pyc
+
+# Raw downloads (re-fetch with scripts/fetch_sources.py); keep provenance records
+data/raw/*
+!data/raw/*-source.json
+# Build intermediates and verification screenshots; index.html embeds the data
+outputs/report-data.json
+outputs/report-*.png
+# Output tables ship as outputs/*.csv.zip
+outputs/*.csv

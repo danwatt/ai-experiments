@@ -3,3 +3,9 @@ __pycache__/
 data/raw/*.zip
 data/raw/*civix_main.js
 data/raw/discovery_*
+
+# All raw downloads (re-fetch with scripts/fetch_sources.py); keep provenance records
+data/raw/*
+!data/raw/*.source.json
+!data/raw/fetch_status.json
+data/raw/discovery_*

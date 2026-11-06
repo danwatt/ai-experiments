@@ -3,3 +3,8 @@ __pycache__/
 *.pyc
 .DS_Store
 data/source/
+
+# Build intermediates; index.html embeds geometry and results
+dist/
+data/*.topojson
+data/*.json.gz

@@ -27,15 +27,15 @@ Downloads are cached per election. To fetch a newer 2026 snapshot use `python3 s
 ## Sources and outputs
 
 - `data/sources.json`: exact county archive, tally, PDF, and Clarity URLs; retrieval timestamps; original download hashes. The 2026 Clarity version is frozen at 385548, timestamp November 4, 2026, 2:53:24 a.m. CST. Its county cumulative PDF is unofficial, timestamped 2:37 a.m.
-- `data/raw/`: compressed original tally text, original cumulative PDFs, 2026 Clarity ZIPs, and the two 2022 declaration certifications. CSV-formatted historical text is compressed losslessly to keep the experiment smaller.
+- `data/raw/` (not committed; recreate with `python3 scripts/fetch_sources.py`): compressed original tally text, original cumulative PDFs, 2026 Clarity ZIPs, and the two 2022 declaration certifications. CSV-formatted historical text is compressed losslessly to keep the experiment smaller.
 - `data/declared_elected_2022.csv`: 29 offices with no vote held, transcribed from the county and state certifications. They are excluded from voted-race denominators and never treated as zero participation.
-- `outputs/year_summary.csv`: summary by election, benchmark, court scope, and contest status.
-- `outputs/contests.csv`: 324 judicial/executive/benchmark contests, with candidate names, eligibility, votes, blanks, and ballot-accounting residuals.
-- `outputs/candidates.csv`: individual candidate totals, including identified write-in accounting buckets.
-- `outputs/comparisons.csv`: each judicial/executive contest against each available benchmark, matching reporting units and eligibility exactly.
-- `outputs/precinct_uncontested.csv`: race-by-precinct observations used for party analysis, after the stated minimum-size filter.
-- `outputs/precinct_relationships.csv`: descriptive weighted correlations, slopes, intercepts, and fitted rates at 50% opposing-party support for each race/benchmark.
-- `outputs/verification.csv`: all 324 named-candidate vote totals independently checked against the separately published cumulative PDFs.
+- `outputs/year_summary.csv.zip`: summary by election, benchmark, court scope, and contest status.
+- `outputs/contests.csv.zip`: 324 judicial/executive/benchmark contests, with candidate names, eligibility, votes, blanks, and ballot-accounting residuals.
+- `outputs/candidates.csv.zip`: individual candidate totals, including identified write-in accounting buckets.
+- `outputs/comparisons.csv.zip`: each judicial/executive contest against each available benchmark, matching reporting units and eligibility exactly.
+- `outputs/precinct_uncontested.csv.zip`: race-by-precinct observations used for party analysis, after the stated minimum-size filter.
+- `outputs/precinct_relationships.csv.zip`: descriptive weighted correlations, slopes, intercepts, and fitted rates at 50% opposing-party support for each race/benchmark.
+- `outputs/verification.csv.zip`: all 324 named-candidate vote totals independently checked against the separately published cumulative PDFs.
 
 ## Important distinctions
 
