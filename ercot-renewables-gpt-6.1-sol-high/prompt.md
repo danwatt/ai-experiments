@@ -79,7 +79,7 @@ Applied **Grid Control Room**: charcoal panels, condensed headings, monospaced r
 
 Refresh your open page to see it. Desktop/mobile checks and data tests passed.
 
-![Grid Control Room preview](prompt-assets/control-room.jpg)
+![Grid Control Room preview](prompt-assets/control-room.webp)
 
 ## You
 

@@ -2,7 +2,8 @@
 # Write <demo-dir>/prompt.md from Claude Code, Cursor and/or Codex (ChatGPT app)
 # session transcript(s): model(s), effort level(s), token usage/cost via
 # tokscale, then the conversation (user prompts + assistant replies) with
-# screenshots saved to <demo-dir>/prompt-assets/. Thinking and tool calls are
+# screenshots saved to <demo-dir>/prompt-assets/ (as WebP, at most 1600px wide,
+# when ImageMagick is installed). Thinking and tool calls are
 # omitted. Cursor transcripts carry no model/effort/usage/images, so those come
 # from tokscale when it knows the session.
 #
@@ -27,6 +28,20 @@ tmp=$(mktemp -d); trap 'rm -rf "$tmp"' EXIT
 # Decompress a codex rollout (.jsonl or .jsonl.zst) to stdout.
 codex_cat() { case $1 in *.zst) zstd -dc "$1";; *) cat "$1";; esac; }
 codex_cwd() { codex_cat "$1" 2>/dev/null | head -1 | jq -r '.payload.cwd // empty'; }
+# Re-encode a PNG/JPEG screenshot as WebP (quality 75, at most 1600px wide) to
+# keep the Pages upload small. Prints the file name to link; keeps the original
+# when ImageMagick is missing or the WebP isn't smaller.
+to_webp() {
+  local src=$1 dst=${1%.*}.webp
+  case $src in *.png|*.jpg|*.jpeg) ;; *) basename "$src"; return;; esac
+  if command -v magick >/dev/null &&
+     magick "$src" -resize '1600x>' -quality 75 "$dst" 2>/dev/null &&
+     [ "$(wc -c <"$dst")" -lt "$(wc -c <"$src")" ]; then
+    rm "$src"; basename "$dst"
+  else
+    rm -f "$dst"; basename "$src"
+  fi
+}
 codex_id() { basename "$1" | sed -E 's/\.jsonl(\.zst)?$//; s/^rollout-[0-9T-]{19}-//'; }
 
 # Echo "<claude|cursor|codex> <path> <session-id>" for an id (uuid, or filename for codex).
@@ -216,6 +231,7 @@ last=""
       file=$(printf '%03d.%s' "$n" "$ext")
       mkdir -p "$assets"
       jq -r .image.data <<<"$ev" | base64 -d > "$assets/$file"
+      file=$(to_webp "$assets/$file")
       echo
       echo "![screenshot $n](prompt-assets/$file)"
     else

@@ -16,17 +16,17 @@ Vendoring QBJS (MIT, QB64→JS compiler) so the page compiles the `.bas` in-brow
 
 Files vendored (~700 KB). Writing runner page now — fetches `.bas`, compiles with QBJS in browser, runs on canvas.
 
-![screenshot 1](prompt-assets/001.jpg)
+![screenshot 1](prompt-assets/001.webp)
 
 Runs. Text renders serif — DOS font not preloaded. Fixing, then testing input.
 
-![screenshot 2](prompt-assets/002.jpg)
+![screenshot 2](prompt-assets/002.webp)
 
 Font fixed, pad moves merge tiles (score 4). Checking canvas click, Esc, and phone width.
 
 Unused GX bitmap font, but path is hardcoded `gx/` relative to page. Moving `gx/` to demo root rather than patching vendored code.
 
-![screenshot 3](prompt-assets/003.jpg)
+![screenshot 3](prompt-assets/003.webp)
 
 Mobile layout good, font 404s gone. One gap: on phones canvas is CSS-scaled, so tap-on-canvas coords would be off. Checking whether GX's own scaling corrects mouse coords.
 
@@ -34,9 +34,9 @@ Confirmed off by scale (158 vs 320). Trying `transform: scale` — offsetX repor
 
 Transform fixes mouse. GX touch handlers use `pageX - rect` (scaled, and scroll-broken), so I'll route touches to mouse events in capture phase.
 
-![screenshot 4](prompt-assets/004.jpg)
+![screenshot 4](prompt-assets/004.webp)
 
-![screenshot 5](prompt-assets/005.jpg)
+![screenshot 5](prompt-assets/005.webp)
 
 Tap north slid tiles north on phone width. Resetting viewport and updating landing card.
 

@@ -29,87 +29,87 @@ Built (18 KB). Checking for non-R3000 instructions.
 
 Clean MIPS I output. Now the browser page.
 
-![screenshot 1](prompt-assets/001.jpg)
+![screenshot 1](prompt-assets/001.webp)
 
 Page loads; clicking play to boot emulator.
 
-![screenshot 2](prompt-assets/002.jpg)
+![screenshot 2](prompt-assets/002.webp)
 
-![screenshot 3](prompt-assets/003.jpg)
+![screenshot 3](prompt-assets/003.webp)
 
 Boots and renders in PCSX-ReARMed. Testing pad input.
 
-![screenshot 4](prompt-assets/004.jpg)
+![screenshot 4](prompt-assets/004.webp)
 
-![screenshot 5](prompt-assets/005.jpg)
+![screenshot 5](prompt-assets/005.webp)
 
-![screenshot 6](prompt-assets/006.jpg)
+![screenshot 6](prompt-assets/006.webp)
 
 Input not reaching game. Adding on-screen pad debug to diagnose SIO.
 
-![screenshot 7](prompt-assets/007.png)
+![screenshot 7](prompt-assets/007.webp)
 
-![screenshot 8](prompt-assets/008.jpg)
+![screenshot 8](prompt-assets/008.webp)
 
 Debugging pad input; capturing debug readout.
 
-![screenshot 9](prompt-assets/009.jpg)
+![screenshot 9](prompt-assets/009.webp)
 
-![screenshot 10](prompt-assets/010.png)
+![screenshot 10](prompt-assets/010.webp)
 
-![screenshot 11](prompt-assets/011.jpg)
+![screenshot 11](prompt-assets/011.webp)
 
 Pad responds (41 5A). Testing Start now with fresh ROM.
 
-![screenshot 12](prompt-assets/012.png)
+![screenshot 12](prompt-assets/012.webp)
 
-![screenshot 13](prompt-assets/013.png)
+![screenshot 13](prompt-assets/013.webp)
 
 Still chasing pad input — reading emulator source to see how it latches buttons.
 
-![screenshot 14](prompt-assets/014.png)
+![screenshot 14](prompt-assets/014.webp)
 
 Keyboard input works — game started. Simulated-input API was the culprit, not the ROM. Testing moves.
 
-![screenshot 15](prompt-assets/015.png)
+![screenshot 15](prompt-assets/015.webp)
 
 Pane hidden, so emulator is throttled. Using longer key holds.
 
-![screenshot 16](prompt-assets/016.png)
+![screenshot 16](prompt-assets/016.webp)
 
 Moves work. Running a longer sequence to check merges/score.
 
-![screenshot 17](prompt-assets/017.png)
+![screenshot 17](prompt-assets/017.webp)
 
 Merges + score work. Fixing panel overlaps, removing debug.
 
 Adding a temporary test hook (Square fills near-win board) to verify win/game-over screens.
 
-![screenshot 18](prompt-assets/018.png)
+![screenshot 18](prompt-assets/018.webp)
 
 Win screen works. Continuing to test game-over.
 
-![screenshot 19](prompt-assets/019.png)
+![screenshot 19](prompt-assets/019.webp)
 
-![screenshot 20](prompt-assets/020.png)
+![screenshot 20](prompt-assets/020.webp)
 
 Gameplay solid. Testing undo + pause menu.
 
-![screenshot 21](prompt-assets/021.png)
+![screenshot 21](prompt-assets/021.webp)
 
-![screenshot 22](prompt-assets/022.png)
+![screenshot 22](prompt-assets/022.webp)
 
-![screenshot 23](prompt-assets/023.jpg)
+![screenshot 23](prompt-assets/023.webp)
 
-![screenshot 24](prompt-assets/024.jpg)
+![screenshot 24](prompt-assets/024.webp)
 
 Game-over overlay OK. Removing test hook; then testing arrow-key chords.
 
-![screenshot 25](prompt-assets/025.jpg)
+![screenshot 25](prompt-assets/025.webp)
 
-![screenshot 26](prompt-assets/026.jpg)
+![screenshot 26](prompt-assets/026.webp)
 
-![screenshot 27](prompt-assets/027.jpg)
+![screenshot 27](prompt-assets/027.webp)
 
 Chords work (tiles pushed to NE edge, merged to 4). Now README, landing card, prompt.md.
 

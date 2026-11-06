@@ -30,37 +30,37 @@ Level builder done and validated (825 cubes, 12 rooms, 10 doors, all reachable).
 
 Now the HTML shell with HUD and screens.
 
-![screenshot 1](prompt-assets/001.jpg)
+![screenshot 1](prompt-assets/001.webp)
 
 Game boots and renders. Tuning lighting and checking each room now.
 
-![screenshot 2](prompt-assets/002.jpg)
+![screenshot 2](prompt-assets/002.webp)
 
-![screenshot 3](prompt-assets/003.jpg)
+![screenshot 3](prompt-assets/003.webp)
 
-![screenshot 4](prompt-assets/004.jpg)
+![screenshot 4](prompt-assets/004.webp)
 
-![screenshot 5](prompt-assets/005.jpg)
+![screenshot 5](prompt-assets/005.webp)
 
-![screenshot 6](prompt-assets/006.jpg)
+![screenshot 6](prompt-assets/006.webp)
 
-![screenshot 7](prompt-assets/007.jpg)
+![screenshot 7](prompt-assets/007.webp)
 
-![screenshot 8](prompt-assets/008.jpg)
+![screenshot 8](prompt-assets/008.webp)
 
 Visuals and automap working. Now running scripted gameplay checks (doors, locked doors, key, reactor, exit).
 
-![screenshot 9](prompt-assets/009.jpg)
+![screenshot 9](prompt-assets/009.webp)
 
 Full loop verified: locked red door → key → reactor → countdown → exit → win screen. Checking lava damage, combat, and automap door-hiding next.
 
-![screenshot 10](prompt-assets/010.jpg)
+![screenshot 10](prompt-assets/010.webp)
 
-![screenshot 11](prompt-assets/011.jpg)
+![screenshot 11](prompt-assets/011.webp)
 
 Pointer-lock fallback added. Doing a final real-click check, then adding the landing-page card.
 
-![screenshot 12](prompt-assets/012.jpg)
+![screenshot 12](prompt-assets/012.webp)
 
 I've built the demo. It's called **Hexahedron** and lives in [games/hexahedron-opus-5.5/](games/hexahedron-opus-5.5/index.html). It uses three.js 0.160 from a CDN and has no build step. To run it locally, start the `hexahedron` server (port 8801) from `.claude/launch.json`.
 

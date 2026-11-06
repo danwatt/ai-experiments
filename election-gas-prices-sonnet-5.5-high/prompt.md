@@ -14,23 +14,23 @@ Write to directory election-gas-prices-sonnet-5.5-high
 
 ## Claude
 
-![screenshot 1](prompt-assets/001.jpg)
+![screenshot 1](prompt-assets/001.webp)
 
-![screenshot 2](prompt-assets/002.jpg)
+![screenshot 2](prompt-assets/002.webp)
 
 Page renders and chart works. Checking chart bottom, other tabs, and edge cases now.
 
-![screenshot 3](prompt-assets/003.jpg)
+![screenshot 3](prompt-assets/003.webp)
 
-![screenshot 4](prompt-assets/004.jpg)
+![screenshot 4](prompt-assets/004.webp)
 
-![screenshot 5](prompt-assets/005.jpg)
+![screenshot 5](prompt-assets/005.webp)
 
-![screenshot 6](prompt-assets/006.jpg)
+![screenshot 6](prompt-assets/006.webp)
 
 Mobile layout holds. Small table fix, then I'll add the index card and run a final check.
 
-![screenshot 7](prompt-assets/007.jpg)
+![screenshot 7](prompt-assets/007.webp)
 
 Last check: tooltip, then reset the viewport.
 

@@ -14,23 +14,23 @@ I want to create a self-contained HTML/JS/CSS math facts quizzer for my 3rd grad
 
 Quizzer built at `fact-rocket/index.html`. Now testing it in browser.
 
-![screenshot 1](prompt-assets/001.jpg)
+![screenshot 1](prompt-assets/001.webp)
 
-![screenshot 2](prompt-assets/002.jpg)
+![screenshot 2](prompt-assets/002.webp)
 
-![screenshot 3](prompt-assets/003.jpg)
+![screenshot 3](prompt-assets/003.webp)
 
-![screenshot 4](prompt-assets/004.jpg)
+![screenshot 4](prompt-assets/004.webp)
 
 Everything works. Last checks: phone layout, then clearing my test data.
 
-![screenshot 5](prompt-assets/005.jpg)
+![screenshot 5](prompt-assets/005.webp)
 
-![screenshot 6](prompt-assets/006.png)
+![screenshot 6](prompt-assets/006.webp)
 
 Class name collision: stats `.empty` rule shrinks answer slot. Renaming.
 
-![screenshot 7](prompt-assets/007.jpg)
+![screenshot 7](prompt-assets/007.webp)
 
 Fixed. Clearing my test runs from storage so your kid starts fresh.
 
@@ -78,17 +78,17 @@ Looking good so far. I would like for it to randomly switch between horizontal "
 
 ## Claude
 
-![screenshot 8](prompt-assets/008.jpg)
+![screenshot 8](prompt-assets/008.webp)
 
-![screenshot 9](prompt-assets/009.jpg)
+![screenshot 9](prompt-assets/009.webp)
 
 Columns line up. "New fact" tag crowds the top number; nudging it down.
 
-![screenshot 10](prompt-assets/010.png)
+![screenshot 10](prompt-assets/010.webp)
 
 Page was still loading. Retrying.
 
-![screenshot 11](prompt-assets/011.jpg)
+![screenshot 11](prompt-assets/011.webp)
 
 Tag clears number now. Clearing test data.
 
@@ -120,7 +120,7 @@ Also, when doing 10+10, or even 10+9, the numbers overflow the white box.
 
 Overflow cause: horizontal font scales with screen width, not card width; "10 + 10 = 20" needs ~6.4em. Fix: size font off card width via container units.
 
-![screenshot 12](prompt-assets/012.jpg)
+![screenshot 12](prompt-assets/012.webp)
 
 Both fixed: same card height and keypad position in both layouts, and 10 + 10 = 20 fits on phone and desktop.
 
@@ -141,13 +141,13 @@ For what its worth, the target devices for this are a phone and an ipad mini
 
 ## Claude
 
-![screenshot 13](prompt-assets/013.jpg)
+![screenshot 13](prompt-assets/013.webp)
 
 Small phone passes: keypad at same spot in all three states, hint fits. Checking larger phone and iPad mini both orientations.
 
 All four sizes pass. Last: real wrong-answer flow on iPad mini portrait.
 
-![screenshot 14](prompt-assets/014.jpg)
+![screenshot 14](prompt-assets/014.webp)
 
 The keypad now stays in place when he gets one wrong. The hint fits inside the same white box instead of making it taller.
 

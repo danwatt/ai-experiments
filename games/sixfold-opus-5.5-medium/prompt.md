@@ -14,37 +14,37 @@ Can we build something, simpler, a demo, like that in three.js?
 
 ## Claude
 
-![screenshot 1](prompt-assets/001.jpg)
+![screenshot 1](prompt-assets/001.webp)
 
 Running fine, 57 segments, no errors. Tuning look — hazard funnels too loud.
 
-![screenshot 2](prompt-assets/002.jpg)
+![screenshot 2](prompt-assets/002.webp)
 
-![screenshot 3](prompt-assets/003.jpg)
+![screenshot 3](prompt-assets/003.webp)
 
 Twisting tunnel and hub look right. Checking loop joins and live combat sim.
 
-![screenshot 4](prompt-assets/004.jpg)
+![screenshot 4](prompt-assets/004.webp)
 
-![screenshot 5](prompt-assets/005.jpg)
+![screenshot 5](prompt-assets/005.webp)
 
-![screenshot 6](prompt-assets/006.jpg)
+![screenshot 6](prompt-assets/006.webp)
 
 Loops join cleanly. Now live sim test: drones shooting, lasers, kills.
 
-![screenshot 7](prompt-assets/007.jpg)
+![screenshot 7](prompt-assets/007.webp)
 
 Laser bolt spawns too close to camera — looks like giant bar. Fixing spawn offset.
 
-![screenshot 8](prompt-assets/008.jpg)
+![screenshot 8](prompt-assets/008.webp)
 
-![screenshot 9](prompt-assets/009.jpg)
+![screenshot 9](prompt-assets/009.webp)
 
 Combat works (2 kills). Shield drained too fast — ram damage applies every frame. Adding hit cooldown, softening fire rate.
 
 Now root index entry.
 
-![screenshot 10](prompt-assets/010.jpg)
+![screenshot 10](prompt-assets/010.webp)
 
 I built a demo called **Sixfold**: a 6DOF tunnel shooter in Three.js, in one file at [sixfold/index.html](sixfold/index.html). It's linked from the root index page. To run it, start the `sixfold` dev server (port 8797), click the page and fly. I tested it in the preview, where the mouse can't be captured, so I moved the ship from code. Mouse-look and how the controls feel are untested.
 
@@ -86,43 +86,43 @@ Lets do all of the next steps
 
 Big restructure (input layer, targets, game state), so rewriting whole file.
 
-![screenshot 11](prompt-assets/011.jpg)
+![screenshot 11](prompt-assets/011.webp)
 
 Reactor renders. Pointer-lock errors come from clicks inside the preview pane, which blocks lock. Adding fallback: if lock fails, play with free mouse. Then test missiles.
 
-![screenshot 12](prompt-assets/012.jpg)
+![screenshot 12](prompt-assets/012.webp)
 
 Missiles detonating early, no lock. Debugging.
 
 Missiles + lock fine (earlier shot was aimed into wall). Testing reactor kill, door, countdown, escape.
 
-![screenshot 13](prompt-assets/013.jpg)
+![screenshot 13](prompt-assets/013.webp)
 
 Door open, exit visible. Timer overlaps objective on narrow screens — will fix. Now automap + escape.
 
-![screenshot 14](prompt-assets/014.jpg)
+![screenshot 14](prompt-assets/014.webp)
 
-![screenshot 15](prompt-assets/015.jpg)
+![screenshot 15](prompt-assets/015.webp)
 
 Automap works (wireframe of whole mine, exit glow green). Testing escape win.
 
-![screenshot 16](prompt-assets/016.jpg)
+![screenshot 16](prompt-assets/016.webp)
 
 Escape works. Now locked door view + touch layout on mobile viewport.
 
-![screenshot 17](prompt-assets/017.jpg)
+![screenshot 17](prompt-assets/017.webp)
 
-![screenshot 18](prompt-assets/018.jpg)
+![screenshot 18](prompt-assets/018.webp)
 
 Door + touch layout render. HUD objective collides with shield bar on phone; roll icons tiny. Fixing, then test touch input events.
 
-![screenshot 19](prompt-assets/019.jpg)
+![screenshot 19](prompt-assets/019.webp)
 
 Stick + look + lock ring work. FIRE didn't register: `setPointerCapture` throws on synthetic pointer ids and aborts the handler. Wrapping it so real devices with odd ids are safe too.
 
 All touch controls work (console errors are from the earlier page load). Last check: countdown look on desktop.
 
-![screenshot 20](prompt-assets/020.jpg)
+![screenshot 20](prompt-assets/020.webp)
 
 I added all four next steps to [sixfold/index.html](sixfold/index.html). Nothing is committed yet. I tested each piece in the preview by moving the ship and firing from code and by faking touch events; I haven't played it with a real mouse or on a phone.
 

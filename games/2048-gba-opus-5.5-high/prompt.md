@@ -22,7 +22,7 @@ My script dropped both includes. Re-add.
 
 Ass­embled clean. Now the JS emulator.
 
-![screenshot 1](prompt-assets/001.png)
+![screenshot 1](prompt-assets/001.webp)
 
 Debugging boot: ROM stuck in memory clear loop. Tracing.
 
@@ -40,19 +40,19 @@ Game logic verified (3000 moves, 5 full games, 0 mismatches). Now web page + con
 
 Page served. Checking it in browser.
 
-![screenshot 5](prompt-assets/005.jpg)
+![screenshot 5](prompt-assets/005.webp)
 
 Return tap not registered: key down+up inside one frame never reaches game. Need minimum hold. Fixing input latch + key legend layout.
 
-![screenshot 6](prompt-assets/006.jpg)
+![screenshot 6](prompt-assets/006.webp)
 
 Keyboard play works. Check touch hex-pad and phone width.
 
-![screenshot 7](prompt-assets/007.jpg)
+![screenshot 7](prompt-assets/007.webp)
 
 Mobile overflows (content cut left). Fix main width.
 
-![screenshot 8](prompt-assets/008.jpg)
+![screenshot 8](prompt-assets/008.webp)
 
 Touch pad works, no overflow at 375px. Quick audio sanity check in Node.
 

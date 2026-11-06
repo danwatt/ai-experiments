@@ -20,23 +20,23 @@ The video is in `~/Downloads/IMG_0650.MOV`
 
 No drawtext; tile without labels (order known).
 
-![screenshot 1](prompt-assets/001.jpg)
+![screenshot 1](prompt-assets/001.webp)
 
-![screenshot 2](prompt-assets/002.jpg)
+![screenshot 2](prompt-assets/002.webp)
 
-![screenshot 3](prompt-assets/003.jpg)
+![screenshot 3](prompt-assets/003.webp)
 
-![screenshot 4](prompt-assets/004.jpg)
+![screenshot 4](prompt-assets/004.webp)
 
-![screenshot 5](prompt-assets/005.jpg)
+![screenshot 5](prompt-assets/005.webp)
 
-![screenshot 6](prompt-assets/006.jpg)
+![screenshot 6](prompt-assets/006.webp)
 
-![screenshot 7](prompt-assets/007.jpg)
+![screenshot 7](prompt-assets/007.webp)
 
-![screenshot 8](prompt-assets/008.jpg)
+![screenshot 8](prompt-assets/008.webp)
 
-![screenshot 9](prompt-assets/009.jpg)
+![screenshot 9](prompt-assets/009.webp)
 
 ![screenshot 10](prompt-assets/010.jpg)
 
@@ -52,11 +52,11 @@ Pulling frames from 39-sec video, IDing plants now. Have magnolias, crape myrtle
 
 ![screenshot 15](prompt-assets/015.jpg)
 
-![screenshot 16](prompt-assets/016.jpg)
+![screenshot 16](prompt-assets/016.webp)
 
-![screenshot 17](prompt-assets/017.jpg)
+![screenshot 17](prompt-assets/017.webp)
 
-![screenshot 18](prompt-assets/018.jpg)
+![screenshot 18](prompt-assets/018.webp)
 
 ![screenshot 19](prompt-assets/019.jpg)
 
@@ -64,17 +64,17 @@ Pulling frames from 39-sec video, IDing plants now. Have magnolias, crape myrtle
 
 Map page written. Checking it in browser.
 
-![screenshot 21](prompt-assets/021.jpg)
+![screenshot 21](prompt-assets/021.webp)
 
-![screenshot 22](prompt-assets/022.jpg)
+![screenshot 22](prompt-assets/022.webp)
 
-![screenshot 23](prompt-assets/023.jpg)
+![screenshot 23](prompt-assets/023.webp)
 
-![screenshot 24](prompt-assets/024.jpg)
+![screenshot 24](prompt-assets/024.webp)
 
 Fixing focus-ring glitch on selected plant, then done.
 
-![screenshot 25](prompt-assets/025.jpg)
+![screenshot 25](prompt-assets/025.webp)
 
 I built the map at [garden-map/index.html](garden-map/index.html) and checked it in the browser preview at `localhost:8803`, in light and dark mode. It's a top-down view of the bed with 20 plants. Click a circle, a table row or a video frame to see the frame where that plant shows up and what it is. Under the map, 39 frames (one per second) line up with the ruler so you can compare spots against the video.
 
@@ -107,9 +107,9 @@ Lets blur the signs
 
 ## Claude
 
-![screenshot 26](prompt-assets/026.jpg)
+![screenshot 26](prompt-assets/026.webp)
 
-![screenshot 27](prompt-assets/027.jpg)
+![screenshot 27](prompt-assets/027.webp)
 
 ![screenshot 28](prompt-assets/028.jpg)
 
@@ -117,9 +117,9 @@ Lets blur the signs
 
 Signs blurred in all 10 frames, text unreadable. Removing sign names from page text too.
 
-![screenshot 30](prompt-assets/030.jpg)
+![screenshot 30](prompt-assets/030.webp)
 
-![screenshot 31](prompt-assets/031.jpg)
+![screenshot 31](prompt-assets/031.webp)
 
 Both signs are blurred now, in every frame that shows them, and you can't read the text on either:
 - **School sign:** frames `00`–`04`. In frame `04` only the edge shows.
@@ -137,9 +137,9 @@ Add and commit
 
 Checking transcript screenshots for unblurred signs before commit.
 
-![screenshot 32](prompt-assets/032.jpg)
+![screenshot 32](prompt-assets/032.webp)
 
-![screenshot 33](prompt-assets/033.jpg)
+![screenshot 33](prompt-assets/033.webp)
 
 Staged clean: only garden-map hunks, hexahedron work left unstaged. Committing.
 
@@ -190,7 +190,7 @@ There was a plant that was missed. Its along the fence, behind number 18. It too
 
 ![screenshot 39](prompt-assets/039.jpg)
 
-![screenshot 40](prompt-assets/040.png)
+![screenshot 40](prompt-assets/040.webp)
 
 I added the second Tropical Milkweed 'Silky Gold' to the map as **plant 21**. It's about 40 ft along, against the fence and behind crape myrtle 18. In the 31-second frame, only some thin, narrow leaves show between the crape myrtle and the salvia, which is why I missed it the first time.
 
@@ -229,11 +229,11 @@ Help me start planning for next year. Lets add a tab that shows a new map, filli
 
 ## Claude
 
-![screenshot 41](prompt-assets/041.jpg)
+![screenshot 41](prompt-assets/041.webp)
 
 Plan tab renders: coverage goes from 39% today to 72% with the plan. Checking the Now tab and dark mode.
 
-![screenshot 42](prompt-assets/042.png)
+![screenshot 42](prompt-assets/042.webp)
 
 I added a **Next year plan** tab. Open it with the tab button or by adding `#plan` to the page's address. It shows the bed at next summer's size, with your current plants faded under their Now-tab numbers and the proposed plants in solid colors marked with letters A–M.
 
@@ -285,7 +285,7 @@ Lets add links to all of the plants to some place that I can see what they look 
 
 Rate-limited. Retrying slower for the rest.
 
-![screenshot 43](prompt-assets/043.png)
+![screenshot 43](prompt-assets/043.webp)
 
 Every plant on both tabs now has links that open in a new tab:
 
@@ -333,9 +333,9 @@ Lets make some more fixes. Plants 6, 7, 9 and 10 do not exist. Lets remove the, 
 
 Now edit data with a script.
 
-![screenshot 44](prompt-assets/044.jpg)
+![screenshot 44](prompt-assets/044.webp)
 
-![screenshot 45](prompt-assets/045.jpg)
+![screenshot 45](prompt-assets/045.webp)
 
 Care notes listed out of order: number-only keys sort first in `Object.entries`. That happened before this change too. Sorting them by first plant number.
 
@@ -371,9 +371,9 @@ There is another plant, like number 3, but with pink-ish flowers, about 4 feet t
 
 Close-up 11 shows the hot-pink spikes, so that photo is the new Red Fox, not #3. Moving that description over and adding the plant.
 
-![screenshot 49](prompt-assets/049.png)
+![screenshot 49](prompt-assets/049.webp)
 
-![screenshot 50](prompt-assets/050.png)
+![screenshot 50](prompt-assets/050.webp)
 
 I added the pink speedwell as plant 6, which brings the map to 18 plants. Both tabs load in the preview with no errors. Nothing is committed yet.
 
@@ -389,7 +389,7 @@ Plan number 9 is the same as plant number 4
 
 ## Claude
 
-![screenshot 51](prompt-assets/051.png)
+![screenshot 51](prompt-assets/051.webp)
 
 Plants 8 and 9 now match 3 and 4. They keep their positions, so no numbers changed. The page loads in the preview with no errors. Nothing is committed yet.
 
@@ -405,7 +405,7 @@ There is another plant like numbers 4 and 9 located between 12 and 13, near the 
 
 Topmost canopy intersection lands at about 28.2 ft, 1.2 ft from the fence, which matches 4 and 9. Adding it as the new plant 13.
 
-![screenshot 52](prompt-assets/052.png)
+![screenshot 52](prompt-assets/052.webp)
 
 I added the new Autumn Sage as plant 13, which brings the map to 19 plants. The page loads in the preview with no errors. Nothing is committed yet.
 
@@ -419,7 +419,7 @@ There is another hanging plant number 15, about 4 feet to the left of number 15 
 
 ## Claude
 
-![screenshot 53](prompt-assets/053.png)
+![screenshot 53](prompt-assets/053.webp)
 
 I added the second hanging Red Mandevilla as plant 15, which brings the map to 20 plants. The page loads in the preview with no errors. Nothing is committed yet.
 
@@ -436,7 +436,7 @@ Lets add to the "Now" tab some additional care instructions for each species, in
 
 ## Claude
 
-![screenshot 54](prompt-assets/054.jpg)
+![screenshot 54](prompt-assets/054.webp)
 
 Cards render. Checking that clicking a number jumps to the plant, and checking phone width.
 
@@ -463,7 +463,7 @@ On the "Next year plan", lets add more Red Mandevilla hanging pots along the bac
 
 ## Claude
 
-![screenshot 55](prompt-assets/055.jpg)
+![screenshot 55](prompt-assets/055.webp)
 
 ![screenshot 56](prompt-assets/056.jpg)
 
@@ -475,11 +475,11 @@ Tracking fence posts across frames to measure the spacing. First pass gives abou
 
 ![screenshot 59](prompt-assets/059.jpg)
 
-![screenshot 60](prompt-assets/060.png)
+![screenshot 60](prompt-assets/060.webp)
 
 Pots show along the fence. One fix: the detail panel adds "once established; water weekly the first summer", which is wrong for pots.
 
-![screenshot 61](prompt-assets/061.png)
+![screenshot 61](prompt-assets/061.webp)
 
 I added six hanging Red Mandevilla pots to the Next year plan, one on each fence post, marked N. With the two existing pots at the gate (15 and 16), that makes eight in all. The page loads in the preview with no errors. Nothing is committed yet.
 
@@ -501,7 +501,7 @@ Ok, so you suggested I add some purple coneflowers. Turns out I do have some, bu
 
 ## Claude
 
-![screenshot 62](prompt-assets/062.png)
+![screenshot 62](prompt-assets/062.webp)
 
 I added your two Purple Coneflowers as plants 13 and 20, which brings the map to 22 plants. The page loads in the preview with no errors. Nothing is committed yet.
 
@@ -557,27 +557,27 @@ Can we get a 3d render of the next year plan?
 
 Building it as a third tab: a Three.js scene loaded only when the tab opens, drawn from the same plan data.
 
-![screenshot 64](prompt-assets/064.jpg)
+![screenshot 64](prompt-assets/064.webp)
 
 Scene renders without errors. The lawn view shows too much lawn, so I'm lowering the framing; I'm also pushing the background trees back.
 
-![screenshot 65](prompt-assets/065.png)
+![screenshot 65](prompt-assets/065.webp)
 
 Click-to-name works (you'd selected G). Checking the other two views.
 
-![screenshot 66](prompt-assets/066.png)
+![screenshot 66](prompt-assets/066.webp)
 
-![screenshot 67](prompt-assets/067.png)
+![screenshot 67](prompt-assets/067.webp)
 
-![screenshot 68](prompt-assets/068.png)
+![screenshot 68](prompt-assets/068.webp)
 
 "Along the fence" puts the camera behind the left wooden fence, so the wall fills the view. Moving that camera inside the yard.
 
-![screenshot 69](prompt-assets/069.png)
+![screenshot 69](prompt-assets/069.webp)
 
 Along-the-fence view works. Checking phone width and tab switching.
 
-![screenshot 70](prompt-assets/070.jpg)
+![screenshot 70](prompt-assets/070.webp)
 
 I added a third tab, "Next year in 3D", with a 3D model of the plan that you can turn and zoom. It's in the preview now, and it looks like you've already been using it. It works at desktop and phone width with no console errors. Nothing is committed yet.
 
@@ -623,31 +623,31 @@ On the timeline, lets show each species that will be planted, and using their co
 
 Whole file is 618 lines. Read it fully.
 
-![screenshot 71](prompt-assets/071.jpg)
+![screenshot 71](prompt-assets/071.webp)
 
-![screenshot 72](prompt-assets/072.jpg)
+![screenshot 72](prompt-assets/072.webp)
 
 Timeline tab built; checking render now.
 
-![screenshot 73](prompt-assets/073.jpg)
+![screenshot 73](prompt-assets/073.webp)
 
-![screenshot 74](prompt-assets/074.jpg)
+![screenshot 74](prompt-assets/074.webp)
 
-![screenshot 75](prompt-assets/075.jpg)
+![screenshot 75](prompt-assets/075.webp)
 
 Mobile: name column hogs width, bars off-screen. Fix: narrower sticky name column on phones.
 
-![screenshot 76](prompt-assets/076.jpg)
+![screenshot 76](prompt-assets/076.webp)
 
-![screenshot 77](prompt-assets/077.jpg)
+![screenshot 77](prompt-assets/077.webp)
 
 Bars leak into scroller padding left of the pinned names. Cover it with a panel-colored shadow.
 
-![screenshot 78](prompt-assets/078.png)
+![screenshot 78](prompt-assets/078.webp)
 
 Mobile clean. Check row click plus dark mode.
 
-![screenshot 79](prompt-assets/079.jpg)
+![screenshot 79](prompt-assets/079.webp)
 
 The "Next year timeline" tab is in [index.html](index.html), and you can link straight to it with `#timeline`. It works on desktop, on a phone and in dark mode. Not committed yet.
 
@@ -666,19 +666,19 @@ Lets add to the timeline a marker to indicate the best time to plant or do other
 
 ## Claude
 
-![screenshot 80](prompt-assets/080.jpg)
+![screenshot 80](prompt-assets/080.webp)
 
 Markers render. Check legend and month list.
 
-![screenshot 81](prompt-assets/081.png)
+![screenshot 81](prompt-assets/081.webp)
 
-![screenshot 82](prompt-assets/082.jpg)
+![screenshot 82](prompt-assets/082.webp)
 
 Month list works. Start it at current month so due-now tasks come first.
 
-![screenshot 83](prompt-assets/083.jpg)
+![screenshot 83](prompt-assets/083.webp)
 
-![screenshot 84](prompt-assets/084.jpg)
+![screenshot 84](prompt-assets/084.webp)
 
 Timeline now marks when to plant and when to do upkeep, per species. Checked on desktop and phone with no errors. Not committed yet.
 
@@ -708,7 +708,7 @@ Regenerated prompt.md; now restoring blurred screenshots and removing close-ups.
 
 Check new screenshot 071 (Now tab with video frames) for unblurred signs.
 
-![screenshot 85](prompt-assets/085.jpg)
+![screenshot 85](prompt-assets/085.webp)
 
 Sign in frame already blurred. Committing.
 
@@ -732,13 +732,13 @@ Zinnias new; blue mealy sage = existing blue salvia (12, 21); aromatic aster = a
 
 Picking front-edge gaps for 5 zinnias. Adding data.
 
-![screenshot 89](prompt-assets/089.jpg)
+![screenshot 89](prompt-assets/089.webp)
 
-![screenshot 90](prompt-assets/090.jpg)
+![screenshot 90](prompt-assets/090.webp)
 
-![screenshot 91](prompt-assets/091.jpg)
+![screenshot 91](prompt-assets/091.webp)
 
-![screenshot 92](prompt-assets/092.png)
+![screenshot 92](prompt-assets/092.webp)
 
 Of the three photos, only the zinnias were new; the other two were already covered. The zinnias are now in the plan as **O**, and the change works on the plan, timeline and 3D tabs with no errors.
 
@@ -798,19 +798,19 @@ Blurs look right: house, porch, windows, door, cars, street, fence, bins and hos
 
 Edits: CSS colors, tab + section, data and drawing code.
 
-![screenshot 116](prompt-assets/116.jpg)
+![screenshot 116](prompt-assets/116.webp)
 
 Map renders. Fix blank corner by the side gate, then check the rest.
 
-![screenshot 117](prompt-assets/117.jpg)
+![screenshot 117](prompt-assets/117.webp)
 
-![screenshot 118](prompt-assets/118.jpg)
+![screenshot 118](prompt-assets/118.webp)
 
-![screenshot 119](prompt-assets/119.jpg)
+![screenshot 119](prompt-assets/119.webp)
 
 Tabs wrap to 3 lines on phones. Make them scroll instead.
 
-![screenshot 120](prompt-assets/120.png)
+![screenshot 120](prompt-assets/120.webp)
 
 I added a **Front yard** tab with 27 plants on a top-down map, built from the video and your three photos. It works on desktop and phone with no errors; nothing is committed yet. I also renamed the page "Garden Map" and the "Now" tab "Back yard".
 
@@ -856,25 +856,25 @@ Now 3D: make `plan3d.js` take a yard and build a front scene.
 
 Gap check found better spots. Updating positions.
 
-![screenshot 121](prompt-assets/121.jpg)
+![screenshot 121](prompt-assets/121.webp)
 
 Front plan works (47% → 54% → 66%). Check front timeline and 3D.
 
-![screenshot 122](prompt-assets/122.jpg)
+![screenshot 122](prompt-assets/122.webp)
 
-![screenshot 123](prompt-assets/123.jpg)
+![screenshot 123](prompt-assets/123.webp)
 
 Front 3D renders. Tighten the street camera, then check back-yard tabs still work.
 
-![screenshot 124](prompt-assets/124.jpg)
+![screenshot 124](prompt-assets/124.webp)
 
-![screenshot 125](prompt-assets/125.jpg)
+![screenshot 125](prompt-assets/125.webp)
 
-![screenshot 126](prompt-assets/126.jpg)
+![screenshot 126](prompt-assets/126.webp)
 
 User is clicking in the pane, so testing via JS calls instead.
 
-![screenshot 127](prompt-assets/127.jpg)
+![screenshot 127](prompt-assets/127.webp)
 
 The front yard now has its own Next year plan, 3D view and timeline. I checked both yards in the browser; nothing is committed yet.
 
@@ -916,17 +916,17 @@ Changes: add the hidden holly left of the porch (renumbering the front), add the
 
 Now oak on Now map as canopy, the shade-aware plant picks, and new species data.
 
-![screenshot 128](prompt-assets/128.jpg)
+![screenshot 128](prompt-assets/128.webp)
 
 Plan good. Check Now map, 3D and timeline.
 
-![screenshot 129](prompt-assets/129.jpg)
+![screenshot 129](prompt-assets/129.webp)
 
-![screenshot 130](prompt-assets/130.jpg)
+![screenshot 130](prompt-assets/130.webp)
 
 Oak cut off at left of the street view. Widen it.
 
-![screenshot 131](prompt-assets/131.jpg)
+![screenshot 131](prompt-assets/131.webp)
 
 I added the second holly and the live oak bed, and changed the plan to fit the afternoon shade by the house. I checked all four front tabs in the browser with no errors; nothing is committed yet.
 
@@ -957,7 +957,7 @@ Merging 21 and 23 into one holly at the midpoint, renumbering 24–29 down by on
 
 Open space: x 43–45 by the gate. Turk's cap there plus a Gregg's mistflower; the Turk's cap that sat under the merged holly moves to the gap at 35 ft.
 
-![screenshot 132](prompt-assets/132.png)
+![screenshot 132](prompt-assets/132.webp)
 
 Plants 21 and 23 are now one holly, centered between them, and I've filled the open space to its right. The front plan page loads without errors; nothing is committed yet.
 

@@ -15,73 +15,73 @@ The focus is on the order of a service - prayers, hymns, etc, with a strong emph
 
 Data and shared helpers are done. Next is the sheet-music slide renderer.
 
-![screenshot 1](prompt-assets/001.jpg)
+![screenshot 1](prompt-assets/001.webp)
 
 Browser pane only rendered a static snapshot, so I'm starting a local server to test properly.
 
-![screenshot 2](prompt-assets/002.jpg)
+![screenshot 2](prompt-assets/002.webp)
 
-![screenshot 3](prompt-assets/003.jpg)
+![screenshot 3](prompt-assets/003.webp)
 
 Layout tweak applied. Now checking how the sheet-music slides render at full size.
 
-![screenshot 4](prompt-assets/004.jpg)
+![screenshot 4](prompt-assets/004.webp)
 
-![screenshot 5](prompt-assets/005.jpg)
+![screenshot 5](prompt-assets/005.webp)
 
-![screenshot 6](prompt-assets/006.jpg)
+![screenshot 6](prompt-assets/006.webp)
 
-![screenshot 7](prompt-assets/007.jpg)
+![screenshot 7](prompt-assets/007.webp)
 
-![screenshot 8](prompt-assets/008.jpg)
+![screenshot 8](prompt-assets/008.webp)
 
-![screenshot 9](prompt-assets/009.jpg)
+![screenshot 9](prompt-assets/009.webp)
 
-![screenshot 10](prompt-assets/010.jpg)
+![screenshot 10](prompt-assets/010.webp)
 
 Testing the search flow next — typing into the box and checking highlights and matches.
 
-![screenshot 11](prompt-assets/011.jpg)
+![screenshot 11](prompt-assets/011.webp)
 
-![screenshot 12](prompt-assets/012.jpg)
+![screenshot 12](prompt-assets/012.webp)
 
-![screenshot 13](prompt-assets/013.jpg)
+![screenshot 13](prompt-assets/013.webp)
 
-![screenshot 14](prompt-assets/014.jpg)
+![screenshot 14](prompt-assets/014.webp)
 
-![screenshot 15](prompt-assets/015.jpg)
+![screenshot 15](prompt-assets/015.webp)
 
 Screenshot lags one step behind; grabbing another.
 
-![screenshot 16](prompt-assets/016.jpg)
+![screenshot 16](prompt-assets/016.webp)
 
 Now the mobile companion: HTML, styles, and script.
 
-![screenshot 17](prompt-assets/017.jpg)
+![screenshot 17](prompt-assets/017.webp)
 
-![screenshot 18](prompt-assets/018.jpg)
+![screenshot 18](prompt-assets/018.webp)
 
-![screenshot 19](prompt-assets/019.jpg)
+![screenshot 19](prompt-assets/019.webp)
 
-![screenshot 20](prompt-assets/020.jpg)
+![screenshot 20](prompt-assets/020.webp)
 
 Sheet looks right. Checking the Live (leader) and Me tabs.
 
-![screenshot 21](prompt-assets/021.jpg)
+![screenshot 21](prompt-assets/021.webp)
 
-![screenshot 22](prompt-assets/022.jpg)
+![screenshot 22](prompt-assets/022.webp)
 
-![screenshot 23](prompt-assets/023.jpg)
+![screenshot 23](prompt-assets/023.webp)
 
-![screenshot 24](prompt-assets/024.jpg)
+![screenshot 24](prompt-assets/024.webp)
 
-![screenshot 25](prompt-assets/025.jpg)
+![screenshot 25](prompt-assets/025.webp)
 
-![screenshot 26](prompt-assets/026.jpg)
+![screenshot 26](prompt-assets/026.webp)
 
 Smoke test clean: no errors across menus, deck, presenter, service switching, and grid view. Taking a last look at the grid view, then cleaning up.
 
-![screenshot 27](prompt-assets/027.jpg)
+![screenshot 27](prompt-assets/027.webp)
 
 Mockup done in `worship-planner-sonnet-5.5/`. Open `index.html` for desktop, `mobile.html` for phone. No build step; I tested both in the browser pane, and the scripted smoke test (menus, deck, presenter, service switching, drag-and-drop) threw no errors.
 
@@ -148,9 +148,9 @@ Some minor tweaks
 
 ## Claude
 
-![screenshot 28](prompt-assets/028.jpg)
+![screenshot 28](prompt-assets/028.webp)
 
-![screenshot 29](prompt-assets/029.jpg)
+![screenshot 29](prompt-assets/029.webp)
 
 Timing is removed from the desktop mockup, the mobile mockup, the sample data and both docs. I ran the app in the browser after the change and hit no errors. A search of the page text for durations, "min" and clock times found nothing.
 
@@ -173,15 +173,15 @@ The developers have chosen the .NET Uno framework, and I suspect they will be us
 
 ## Claude
 
-![screenshot 30](prompt-assets/030.jpg)
+![screenshot 30](prompt-assets/030.webp)
 
-![screenshot 31](prompt-assets/031.jpg)
+![screenshot 31](prompt-assets/031.webp)
 
-![screenshot 32](prompt-assets/032.jpg)
+![screenshot 32](prompt-assets/032.webp)
 
-![screenshot 33](prompt-assets/033.jpg)
+![screenshot 33](prompt-assets/033.webp)
 
-![screenshot 34](prompt-assets/034.jpg)
+![screenshot 34](prompt-assets/034.webp)
 
 Now linking the variants together and updating the README.
 

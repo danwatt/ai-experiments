@@ -25,15 +25,15 @@ Do not reference any other code in this codebase, this is a standalone project
 
 Writing game. Single file, three.js via CDN importmap.
 
-![screenshot 1](prompt-assets/001.jpg)
+![screenshot 1](prompt-assets/001.webp)
 
 Renders. Start game, inspect map.
 
-![screenshot 2](prompt-assets/002.jpg)
+![screenshot 2](prompt-assets/002.webp)
 
 Works. Fixes needed: highland color too close to path sand; camera should reset to full-map view on start. Patch.
 
-![screenshot 3](prompt-assets/003.jpg)
+![screenshot 3](prompt-assets/003.webp)
 
 Pane shows stale data-URL snapshot. Navigate to real file URL.
 
@@ -41,69 +41,69 @@ Snapshot refreshes on navigate. Expose a few more debug hooks for scripted testi
 
 Map generation OK (42 tiles, 7 ramps, all 3 levels). Scripted build + waves to smoke-test combat.
 
-![screenshot 4](prompt-assets/004.jpg)
+![screenshot 4](prompt-assets/004.webp)
 
 Wave 1 clean, ramps render. Push waves 2–6 (scouts, brutes, wasps, phantoms) at once.
 
-![screenshot 5](prompt-assets/005.jpg)
+![screenshot 5](prompt-assets/005.webp)
 
 No errors, 81 kills, 0 leaks. Now check build-mode LOS overlay visually.
 
-![screenshot 6](prompt-assets/006.jpg)
+![screenshot 6](prompt-assets/006.webp)
 
 Pick works. Retest real hover with build mode.
 
-![screenshot 7](prompt-assets/007.jpg)
+![screenshot 7](prompt-assets/007.webp)
 
-![screenshot 8](prompt-assets/008.jpg)
+![screenshot 8](prompt-assets/008.webp)
 
 Overlay works but too faint (tone mapping washes it out; 1px lines). Switching to tone-map-free ribbons for rings/outlines and a dotted 3D LOS trace.
 
-![screenshot 9](prompt-assets/009.jpg)
+![screenshot 9](prompt-assets/009.webp)
 
-![screenshot 10](prompt-assets/010.jpg)
+![screenshot 10](prompt-assets/010.webp)
 
-![screenshot 11](prompt-assets/011.png)
+![screenshot 11](prompt-assets/011.webp)
 
-![screenshot 12](prompt-assets/012.png)
+![screenshot 12](prompt-assets/012.webp)
 
 Game runs, waves clear without errors. Now polishing overlay visibility — ghost tower preview not showing, debugging.
 
-![screenshot 13](prompt-assets/013.jpg)
+![screenshot 13](prompt-assets/013.webp)
 
 Ghost renders but flat/faint. Switch to shaded emissive material.
 
 Now verify direct-fire blocking: place Rifle on lowland near cliffs, select it, hover a blocked path tile.
 
-![screenshot 14](prompt-assets/014.jpg)
+![screenshot 14](prompt-assets/014.webp)
 
 Statuses render correctly (pink uphill, red blocked, green clear). Re-aim hover onto the red tile to check the dotted LOS trace.
 
-![screenshot 15](prompt-assets/015.jpg)
+![screenshot 15](prompt-assets/015.webp)
 
 LOS trace works: green until the ridge, red after. Now stress-test boss wave 10 + game-over flow.
 
-![screenshot 16](prompt-assets/016.jpg)
+![screenshot 16](prompt-assets/016.webp)
 
 Boss wave clean. Test game-over flow and phone layout.
 
-![screenshot 17](prompt-assets/017.jpg)
+![screenshot 17](prompt-assets/017.webp)
 
 Game-over works. Phone layout check.
 
-![screenshot 18](prompt-assets/018.jpg)
+![screenshot 18](prompt-assets/018.webp)
 
 Mobile OK-ish; toast overlaps wrapped top bar and portrait camera too close. Fix both.
 
 Two more fixes: panel re-renders mid-combat could eat clicks (rebuilds innerHTML on damage ticks), and new-enemy intros should warn a wave ahead.
 
-![screenshot 19](prompt-assets/019.jpg)
+![screenshot 19](prompt-assets/019.webp)
 
 Mobile framing better. Final desktop action shot.
 
-![screenshot 20](prompt-assets/020.jpg)
+![screenshot 20](prompt-assets/020.webp)
 
-![screenshot 21](prompt-assets/021.jpg)
+![screenshot 21](prompt-assets/021.webp)
 
 I've built the game, "Hex Highlands TD", as a single file: [3dtd-opus-5.5-uiltra/index.html](3dtd-opus-5.5-uiltra/index.html). Open it in a browser to play. It loads three.js r164 from the jsDelivr CDN, so it needs internet the first time. Nothing else in the repo is touched or referenced, and nothing is committed. I kept the folder name exactly as you typed it ("uiltra").
 
@@ -149,15 +149,15 @@ Audio running, build-phase music RMS ~0.034 (quiet, background-ish). Now measure
 
 No clipping (boss peak 0.43). Bump overall levels slightly, then check popover UI + mute.
 
-![screenshot 22](prompt-assets/022.jpg)
+![screenshot 22](prompt-assets/022.webp)
 
-![screenshot 23](prompt-assets/023.png)
+![screenshot 23](prompt-assets/023.webp)
 
 Sound engine in, no errors, levels clean. Checking settings popover UI now.
 
-![screenshot 24](prompt-assets/024.png)
+![screenshot 24](prompt-assets/024.webp)
 
-![screenshot 25](prompt-assets/025.jpg)
+![screenshot 25](prompt-assets/025.webp)
 
 Popover renders. Looks like someone's playing in the pane (towers/waves appeared that I didn't place), so I'll stop poking it. Final error check.
 
@@ -255,17 +255,17 @@ All anchors applied. Browser test: place Tesla + Gust at best spots, check overl
 
 Both build; 4 uphill ramps on this map. Now find a Tesla spot with mixed coverage for overlay check, and run combat.
 
-![screenshot 26](prompt-assets/026.jpg)
+![screenshot 26](prompt-assets/026.webp)
 
 Overlay + legend correct (green same-height, purple other-height). Now combat run with all towers.
 
 Teslas dealing damage, Gusts pushing (0 leaks). Grab an action shot.
 
-![screenshot 27](prompt-assets/027.jpg)
+![screenshot 27](prompt-assets/027.webp)
 
-![screenshot 28](prompt-assets/028.jpg)
+![screenshot 28](prompt-assets/028.webp)
 
-![screenshot 29](prompt-assets/029.jpg)
+![screenshot 29](prompt-assets/029.webp)
 
 Lightning chain renders (orb → grunts), gust ring visible bottom. Cleanup + final error check.
 

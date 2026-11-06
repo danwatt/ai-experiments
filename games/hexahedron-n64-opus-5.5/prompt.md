@@ -28,125 +28,125 @@ Exporter works (825 / 2308 / 2550 cells). Now checking libdragon GL/rdpq API in 
 
 Image includes a prebuilt `gldemo.z64` — testing that in browser emulator first to de-risk.
 
-![screenshot 1](prompt-assets/001.jpg)
+![screenshot 1](prompt-assets/001.webp)
 
 Emulator boots ROM but screen black with parallel_n64+Angrylion. Trying mupen64plus_next core.
 
-![screenshot 2](prompt-assets/002.jpg)
+![screenshot 2](prompt-assets/002.webp)
 
-![screenshot 3](prompt-assets/003.jpg)
+![screenshot 3](prompt-assets/003.webp)
 
 Emulator frozen at frame 1 because Browser pane hidden (no rAF). Opening pane.
 
-![screenshot 4](prompt-assets/004.jpg)
+![screenshot 4](prompt-assets/004.webp)
 
 parallel_n64 crashes (stack overflow) and mupen64plus_next crashes (table OOB) on libdragon gldemo. Trying other option combos.
 
-![screenshot 5](prompt-assets/005.jpg)
+![screenshot 5](prompt-assets/005.webp)
 
 Crash is deterministic. Building my own minimal test ROMs (CPU-only, rdpq, GL) to isolate which layer each core handles.
 
-![screenshot 6](prompt-assets/006.jpg)
+![screenshot 6](prompt-assets/006.webp)
 
-![screenshot 7](prompt-assets/007.jpg)
+![screenshot 7](prompt-assets/007.webp)
 
-![screenshot 8](prompt-assets/008.jpg)
+![screenshot 8](prompt-assets/008.webp)
 
 Even CPU-only test ROM shows black and core halts — testing core/plugin matrix with error overlay.
 
-![screenshot 9](prompt-assets/009.jpg)
+![screenshot 9](prompt-assets/009.webp)
 
-![screenshot 10](prompt-assets/010.jpg)
+![screenshot 10](prompt-assets/010.webp)
 
 Both cores crash even on CPU-only ROM — suspect libdragon IPL3 boot vs emulator CIC handling. Checking libdragon IPL3 variants.
 
 libdragon needs accurate emulation (MI repeat, PI DMA); old cores may choke. Cheap test first: pad ROMs to 2 MB (old cores assume ≥1 MB).
 
-![screenshot 11](prompt-assets/011.jpg)
+![screenshot 11](prompt-assets/011.webp)
 
-![screenshot 12](prompt-assets/012.jpg)
+![screenshot 12](prompt-assets/012.webp)
 
 Same crashes. Checking whether in-app browser is the culprit — testing same page in Chrome.
 
-![screenshot 13](prompt-assets/013.jpg)
+![screenshot 13](prompt-assets/013.webp)
 
 Same crash in Chrome, so it's ROM/core, not browser. Next test: bare-metal ELF (no libdragon runtime) booted by libdragon IPL3 — isolates boot vs runtime.
 
 Bare-metal test ROM built. Running it in both cores.
 
-![screenshot 14](prompt-assets/014.jpg)
+![screenshot 14](prompt-assets/014.webp)
 
-![screenshot 15](prompt-assets/015.jpg)
+![screenshot 15](prompt-assets/015.webp)
 
 Crash identical for every ROM → likely my EmulatorJS options, not ROMs. Testing pure defaults.
 
-![screenshot 16](prompt-assets/016.jpg)
+![screenshot 16](prompt-assets/016.webp)
 
-![screenshot 17](prompt-assets/017.jpg)
+![screenshot 17](prompt-assets/017.webp)
 
 EmulatorJS caches core settings in browser storage — clearing it and retesting defaults.
 
-![screenshot 18](prompt-assets/018.jpg)
+![screenshot 18](prompt-assets/018.webp)
 
 Even bare-metal ROM crashes both cores → suspect libdragon's IPL3 itself on these old cores. Next test: my own trivial IPL3 (PI DMA flat binary → 0x80000400, jump).
 
-![screenshot 19](prompt-assets/019.jpg)
+![screenshot 19](prompt-assets/019.webp)
 
-![screenshot 20](prompt-assets/020.jpg)
+![screenshot 20](prompt-assets/020.webp)
 
 Both cores run with my custom IPL3 — root cause is libdragon's IPL3 on these old cores. Next: try libdragon runtime as flat binary under my IPL3.
 
-![screenshot 21](prompt-assets/021.jpg)
+![screenshot 21](prompt-assets/021.webp)
 
-![screenshot 22](prompt-assets/022.jpg)
+![screenshot 22](prompt-assets/022.webp)
 
-![screenshot 23](prompt-assets/023.jpg)
+![screenshot 23](prompt-assets/023.webp)
 
 No crash now but black — libdragon init likely stuck somewhere. Building probe ROM that paints a raw-VI color per init stage.
 
-![screenshot 24](prompt-assets/024.jpg)
+![screenshot 24](prompt-assets/024.webp)
 
-![screenshot 25](prompt-assets/025.jpg)
+![screenshot 25](prompt-assets/025.webp)
 
-![screenshot 26](prompt-assets/026.jpg)
+![screenshot 26](prompt-assets/026.webp)
 
 Likely cause: parallel_n64 defaults to 4 MB (expansion pak off) while probe/stack use 8 MB. Enabling expansion memory.
 
-![screenshot 27](prompt-assets/027.jpg)
+![screenshot 27](prompt-assets/027.webp)
 
-![screenshot 28](prompt-assets/028.jpg)
+![screenshot 28](prompt-assets/028.webp)
 
 Option applied but still black. Making IPL3 probe real RDRAM size (4 vs 8 MB) instead of assuming 8 MB, and keep probe framebuffer under 4 MB.
 
-![screenshot 29](prompt-assets/029.jpg)
+![screenshot 29](prompt-assets/029.webp)
 
-![screenshot 30](prompt-assets/030.jpg)
+![screenshot 30](prompt-assets/030.webp)
 
-![screenshot 31](prompt-assets/031.jpg)
+![screenshot 31](prompt-assets/031.webp)
 
-![screenshot 32](prompt-assets/032.jpg)
+![screenshot 32](prompt-assets/032.webp)
 
-![screenshot 33](prompt-assets/033.jpg)
+![screenshot 33](prompt-assets/033.webp)
 
-![screenshot 34](prompt-assets/034.jpg)
+![screenshot 34](prompt-assets/034.webp)
 
 Reached constructor(135), hangs in a default-priority libdragon constructor. Listing the ctor table to bisect.
 
 Order after c135: `__joybus_init`, `__rompak_init`, `__n64sys_hwmemset_emucheck`, … Patching ctor table to skip each suspect, one variant per ROM.
 
-![screenshot 35](prompt-assets/035.jpg)
+![screenshot 35](prompt-assets/035.webp)
 
-![screenshot 36](prompt-assets/036.jpg)
+![screenshot 36](prompt-assets/036.webp)
 
-![screenshot 37](prompt-assets/037.jpg)
+![screenshot 37](prompt-assets/037.webp)
 
 Both `__rompak_init` and `__n64sys_hwmemset_emucheck` hang on these cores. Checking what depends on them.
 
 Hypothesis: my IPL3's PI DMA leaves PI interrupt pending → interrupt storm once libdragon enables interrupts. Clearing PI interrupt in IPL3.
 
-![screenshot 38](prompt-assets/038.jpg)
+![screenshot 38](prompt-assets/038.webp)
 
-![screenshot 39](prompt-assets/039.jpg)
+![screenshot 39](prompt-assets/039.webp)
 
 Bare-metal path chosen. Pulling RDP bitfield constants (other modes, combiner) from libdragon headers to get commands right.
 
@@ -172,21 +172,21 @@ Page froze (likely emulator stuck inside RDP work). Building staged debug ROMs: 
 
 In-app browser wedged; switching to Chrome for testing.
 
-![screenshot 40](prompt-assets/040.jpg)
+![screenshot 40](prompt-assets/040.webp)
 
-![screenshot 41](prompt-assets/041.jpg)
+![screenshot 41](prompt-assets/041.webp)
 
 Old hung tab holds the origin's IndexedDB lock. Using `127.0.0.1` (separate origin).
 
 Found it: IPL3 DMAs the image to RDRAM 0x0 but my program is linked at 0x80000400 (libdragon's flat images happened to start at 0x80000000). Fixing IPL3 destination.
 
-![screenshot 42](prompt-assets/042.jpg)
+![screenshot 42](prompt-assets/042.webp)
 
-![screenshot 43](prompt-assets/043.jpg)
+![screenshot 43](prompt-assets/043.webp)
 
 Stage 0 runs: 59 fps, level loaded, player in HANGAR. Trying RDP clear (s1) then world (s2).
 
-![screenshot 44](prompt-assets/044.jpg)
+![screenshot 44](prompt-assets/044.webp)
 
 RDP wait never completes (black, CPU stuck in idle-wait). Probably emulator leaves busy bits set; waiting only on `DPC_CURRENT == DPC_END`, and adding DPC status to debug overlay.
 
@@ -368,25 +368,25 @@ Back at title (my scripted Start/Z presses hit Pause→Abandon). Before more pla
 
 Now writing the real player page (`index.html`): mupen64plus_next/GLideN64, pre-boot options, keyboard + gamepad mapping, click-to-start for audio.
 
-![screenshot 95](prompt-assets/095.jpg)
+![screenshot 95](prompt-assets/095.webp)
 
-![screenshot 96](prompt-assets/096.jpg)
+![screenshot 96](prompt-assets/096.webp)
 
 Player page loads with Start Game button. Clicking it and checking boot.
 
-![screenshot 97](prompt-assets/097.jpg)
+![screenshot 97](prompt-assets/097.webp)
 
 Title runs at 60 fps on the real page. Testing real keyboard input: Enter → briefing → launch, then fly.
 
-![screenshot 98](prompt-assets/098.jpg)
+![screenshot 98](prompt-assets/098.webp)
 
 Keyboard works and gameplay runs ~60 fps here (draw 14 ms). Flying through to the Junction to see robots and combat.
 
-![screenshot 99](prompt-assets/099.jpg)
+![screenshot 99](prompt-assets/099.webp)
 
 In the Junction, getting shot. Backing up and turning to find the drones.
 
-![screenshot 100](prompt-assets/100.jpg)
+![screenshot 100](prompt-assets/100.webp)
 
 Dropped back to the title unexpectedly. Checking whether the game is frozen (crash) or genuinely on the title.
 
@@ -406,13 +406,13 @@ No issue from stick input. Re-running the exact earlier route (into the Junction
 
 Old tab group is gone (hung tabs closed). Continuing in a fresh tab.
 
-![screenshot 104](prompt-assets/104.jpg)
+![screenshot 104](prompt-assets/104.webp)
 
 Chrome tab group keeps vanishing (you may be using Chrome). Switching testing to the in-app browser.
 
-![screenshot 105](prompt-assets/105.jpg)
+![screenshot 105](prompt-assets/105.webp)
 
-![screenshot 106](prompt-assets/106.jpg)
+![screenshot 106](prompt-assets/106.webp)
 
 Running in the in-app browser. Replaying the Junction route with snapshots.
 

@@ -34,19 +34,19 @@ Data checks out: 26 record votes (4 Senate, 22 House), all linked to their amend
 
 Report generated. Checking it in browser.
 
-![screenshot 1](prompt-assets/001.jpg)
+![screenshot 1](prompt-assets/001.webp)
 
-![screenshot 2](prompt-assets/002.jpg)
+![screenshot 2](prompt-assets/002.webp)
 
-![screenshot 3](prompt-assets/003.jpg)
+![screenshot 3](prompt-assets/003.webp)
 
-![screenshot 4](prompt-assets/004.jpg)
+![screenshot 4](prompt-assets/004.webp)
 
-![screenshot 5](prompt-assets/005.jpg)
+![screenshot 5](prompt-assets/005.webp)
 
-![screenshot 6](prompt-assets/006.jpg)
+![screenshot 6](prompt-assets/006.webp)
 
-![screenshot 7](prompt-assets/007.jpg)
+![screenshot 7](prompt-assets/007.webp)
 
 SB17 report renders correctly. Now testing other bills (Senate floor amendments, House-origin bill, older session) to shake out parser edge cases.
 
@@ -58,11 +58,11 @@ Senate voice votes with "deemed" members now captured (HB 2: 18→26 votes, SB 2
 
 All amendments now link to votes (only withdrawn ones lack them). Adding "voice vote, deemed" labeling to the report, then tests and README.
 
-![screenshot 8](prompt-assets/008.jpg)
+![screenshot 8](prompt-assets/008.webp)
 
-![screenshot 9](prompt-assets/009.jpg)
+![screenshot 9](prompt-assets/009.webp)
 
-![screenshot 10](prompt-assets/010.jpg)
+![screenshot 10](prompt-assets/010.webp)
 
 Dark mode fine. Writing unit tests.
 
@@ -74,7 +74,7 @@ Journal HTML markup differs before 2013 (83rd Lege). Adding a fallback parser fo
 
 Tally check passes on all 6 test bills (parsed names match official Yea/Nay counts for every vote). Updating README and adding an old-format test.
 
-![screenshot 11](prompt-assets/011.jpg)
+![screenshot 11](prompt-assets/011.webp)
 
 ## You
 
@@ -143,15 +143,15 @@ Can we update the text changes to look more like a github diff?
 
 Paragraph text works. Now GitHub-style diff renderer.
 
-![screenshot 12](prompt-assets/012.jpg)
+![screenshot 12](prompt-assets/012.webp)
 
-![screenshot 13](prompt-assets/013.jpg)
+![screenshot 13](prompt-assets/013.webp)
 
 Diff renders GitHub-style with word highlights. Checking expand button, styled full text, dark mode.
 
-![screenshot 14](prompt-assets/014.jpg)
+![screenshot 14](prompt-assets/014.webp)
 
-![screenshot 15](prompt-assets/015.jpg)
+![screenshot 15](prompt-assets/015.webp)
 
 Dark mode good. Adding diff tests, regenerating all reports.
 

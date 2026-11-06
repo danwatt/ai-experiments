@@ -50,49 +50,49 @@ Now the page itself (single HTML, inline SVG charts, data inlined by the build s
 
 Page written, data inlined (~50KB). Checking it in the browser.
 
-![screenshot 1](prompt-assets/001.jpg)
+![screenshot 1](prompt-assets/001.webp)
 
-![screenshot 2](prompt-assets/002.jpg)
+![screenshot 2](prompt-assets/002.webp)
 
-![screenshot 3](prompt-assets/003.jpg)
+![screenshot 3](prompt-assets/003.webp)
 
 Page renders clean, no console errors. Fixing layout (Sankey labels clipped at narrow widths); checking again.
 
-![screenshot 4](prompt-assets/004.jpg)
+![screenshot 4](prompt-assets/004.webp)
 
-![screenshot 5](prompt-assets/005.jpg)
+![screenshot 5](prompt-assets/005.webp)
 
-![screenshot 6](prompt-assets/006.jpg)
+![screenshot 6](prompt-assets/006.webp)
 
-![screenshot 7](prompt-assets/007.jpg)
+![screenshot 7](prompt-assets/007.webp)
 
 Main charts working. Now checking the school-meals section.
 
-![screenshot 8](prompt-assets/008.jpg)
+![screenshot 8](prompt-assets/008.webp)
 
-![screenshot 9](prompt-assets/009.jpg)
+![screenshot 9](prompt-assets/009.webp)
 
-![screenshot 10](prompt-assets/010.png)
+![screenshot 10](prompt-assets/010.webp)
 
 Table fine. Making half-width charts use a narrower canvas so text stays legible.
 
-![screenshot 11](prompt-assets/011.jpg)
+![screenshot 11](prompt-assets/011.webp)
 
-![screenshot 12](prompt-assets/012.jpg)
+![screenshot 12](prompt-assets/012.webp)
 
 Meals section looks right. Testing budget mode, per-student/real-dollar toggles, dark mode and phone width.
 
-![screenshot 13](prompt-assets/013.jpg)
+![screenshot 13](prompt-assets/013.webp)
 
-![screenshot 14](prompt-assets/014.jpg)
+![screenshot 14](prompt-assets/014.webp)
 
-![screenshot 15](prompt-assets/015.jpg)
+![screenshot 15](prompt-assets/015.webp)
 
-![screenshot 16](prompt-assets/016.jpg)
+![screenshot 16](prompt-assets/016.webp)
 
 Mobile OK (no horizontal scroll). Final polish, then build/fetch script, landing-page entry and screenshot.
 
-![screenshot 17](prompt-assets/017.png)
+![screenshot 17](prompt-assets/017.webp)
 
 Landing card added. Writing `build/fetch.sh` and a short README so the data can be rebuilt.
 

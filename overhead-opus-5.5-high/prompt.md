@@ -32,87 +32,87 @@ Now main wiring (state, filters, render loop, compass, details).
 
 Modules parse. Launching in browser.
 
-![screenshot 1](prompt-assets/001.jpg)
+![screenshot 1](prompt-assets/001.webp)
 
 Browser render works. Investigating slow/stale backend responses (direct curl is fresh, proxy isn't).
 
 adsb.lol rate-limits anonymous use (60/min, 500/day). Switching default to adsb.fi, adding 429 backoff in server.
 
-![screenshot 2](prompt-assets/002.jpg)
+![screenshot 2](prompt-assets/002.webp)
 
 Map rendering blank after reload; adding debug handle to inspect.
 
-![screenshot 3](prompt-assets/003.jpg)
+![screenshot 3](prompt-assets/003.webp)
 
-![screenshot 4](prompt-assets/004.jpg)
+![screenshot 4](prompt-assets/004.webp)
 
-![screenshot 5](prompt-assets/005.jpg)
+![screenshot 5](prompt-assets/005.webp)
 
-![screenshot 6](prompt-assets/006.png)
+![screenshot 6](prompt-assets/006.webp)
 
-![screenshot 7](prompt-assets/007.png)
+![screenshot 7](prompt-assets/007.webp)
 
-![screenshot 8](prompt-assets/008.png)
+![screenshot 8](prompt-assets/008.webp)
 
-![screenshot 9](prompt-assets/009.png)
+![screenshot 9](prompt-assets/009.webp)
 
-![screenshot 10](prompt-assets/010.png)
+![screenshot 10](prompt-assets/010.webp)
 
-![screenshot 11](prompt-assets/011.png)
+![screenshot 11](prompt-assets/011.webp)
 
 Labels vanish with deck's collision extension; replacing with a simple screen-space declutter.
 
-![screenshot 12](prompt-assets/012.jpg)
+![screenshot 12](prompt-assets/012.webp)
 
-![screenshot 13](prompt-assets/013.jpg)
+![screenshot 13](prompt-assets/013.webp)
 
-![screenshot 14](prompt-assets/014.png)
+![screenshot 14](prompt-assets/014.webp)
 
 2D view working with decluttered labels. Verifying icon heading direction up close.
 
-![screenshot 15](prompt-assets/015.jpg)
+![screenshot 15](prompt-assets/015.webp)
 
-![screenshot 16](prompt-assets/016.png)
+![screenshot 16](prompt-assets/016.webp)
 
-![screenshot 17](prompt-assets/017.jpg)
+![screenshot 17](prompt-assets/017.webp)
 
-![screenshot 18](prompt-assets/018.jpg)
+![screenshot 18](prompt-assets/018.webp)
 
-![screenshot 19](prompt-assets/019.jpg)
+![screenshot 19](prompt-assets/019.webp)
 
-![screenshot 20](prompt-assets/020.png)
+![screenshot 20](prompt-assets/020.webp)
 
 3D meshes render well. Fixing 3D fit centering + helicopter rotor, then testing Sky view, filters, details.
 
-![screenshot 21](prompt-assets/021.jpg)
+![screenshot 21](prompt-assets/021.webp)
 
-![screenshot 22](prompt-assets/022.jpg)
+![screenshot 22](prompt-assets/022.webp)
 
-![screenshot 23](prompt-assets/023.jpg)
+![screenshot 23](prompt-assets/023.webp)
 
-![screenshot 24](prompt-assets/024.jpg)
+![screenshot 24](prompt-assets/024.webp)
 
 Sky dome renders; elevation scale crowds horizon. Switching to sqrt elevation scale + label declutter.
 
-![screenshot 25](prompt-assets/025.jpg)
+![screenshot 25](prompt-assets/025.webp)
 
-![screenshot 26](prompt-assets/026.jpg)
+![screenshot 26](prompt-assets/026.webp)
 
 Sky view good. Testing filters, list, details card, and Live mode.
 
-![screenshot 27](prompt-assets/027.jpg)
+![screenshot 27](prompt-assets/027.webp)
 
 Live and Smooth motion both continuous (no jumps at poll boundaries). Checking 3D fit + rotation.
 
-![screenshot 28](prompt-assets/028.jpg)
+![screenshot 28](prompt-assets/028.webp)
 
-![screenshot 29](prompt-assets/029.jpg)
+![screenshot 29](prompt-assets/029.webp)
 
-![screenshot 30](prompt-assets/030.jpg)
+![screenshot 30](prompt-assets/030.webp)
 
 Mobile layout holds. Resetting viewport, writing README.
 
-![screenshot 31](prompt-assets/031.jpg)
+![screenshot 31](prompt-assets/031.webp)
 
 I've built **Overhead** in `overhead/`. It's no-build like the other experiments, and it's added to `.claude/launch.json` as `overhead` on port 8795. I tested it in the browser against live traffic around a test spot near DFW, and all three data sources returned real aircraft.
 
@@ -162,7 +162,7 @@ Lets add the ability to recenter the map somehow. Right click action on the map 
 
 ## Claude
 
-![screenshot 32](prompt-assets/032.jpg)
+![screenshot 32](prompt-assets/032.webp)
 
 Recenter works from the menu. Checking that a right-drag (rotate) doesn't open the menu.
 
@@ -267,27 +267,27 @@ Your own `server.py` is running on 8795 with the old code, so I'll leave it alon
 
 Results look right now. Checking the visuals.
 
-![screenshot 33](prompt-assets/033.jpg)
+![screenshot 33](prompt-assets/033.webp)
 
 Browser pane is hidden, so animation frames are throttled. Driving the test step by step.
 
-![screenshot 34](prompt-assets/034.jpg)
+![screenshot 34](prompt-assets/034.webp)
 
-![screenshot 35](prompt-assets/035.jpg)
+![screenshot 35](prompt-assets/035.webp)
 
-![screenshot 36](prompt-assets/036.jpg)
+![screenshot 36](prompt-assets/036.webp)
 
-![screenshot 37](prompt-assets/037.jpg)
+![screenshot 37](prompt-assets/037.webp)
 
 Details card, dashed line, and DFW marker all render. Checking 3D and Sky with the same selection.
 
-![screenshot 38](prompt-assets/038.jpg)
+![screenshot 38](prompt-assets/038.webp)
 
-![screenshot 39](prompt-assets/039.jpg)
+![screenshot 39](prompt-assets/039.webp)
 
 Sky labels show routes. The details card covers the selected plane at this small pane size. Quick check of "all aircraft" lines, then cleanup.
 
-![screenshot 40](prompt-assets/040.jpg)
+![screenshot 40](prompt-assets/040.webp)
 
 All modes verified. Cleaning up the temporary test server and updating the README.
 
@@ -357,23 +357,23 @@ Settings + fading done. Moving a shared helper out of mapview, then testing in b
 
 Your server on 8795 is running; testing on a temporary port so your saved settings stay untouched.
 
-![screenshot 41](prompt-assets/041.jpg)
+![screenshot 41](prompt-assets/041.webp)
 
-![screenshot 42](prompt-assets/042.jpg)
+![screenshot 42](prompt-assets/042.webp)
 
-![screenshot 43](prompt-assets/043.png)
+![screenshot 43](prompt-assets/043.webp)
 
-![screenshot 44](prompt-assets/044.png)
+![screenshot 44](prompt-assets/044.webp)
 
 Trails are working; 60 s of a slow plane is just short at that zoom. Zooming in to check the fade visually.
 
-![screenshot 45](prompt-assets/045.png)
+![screenshot 45](prompt-assets/045.webp)
 
-![screenshot 46](prompt-assets/046.png)
+![screenshot 46](prompt-assets/046.webp)
 
 Fade works: the tail fades out, versus a uniform line with fade off. Quick Sky view check, then cleanup.
 
-![screenshot 47](prompt-assets/047.jpg)
+![screenshot 47](prompt-assets/047.webp)
 
 Trail length is now configurable under ⚙ Settings → Display:
 
@@ -447,39 +447,39 @@ Map layers done. Wiring into main: settings, runway watch, sun, heatmap, and the
 
 Wired up. Starting a test server; it's night at DFW now, so I'll simulate daytime sun from the console.
 
-![screenshot 48](prompt-assets/048.jpg)
+![screenshot 48](prompt-assets/048.webp)
 
-![screenshot 49](prompt-assets/049.jpg)
+![screenshot 49](prompt-assets/049.webp)
 
-![screenshot 50](prompt-assets/050.jpg)
+![screenshot 50](prompt-assets/050.webp)
 
 Now checking simulated afternoon sun in 3D: lighting, sky, shadows, and the auto light map.
 
-![screenshot 51](prompt-assets/051.jpg)
+![screenshot 51](prompt-assets/051.webp)
 
-![screenshot 52](prompt-assets/052.jpg)
+![screenshot 52](prompt-assets/052.webp)
 
-![screenshot 53](prompt-assets/053.jpg)
+![screenshot 53](prompt-assets/053.webp)
 
-![screenshot 54](prompt-assets/054.jpg)
+![screenshot 54](prompt-assets/054.webp)
 
-![screenshot 55](prompt-assets/055.jpg)
+![screenshot 55](prompt-assets/055.webp)
 
 Departure from Addison runway 16 is picked up and highlighted, and the sun-cast shadow is visible. Checking the Sky dome with the sun, then the heatmap.
 
-![screenshot 56](prompt-assets/056.jpg)
+![screenshot 56](prompt-assets/056.webp)
 
-![screenshot 57](prompt-assets/057.jpg)
+![screenshot 57](prompt-assets/057.webp)
 
-![screenshot 58](prompt-assets/058.jpg)
+![screenshot 58](prompt-assets/058.webp)
 
-![screenshot 59](prompt-assets/059.jpg)
+![screenshot 59](prompt-assets/059.webp)
 
-![screenshot 60](prompt-assets/060.jpg)
+![screenshot 60](prompt-assets/060.webp)
 
 Text is readable on both. Testing the heatmap in 2D.
 
-![screenshot 61](prompt-assets/061.jpg)
+![screenshot 61](prompt-assets/061.webp)
 
 The heatmap draws flight corridors from 16 minutes of late-night recording, and it fills in as the server runs. Cleaning up and updating the README.
 
@@ -543,89 +543,89 @@ Camera done. Wiring chase controls into the app.
 
 Wired. Testing in the browser.
 
-![screenshot 62](prompt-assets/062.jpg)
+![screenshot 62](prompt-assets/062.webp)
 
-![screenshot 63](prompt-assets/063.jpg)
+![screenshot 63](prompt-assets/063.webp)
 
-![screenshot 64](prompt-assets/064.jpg)
+![screenshot 64](prompt-assets/064.webp)
 
 2D chase works: the plane is centred and nose-up, bearing matches its track, and the HUD shows. Testing 3D.
 
-![screenshot 65](prompt-assets/065.jpg)
+![screenshot 65](prompt-assets/065.webp)
 
-![screenshot 66](prompt-assets/066.jpg)
+![screenshot 66](prompt-assets/066.webp)
 
 Chase camera is moving, but the plane isn't visible. Checking where deck.gl projects it.
 
-![screenshot 67](prompt-assets/067.jpg)
+![screenshot 67](prompt-assets/067.webp)
 
-![screenshot 68](prompt-assets/068.jpg)
+![screenshot 68](prompt-assets/068.webp)
 
-![screenshot 69](prompt-assets/069.jpg)
+![screenshot 69](prompt-assets/069.webp)
 
 My test script deselected the plane before pressing C. Retrying.
 
-![screenshot 70](prompt-assets/070.jpg)
+![screenshot 70](prompt-assets/070.webp)
 
-![screenshot 71](prompt-assets/071.jpg)
+![screenshot 71](prompt-assets/071.webp)
 
 Pixel sizes fixed. Closing the details card currently ends the chase, which would block the view, so during a chase × will just hide the card, with an Info toggle in the HUD.
 
-![screenshot 72](prompt-assets/072.jpg)
+![screenshot 72](prompt-assets/072.webp)
 
-![screenshot 73](prompt-assets/073.jpg)
+![screenshot 73](prompt-assets/073.webp)
 
-![screenshot 74](prompt-assets/074.jpg)
+![screenshot 74](prompt-assets/074.webp)
 
-![screenshot 75](prompt-assets/075.jpg)
+![screenshot 75](prompt-assets/075.webp)
 
-![screenshot 76](prompt-assets/076.jpg)
+![screenshot 76](prompt-assets/076.webp)
 
-![screenshot 77](prompt-assets/077.png)
+![screenshot 77](prompt-assets/077.webp)
 
 The thick band is the drop line from the plane to the ground, which has the same depth issue. Scaling it as well.
 
-![screenshot 78](prompt-assets/078.jpg)
+![screenshot 78](prompt-assets/078.webp)
 
-![screenshot 79](prompt-assets/079.jpg)
+![screenshot 79](prompt-assets/079.webp)
 
-![screenshot 80](prompt-assets/080.png)
+![screenshot 80](prompt-assets/080.webp)
 
-![screenshot 81](prompt-assets/081.png)
+![screenshot 81](prompt-assets/081.webp)
 
-![screenshot 82](prompt-assets/082.jpg)
+![screenshot 82](prompt-assets/082.webp)
 
-![screenshot 83](prompt-assets/083.jpg)
-
-API Error: Your computer went to sleep mid-response. The response above may be incomplete.
+![screenshot 83](prompt-assets/083.webp)
 
 API Error: Your computer went to sleep mid-response. The response above may be incomplete.
 
-![screenshot 84](prompt-assets/084.jpg)
+API Error: Your computer went to sleep mid-response. The response above may be incomplete.
 
-![screenshot 85](prompt-assets/085.jpg)
+![screenshot 84](prompt-assets/084.webp)
 
-![screenshot 86](prompt-assets/086.jpg)
+![screenshot 85](prompt-assets/085.webp)
 
-![screenshot 87](prompt-assets/087.jpg)
+![screenshot 86](prompt-assets/086.webp)
 
-![screenshot 88](prompt-assets/088.jpg)
+![screenshot 87](prompt-assets/087.webp)
+
+![screenshot 88](prompt-assets/088.webp)
 
 Forgot to reload after the edit. Reloading.
 
-![screenshot 89](prompt-assets/089.jpg)
+![screenshot 89](prompt-assets/089.webp)
 
-![screenshot 90](prompt-assets/090.jpg)
+![screenshot 90](prompt-assets/090.webp)
 
-![screenshot 91](prompt-assets/091.jpg)
+![screenshot 91](prompt-assets/091.webp)
 
 Now it looks right: EVA049, a widebody, just departed DFW 17R, seen from behind, with the blue climb-out guide ahead. Testing orbit drag, scroll distance, and Esc.
 
-![screenshot 92](prompt-assets/092.jpg)
+![screenshot 92](prompt-assets/092.webp)
 
-![screenshot 93](prompt-assets/093.jpg)
+![screenshot 93](prompt-assets/093.webp)
 
-![screenshot 94](prompt-assets/094.jpg)
+![screenshot 94](prompt-assets/094.webp)
 
 Orbit works: dragging swung the camera round to a side-on view of the 777. Checking that Esc restores normal map controls.
 
@@ -693,9 +693,9 @@ Wired up. While the recording finishes, updating the README.
 
 About 13 minutes of recording left. Meanwhile I'll test static hosting with the short test recording, served from the repo root the way Pages serves it (under a subfolder).
 
-![screenshot 95](prompt-assets/095.jpg)
+![screenshot 95](prompt-assets/095.webp)
 
-![screenshot 96](prompt-assets/096.jpg)
+![screenshot 96](prompt-assets/096.webp)
 
 It was just tiles still loading; the map fills the view now. Waiting for the full recording to finish.
 
@@ -707,9 +707,9 @@ Demo mode is built and works on static hosting. I'm waiting on the full 15-minut
 
 False alarm: it matched the aircraft model name "Beech 23 Sundowner". There's no owner field. Re-testing the static demo with the full recording.
 
-![screenshot 97](prompt-assets/097.jpg)
+![screenshot 97](prompt-assets/097.webp)
 
-![screenshot 98](prompt-assets/098.jpg)
+![screenshot 98](prompt-assets/098.webp)
 
 Full recording works: 86 aircraft have trails from the start, along with routes and runways in use (DFW south flow), and the morning sun gives the light map. Cleaning up the test server.
 
@@ -742,9 +742,9 @@ Commit and push
 
 Deployed. Verifying the live page.
 
-![screenshot 99](prompt-assets/099.jpg)
+![screenshot 99](prompt-assets/099.webp)
 
-![screenshot 100](prompt-assets/100.jpg)
+![screenshot 100](prompt-assets/100.webp)
 
 Overhead is live in demo mode at **https://danwatt.github.io/ai-experiments/overhead/**.
 
@@ -802,45 +802,45 @@ Renderer done. Now device pose, alignment, and wiring into main.
 
 Wired. Testing against the DFW demo recording, which needs no backend.
 
-![screenshot 101](prompt-assets/101.jpg)
+![screenshot 101](prompt-assets/101.webp)
 
-![screenshot 102](prompt-assets/102.jpg)
+![screenshot 102](prompt-assets/102.webp)
 
-![screenshot 103](prompt-assets/103.jpg)
+![screenshot 103](prompt-assets/103.webp)
 
-![screenshot 104](prompt-assets/104.jpg)
+![screenshot 104](prompt-assets/104.webp)
 
-![screenshot 105](prompt-assets/105.jpg)
+![screenshot 105](prompt-assets/105.webp)
 
-![screenshot 106](prompt-assets/106.jpg)
+![screenshot 106](prompt-assets/106.webp)
 
 Looks right: arrivals labelled "Lands 17L in 1:27", "in view 1:00" arrows, and runway numbers on the horizon. One bug: a plane at touchdown shows "-1:-1" in the strip. Making it say "landing".
 
 Testing the phone-pose maths with a synthetic orientation event: tablet upright, rotated to face west, tilted up 5°.
 
-![screenshot 107](prompt-assets/107.jpg)
+![screenshot 107](prompt-assets/107.webp)
 
-![screenshot 108](prompt-assets/108.jpg)
+![screenshot 108](prompt-assets/108.webp)
 
 The browser pane refuses compass permission, so I'm checking the pose maths directly in Node instead.
 
 The pose maths checks out: upright facing north gives 0°, turned left gives 270°, tilting changes pitch, and landscape holds work. Checking the phone layout.
 
-![screenshot 109](prompt-assets/109.jpg)
+![screenshot 109](prompt-assets/109.webp)
 
-![screenshot 110](prompt-assets/110.jpg)
+![screenshot 110](prompt-assets/110.webp)
 
 Portrait phone layout works. On narrow screens the zoom/Align buttons overlap the heading readout and the compass covers the strip, so tightening that.
 
-![screenshot 111](prompt-assets/111.jpg)
+![screenshot 111](prompt-assets/111.webp)
 
-![screenshot 112](prompt-assets/112.jpg)
+![screenshot 112](prompt-assets/112.webp)
 
 Phone layout is clean. Checking that switching back to 2D still works, then cleaning up.
 
-![screenshot 113](prompt-assets/113.jpg)
+![screenshot 113](prompt-assets/113.webp)
 
-![screenshot 114](prompt-assets/114.jpg)
+![screenshot 114](prompt-assets/114.webp)
 
 2D is back, still facing the same direction as the spotter view. Cleaning up and documenting.
 
@@ -880,11 +880,11 @@ Commit and push
 
 ## Claude
 
-![screenshot 115](prompt-assets/115.jpg)
+![screenshot 115](prompt-assets/115.webp)
 
-![screenshot 116](prompt-assets/116.jpg)
+![screenshot 116](prompt-assets/116.webp)
 
-![screenshot 117](prompt-assets/117.jpg)
+![screenshot 117](prompt-assets/117.webp)
 
 The spotter view is live at **https://danwatt.github.io/ai-experiments/overhead/** — tap **Spot** or press `4`.
 
@@ -909,49 +909,49 @@ Now drawing the buildings in the spotter view, depth-sorted with the aircraft so
 
 Buildings render now. Testing on the demo.
 
-![screenshot 118](prompt-assets/118.jpg)
+![screenshot 118](prompt-assets/118.webp)
 
-![screenshot 119](prompt-assets/119.jpg)
+![screenshot 119](prompt-assets/119.webp)
 
-![screenshot 120](prompt-assets/120.jpg)
+![screenshot 120](prompt-assets/120.webp)
 
-![screenshot 121](prompt-assets/121.jpg)
+![screenshot 121](prompt-assets/121.webp)
 
-![screenshot 122](prompt-assets/122.jpg)
+![screenshot 122](prompt-assets/122.webp)
 
-![screenshot 123](prompt-assets/123.jpg)
+![screenshot 123](prompt-assets/123.webp)
 
 Zero buildings were collected. Debugging the footprint query directly.
 
-![screenshot 124](prompt-assets/124.jpg)
+![screenshot 124](prompt-assets/124.webp)
 
-![screenshot 125](prompt-assets/125.jpg)
+![screenshot 125](prompt-assets/125.webp)
 
-![screenshot 126](prompt-assets/126.jpg)
+![screenshot 126](prompt-assets/126.webp)
 
 No buildings yet. The browser pane is hidden, which throttles map rendering, so each grid step waits out its 6-second timeout. Giving it more time.
 
 The direct query works, returning 137 buildings with heights. The real bug: on startup the collection ran before the map style had loaded, found no tile source, and never retried. Fixing that.
 
-![screenshot 127](prompt-assets/127.jpg)
+![screenshot 127](prompt-assets/127.webp)
 
-![screenshot 128](prompt-assets/128.jpg)
+![screenshot 128](prompt-assets/128.webp)
 
 Down to 779 buildings (about 9,600 vertices) within 5 km. Taking a look.
 
-![screenshot 129](prompt-assets/129.jpg)
+![screenshot 129](prompt-assets/129.webp)
 
-![screenshot 130](prompt-assets/130.jpg)
+![screenshot 130](prompt-assets/130.webp)
 
-![screenshot 131](prompt-assets/131.jpg)
+![screenshot 131](prompt-assets/131.webp)
 
-![screenshot 132](prompt-assets/132.jpg)
+![screenshot 132](prompt-assets/132.webp)
 
 Buildings show in the spotter view: the terminal skyline across the field, with the tall Terminal D hotel in the middle, shaded by the sun and drawn over the runway line. Checking the 3D map.
 
-![screenshot 133](prompt-assets/133.jpg)
+![screenshot 133](prompt-assets/133.webp)
 
-![screenshot 134](prompt-assets/134.jpg)
+![screenshot 134](prompt-assets/134.webp)
 
 The 3D map now shows DFW's terminals extruded, with active runways tinted and aircraft on approach. Cleaning up and documenting.
 
@@ -988,19 +988,19 @@ Commit and push
 
 ## Claude
 
-![screenshot 135](prompt-assets/135.jpg)
+![screenshot 135](prompt-assets/135.webp)
 
-![screenshot 136](prompt-assets/136.jpg)
+![screenshot 136](prompt-assets/136.webp)
 
-![screenshot 137](prompt-assets/137.jpg)
+![screenshot 137](prompt-assets/137.webp)
 
 Opening straight into Spot now faces 141° toward the airport after the buildings load. Deploying.
 
-![screenshot 138](prompt-assets/138.jpg)
+![screenshot 138](prompt-assets/138.webp)
 
 The deployed files have the fix, but the page is still running older JavaScript from the browser cache (GitHub Pages lets browsers cache for 10 minutes). Trying a hard reload.
 
-![screenshot 139](prompt-assets/139.jpg)
+![screenshot 139](prompt-assets/139.webp)
 
 The hard reload didn't take in this pane. Browsers pick up the new files within 10 minutes of a deploy, so I'll re-check the live page then.
 
@@ -1011,7 +1011,7 @@ Founders' Plaza default and 3D buildings are committed and deployed (`16f8d05`),
 
 Locally, with the same code, opening straight into Spot faces 141° toward DFW with 779 buildings loaded. The live page in my browser is still running the previous JavaScript from its 10-minute cache, so I'll re-check it in about 11 minutes. If you open it before then and it faces north, a hard refresh fixes it.
 
-![screenshot 140](prompt-assets/140.jpg)
+![screenshot 140](prompt-assets/140.webp)
 
 The live site at **https://danwatt.github.io/ai-experiments/overhead/** now has the fix. I re-checked after the browser cache expired:
 
@@ -1026,9 +1026,9 @@ Let’s remove shadows from 3d view
 
 ## Claude
 
-![screenshot 141](prompt-assets/141.jpg)
+![screenshot 141](prompt-assets/141.webp)
 
-![screenshot 142](prompt-assets/142.jpg)
+![screenshot 142](prompt-assets/142.webp)
 
 No shadow layers are left in 3D; the aircraft, drop lines, labels and trails are unchanged, with no console errors. Cleaning up.
 
@@ -1120,39 +1120,39 @@ Flight-level filter in place. Now the night-brightness option.
 
 Testing all three on the demo.
 
-![screenshot 143](prompt-assets/143.jpg)
+![screenshot 143](prompt-assets/143.webp)
 
-![screenshot 144](prompt-assets/144.jpg)
+![screenshot 144](prompt-assets/144.webp)
 
-![screenshot 145](prompt-assets/145.jpg)
+![screenshot 145](prompt-assets/145.webp)
 
-![screenshot 146](prompt-assets/146.jpg)
+![screenshot 146](prompt-assets/146.webp)
 
-![screenshot 147](prompt-assets/147.jpg)
+![screenshot 147](prompt-assets/147.webp)
 
-![screenshot 148](prompt-assets/148.jpg)
+![screenshot 148](prompt-assets/148.webp)
 
-![screenshot 149](prompt-assets/149.jpg)
+![screenshot 149](prompt-assets/149.webp)
 
 The basemap was still switching to night in the first shot. Taking a closer comparison on one aircraft.
 
-![screenshot 150](prompt-assets/150.jpg)
+![screenshot 150](prompt-assets/150.webp)
 
-![screenshot 151](prompt-assets/151.png)
+![screenshot 151](prompt-assets/151.webp)
 
-![screenshot 152](prompt-assets/152.jpg)
+![screenshot 152](prompt-assets/152.webp)
 
-![screenshot 153](prompt-assets/153.png)
+![screenshot 153](prompt-assets/153.webp)
 
 The plane is high above this view. Using chase mode to put it in the middle of the screen.
 
-![screenshot 154](prompt-assets/154.jpg)
+![screenshot 154](prompt-assets/154.webp)
 
-![screenshot 155](prompt-assets/155.png)
+![screenshot 155](prompt-assets/155.webp)
 
-![screenshot 156](prompt-assets/156.jpg)
+![screenshot 156](prompt-assets/156.webp)
 
-![screenshot 157](prompt-assets/157.png)
+![screenshot 157](prompt-assets/157.webp)
 
 Clear difference: with the option off, the aircraft at night is a dark, muddy shape; with it on, it's bright and readable. Cleaning up.
 

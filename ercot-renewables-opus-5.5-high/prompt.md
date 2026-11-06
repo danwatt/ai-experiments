@@ -24,61 +24,61 @@ Data verified against ERCOT's published annual shares (e.g. 2024 wind 24%, solar
 
 Page built; checking it in browser.
 
-![screenshot 1](prompt-assets/001.jpg)
+![screenshot 1](prompt-assets/001.webp)
 
-![screenshot 2](prompt-assets/002.jpg)
+![screenshot 2](prompt-assets/002.webp)
 
-![screenshot 3](prompt-assets/003.jpg)
+![screenshot 3](prompt-assets/003.webp)
 
 Charts render, no console errors. Checking details (axis labels, heatmap, dark mode, mobile).
 
-![screenshot 4](prompt-assets/004.png)
+![screenshot 4](prompt-assets/004.webp)
 
-![screenshot 5](prompt-assets/005.jpg)
+![screenshot 5](prompt-assets/005.webp)
 
-![screenshot 6](prompt-assets/006.jpg)
+![screenshot 6](prompt-assets/006.webp)
 
-![screenshot 7](prompt-assets/007.jpg)
+![screenshot 7](prompt-assets/007.webp)
 
-![screenshot 8](prompt-assets/008.jpg)
+![screenshot 8](prompt-assets/008.webp)
 
-![screenshot 9](prompt-assets/009.jpg)
+![screenshot 9](prompt-assets/009.webp)
 
-![screenshot 10](prompt-assets/010.jpg)
+![screenshot 10](prompt-assets/010.webp)
 
 Mobile: sticky filter bar too tall, x-axis years crowd. Fixing.
 
-![screenshot 11](prompt-assets/011.jpg)
+![screenshot 11](prompt-assets/011.webp)
 
-![screenshot 12](prompt-assets/012.jpg)
+![screenshot 12](prompt-assets/012.webp)
 
-![screenshot 13](prompt-assets/013.jpg)
+![screenshot 13](prompt-assets/013.webp)
 
-![screenshot 14](prompt-assets/014.jpg)
+![screenshot 14](prompt-assets/014.webp)
 
-![screenshot 15](prompt-assets/015.jpg)
+![screenshot 15](prompt-assets/015.webp)
 
-![screenshot 16](prompt-assets/016.jpg)
+![screenshot 16](prompt-assets/016.webp)
 
-![screenshot 17](prompt-assets/017.jpg)
+![screenshot 17](prompt-assets/017.webp)
 
-![screenshot 18](prompt-assets/018.jpg)
+![screenshot 18](prompt-assets/018.webp)
 
-![screenshot 19](prompt-assets/019.jpg)
+![screenshot 19](prompt-assets/019.webp)
 
-![screenshot 20](prompt-assets/020.jpg)
+![screenshot 20](prompt-assets/020.webp)
 
-![screenshot 21](prompt-assets/021.jpg)
+![screenshot 21](prompt-assets/021.webp)
 
-![screenshot 22](prompt-assets/022.jpg)
+![screenshot 22](prompt-assets/022.webp)
 
 Mobile layout good; fixing a clipped line label, then testing hover/click.
 
-![screenshot 23](prompt-assets/023.jpg)
+![screenshot 23](prompt-assets/023.webp)
 
-![screenshot 24](prompt-assets/024.png)
+![screenshot 24](prompt-assets/024.webp)
 
-![screenshot 25](prompt-assets/025.jpg)
+![screenshot 25](prompt-assets/025.webp)
 
 Hover tooltip, focus marker and click-to-focus all work. Adding landing-page card next.
 
@@ -151,31 +151,31 @@ Battery numbers check out (Aug discharge peak 0.2 GW in 2022, 9.9 GW in 2026). N
 
 Colors validated (ordinal blue ramp, newest year darkest in light / brightest in dark). Adding the card now.
 
-![screenshot 27](prompt-assets/027.jpg)
+![screenshot 27](prompt-assets/027.webp)
 
-![screenshot 28](prompt-assets/028.jpg)
+![screenshot 28](prompt-assets/028.webp)
 
 Chart renders. Checking "minus batteries" view, hover, and summer.
 
-![screenshot 29](prompt-assets/029.jpg)
+![screenshot 29](prompt-assets/029.webp)
 
-![screenshot 30](prompt-assets/030.jpg)
+![screenshot 30](prompt-assets/030.webp)
 
-![screenshot 31](prompt-assets/031.jpg)
+![screenshot 31](prompt-assets/031.webp)
 
-![screenshot 32](prompt-assets/032.jpg)
+![screenshot 32](prompt-assets/032.webp)
 
-![screenshot 33](prompt-assets/033.jpg)
+![screenshot 33](prompt-assets/033.webp)
 
 Desktop, dark mode and toggles all work. Fixing crowded time labels on phone width.
 
-![screenshot 34](prompt-assets/034.jpg)
+![screenshot 34](prompt-assets/034.webp)
 
-![screenshot 35](prompt-assets/035.jpg)
+![screenshot 35](prompt-assets/035.webp)
 
 Mobile good now. Final desktop check, then update landing-page blurb and prompt.md.
 
-![screenshot 36](prompt-assets/036.jpg)
+![screenshot 36](prompt-assets/036.webp)
 
 I added the duck curve section to the ERCOT page. No new download was needed: the workbooks I was already using have 15-minute data, and batteries show up in them as "Other" (discharging) and "WSL" (charging). It works at desktop and phone widths, in light and dark mode, with no console errors. Nothing is committed yet.
 
@@ -218,45 +218,45 @@ Lets do this.... lets focus just on the demand curve. Produce an annotated anima
 
 ## Claude
 
-![screenshot 37](prompt-assets/037.jpg)
+![screenshot 37](prompt-assets/037.webp)
 
-![screenshot 38](prompt-assets/038.png)
+![screenshot 38](prompt-assets/038.webp)
 
-![screenshot 39](prompt-assets/039.png)
+![screenshot 39](prompt-assets/039.webp)
 
-![screenshot 40](prompt-assets/040.png)
+![screenshot 40](prompt-assets/040.webp)
 
 Story scenes 1–4 render correctly. Checking 5–7 now, after fixing where the wind label sits.
 
-![screenshot 41](prompt-assets/041.png)
+![screenshot 41](prompt-assets/041.webp)
 
-![screenshot 42](prompt-assets/042.png)
+![screenshot 42](prompt-assets/042.webp)
 
-![screenshot 43](prompt-assets/043.png)
+![screenshot 43](prompt-assets/043.webp)
 
-![screenshot 44](prompt-assets/044.png)
+![screenshot 44](prompt-assets/044.webp)
 
-![screenshot 45](prompt-assets/045.png)
+![screenshot 45](prompt-assets/045.webp)
 
-![screenshot 46](prompt-assets/046.png)
+![screenshot 46](prompt-assets/046.webp)
 
 Summer and dark mode work. Checking phone width.
 
-![screenshot 47](prompt-assets/047.jpg)
+![screenshot 47](prompt-assets/047.webp)
 
-![screenshot 48](prompt-assets/048.jpg)
+![screenshot 48](prompt-assets/048.webp)
 
-![screenshot 49](prompt-assets/049.png)
+![screenshot 49](prompt-assets/049.webp)
 
-![screenshot 50](prompt-assets/050.png)
+![screenshot 50](prompt-assets/050.webp)
 
 Phone layout clean now. Checking that autoplay advances and pause holds.
 
 Autoplay, pause and resume all behave. Linking it in.
 
-![screenshot 51](prompt-assets/051.png)
+![screenshot 51](prompt-assets/051.webp)
 
-![screenshot 52](prompt-assets/052.png)
+![screenshot 52](prompt-assets/052.webp)
 
 I built the animated explainer as a new page: `ercot-renewables-opus-5.5-high/duck.html`. It walks through the demand curve in 7 annotated steps, playing on its own with Back, Pause and Next buttons, a progress bar, and buttons to jump to any step. I checked it at desktop and phone widths, in light and dark mode, and confirmed autoplay advances and pause/resume hold. Nothing is committed yet.
 
@@ -306,9 +306,9 @@ Fourteen clips, 888 KB in total, mono Opus at 24 kbps. Wiring the optional voice
 
 Voiceover plays and drives the progress bar. Checking that pause holds and the next step starts when the clip ends.
 
-![screenshot 53](prompt-assets/053.jpg)
+![screenshot 53](prompt-assets/053.webp)
 
-![screenshot 54](prompt-assets/054.jpg)
+![screenshot 54](prompt-assets/054.webp)
 
 The explainer now has an optional voiceover in the Heart voice. It's off by default and turned on with the "Voiceover" button next to Back / Pause / Next. I tested it in the built-in browser (Chromium) only; I haven't tried Safari. I also couldn't listen to the clips, so how Heart pronounces the times (like "5:45") and the decimals is unchecked. Nothing is committed yet.
 
@@ -386,16 +386,16 @@ Build both
 
 ## Claude
 
-![screenshot 55](prompt-assets/055.jpg)
+![screenshot 55](prompt-assets/055.webp)
 
-![screenshot 56](prompt-assets/056.jpg)
+![screenshot 56](prompt-assets/056.webp)
 
-![screenshot 57](prompt-assets/057.jpg)
+![screenshot 57](prompt-assets/057.webp)
 
-![screenshot 58](prompt-assets/058.jpg)
+![screenshot 58](prompt-assets/058.webp)
 
-![screenshot 59](prompt-assets/059.jpg)
+![screenshot 59](prompt-assets/059.webp)
 
-![screenshot 60](prompt-assets/060.jpg)
+![screenshot 60](prompt-assets/060.webp)
 
 Both price charts are verified at phone width too. Updating the landing-page blurb and prompt.md.

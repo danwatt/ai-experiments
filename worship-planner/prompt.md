@@ -12,13 +12,13 @@ Build for me a ui mockup for a worship planner. The focus is on the order of a s
 
 ## Claude
 
-![screenshot 1](prompt-assets/001.jpg)
+![screenshot 1](prompt-assets/001.webp)
 
 Mockup built; checking desktop render once.
 
-![screenshot 2](prompt-assets/002.jpg)
+![screenshot 2](prompt-assets/002.webp)
 
-![screenshot 3](prompt-assets/003.jpg)
+![screenshot 3](prompt-assets/003.webp)
 
 Fixes applied. Publishing.
 
@@ -69,29 +69,29 @@ Rewriting the file.
 
 Main script written. Merging it in and checking the render once.
 
-![screenshot 4](prompt-assets/004.jpg)
+![screenshot 4](prompt-assets/004.webp)
 
-![screenshot 5](prompt-assets/005.jpg)
+![screenshot 5](prompt-assets/005.webp)
 
-![screenshot 6](prompt-assets/006.jpg)
+![screenshot 6](prompt-assets/006.webp)
 
 Preview pane only shows a static snapshot, so I'm starting a small local server to test the interactive desktop view.
 
 Adding a matching entry to the root launch config for this mockup.
 
-![screenshot 7](prompt-assets/007.jpg)
+![screenshot 7](prompt-assets/007.webp)
 
-![screenshot 8](prompt-assets/008.jpg)
+![screenshot 8](prompt-assets/008.webp)
 
-![screenshot 9](prompt-assets/009.jpg)
+![screenshot 9](prompt-assets/009.webp)
 
 Center column too cramped at laptop widths. Widening it.
 
-![screenshot 10](prompt-assets/010.jpg)
+![screenshot 10](prompt-assets/010.webp)
 
-![screenshot 11](prompt-assets/011.jpg)
+![screenshot 11](prompt-assets/011.webp)
 
-![screenshot 12](prompt-assets/012.jpg)
+![screenshot 12](prompt-assets/012.webp)
 
 Features check out. Republishing.
 
@@ -142,15 +142,15 @@ Assembling the new page. Fixing a token-table syntax slip in the build script.
 
 Now add link from original page, then test in browser.
 
-![screenshot 13](prompt-assets/013.jpg)
+![screenshot 13](prompt-assets/013.webp)
 
 Mostly right. The stats text wraps inside the command bar, so I'm moving it into the caption line.
 
-![screenshot 14](prompt-assets/014.jpg)
+![screenshot 14](prompt-assets/014.webp)
 
-![screenshot 15](prompt-assets/015.jpg)
+![screenshot 15](prompt-assets/015.webp)
 
-![screenshot 16](prompt-assets/016.jpg)
+![screenshot 16](prompt-assets/016.webp)
 
 Checks pass. Publishing both pages to the same artifact.
 
@@ -207,7 +207,7 @@ Looking good. Lets make the following tweaks.
 
 I'll apply all four to both pages. They're facts about how your congregation does things, not styling choices. The Fluent page is rebuilt from the original's shared code, so fixing the data in one place covers both.
 
-![screenshot 17](prompt-assets/017.jpg)
+![screenshot 17](prompt-assets/017.webp)
 
 Both pages load clean with all four changes. Republishing.
 
