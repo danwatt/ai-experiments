@@ -29,19 +29,7 @@
     .stats { display: flex; gap: 32px; flex-wrap: wrap; margin-top: 28px; font: 500 13px "JetBrains Mono", monospace; color: var(--ink-2); }
     .stats b { display: block; font: 600 28px Fraunces, serif; color: var(--ink); }
 
-    /* Filmstrip hero */
-    .feature { padding-block: 40px 8px; }
     img { height: auto; }
-    .feature-head { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; flex-wrap: wrap; }
-    .feature h2 { font: 600 30px/1.1 Fraunces, serif; margin: 0; }
-    .feature p { margin: 6px 0 0; color: var(--ink-2); }
-    .hint { font: 12px "JetBrains Mono", monospace; color: var(--ink-2); }
-    .strip { display: grid; grid-auto-flow: column; grid-auto-columns: 220px; gap: 14px; overflow-x: auto; padding: 20px 0 18px; scroll-snap-type: x mandatory; }
-    .frame { scroll-snap-align: start; text-decoration: none; background: var(--card); border: 1px solid var(--rule); border-radius: 6px; padding: 8px 8px 10px; transition: transform .15s, box-shadow .15s; }
-    .frame:hover { transform: translateY(-3px) rotate(-.4deg); box-shadow: 0 10px 24px -12px rgba(0,0,0,.35); }
-    .frame img { width: 100%; aspect-ratio: 8/5; object-fit: cover; border-radius: 3px; display: block; background: var(--paper-2); }
-    .frame .plat { font: 600 15px Fraunces, serif; margin-top: 8px; }
-    .frame .meta { font: 11px "JetBrains Mono", monospace; color: var(--ink-2); }
 
     /* Filters */
     .filters { position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--paper) 92%, transparent); backdrop-filter: blur(6px); border-block: 1px solid var(--rule); padding: 12px 0; margin-top: 24px; }
@@ -89,18 +77,6 @@
     </div>
   </header>
 
-  <div class="wrap feature">
-    <div class="feature-head">
-      <div>
-        <h2>One prompt, many machines</h2>
-        <p>Hex 2048, rebuilt by different models, then ported down to the Game Boy, DOS, PlayStation and more obscure
-          platforms just to see what the models can do.</p>
-      </div>
-      <span class="hint">scroll →</span>
-    </div>
-    <div class="strip" id="strip"></div>
-  </div>
-
   <nav class="filters" aria-label="Filter by model"><div class="wrap" id="filters"><span>Model</span></div></nav>
 
   <main class="wrap" id="chapters"></main>
@@ -117,13 +93,6 @@
     const prompts = DEMOS.filter(d => (d.links || []).some(l => l[0] === "prompt")).length;
     document.getElementById("stats").innerHTML =
       `<div><b>${DEMOS.length}</b>demos</div><div><b>${models.length}</b>models</div><div><b>${prompts}</b>with prompts</div><div><b>${Object.keys(SECTIONS).length}</b>chapters</div>`;
-
-    document.getElementById("strip").innerHTML = DEMOS.filter(d => d.s === "2048").map(d => `
-      <a class="frame" href="${d.href}">
-        <img src="${d.img}" alt="" loading="lazy" width="640" height="400">
-        <div class="plat">${esc(d.platform === "Browser" ? d.model : d.platform)}</div>
-        <div class="meta">${esc([d.model, d.effort].filter(Boolean).join(" · ") || "—")}</div>
-      </a>`).join("");
 
     const filters = document.getElementById("filters");
     ["All", ...models].forEach((m, i) => {

@@ -1,6 +1,6 @@
 // Landing-page cards, rendered by index.html. One entry per card, grouped by section key `s` (see SECTIONS).
 // t: title, href: demo link, img: screenshot (null for none), d: description, links: [[label, href], ...].
-// model/effort left null where the repo doesn't record them. platform: shown in the Hex 2048 strip.
+// model/effort left null where the repo doesn't record them. platform: target machine (not rendered).
 window.DEMOS = [
   // Hex 2048: same prompt, many models / platforms
   { s: "2048", t: "Opus 5.5 · max", href: "games/2048-opus-5.5-max/", img: "screenshots/games/2048-opus-5.5-max.webp", d: "Hex 2048, highest effort.", model: "Opus 5.5", effort: "max", platform: "Browser" },
@@ -20,12 +20,14 @@ window.DEMOS = [
   { s: "games", t: "Cinder Six", href: "games/cinder-six-gpt-6.1-sol-high/", img: "screenshots/games/cinder-six-gpt-6.1-sol-high.webp", d: "A 6DOF Three.js mine shooter: 14 rooms, three robot types, lava, a red-key reactor lock, and an exploration automap.", model: "GPT 6.1 Sol", effort: "high", links: [["prompt", "games/cinder-six-gpt-6.1-sol-high/prompt.html"], ["README", "games/cinder-six-gpt-6.1-sol-high/README.html"]] },
   { s: "games", t: "Hex Bastion", href: "games/td-opus-5.5-high/", img: "screenshots/games/td-opus-5.5-high.webp", d: "Tower defense on a hex grid.", model: "Opus 5.5", effort: "high" },
   { s: "games", t: "Hex Highlands TD", href: "games/3dtd-opus-5.5-uiltra/", img: "screenshots/games/3dtd-opus-5.5-uiltra.webp", d: "3D tower defense on a hex grid.", model: "Opus 5.5", effort: "ultra", links: [["prompt", "games/3dtd-opus-5.5-uiltra/prompt.html"]] },
-  { s: "games", t: "Fact Rocket", href: "games/fact-rocket/", img: "screenshots/games/fact-rocket.webp", d: "Fly a rocket by answering math facts.", model: null, effort: null, links: [["prompt", "games/fact-rocket/prompt.html"]] },
-  { s: "games", t: "Number Garden", href: "games/math-garden/", img: "screenshots/games/math-garden.webp", d: "A little practice, a lot of growth. Addition and subtraction rounds.", model: null, effort: null },
   { s: "games", t: "Hohmann Works", href: "games/hohmann-works/", img: "screenshots/games/hohmann-works.webp", d: "Orbital logistics: build stations and orbits.", model: null, effort: null },
   { s: "games", t: "Sixfold", href: "games/sixfold-opus-5.5-medium/", img: "screenshots/games/sixfold-opus-5.5-medium.webp", d: "6DOF tunnel shooter in a mine built from deformed cubes. Three.js.", model: "Opus 5.5", effort: "medium", links: [["prompt", "games/sixfold-opus-5.5-medium/prompt.html"]] },
   { s: "games", t: "Hexahedron", href: "games/hexahedron-opus-5.5/", img: "screenshots/games/hexahedron-opus-5.5.webp", d: "6DOF mine run: red key, lava cavern, reactor, escape timer and an automap. Three.js.", model: "Opus 5.5", effort: null, links: [["prompt", "games/hexahedron-opus-5.5/prompt.html"]] },
   { s: "games", t: "Hexahedron 64", href: "games/hexahedron-n64-opus-5.5/", img: "screenshots/games/hexahedron-n64-opus-5.5.webp", d: "Hexahedron's three missions as a bare-metal N64 ROM: CPU-built RDP command lists, portal culling, three robot types, three weapons. Runs in mupen64plus-next via EmulatorJS.", model: "Opus 5.5", effort: null, platform: "Nintendo 64", links: [["prompt", "games/hexahedron-n64-opus-5.5/prompt.html"], ["README", "games/hexahedron-n64-opus-5.5/README.html"], [".z64 ROM", "games/hexahedron-n64-opus-5.5/hexahedron64.z64"]] },
+
+  // Educational tools
+  { s: "edu", t: "Fact Rocket", href: "games/fact-rocket/", img: "screenshots/games/fact-rocket.webp", d: "Fly a rocket by answering math facts.", model: null, effort: null, links: [["prompt", "games/fact-rocket/prompt.html"]] },
+  { s: "edu", t: "Number Garden", href: "games/math-garden/", img: "screenshots/games/math-garden.webp", d: "A little practice, a lot of growth. Addition and subtraction rounds.", model: null, effort: null },
 
   // Worship planner mockups
   { s: "worship", t: "Lectern", href: "worship-planner/", img: "screenshots/projects/worship-planner.webp", d: "Original planner.", model: null, effort: null, links: [["Fluent variant", "worship-planner/fluent.html"], ["prompt", "worship-planner/prompt.html"]] },
@@ -49,8 +51,9 @@ window.DEMOS = [
 ];
 
 window.SECTIONS = {
-  "2048": { name: "Hex 2048 variants", blurb: "Same prompt, different models, effort levels and machines." },
+  "2048": { name: "Hex 2048 variants", blurb: "Simple game, same prompt, different models, effort levels and machines to see what is possible." },
   games: { name: "Games & toys" },
+  edu: { name: "Educational tools" },
   worship: { name: "Worship planner mockups", blurb: "UI prototypes for a worship planner, spawned out of an idea from some friends." },
   data: { name: "Data & analysis" },
   tools: { name: "Tools", blurb: "Python projects; the README says how to run them." },
