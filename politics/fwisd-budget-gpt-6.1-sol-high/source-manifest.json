@@ -1,0 +1,182 @@
+[
+  {
+    "id": "adopted-2026",
+    "kind": "adopted",
+    "year": 2026,
+    "label": "2026-2027 Adopted Budget",
+    "url": "https://resources.finalsite.net/images/v1788960567/fwisdorg/bdl4intfjapmqjieutly/2026-27AdoptedBudget_TaxRateCalc.pdf",
+    "index_url": "https://www.fwisd.org/departments/budget/budget-documents/adopted-budgets",
+    "sha256": "a2a39cf54b9685b6319d7af532225b7bc75fd144e15da38257b080dfc9444a62",
+    "pdf_pages": 7
+  },
+  {
+    "id": "adopted-2025",
+    "kind": "adopted",
+    "year": 2025,
+    "label": "2025-2026 Adopted Budget",
+    "url": "https://resources.finalsite.net/images/v1788962831/fwisdorg/dneribvrvtk2nytjwb6j/2025-26AdoptedBudget_TaxRateCalc_1.pdf",
+    "index_url": "https://www.fwisd.org/departments/budget/budget-documents/adopted-budgets",
+    "sha256": "6bec9b1b35040284a3728d19d1f3989f5efc56768b0caf2c7c925ffddac61cb1",
+    "pdf_pages": 7
+  },
+  {
+    "id": "adopted-2024",
+    "kind": "adopted",
+    "year": 2024,
+    "label": "2024-2025 Adopted Budget",
+    "url": "https://resources.finalsite.net/images/v1788962847/fwisdorg/fvtdqznl0ww41zxazhem/2024-25AdoptedBudget_TaxRateCalc_3.pdf",
+    "index_url": "https://www.fwisd.org/departments/budget/budget-documents/adopted-budgets",
+    "sha256": "7402e211024726ac9e6a5d036abc3fd22c4fcf2af500e4bff479f8c986918c7f",
+    "pdf_pages": 6
+  },
+  {
+    "id": "adopted-2023",
+    "kind": "adopted",
+    "year": 2023,
+    "label": "2023-2024 Adopted Budget",
+    "url": "https://resources.finalsite.net/images/v1717012991/fwisdorg/tvqbkbbs3zer1zg6lz0i/2023-24_Adopted_Budget_TaxRateCalc.pdf",
+    "index_url": "https://www.fwisd.org/departments/budget/budget-documents/adopted-budgets",
+    "sha256": "7895c3486b3871705fe824a009c98c09627ce93d5115e56c387b54a5f528b1d5",
+    "pdf_pages": 6
+  },
+  {
+    "id": "book-2025",
+    "kind": "book",
+    "year": 2025,
+    "label": "2025 - 2026 Budget Book",
+    "url": "https://resources.finalsite.net/images/v1749736861/fwisdorg/ako9zizlxvoddtyg9etv/Budget_Book_2025-2026.pdf",
+    "index_url": "https://www.fwisd.org/departments/budget/budget-documents/official-budget-books",
+    "sha256": "1af969dfc58120088b4b66906874d491a91baad2ba49faeb34265028ed078803",
+    "pdf_pages": 39
+  },
+  {
+    "id": "book-2024",
+    "kind": "book",
+    "year": 2024,
+    "label": "2024 - 2025 Budget Book",
+    "url": "https://resources.finalsite.net/images/v1721833805/fwisdorg/bd72bm6dqyzd3wxxggyy/Budget_Book_2024-2025.pdf",
+    "index_url": "https://www.fwisd.org/departments/budget/budget-documents/official-budget-books",
+    "sha256": "d7e899048c2419f475274b9fe2a030c49a462d40c37378b0bf35afa9964b13ec",
+    "pdf_pages": 42
+  },
+  {
+    "id": "book-2023",
+    "kind": "book",
+    "year": 2023,
+    "label": "2023 - 2024 Budget Book",
+    "url": "https://resources.finalsite.net/images/v1717012973/fwisdorg/oe5u0zo7nr3mkxzntamk/Budget_Book_2023-2024.pdf",
+    "index_url": "https://www.fwisd.org/departments/budget/budget-documents/official-budget-books",
+    "sha256": "c7305410cae32f109eae9625d1ac8d0849ae921df39188cf418093a24394d27a",
+    "pdf_pages": 33
+  },
+  {
+    "id": "book-2022",
+    "kind": "book",
+    "year": 2022,
+    "label": "2022 - 2023 Budget Book",
+    "url": "https://resources.finalsite.net/images/v1717012977/fwisdorg/zbtf0suzb9kk4jo6galx/Budget_Book_2022-2023.pdf",
+    "index_url": "https://www.fwisd.org/departments/budget/budget-documents/official-budget-books",
+    "sha256": "ecffb19508d59733393bfedd0b0070648062402064b00201299c4f2dc274b42b",
+    "pdf_pages": 22
+  },
+  {
+    "id": "acfr-2025",
+    "kind": "acfr",
+    "year": 2025,
+    "label": "Annual Comprehensive Financial Report Jun 2025",
+    "url": "https://resources.finalsite.net/images/v1778537241/hvuxe2uenkfunpmm0ple/Fort_Worth_ISD_Signed_ACFR.pdf",
+    "index_url": "https://www.fwisd.org/departments/financial-services/financial-required-postings/annual-comprehensive-financial-reports-acfr",
+    "sha256": "ac0be17cc73a38c80236c4a9887ee5ee2453850a199359dbbbabf73798805116",
+    "pdf_pages": 232
+  },
+  {
+    "id": "acfr-2024",
+    "kind": "acfr",
+    "year": 2024,
+    "label": "Annual Comprehensive Financial Report Jun 2024",
+    "url": "https://resources.finalsite.net/images/v1751476207/fwisdorg/xx7y4pfqgcgl7wq5crbg/ACFR_070225.pdf",
+    "index_url": "https://www.fwisd.org/departments/financial-services/financial-required-postings/annual-comprehensive-financial-reports-acfr",
+    "sha256": "07ac17f2bbae3298c32e47877bbc4a70a0de18bcd09526fcb58b5188ef4455bc",
+    "pdf_pages": 232
+  },
+  {
+    "id": "acfr-2023",
+    "kind": "acfr",
+    "year": 2023,
+    "label": "Annual Comprehensive Financial Report Jun 2023",
+    "url": "https://resources.finalsite.net/images/v1717008936/fwisdorg/bwnfdt4shcscd7yyylqb/FW_ISD_Final_Report_Signed.pdf",
+    "index_url": "https://www.fwisd.org/departments/financial-services/financial-required-postings/annual-comprehensive-financial-reports-acfr",
+    "sha256": "b8976e1dc7f5930736495d985f5a653f6a54fc01386674c2c060f2a544d65769",
+    "pdf_pages": 222
+  },
+  {
+    "id": "acfr-2022",
+    "kind": "acfr",
+    "year": 2022,
+    "label": "Annual Comprehensive Financial Report Jun 2022",
+    "url": "https://resources.finalsite.net/images/v1717008937/fwisdorg/ymsb3qah1dkmi1rd6df2/ACFR_2022.pdf",
+    "index_url": "https://www.fwisd.org/departments/financial-services/financial-required-postings/annual-comprehensive-financial-reports-acfr",
+    "sha256": "3046c46e3af2e707a88911960569688bf50faab4048902c8f61166e21daee6d6",
+    "pdf_pages": 230
+  },
+  {
+    "id": "acfr-2021",
+    "kind": "acfr",
+    "year": 2021,
+    "label": "Annual Comprehensive Financial Report Jun 2021",
+    "url": "https://resources.finalsite.net/images/v1717008940/fwisdorg/sz4p5yrekjlnkjh3m1oa/ACFR_2021.pdf",
+    "index_url": "https://www.fwisd.org/departments/financial-services/financial-required-postings/annual-comprehensive-financial-reports-acfr",
+    "sha256": "4f7cc620ca7ec60cf2328e8bcb2ffbee14bf89719b805e2cf8b54af82134f679",
+    "pdf_pages": 216
+  },
+  {
+    "id": "acfr-2020",
+    "kind": "acfr",
+    "year": 2020,
+    "label": "Comprehensive Annual Financial Report Jun 2020",
+    "url": "https://resources.finalsite.net/images/v1717008942/fwisdorg/qrfwyiqmxge6ttpgwzxw/2019-2020_CAFR.pdf",
+    "index_url": "https://www.fwisd.org/departments/financial-services/financial-required-postings/annual-comprehensive-financial-reports-acfr",
+    "sha256": "5b7efcc970e73a9823560da4a24320b8d11d9495b3bcca3829b207a699a3dd7a",
+    "pdf_pages": 220
+  },
+  {
+    "id": "acfr-2019",
+    "kind": "acfr",
+    "year": 2019,
+    "label": "Comprehensive Annual Financial Report Jun 2019",
+    "url": "https://resources.finalsite.net/images/v1717008943/fwisdorg/tufvx3oghimv1pgkbnsp/2019_Fort_Worth_ISD_Final_CAFR.pdf",
+    "index_url": "https://www.fwisd.org/departments/financial-services/financial-required-postings/annual-comprehensive-financial-reports-acfr",
+    "sha256": "78b1f436fac026586cc8332c27d9b90604d8c60c8a40698928d2175cd0682ca0",
+    "pdf_pages": 218
+  },
+  {
+    "id": "acfr-2018",
+    "kind": "acfr",
+    "year": 2018,
+    "label": "Comprehensive Annual Financial Report Jun 2018",
+    "url": "https://resources.finalsite.net/images/v1717008945/fwisdorg/w9bu7wynrkvycsgzmedj/Fort_Worth_ISD_CAFR_6-30-18_Final.pdf",
+    "index_url": "https://www.fwisd.org/departments/financial-services/financial-required-postings/annual-comprehensive-financial-reports-acfr",
+    "sha256": "66b55f1ad9c22beaa1e28b27c5d46ac513b4b0f3fd0429d672d4a711db79fb3e",
+    "pdf_pages": 226
+  },
+  {
+    "id": "acfr-2017",
+    "kind": "acfr",
+    "year": 2017,
+    "label": "Comprehensive Annual Financial Report Jun 2017",
+    "url": "https://resources.finalsite.net/images/v1717008947/fwisdorg/kqdjdltwythlvy3cpdnm/Final_CAFR.pdf",
+    "index_url": "https://www.fwisd.org/departments/financial-services/financial-required-postings/annual-comprehensive-financial-reports-acfr",
+    "sha256": "73e91539ccb5deab3aa4e8c5de5f9334d973eb0558d371c20daf9618bdfb2780",
+    "pdf_pages": 212
+  },
+  {
+    "id": "acfr-2016",
+    "kind": "acfr",
+    "year": 2016,
+    "label": "Comprehensive Annual Financial Report Jun 2016",
+    "url": "https://resources.finalsite.net/images/v1717008949/fwisdorg/odpe5fzfzgpyhrzfb2yq/CAFR_2016.pdf",
+    "index_url": "https://www.fwisd.org/departments/financial-services/financial-required-postings/annual-comprehensive-financial-reports-acfr",
+    "sha256": "e95ed3f7b86b60b8c0c2522cacfeb8256751417e708cc4e4c38c6e61ee0cfae6",
+    "pdf_pages": 209
+  }
+]

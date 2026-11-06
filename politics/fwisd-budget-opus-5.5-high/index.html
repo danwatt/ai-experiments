@@ -1,0 +1,805 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fort Worth ISD Budget</title>
+<meta name="description" content="Fort Worth ISD revenue and spending, FY2011–FY2027, with a focus on federal funding and USDA school meals. Built from TEA PEIMS actuals, FWISD adopted budgets and Texas Department of Agriculture meal claims.">
+<style>
+:root {
+  color-scheme: light;
+  --bg: #f6f5f2;
+  --surface: #fcfcfb;
+  --surface-2: #f0efeb;
+  --border: #dedcd5;
+  --grid: #e6e4de;
+  --text: #0b0b0b;
+  --text-2: #52514e;
+  --text-3: #7a7974;
+  --accent: #2a78d6;
+  --local: #2a78d6;
+  --state: #1baf7a;
+  --federal: #eb6834;
+  --cn: #6250d6;
+  --neutral: #a9a79f;
+  --neutral-link: #c9c7c0;
+  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100; --s5: #e87ba4; --s6: #008300; --s7: #6250d6; --s8: #e34948;
+  --down: #c2410c;
+  --up: #1c5cab;
+}
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    color-scheme: dark;
+    --bg: #121211; --surface: #1a1a19; --surface-2: #232321; --border: #34342f; --grid: #2b2b28;
+    --text: #f0efec; --text-2: #c3c2b7; --text-3: #8f8e86; --accent: #3987e5;
+    --local: #3987e5; --state: #199e70; --federal: #d95926; --cn: #9085e9;
+    --neutral: #6c6b65; --neutral-link: #46453f;
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181; --s6: #008300; --s7: #9085e9; --s8: #e66767;
+    --down: #f08a5d; --up: #86b6ef;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #121211; --surface: #1a1a19; --surface-2: #232321; --border: #34342f; --grid: #2b2b28;
+  --text: #f0efec; --text-2: #c3c2b7; --text-3: #8f8e86; --accent: #3987e5;
+  --local: #3987e5; --state: #199e70; --federal: #d95926; --cn: #9085e9;
+  --neutral: #6c6b65; --neutral-link: #46453f;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181; --s6: #008300; --s7: #9085e9; --s8: #e66767;
+  --down: #f08a5d; --up: #86b6ef;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font: 15px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+.wrap { max-width: 1180px; margin: 0 auto; padding: 0 16px 64px; }
+header { padding: 36px 0 12px; }
+h1 { font-size: clamp(26px, 4vw, 38px); line-height: 1.15; margin: 0 0 10px; letter-spacing: -0.01em; }
+h2 { font-size: 21px; margin: 0 0 4px; }
+h3 { font-size: 15px; margin: 0 0 6px; }
+p { margin: 0 0 10px; }
+.lede { color: var(--text-2); max-width: 820px; font-size: 16px; }
+a { color: var(--accent); }
+.muted { color: var(--text-3); }
+.small { font-size: 13px; }
+.card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+  padding: 20px; margin: 18px 0;
+}
+.card > .sub { color: var(--text-2); margin-bottom: 14px; max-width: 860px; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 18px 0 6px; }
+.tile { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; }
+.tile .k { font-size: 12px; color: var(--text-2); text-transform: uppercase; letter-spacing: .04em; }
+.tile .v { font-size: 28px; font-weight: 650; line-height: 1.2; margin: 4px 0 2px; font-variant-numeric: tabular-nums; }
+.tile .d { font-size: 13px; color: var(--text-2); }
+.controls {
+  position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--bg) 92%, transparent);
+  backdrop-filter: blur(6px); padding: 10px 0; border-bottom: 1px solid var(--border);
+  display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center;
+}
+.seg { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: var(--surface); }
+.seg button {
+  border: 0; background: none; color: var(--text-2); padding: 6px 11px; font: inherit; font-size: 13px; cursor: pointer;
+}
+.seg button + button { border-left: 1px solid var(--border); }
+.seg button[aria-pressed="true"] { background: var(--text); color: var(--surface); }
+.ctl-label { font-size: 12px; color: var(--text-3); margin-right: 6px; text-transform: uppercase; letter-spacing: .04em; }
+.years { display: flex; flex-wrap: nowrap; gap: 4px; overflow-x: auto; max-width: 100%; padding-bottom: 2px; scrollbar-width: thin; }
+.controls > .row:last-child { min-width: 0; flex: 1 1 100%; flex-wrap: nowrap; }
+.years button {
+  border: 1px solid var(--border); background: var(--surface); color: var(--text-2); border-radius: 6px;
+  padding: 4px 7px; font: inherit; font-size: 12.5px; cursor: pointer; font-variant-numeric: tabular-nums; min-width: 48px;
+}
+.years button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+.years button:focus-visible, .seg button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.row { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--text-2); margin: 6px 0 10px; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+.chart { width: 100%; overflow: hidden; }
+.chart svg { display: block; width: 100%; height: auto; }
+.chart.wide { overflow-x: auto; }
+.chart.wide svg { min-width: 720px; }
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr)); gap: 18px; }
+.grid2 > div { min-width: 0; }
+.multiples { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
+.mini { border: 1px solid var(--border); border-radius: 10px; padding: 10px 10px 4px; background: var(--surface); }
+.mini .t { font-size: 13px; font-weight: 600; }
+.mini .n { font-size: 12.5px; color: var(--text-2); font-variant-numeric: tabular-nums; }
+.changes { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 6px 28px; font-size: 13.5px; margin-top: 10px; }
+.changes h3 { margin-top: 6px; }
+.chg { display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--grid); padding: 3px 0; }
+.chg b { font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.dn { color: var(--down); } .upc { color: var(--up); }
+.callout { border-left: 3px solid var(--cn); padding: 8px 14px; background: var(--surface-2); border-radius: 0 8px 8px 0; margin: 12px 0; max-width: 900px; }
+.callout.fed { border-color: var(--federal); }
+.note { font-size: 13px; color: var(--text-2); }
+#tip {
+  position: fixed; pointer-events: none; z-index: 20; background: var(--text); color: var(--surface);
+  border-radius: 8px; padding: 8px 10px; font-size: 12.5px; line-height: 1.4; max-width: 300px;
+  box-shadow: 0 4px 18px rgba(0,0,0,.18); opacity: 0; transition: opacity .08s;
+}
+#tip .tt { font-weight: 650; margin-bottom: 2px; }
+#tip .tr { display: flex; justify-content: space-between; gap: 14px; font-variant-numeric: tabular-nums; }
+#tip i { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 6px; }
+table { border-collapse: collapse; width: 100%; font-size: 13px; font-variant-numeric: tabular-nums; }
+th, td { padding: 5px 8px; border-bottom: 1px solid var(--grid); text-align: right; white-space: nowrap; }
+th:first-child, td:first-child { text-align: left; }
+thead th { color: var(--text-2); font-weight: 600; position: sticky; top: 0; background: var(--surface); }
+.tablewrap { overflow-x: auto; max-height: 520px; }
+details summary { cursor: pointer; color: var(--accent); font-size: 14px; margin-top: 8px; }
+.sankey-node-label { font-size: 12.5px; fill: var(--text); paint-order: stroke; stroke: var(--surface); stroke-width: 3px; stroke-linejoin: round; }
+.sankey-node-val { font-size: 11px; fill: var(--text-2); }
+.axis text { font-size: 11px; fill: var(--text-3); }
+.sources li { margin-bottom: 6px; }
+.theme-toggle { float: right; margin: 0 0 8px 12px; }
+@media (max-width: 640px) {
+  .controls { position: static; }
+  .card { padding: 14px; }
+}
+</style>
+</head>
+<body>
+<div id="tip" role="tooltip"></div>
+<div class="wrap">
+<header>
+  <div class="seg theme-toggle" id="themeSeg" aria-label="Color theme">
+    <button data-v="auto" aria-pressed="true">Auto</button>
+    <button data-v="light" aria-pressed="false">Light</button>
+    <button data-v="dark" aria-pressed="false">Dark</button>
+  </div>
+  <h1>Where Fort Worth ISD's money comes from, and where it goes</h1>
+  <p class="lede">Revenue and spending for the Fort Worth Independent School District from fiscal 2011 through the budget adopted for 2026-27, with a closer look at federal money and the USDA school-meal reimbursements that are tied to SNAP enrollment.</p>
+  <div class="tiles" id="tiles"></div>
+</header>
+
+<div class="controls" role="toolbar" aria-label="Chart controls">
+  <div class="row">
+    <span class="ctl-label">Data</span>
+    <div class="seg" id="modeSeg">
+      <button data-v="actual" aria-pressed="true" title="Audited actuals from TEA PEIMS, all governmental funds plus food service">Actual, all funds · FY2011–25</button>
+      <button data-v="budget" aria-pressed="false" title="FWISD adopted budgets: General Fund, Food Service and Debt Service">Adopted budget · FY2023–27</button>
+    </div>
+  </div>
+  <div class="row">
+    <span class="ctl-label">Dollars</span>
+    <div class="seg" id="dollarSeg">
+      <button data-v="nominal" aria-pressed="true">Nominal</button>
+      <button data-v="real" aria-pressed="false" title="Adjusted with CPI-U to fiscal 2026 dollars">2026 dollars</button>
+    </div>
+    <div class="seg" id="basisSeg">
+      <button data-v="total" aria-pressed="true">Total</button>
+      <button data-v="pupil" aria-pressed="false">Per student</button>
+    </div>
+  </div>
+  <div class="row">
+    <span class="ctl-label">Year</span>
+    <div class="years" id="yearBtns"></div>
+  </div>
+</div>
+
+<section class="card" id="flow">
+  <h2 id="sankeyTitle">Money flow</h2>
+  <div class="sub" id="sankeySub"></div>
+  <div class="legend">
+    <span><i style="background:var(--local)"></i>Local</span>
+    <span><i style="background:var(--state)"></i>State</span>
+    <span><i style="background:var(--federal)"></i>Federal</span>
+    <span><i style="background:var(--cn)"></i>Federal: USDA school meals</span>
+    <span><i style="background:var(--neutral)"></i>Fund balance, bonds &amp; transfers</span>
+  </div>
+  <div class="row small" style="margin-bottom:6px">
+    <label><input type="checkbox" id="fixedScale" checked> Same scale for every year</label>
+    <label><input type="checkbox" id="fedOnly"> Highlight federal money</label>
+  </div>
+  <div class="chart wide" id="sankey"></div>
+  <div class="changes" id="changes"></div>
+</section>
+
+<section class="card">
+  <h2>Revenue by level of government</h2>
+  <div class="sub" id="revSub">Click a bar to move the Sankey to that year.</div>
+  <div class="legend" id="revLegend"></div>
+  <div class="chart" id="revChart"></div>
+</section>
+
+<section class="card">
+  <h2>Federal money by program</h2>
+  <div class="sub" id="fedSub"></div>
+  <div class="legend" id="fedLegend"></div>
+  <div class="chart" id="fedChart"></div>
+  <div class="callout fed small" id="fedCallout"></div>
+</section>
+
+<section class="card">
+  <h2>Spending by function</h2>
+  <div class="sub">Each panel has its own scale. The dot marks the selected year; the percentage compares the last year shown with the first.</div>
+  <div class="multiples" id="multiples"></div>
+</section>
+
+<section class="card" id="meals">
+  <h2>School meals and the SNAP connection</h2>
+  <div class="sub">Every Fort Worth ISD student eats free under the federal Community Eligibility Provision (CEP). How much USDA pays the district for those meals depends on the share of students who are <em>directly certified</em>: matched to SNAP, TANF, foster care, homeless or migrant records instead of filing a paper application. Fewer SNAP households means fewer directly certified students, and that lowers the reimbursement for the same meal.</div>
+  <div class="tiles" id="mealTiles"></div>
+
+  <div class="grid2" style="margin-top:14px">
+    <div>
+      <h3>USDA child-nutrition revenue (actuals)</h3>
+      <div class="legend" id="cnLegend"></div>
+      <div class="chart" id="cnChart"></div>
+      <p class="note">From the district's food-service fund in TEA PEIMS (enterprise fund 701; special revenue fund 240 from FY2026). Commodities are USDA Foods valued at cost. Pandemic-era summer and year-round meals (Seamless Summer Option) are booked as breakfast and lunch.</p>
+    </div>
+    <div>
+      <h3>Meals claimed by school year</h3>
+      <div class="legend" id="mealLegend"></div>
+      <div class="chart" id="mealChart"></div>
+      <p class="note">Texas Department of Agriculture reimbursement claims for Fort Worth ISD (CE 01020). In 2020-21 every meal was served under the Seamless Summer Option, so it has no regular school-year claims.</p>
+    </div>
+    <div>
+      <h3>Share of students claimed at the free rate</h3>
+      <div class="chart" id="freeChart"></div>
+      <p class="note">October claims: students counted free ÷ enrollment. Under CEP the free share equals the identified-student percentage (ISP) × 1.6, capped at 100%. Dashed line: the ISP implied by that share for district-wide CEP years.</p>
+    </div>
+    <div>
+      <h3>Monthly USDA reimbursement: 2024-25 vs 2025-26</h3>
+      <div class="legend" id="monLegend"></div>
+      <div class="chart" id="monthChart"></div>
+      <p class="note">School-year National School Lunch and School Breakfast claims only (no summer or after-school supper).</p>
+    </div>
+  </div>
+  <div class="callout" id="mealCallout"></div>
+  <div class="grid2">
+    <div>
+      <h3>Budgeted food-service spending (adopted budgets)</h3>
+      <div class="chart" id="foodBudget"></div>
+      <p class="note">Function 35 across official funds. FY2026 includes the district's PEIMS food-service budget (fund 240), which ran about $12 million above that fund's revenue.</p>
+    </div>
+    <div>
+      <h3>What to watch</h3>
+      <ul class="small" style="padding-left:18px;margin:4px 0">
+        <li>The CEP rate for a school year is set from students identified by April 1 of the year before. The 2025-26 drop was locked in before H.R. 1 (signed July 4, 2025) changed SNAP rules, so the law didn't cause it.</li>
+        <li>H.R. 1 widens SNAP work requirements and moves part of SNAP's cost to states starting in federal FY2028. Fewer SNAP households would mean fewer directly certified students and a lower CEP claiming rate in later years.</li>
+        <li>If the free share drops further, the district either covers more of the meal cost from local and state money or reconsiders district-wide CEP. The district says all students eat free in 2026-27.</li>
+        <li>After-school suppers (CACFP at-risk) are new since fall 2024 and bring in about $1.8 million a year.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="card">
+  <h2>Data table</h2>
+  <div class="sub">Values in the units selected above.</div>
+  <div class="tablewrap" id="table"></div>
+</section>
+
+<section class="card small">
+  <h2>Sources and method</h2>
+  <ul class="sources">
+    <li><b>Actuals FY2011–FY2025:</b> Texas Education Agency, <a href="https://tea.texas.gov/about-tea/state-funding/state-funding-reports-and-data/peims-single-file-financial-data-downloads">PEIMS district actual financial data</a> (audited, every fund/function/object), filtered to district 220905. "All funds" means the General Fund, food service, federal and state/local grant funds, Debt Service and Capital Projects. Internal-service and fiduciary funds are left out so money isn't counted twice. Bond proceeds, refundings and transfers between funds show up only as the balancing node "Fund balance, bonds &amp; transfers".</li>
+    <li><b>Adopted budgets FY2023–FY2027:</b> Fort Worth ISD <a href="https://www.fwisd.org/departments/budget/budget-documents">budget documents</a>: Budget Books 2022-23, 2023-24 and 2024-25 (All Funds table), and the 2024-25 and 2026-27 Adopted Budget postings. The posted 2025-26 adopted budget covers only the General Fund, so that year's Food Service and Debt Service figures come from the district's PEIMS budget submission (<a href="https://tea.texas.gov/about-tea/state-funding/state-funding-reports-and-data/peims-single-file-financial-data-downloads">TEA budget2026</a>). The 2026-27 posting has no fund split. Budgets cover only the three funds Texas requires a board to adopt, so most federal grants (Title I, IDEA, ESSER) aren't in them. That's why the actuals are the better source for federal trends.</li>
+    <li><b>Federal program categories</b> follow TEA fund codes: 211/276 Title I; 224–226 IDEA-B; 266 (FY2020+), 281, 282, 284, 285, 279 COVID relief; 266 (FY2011), 283–287 (FY2011–13) the 2009 stimulus and Education Jobs; General Fund objects 5931/5932 Medicaid (SHARS, administrative claiming); food-service fund objects 7952–7955 / 5921–5923 USDA child nutrition.</li>
+    <li><b>School meals:</b> Texas Department of Agriculture open data on <a href="https://data.texas.gov/">data.texas.gov</a>: School Nutrition Programs meal reimbursement (program years 2015-16 to 2025-26), Seamless Summer Option and CACFP at-risk reimbursement, contracting entity 01020.</li>
+    <li><b>Enrollment:</b> TEA <a href="https://tea.texas.gov/about-tea/state-funding/state-funding-reports-and-data/peims-financial-data-downloads">Summarized PEIMS Actual Financial Data</a>, fall survey enrollment. For FY2026 and FY2027 budgets, per-student values use the enrollment implied by the district's own per-pupil figures in the 2026-27 budget summary.</li>
+    <li><b>Inflation:</b> CPI-U (not seasonally adjusted) from <a href="https://fred.stlouisfed.org/series/CPIAUCNS">FRED</a>, averaged July–June to match the district fiscal year. FY2027 uses July–September 2026 only.</li>
+    <li>Fiscal years run July 1 to June 30 and are named for the year they end, so FY2025 is the 2024-25 school year. Rebuild with <code>build/fetch.sh</code> and <code>build/build_data.py</code>.</li>
+  </ul>
+</section>
+</div>
+
+<script>/*DATA*/window.FWISD={"built":"2026-11-06","cpi":{"2011":221.09,"2012":227.56,"2013":231.35,"2014":234.97,"2015":236.68,"2016":238.27,"2017":242.66,"2018":248.13,"2019":253.27,"2020":257.23,"2021":263.15,"2022":282.03,"2023":299.69,"2024":309.57,"2025":317.73,"2026":327.67,"2027":335.28},"funds":{"GF":"General Fund","CN":"Child Nutrition Fund","FG":"Federal grant funds","SL":"State & local grant funds","DS":"Debt Service Fund","CP":"Capital Projects (bonds)"},"uses":[["instr","Instruction"],["isup","Libraries & curriculum"],["lead","Campus & instructional leadership"],["stud","Counseling, health & social work"],["trans","Transportation"],["food","Food service"],["extra","Extracurricular"],["admin","Central administration"],["ops","Facilities, security & IT"],["comm","Community services"],["debt","Debt payments"],["build","Construction"],["inter","Recapture & intergovernmental"]],"sources":[["tax_mo","Property tax: operations","local"],["tax_is","Property tax: debt (I&S)","local"],["loc_oth","Other local (interest, fees, sales)","local"],["st_fsp","State: Foundation School Program","state"],["st_trs","State: TRS pension on-behalf","state"],["st_oth","State: other","state"],["fed_cn","Federal: USDA child nutrition","federal"],["fed_t1","Federal: Title I","federal"],["fed_sped","Federal: special ed (IDEA)","federal"],["fed_covid","Federal: COVID relief (ESSER)","federal"],["fed_arra","Federal: 2009 stimulus (ARRA)","federal"],["fed_med","Federal: Medicaid (SHARS)","federal"],["fed_oth","Federal: other grants","federal"]],"fedPrograms":{"211":"Title I, Part A (low-income schools)","276":"Title I school improvement","224":"IDEA-B special education","225":"IDEA-B preschool","255":"Title II-A (teacher training)","263":"Title III-A (English learners)","265":"Title IV-B 21st Century after-school","244":"Perkins career & technical","220":"Adult education","206":"Homeless children (McKinney-Vento)","258":"Charter school program","266":"ESSER I (CARES) / SFSF stimulus","281":"ESSER II (CRRSA)","282":"ESSER III (ARP)","283":"ARP / ARRA supplemental","284":"IDEA-B ARP / ARRA","285":"Title I ARRA / IDEA preschool ARP","286":"Title I school improvement (ARRA)","287":"Education Jobs Fund (2010)","289":"Other federal (locally defined)","279":"ESSER III TCLAS"},"actual":{"2011":{"enroll":81511,"src":{"tax_mo":263862544,"loc_oth":17448645,"st_fsp":254269943,"st_oth":16816900,"st_trs":28751814,"fed_oth":29460047,"fed_med":10378025,"fed_t1":37549821,"fed_sped":15562220,"fed_arra":58577412,"tax_is":70914589,"fed_cn":32365205},"use":{"instr":429082966,"isup":44686867,"lead":57318667,"stud":45482203,"trans":19819243,"food":36427507,"extra":9486349,"admin":16011698,"ops":100673778,"comm":5563577,"build":233691102,"inter":5853290,"debt":71464945},"links":[["tax_mo","GF",263862544],["loc_oth","GF",3892127],["st_fsp","GF",253456338],["st_oth","GF",305572],["st_trs","GF",28751814],["fed_oth","GF",5691262],["fed_med","GF",10378025],["GF","instr",312767308],["GF","isup",17038517],["GF","lead",52402645],["GF","stud",41031995],["GF","trans",19362743],["GF","food",261885],["GF","extra",9108997],["GF","admin",15685493],["GF","ops",98870709],["GF","comm",4086957],["GF","build",713636],["GF","inter",4863983],["bal_in","GF",9857186],["loc_oth","CN",4684860],["st_oth","CN",236641],["fed_cn","CN",32365205],["CN","food",36151475],["CN","ops",220938],["CN","bal_out",914293],["fed_oth","FG",21399085],["fed_t1","FG",37549821],["fed_sped","FG",15562220],["fed_arra","FG",58577412],["st_oth","FG",251740],["st_fsp","FG",188022],["FG","stud",3928957],["FG","instr",96837290],["FG","comm",1332624],["FG","isup",25393694],["FG","lead",4175458],["FG","ops",937646],["FG","admin",259149],["FG","trans",443578],["FG","build",143074],["FG","inter",64117],["FG","extra",12830],["st_fsp","SL",625583],["st_oth","SL",14779931],["loc_oth","SL",8012766],["SL","instr",18009519],["SL","isup",2254656],["SL","stud",521251],["SL","ops",630715],["SL","lead",740564],["SL","comm",143996],["SL","food",14147],["SL","inter",8369],["SL","extra",315083],["SL","admin",60047],["SL","build",595709],["tax_is","DS",70914589],["loc_oth","DS",63785],["st_oth","DS",1243016],["DS","debt",70541043],["DS","inter",916821],["DS","bal_out",763526],["loc_oth","CP",795107],["fed_oth","CP",2369700],["CP","instr",1468849],["CP","trans",12922],["CP","extra",49439],["CP","admin",7009],["CP","ops",13770],["CP","debt",923902],["CP","build",232238683],["bal_in","CP",231549767]],"fed":{"266":39982764,"211":37367406,"CN":32365205,"224":15235131,"285":10721177,"199/5931":10108399,"283":7319817,"255":6384163,"265":4300166,"289":4000769,"199/5949":3209375,"199/5929":2474733,"699":2369700,"263":2356396,"309":1789062,"244":1259893,"279":531152,"286":364091,"199/5932":269626,"225":262916,"284":189563,"276":182415,"223":142335,"206":141521,"280":127172,"220":125749,"316":68968,"212":67813,"262":66421,"315":64173},"cn":{"otherLocalState":299769,"sales":4621732,"breakfast":5790277,"lunch":24160650,"commodities":2414278,"spent":36372413}},"2012":{"enroll":82853,"src":{"st_oth":19876072,"st_trs":24754693,"tax_mo":268930424,"loc_oth":20935492,"st_fsp":262763130,"fed_oth":30729399,"fed_med":10265877,"fed_arra":20723891,"fed_sped":15047955,"fed_cn":35866306,"tax_is":72640217,"fed_t1":35434015},"use":{"instr":431799661,"isup":43423073,"lead":57597704,"stud":44408095,"extra":9903103,"trans":23845179,"food":39078594,"ops":89924175,"admin":14209756,"comm":5274691,"build":72922635,"inter":6695123,"debt":75062944},"links":[["st_oth","GF",116812],["st_trs","GF",24754693],["tax_mo","GF",268930424],["loc_oth","GF",7285140],["st_fsp","GF",262164605],["fed_oth","GF",4616850],["fed_med","GF",10265877],["GF","instr",349911254],["GF","isup",15965701],["GF","lead",52374113],["GF","stud",38765391],["GF","extra",9214734],["GF","trans",18726654],["GF","food",197298],["GF","ops",87923119],["GF","admin",14062418],["GF","comm",3466822],["GF","inter",5617831],["bal_in","GF",18090934],["st_oth","CN",254745],["loc_oth","CN",4684386],["fed_cn","CN",35866306],["CN","food",38768086],["CN","ops",580064],["CN","bal_out",1457287],["fed_oth","FG",26112549],["fed_arra","FG",20723891],["st_oth","FG",213635],["fed_sped","FG",15047955],["st_fsp","FG",60492],["fed_t1","FG",35434015],["FG","instr",60021074],["FG","comm",1644388],["FG","isup",25587854],["FG","lead",4413284],["FG","stud",4852249],["FG","ops",639879],["FG","food",26888],["FG","admin",122348],["FG","build",227000],["FG","inter",57595],["FG","extra",96],["st_oth","SL",15355651],["st_fsp","SL",538033],["loc_oth","SL",8717526],["SL","instr",19833148],["SL","isup",1869518],["SL","lead",810307],["SL","stud",790455],["SL","ops",767635],["SL","comm",163481],["SL","inter",56253],["SL","food",86322],["SL","extra",453666],["SL","build",96777],["SL","admin",24990],["st_oth","DS",3935229],["tax_is","DS",72640217],["loc_oth","DS",105530],["DS","debt",75062944],["DS","inter",963444],["DS","bal_out",654588],["loc_oth","CP",142910],["CP","instr",2034185],["CP","extra",234607],["CP","ops",13478],["CP","build",72598858],["CP","trans",5118525],["bal_in","CP",79856743]],"fed":{"CN":35866306,"211":35434015,"224":14673624,"286":10459253,"199/5931":10069674,"289":10001615,"287":9983831,"255":5002189,"265":4338778,"199/5949":3003733,"263":2749774,"309":1884301,"199/5929":1610936,"244":1439187,"225":318879,"285":253922,"223":246214,"199/5932":196203,"220":96057,"206":95688,"212":86726,"280":84714,"316":75833,"315":55452},"cn":{"spent":39348150,"otherLocalState":388964,"sales":4550167,"commodities":2518147,"lunch":26097313,"breakfast":7250846}},"2013":{"enroll":83255,"src":{"tax_mo":277323143,"loc_oth":19662695,"st_fsp":307350250,"fed_oth":26660483,"fed_med":3174071,"st_oth":8797857,"st_trs":22463544,"fed_cn":36460006,"tax_is":74796297,"fed_arra":15226592,"fed_sped":14994106,"fed_t1":35580067},"use":{"instr":402851757,"isup":35533361,"lead":56483207,"stud":44662372,"food":40605627,"ops":87896996,"build":47562378,"extra":10501665,"admin":13477116,"comm":5675463,"debt":75188849,"inter":5934763,"trans":18047188},"links":[["tax_mo","GF",277323143],["loc_oth","GF",6090625],["st_fsp","GF",306817983],["fed_oth","GF",5335299],["fed_med","GF",3174071],["st_oth","GF",48165],["st_trs","GF",22463544],["GF","instr",334268054],["GF","isup",14695416],["GF","lead",51898701],["GF","stud",40026407],["GF","comm",3845756],["GF","inter",5072633],["GF","ops",86655709],["GF","extra",10023379],["GF","admin",13386514],["GF","trans",18047188],["GF","food",182005],["GF","build",5871794],["GF","bal_out",37279274],["loc_oth","CN",4216183],["fed_cn","CN",36460006],["st_oth","CN",255947],["CN","food",40303995],["CN","ops",63515],["CN","bal_out",564626],["st_oth","FG",144358],["fed_oth","FG",21325184],["fed_arra","FG",15226592],["fed_sped","FG",14994106],["fed_t1","FG",35580067],["FG","instr",58086988],["FG","lead",4112651],["FG","ops",585868],["FG","inter",38008],["FG","isup",19063771],["FG","stud",3775442],["FG","food",27815],["FG","extra",1145],["FG","comm",1513485],["FG","admin",65262],["loc_oth","SL",9250877],["st_oth","SL",4379882],["st_fsp","SL",532267],["SL","food",91812],["SL","extra",363836],["SL","admin",25340],["SL","ops",578148],["SL","comm",316222],["SL","isup",1774174],["SL","stud",860523],["SL","instr",9533603],["SL","lead",471855],["SL","build",817],["SL","inter",19944],["tax_is","DS",74796297],["loc_oth","DS",51897],["st_oth","DS",3969505],["DS","debt",75188849],["DS","inter",804178],["DS","bal_out",2824672],["loc_oth","CP",53113],["CP","build",41689767],["CP","instr",963112],["CP","extra",113305],["CP","ops",13756],["bal_in","CP",42726827]],"fed":{"CN":36460006,"211":35580067,"224":14651252,"286":11239003,"289":8307303,"287":3987589,"265":3730651,"255":3155613,"199/5949":2752376,"263":2752101,"199/5931":2735983,"199/5929":2581002,"309":1612641,"244":1127982,"199/5932":438088,"225":290458,"223":180608,"206":115383,"220":113288,"280":82873,"316":72650,"212":62845,"315":52396},"cn":{"spent":40367510,"otherLocalState":330992,"lunch":26364547,"sales":4141138,"commodities":2343715,"breakfast":7751744}},"2014":{"enroll":84360,"src":{"tax_mo":286326641,"loc_oth":21604053,"st_fsp":294432868,"st_oth":17997677,"st_trs":25699952,"fed_oth":28576922,"fed_med":6634636,"fed_t1":30023459,"fed_sped":14033195,"tax_is":77234028,"fed_cn":38449102},"use":{"instr":419166783,"isup":38408782,"lead":58767625,"stud":47813968,"trans":18487429,"food":42945208,"extra":10901679,"admin":15093009,"ops":94649523,"comm":6290658,"build":20843694,"inter":5764814,"debt":76140954},"links":[["tax_mo","GF",286326641],["loc_oth","GF",4844963],["st_fsp","GF",293963450],["st_oth","GF",312987],["st_trs","GF",25699952],["fed_oth","GF",3557165],["fed_med","GF",6634636],["GF","instr",359519308],["GF","isup",17597142],["GF","lead",55285070],["GF","stud",42710105],["GF","trans",18487429],["GF","food",196389],["GF","extra",10568364],["GF","admin",15031361],["GF","ops",93554359],["GF","comm",4221127],["GF","build",71464],["GF","inter",4882174],["bal_in","GF",784498],["loc_oth","CN",4356344],["fed_cn","CN",38449102],["CN","food",42486385],["CN","ops",61917],["fed_oth","FG",25019757],["fed_t1","FG",30023459],["fed_sped","FG",14033195],["st_oth","FG",118403],["FG","instr",40816566],["FG","stud",3564975],["FG","comm",1851130],["FG","isup",20032421],["FG","lead",2646683],["FG","food",18139],["FG","ops",189361],["FG","admin",11289],["FG","inter",64318],["st_oth","SL",11620538],["loc_oth","SL",10915820],["st_fsp","SL",469418],["SL","instr",18226659],["SL","isup",779219],["SL","stud",1538888],["SL","ops",829891],["SL","food",244295],["SL","lead",835872],["SL","inter",33171],["SL","extra",310518],["SL","admin",50359],["SL","comm",218401],["tax_is","DS",77234028],["loc_oth","DS",20603],["st_oth","DS",5945749],["DS","debt",75193150],["DS","inter",785151],["DS","bal_out",7222079],["loc_oth","CP",1466323],["CP","instr",604250],["CP","extra",22797],["CP","ops",13995],["CP","debt",947804],["CP","build",20772230],["bal_in","CP",20894753]],"fed":{"CN":38449102,"211":30023459,"224":13732136,"289":12364828,"199/5931":6011711,"265":3600415,"255":3237988,"199/5949":2478373,"263":2320723,"309":1675990,"244":1211185,"199/5929":1077280,"199/5932":622925,"225":252913,"223":182990,"206":123604,"220":98908,"316":72960,"280":65979,"212":64187},"cn":{"otherLocalState":115063,"sales":4241281,"breakfast":7912137,"lunch":27715981,"commodities":2816205,"other":4779,"spent":42548302}},"2015":{"enroll":85695,"src":{"tax_mo":294948776,"loc_oth":19051293,"st_fsp":329170151,"st_oth":7390177,"st_trs":29272536,"fed_med":8267701,"fed_oth":26115134,"fed_t1":37921556,"fed_sped":15063400,"tax_is":79827888,"fed_cn":44386006},"use":{"instr":461412971,"isup":39839542,"lead":62535952,"stud":52261840,"extra":12928912,"trans":23613757,"food":47878316,"ops":98312644,"admin":15687306,"comm":8051126,"build":33006968,"inter":6314261,"debt":91245090},"links":[["tax_mo","GF",294948776],["loc_oth","GF",5179559],["st_fsp","GF",328654042],["st_oth","GF",334319],["st_trs","GF",29272536],["fed_med","GF",8267701],["fed_oth","GF",3502814],["GF","instr",385905679],["GF","isup",16962980],["GF","lead",58901288],["GF","stud",47182989],["GF","extra",12333033],["GF","trans",19493859],["GF","food",208894],["GF","ops",96549088],["GF","admin",15572188],["GF","comm",5025841],["GF","build",9014778],["GF","inter",5397286],["bal_in","GF",2388156],["st_oth","CN",265928],["fed_cn","CN",44386006],["loc_oth","CN",3052659],["CN","food",47144268],["CN","ops",180007],["fed_t1","FG",37921556],["fed_oth","FG",22612320],["fed_sped","FG",15063400],["st_oth","FG",417113],["FG","instr",44997927],["FG","stud",3400931],["FG","comm",2901359],["FG","isup",21553718],["FG","lead",2839392],["FG","ops",22442],["FG","admin",776],["FG","build",232025],["FG","inter",25999],["FG","extra",39900],["st_oth","SL",3044315],["st_fsp","SL",516109],["loc_oth","SL",10631861],["SL","comm",123926],["SL","instr",8284720],["SL","isup",1322844],["SL","stud",1677920],["SL","food",525154],["SL","lead",795272],["SL","ops",614507],["SL","inter",13295],["SL","extra",327428],["SL","admin",20417],["SL","build",27490],["tax_is","DS",79827888],["loc_oth","DS",39031],["st_oth","DS",3328502],["DS","debt",90588967],["DS","inter",877681],["bal_in","DS",8271227],["loc_oth","CP",148183],["CP","build",23732675],["CP","instr",22224645],["CP","trans",4119898],["CP","extra",228551],["CP","admin",93925],["CP","ops",946600],["CP","debt",656123],["bal_in","CP",51854234]],"fed":{"CN":44386006,"211":37637919,"224":14765502,"289":8332566,"199/5931":7327695,"255":4051805,"265":2953990,"263":2949262,"309":2366409,"199/5949":2164000,"199/5929":1336984,"244":1287018,"199/5932":940006,"220":301798,"276":283637,"225":245718,"206":121325,"212":90778,"316":74085,"315":52180},"cn":{"spent":47324275,"otherLocalState":292281,"lunch":31104422,"other":5675,"sales":3026306,"breakfast":10292265,"commodities":2983644}},"2016":{"enroll":86869,"src":{"tax_mo":299167714,"loc_oth":21142890,"st_fsp":354150832,"st_oth":23784590,"st_trs":30223224,"fed_oth":31520892,"fed_med":10064879,"fed_t1":39389406,"fed_sped":14308507,"tax_is":88986168,"fed_cn":45042387},"use":{"instr":488508582,"isup":41719228,"lead":61970086,"stud":54261021,"trans":26912525,"food":48844201,"extra":14450373,"admin":15148846,"ops":103573730,"comm":7996994,"build":103052518,"inter":2822836,"debt":87888412},"links":[["tax_mo","GF",299167714],["loc_oth","GF",5415653],["st_fsp","GF",353793382],["st_oth","GF",433464],["st_trs","GF",30223224],["fed_oth","GF",7917086],["fed_med","GF",10064879],["GF","instr",408654450],["GF","isup",17887062],["GF","lead",58265471],["GF","stud",48102092],["GF","trans",19383043],["GF","food",231636],["GF","extra",13677318],["GF","admin",14970410],["GF","ops",99706017],["GF","comm",4519632],["GF","build",4995812],["GF","inter",2653948],["GF","bal_out",13968511],["loc_oth","CN",2865701],["st_oth","CN",277963],["fed_cn","CN",45042387],["CN","food",48270491],["CN","ops",282710],["fed_oth","FG",23603806],["fed_t1","FG",39389406],["fed_sped","FG",14308507],["st_oth","FG",386822],["FG","instr",45542019],["FG","stud",3887206],["FG","comm",2827979],["FG","isup",22343490],["FG","lead",2985413],["FG","extra",47942],["FG","admin",1384],["FG","ops",53196],["loc_oth","SL",12222629],["st_oth","SL",20197450],["st_fsp","SL",357450],["SL","instr",23972317],["SL","isup",1488676],["SL","stud",2271723],["SL","trans",616940],["SL","food",342074],["SL","comm",649383],["SL","lead",719202],["SL","extra",614149],["SL","ops",566169],["SL","build",1019397],["SL","bal_out",517499],["tax_is","DS",88986168],["loc_oth","DS",134999],["st_oth","DS",2488891],["DS","debt",87888412],["DS","inter",168888],["DS","bal_out",3552758],["loc_oth","CP",503908],["CP","instr",10339796],["CP","trans",6912542],["CP","extra",110964],["CP","admin",177052],["CP","ops",2965638],["CP","build",97037309],["bal_in","CP",117039393]],"fed":{"CN":45042387,"211":39187813,"224":14029475,"199/5931":9352746,"289":7426804,"255":5879963,"199/5929":4030020,"199/5949":3839925,"309":2929147,"263":2892300,"265":2765799,"244":1047271,"199/5932":712133,"220":324472,"225":238019,"276":201593,"206":129272,"212":73691,"316":72693,"280":51258},"cn":{"otherLocalState":309786,"sales":2833878,"breakfast":10626193,"lunch":30945550,"commodities":3452449,"other":18195,"spent":48553201}},"2017":{"enroll":87233,"src":{"tax_mo":319660751,"loc_oth":23893077,"st_fsp":356485759,"st_oth":13071806,"st_trs":31256784,"fed_oth":22018143,"fed_med":10804180,"fed_t1":40182976,"fed_sped":13841742,"tax_is":96234014,"fed_cn":45896205},"use":{"instr":495775547,"isup":42387026,"lead":62813372,"stud":59331588,"trans":22590772,"food":53022621,"extra":14991760,"admin":15382363,"ops":107600133,"comm":8541256,"build":100775137,"inter":3521301,"debt":99003403},"links":[["tax_mo","GF",319660751],["loc_oth","GF",7295856],["st_fsp","GF",355985485],["st_oth","GF",589365],["st_trs","GF",31256784],["fed_oth","GF",7107906],["fed_med","GF",10804180],["GF","instr",431580696],["GF","isup",17373964],["GF","lead",59570929],["GF","stud",53310229],["GF","trans",19214752],["GF","food",217623],["GF","extra",14637200],["GF","admin",15357756],["GF","ops",102707114],["GF","comm",4637229],["GF","build",4978322],["GF","inter",2217444],["GF","bal_out",6897069],["loc_oth","CN",2771959],["st_oth","CN",278576],["fed_cn","CN",45896205],["CN","food",52608896],["CN","ops",303934],["bal_in","CN",3966090],["fed_oth","FG",14910237],["fed_t1","FG",40182976],["fed_sped","FG",13841742],["st_oth","FG",28922],["FG","instr",36466318],["FG","stud",3635252],["FG","comm",3065695],["FG","isup",22523783],["FG","lead",2143581],["FG","ops",49488],["FG","inter",1079881],["loc_oth","SL",11506748],["st_oth","SL",9549161],["st_fsp","SL",500274],["SL","instr",13496529],["SL","isup",2489279],["SL","lead",1098862],["SL","stud",2386107],["SL","food",196102],["SL","ops",1533466],["SL","comm",838332],["SL","inter",223976],["SL","extra",354560],["SL","admin",3609],["SL","build",2863547],["bal_in","SL",3928186],["tax_is","DS",96234014],["loc_oth","DS",357183],["st_oth","DS",2625782],["DS","debt",97661306],["DS","bal_out",1555673],["loc_oth","CP",1961331],["CP","instr",14232004],["CP","trans",3376020],["CP","admin",20998],["CP","ops",3006131],["CP","debt",1342097],["CP","build",92933268],["bal_in","CP",112949187]],"fed":{"CN":45896205,"211":38499711,"224":13479879,"199/5931":10115425,"255":4043762,"199/5929":3982126,"199/5949":3063475,"309":3006365,"263":2744032,"276":1683265,"289":1652063,"265":1466224,"244":1459435,"199/5932":688755,"223":290833,"225":222342,"315":139521,"206":92677,"220":85746,"199/5939":62305,"280":61694},"cn":{"sales":2757607,"otherLocalState":292928,"breakfast":10968055,"lunch":31269048,"commodities":3631461,"other":27641,"spent":52912830}},"2018":{"enroll":86039,"src":{"tax_mo":358214452,"loc_oth":26149335,"st_fsp":347438465,"st_oth":12040322,"st_trs":31028682,"fed_oth":20782340,"fed_med":7311160,"fed_t1":36293029,"fed_sped":15274189,"tax_is":98677943,"fed_cn":45627740},"use":{"instr":500880947,"isup":41095284,"lead":63717924,"stud":62148143,"trans":23760421,"food":54783569,"extra":17103329,"admin":17249190,"ops":109050516,"comm":9358240,"build":110363374,"inter":2363897,"debt":98972201},"links":[["tax_mo","GF",358214452],["loc_oth","GF",8005173],["st_fsp","GF",346933826],["st_oth","GF",120637],["st_trs","GF",31028682],["fed_oth","GF",7477714],["fed_med","GF",7311160],["GF","instr",438958875],["GF","isup",18351833],["GF","lead",60744642],["GF","stud",55822388],["GF","trans",19181097],["GF","food",255883],["GF","extra",15706933],["GF","admin",17173591],["GF","ops",103708899],["GF","comm",4922652],["GF","build",5873832],["GF","inter",2363897],["GF","bal_out",16027122],["loc_oth","CN",2905318],["fed_cn","CN",45627740],["CN","food",54156120],["CN","ops",58676],["bal_in","CN",5681738],["fed_oth","FG",13304626],["fed_t1","FG",36293029],["fed_sped","FG",15274189],["st_oth","FG",274935],["FG","lead",2006707],["FG","stud",3906690],["FG","comm",3387718],["FG","instr",35154199],["FG","isup",20648180],["FG","ops",43332],["loc_oth","SL",11087448],["st_oth","SL",9480749],["st_fsp","SL",504639],["SL","instr",11863704],["SL","isup",2095271],["SL","lead",966575],["SL","stud",2397459],["SL","trans",945000],["SL","food",371566],["SL","ops",307818],["SL","comm",1047870],["SL","extra",1160750],["SL","admin",2804],["SL","build",1896695],["bal_in","SL",1982676],["tax_is","DS",98677943],["loc_oth","DS",688628],["st_oth","DS",2164001],["DS","debt",97697673],["DS","bal_out",3832899],["loc_oth","CP",3462768],["CP","instr",14904169],["CP","stud",21606],["CP","trans",3634324],["CP","extra",235646],["CP","admin",72795],["CP","ops",4931791],["CP","debt",1274528],["CP","build",102592847],["bal_in","CP",124204938]],"fed":{"CN":45627740,"211":34643410,"224":14876020,"199/5931":6665441,"199/5929":3986397,"255":3686758,"199/5949":3486127,"263":3352008,"220":1705552,"276":1649619,"289":1513671,"265":1154784,"244":1130634,"199/5932":645719,"203":337427,"225":261866,"223":190736,"206":166721,"315":136303,"309":66335},"cn":{"otherLocalState":27461,"sales":2877857,"breakfast":11457331,"lunch":30570005,"commodities":3582169,"other":18235,"spent":54214796}},"2019":{"enroll":84332,"src":{"tax_mo":378974397,"loc_oth":35404755,"st_fsp":310792998,"st_oth":11709311,"st_trs":32495970,"fed_oth":15708157,"fed_med":8445385,"fed_t1":35621725,"fed_sped":15798735,"tax_is":104191643,"fed_cn":46375756},"use":{"instr":517771500,"isup":45053661,"lead":64755550,"stud":64706143,"food":55120853,"trans":20739624,"extra":16548425,"ops":106370327,"admin":18979324,"comm":9361879,"build":75655979,"inter":2501724,"debt":108137412},"links":[["tax_mo","GF",378974397],["loc_oth","GF",11306800],["st_fsp","GF",310221103],["st_oth","GF",843157],["st_trs","GF",32495970],["fed_oth","GF",4518453],["fed_med","GF",8445385],["GF","instr",449584852],["GF","isup",20590945],["GF","lead",61373260],["GF","stud",57427954],["GF","food",386272],["GF","trans",18839138],["GF","extra",14619939],["GF","ops",105388098],["GF","admin",18912936],["GF","comm",4795165],["GF","build",2380897],["GF","inter",2501724],["bal_in","GF",9995915],["loc_oth","CN",2794128],["fed_cn","CN",46375756],["CN","food",54148161],["CN","ops",45747],["bal_in","CN",5024024],["fed_oth","FG",11189704],["fed_t1","FG",35621725],["fed_sped","FG",15798735],["st_oth","FG",365776],["FG","instr",32149350],["FG","lead",2253041],["FG","stud",4265665],["FG","comm",3074467],["FG","isup",20936756],["FG","ops",32790],["FG","food",263944],["st_oth","SL",8563553],["st_fsp","SL",571895],["loc_oth","SL",13656130],["SL","lead",1129249],["SL","instr",12066328],["SL","isup",3525960],["SL","stud",3012524],["SL","comm",1492247],["SL","extra",1221942],["SL","food",3650],["SL","ops",111090],["SL","admin",6488],["SL","build",343265],["tax_is","DS",104191643],["loc_oth","DS",1095398],["st_oth","DS",1936825],["DS","debt",108137412],["bal_in","DS",913546],["loc_oth","CP",6552299],["CP","instr",23970970],["CP","build",72931817],["CP","trans",1900486],["CP","food",318826],["CP","extra",706544],["CP","admin",59900],["CP","ops",792602],["bal_in","CP",94128846]],"fed":{"CN":46375756,"211":34019906,"224":15137264,"199/5931":7818827,"255":3237441,"199/5929":3090496,"263":2765701,"289":2056679,"220":1678601,"276":1601819,"199/5949":1427206,"244":1220840,"199/5932":626558,"225":387134,"206":151731,"226":138267,"315":136070},"cn":{"spent":54193908,"sales":2794128,"breakfast":11565110,"lunch":31281668,"commodities":3515106,"other":13872}},"2020":{"enroll":82704,"src":{"tax_mo":402100053,"loc_oth":28037298,"st_fsp":316352910,"st_oth":15821567,"st_trs":39911181,"fed_oth":14028959,"fed_med":11540630,"fed_t1":36656365,"fed_sped":16123700,"fed_covid":5606378,"tax_is":118365299,"fed_cn":35400622},"use":{"instr":499772077,"isup":48258928,"lead":69539643,"stud":67045299,"trans":17821707,"food":46685450,"extra":14832827,"admin":19805032,"ops":103204316,"comm":7845276,"build":183249703,"inter":2621272,"debt":114353233},"links":[["tax_mo","GF",402100053],["loc_oth","GF",9614522],["st_fsp","GF",315701650],["st_oth","GF",72983],["st_trs","GF",39911181],["fed_oth","GF",4455964],["fed_med","GF",11540630],["GF","instr",447667082],["GF","isup",22213942],["GF","lead",66047313],["GF","stud",59716300],["GF","trans",17821707],["GF","food",317035],["GF","extra",13824995],["GF","admin",19678987],["GF","ops",101805712],["GF","comm",3861278],["GF","build",11103172],["GF","inter",2574339],["GF","bal_out",16765121],["loc_oth","CN",2025262],["fed_cn","CN",35400622],["CN","food",46315864],["CN","ops",28954],["bal_in","CN",8918934],["fed_oth","FG",9572995],["fed_t1","FG",36656365],["fed_sped","FG",16123700],["fed_covid","FG",5606378],["st_oth","FG",32732],["FG","instr",35085296],["FG","lead",2491727],["FG","stud",4958948],["FG","isup",22065759],["FG","comm",2990738],["FG","ops",288384],["FG","food",52551],["FG","extra",11931],["FG","inter",46933],["st_oth","SL",14160634],["loc_oth","SL",11697429],["st_fsp","SL",651260],["SL","instr",16516176],["SL","isup",3979227],["SL","lead",1000603],["SL","stud",2370051],["SL","ops",795469],["SL","comm",993260],["SL","extra",779608],["SL","admin",3590],["SL","build",23150],["tax_is","DS",118365299],["loc_oth","DS",717766],["st_oth","DS",1555218],["DS","debt",113231814],["DS","bal_out",7406469],["loc_oth","CP",3982319],["CP","instr",503523],["CP","extra",216293],["CP","admin",122455],["CP","ops",285797],["CP","debt",1121419],["CP","build",172123381],["bal_in","CP",170390549]],"fed":{"CN":35400622,"211":34642715,"224":15705100,"199/5931":10898994,"266":5606378,"199/5929":2981207,"255":2216298,"263":2185252,"276":2013650,"289":1997893,"220":1599901,"199/5949":1474757,"244":1058885,"199/5932":641636,"331":417049,"225":283137,"315":121471,"206":97717},"cn":{"otherLocalState":74993,"sales":1950269,"breakfast":9040581,"lunch":22680431,"commodities":3678300,"other":1310,"spent":46344818}},"2021":{"enroll":76754,"src":{"tax_mo":454710798,"loc_oth":12432563,"st_fsp":297088031,"st_oth":7073604,"st_trs":37135455,"fed_oth":23431844,"fed_med":9836401,"fed_t1":40124518,"fed_sped":16490400,"fed_covid":73311833,"tax_is":121985694,"fed_cn":32295718},"use":{"instr":511213270,"isup":50420938,"lead":67345494,"stud":67366946,"trans":18145063,"food":38596887,"extra":16119814,"admin":20066434,"ops":123569301,"comm":9055261,"build":309400834,"inter":2878452,"debt":123085357},"links":[["tax_mo","GF",454710798],["loc_oth","GF",3864069],["st_fsp","GF",296438949],["st_oth","GF",1397970],["st_trs","GF",37135455],["fed_oth","GF",9422455],["fed_med","GF",9836401],["GF","instr",410465190],["GF","isup",22702101],["GF","lead",62895386],["GF","stud",59296056],["GF","trans",17501757],["GF","food",1339922],["GF","extra",15254487],["GF","admin",19573867],["GF","ops",114272248],["GF","comm",4220418],["GF","build",8353420],["GF","inter",2567701],["GF","bal_out",74363544],["loc_oth","CN",590407],["fed_cn","CN",32295718],["CN","food",36994497],["CN","ops",47210],["bal_in","CN",4155582],["fed_oth","FG",14009389],["fed_t1","FG",40124518],["fed_sped","FG",16490400],["fed_covid","FG",73311833],["st_oth","FG",25257],["FG","instr",93854993],["FG","lead",3560374],["FG","stud",6074448],["FG","isup",26768855],["FG","ops",7625886],["FG","comm",4049088],["FG","trans",575099],["FG","extra",397464],["FG","admin",482891],["FG","food",261621],["FG","inter",310751],["st_oth","SL",4313886],["st_fsp","SL",649082],["loc_oth","SL",7515211],["SL","isup",949982],["SL","lead",889734],["SL","stud",1996442],["SL","comm",785755],["SL","instr",6889587],["SL","ops",1430279],["SL","extra",459166],["SL","admin",2900],["SL","trans",68207],["SL","food",847],["SL","build",12000],["bal_in","SL",1006720],["tax_is","DS",121985694],["loc_oth","DS",73366],["st_oth","DS",1336491],["DS","debt",122087854],["DS","bal_out",1307697],["loc_oth","CP",389510],["CP","instr",3500],["CP","extra",8697],["CP","admin",6776],["CP","ops",193678],["CP","debt",997503],["CP","build",301035414],["bal_in","CP",301856058]],"fed":{"281":51308654,"211":40165296,"CN":32295718,"266":22003179,"224":16100131,"199/5931":9040344,"199/5929":6502578,"255":3287964,"258":3118651,"289":2956919,"220":1796412,"199/5939":1548856,"199/5949":1371021,"263":1203928,"244":966375,"199/5932":796057,"338":503449,"225":298399,"206":175691,"315":91870},"cn":{"otherLocalState":85614,"sales":504793,"breakfast":7651377,"lunch":20764441,"commodities":3877413,"other":2487,"spent":37041707}},"2022":{"enroll":74326,"src":{"tax_mo":462661884,"loc_oth":13852180,"st_fsp":263222271,"st_oth":9814412,"st_trs":33654494,"fed_oth":66231892,"fed_med":14831570,"fed_t1":35041605,"fed_sped":15466792,"fed_covid":108831567,"tax_is":128049435,"fed_cn":48143284},"use":{"instr":533808742,"isup":63739138,"lead":69670251,"stud":69390687,"trans":21970878,"food":46007239,"extra":17877529,"admin":23423522,"ops":133228923,"comm":11636019,"debt":120612143,"build":161406455,"inter":3092698},"links":[["tax_mo","GF",462661884],["loc_oth","GF",5837298],["st_fsp","GF",262790738],["st_oth","GF",66258],["st_trs","GF",33654494],["fed_oth","GF",29294207],["fed_med","GF",14831570],["GF","instr",405816470],["GF","isup",23645849],["GF","lead",63262560],["GF","stud",58016211],["GF","trans",20523852],["GF","food",1423615],["GF","extra",16962174],["GF","admin",22124957],["GF","ops",118924710],["GF","comm",4859917],["GF","debt",831021],["GF","build",355489],["GF","inter",2772413],["GF","bal_out",69617211],["loc_oth","CN",1227631],["fed_cn","CN",48143284],["CN","food",43108534],["CN","ops",31360],["CN","bal_out",6231021],["fed_oth","FG",36937685],["fed_t1","FG",35041605],["fed_sped","FG",15466792],["fed_covid","FG",108831567],["st_oth","FG",83850],["FG","stud",10252485],["FG","instr",123417517],["FG","isup",34919362],["FG","lead",5318286],["FG","comm",6144100],["FG","ops",11820638],["FG","extra",157753],["FG","trans",1431292],["FG","food",1475090],["FG","admin",1085553],["FG","build",19333],["FG","inter",320285],["st_oth","SL",7878010],["st_fsp","SL",431533],["loc_oth","SL",6126208],["SL","isup",5173927],["SL","lead",1089405],["SL","stud",1121991],["SL","instr",4574755],["SL","ops",1164732],["SL","comm",632002],["SL","extra",757602],["SL","trans",15734],["SL","admin",99788],["SL","build",98974],["tax_is","DS",128049435],["loc_oth","DS",150784],["st_oth","DS",1786294],["DS","debt",117936262],["DS","bal_out",12050251],["loc_oth","CP",510259],["CP","admin",113224],["CP","ops",1287483],["CP","debt",1844860],["CP","build",160932659],["bal_in","CP",163667967]],"fed":{"281":55300305,"282":50139918,"CN":48143284,"211":35041605,"199/5929":28050631,"289":26902161,"224":15057048,"199/5931":13915910,"255":2944438,"263":2881389,"284":2296222,"220":1742346,"199/5949":1224264,"244":989498,"199/5932":915660,"265":834511,"266":565664,"338":415971,"279":329528,"225":308234,"206":199968,"285":199930,"315":101510},"cn":{"otherLocalState":232518,"sales":995113,"breakfast":9948732,"lunch":32842452,"commodities":5329791,"other":22309,"spent":43139894}},"2023":{"enroll":72637,"src":{"tax_mo":487887270,"loc_oth":79809574,"st_fsp":226122794,"st_oth":14561361,"st_trs":37477214,"fed_oth":32885417,"fed_med":14622082,"fed_t1":37085211,"fed_sped":18095615,"fed_covid":121074464,"tax_is":143472501,"fed_cn":45195660},"use":{"instr":553320009,"isup":69666393,"lead":77304620,"stud":72215717,"trans":22605695,"food":39632992,"extra":21088269,"admin":24834568,"ops":137342934,"comm":12090475,"debt":145961145,"build":128237466,"inter":5592868},"links":[["tax_mo","GF",487887270],["loc_oth","GF",54174754],["st_fsp","GF",226113103],["st_oth","GF",305290],["st_trs","GF",37477214],["fed_oth","GF",14567903],["fed_med","GF",14622082],["GF","instr",435701664],["GF","isup",25846134],["GF","lead",66150273],["GF","stud",58621047],["GF","trans",21838170],["GF","food",520621],["GF","extra",20150072],["GF","admin",22856215],["GF","ops",125309950],["GF","comm",4931042],["GF","debt",2075238],["GF","build",1318021],["GF","inter",5373678],["GF","bal_out",44455491],["loc_oth","CN",2020135],["st_oth","CN",171686],["fed_cn","CN",45195660],["CN","food",37608896],["CN","ops",28696],["CN","bal_out",9749889],["fed_oth","FG",18317514],["fed_t1","FG",37085211],["fed_sped","FG",18095615],["fed_covid","FG",121074464],["st_oth","FG",67642],["FG","stud",13040076],["FG","instr",106239990],["FG","isup",42314936],["FG","lead",10484511],["FG","ops",11223760],["FG","comm",6811023],["FG","extra",278838],["FG","admin",1814187],["FG","trans",767525],["FG","food",1430475],["FG","build",18360],["FG","inter",219190],["st_oth","SL",10389863],["st_fsp","SL",9691],["loc_oth","SL",5184515],["SL","instr",11220052],["SL","isup",1505323],["SL","lead",669836],["SL","stud",554594],["SL","ops",270336],["SL","comm",348410],["SL","extra",659359],["SL","food",73000],["SL","admin",111890],["SL","build",396271],["tax_is","DS",143472501],["loc_oth","DS",2469248],["st_oth","DS",3626880],["DS","debt",140421319],["DS","bal_out",9147310],["loc_oth","CP",15960922],["CP","instr",158303],["CP","admin",52276],["CP","ops",510192],["CP","debt",3464588],["CP","build",126504814],["bal_in","CP",114729251]],"fed":{"282":106110523,"CN":45195660,"211":37085211,"224":17701452,"199/5931":13373159,"199/5929":13232318,"281":12365195,"289":5926292,"255":3688575,"263":3017208,"220":2046526,"265":1463117,"199/5949":1301735,"284":1250766,"199/5932":1248923,"266":1067288,"244":921645,"258":424398,"338":404333,"225":313803,"206":288687,"279":271718,"278":136733,"315":80360},"cn":{"otherLocalState":449293,"sales":1742528,"breakfast":9841680,"lunch":28690806,"commodities":6009285,"other":653889,"spent":37637592}},"2024":{"enroll":70903,"src":{"tax_mo":402589711,"loc_oth":69079246,"st_fsp":334360455,"st_oth":21056845,"st_trs":43430487,"fed_oth":27265760,"fed_med":7578456,"fed_t1":35231429,"fed_sped":16739755,"fed_covid":65918453,"tax_is":137545176,"fed_cn":44047053},"use":{"instr":545102944,"isup":59929962,"lead":73883832,"stud":73683677,"trans":27890538,"food":40845198,"extra":22611928,"admin":22853335,"ops":146433176,"comm":12060873,"debt":182660332,"build":91454624,"inter":7174628},"links":[["tax_mo","GF",402589711],["loc_oth","GF",26855733],["st_fsp","GF",334360455],["st_oth","GF",202372],["st_trs","GF",43430487],["fed_oth","GF",8443594],["fed_med","GF",7578456],["GF","instr",472217416],["GF","isup",24795551],["GF","lead",68853507],["GF","stud",61148702],["GF","trans",27829974],["GF","food",341682],["GF","extra",21750088],["GF","admin",21838113],["GF","ops",133492683],["GF","comm",5179768],["GF","debt",1864646],["GF","build",4374143],["GF","inter",7021468],["bal_in","GF",27246933],["loc_oth","CN",1086135],["fed_cn","CN",44047053],["CN","food",40049324],["CN","ops",31231],["CN","bal_out",5052633],["fed_oth","FG",18822166],["fed_t1","FG",35231429],["fed_sped","FG",16739755],["fed_covid","FG",65918453],["st_oth","FG",21050],["FG","stud",12247685],["FG","instr",65306253],["FG","isup",34364176],["FG","lead",4625069],["FG","ops",11845355],["FG","comm",6693792],["FG","extra",36714],["FG","admin",951321],["FG","trans",60564],["FG","food",448882],["FG","inter",153160],["st_oth","SL",5933273],["loc_oth","SL",5857378],["SL","instr",7579275],["SL","isup",770235],["SL","lead",405256],["SL","stud",287290],["SL","ops",597606],["SL","extra",825126],["SL","food",5310],["SL","admin",37978],["SL","comm",187313],["SL","build",721],["SL","bal_out",1094541],["tax_is","DS",137545176],["loc_oth","DS",2378511],["st_oth","DS",14900150],["DS","debt",178510591],["bal_in","DS",23686754],["loc_oth","CP",32901489],["CP","admin",25923],["CP","ops",466301],["CP","debt",2285095],["CP","build",87079760],["bal_in","CP",56955590]],"fed":{"282":65175951,"CN":44047053,"211":35231429,"224":16361976,"289":7553009,"199/5929":7038210,"199/5931":6976821,"263":3448768,"255":2893126,"220":1833502,"199/5949":1387717,"265":1344771,"244":779679,"279":742502,"199/5932":601635,"338":308634,"225":296236,"278":240899,"206":220265,"258":199513,"315":81543},"cn":{"otherLocalState":176358,"sales":909777,"breakfast":9598698,"lunch":29163770,"commodities":4022015,"other":1262570,"spent":40080555}},"2025":{"enroll":70184,"src":{"tax_mo":412861293,"loc_oth":68454788,"st_fsp":325784375,"st_oth":43737812,"st_trs":42671591,"fed_oth":22755966,"fed_med":6528233,"fed_t1":37127572,"fed_sped":15626177,"fed_covid":7165739,"tax_is":144381077,"fed_cn":43449803},"use":{"instr":523857357,"isup":50665879,"lead":72073001,"stud":67881862,"trans":29515651,"food":45922498,"extra":23602069,"admin":23324379,"ops":146068938,"comm":8944784,"debt":170721430,"build":170827628,"inter":8250026},"links":[["tax_mo","GF",412861293],["loc_oth","GF",26471680],["st_fsp","GF",325192242],["st_oth","GF",44252],["st_trs","GF",42671591],["fed_oth","GF",5552722],["fed_med","GF",6528233],["GF","instr",480454597],["GF","isup",23592418],["GF","lead",67165004],["GF","stud",58044659],["GF","trans",29514293],["GF","food",265092],["GF","extra",22643037],["GF","admin",23239495],["GF","ops",128701154],["GF","comm",4266901],["GF","debt",1628909],["GF","build",6627196],["GF","inter",8250026],["bal_in","GF",35070768],["loc_oth","CN",1292247],["fed_cn","CN",43449803],["CN","food",45279127],["CN","ops",37483],["bal_in","CN",574560],["fed_oth","FG",17203244],["fed_t1","FG",37127572],["fed_sped","FG",15626177],["fed_covid","FG",7165739],["st_oth","FG",18727],["FG","stud",9536280],["FG","instr",29613413],["FG","isup",26538495],["FG","lead",4719069],["FG","admin",32601],["FG","ops",1946463],["FG","comm",4312189],["FG","extra",64761],["FG","trans",1358],["FG","food",376858],["st_oth","SL",28118058],["st_fsp","SL",592133],["loc_oth","SL",4975281],["SL","instr",13789347],["SL","stud",300923],["SL","ops",14948069],["SL","build",2341474],["SL","isup",534966],["SL","extra",894271],["SL","lead",188928],["SL","food",1421],["SL","admin",10067],["SL","comm",365694],["tax_is","DS",144381077],["loc_oth","DS",1574556],["st_oth","DS",15556775],["DS","debt",169025567],["bal_in","DS",7513159],["loc_oth","CP",34141024],["CP","admin",42216],["CP","ops",435769],["CP","debt",66954],["CP","build",161858958],["bal_in","CP",128262873]],"fed":{"CN":43449803,"211":37127572,"224":15253877,"282":7162828,"199/5931":5726176,"289":4511572,"255":4066561,"199/5929":3972200,"263":3937767,"220":1838575,"199/5949":1576859,"265":1547766,"244":971143,"199/5932":802057,"225":291427,"206":258332,"315":80873,"278":71528},"cn":{"otherLocalState":658705,"sales":633542,"breakfast":9339906,"lunch":29427687,"commodities":3252490,"other":1429720,"spent":45316610}}},"budget":{"2023":{"doc":"Budget Book 2022-2023 (Budget: All Funds, p.14)","adopted":"June 2022","total":986314146,"rev":{"b_local":636545501,"b_state":262800426,"b_fed":29419955,"b_other":3000000,"b_fedcn":43121426},"use":{"instr":451297142,"isup":24042419,"lead":67735365,"stud":65263231,"trans":24581334,"food":46771124,"extra":19090722,"admin":23664497,"ops":132120980,"comm":5275169,"debt":123472163,"inter":3000000},"links":[["b_local","GF",485767032],["b_state","GF",260945145],["b_fed","GF",29419955],["b_other","GF",3000000],["b_local","CN",2932084],["b_state","CN",274022],["b_fedcn","CN",43121426],["b_local","DS",147846385],["b_state","DS",1581259],["CN","food",46327532],["DS","debt",120472163],["GF","instr",451297142],["GF","isup",24042419],["GF","lead",67735365],["GF","stud",65263231],["GF","trans",24581334],["GF","food",443592],["GF","extra",19090722],["GF","admin",23664497],["GF","ops",132120980],["GF","comm",5275169],["GF","debt",3000000],["GF","inter",3000000],["bal_in","GF",40382319],["DS","bal_out",28955481]]},"2024":{"doc":"Budget Book 2023-2024 (Budget: All Funds, p.14) and 2023-24 Adopted Budget","adopted":"June 27, 2023","total":1048159573,"rev":{"b_local":676808922,"b_state":269313381,"b_fed":16385807,"b_other":500000,"b_fedcn":50483205},"use":{"instr":452900627,"isup":24954237,"lead":69376811,"stud":64725108,"trans":22731086,"food":52496412,"extra":20321670,"admin":26130271,"ops":144264117,"comm":5146066,"debt":152228071,"build":1500000,"inter":11385097},"links":[["b_local","GF",519067626],["b_state","GF",265550256],["b_fed","GF",16385807],["b_other","GF",500000],["b_local","CN",2176933],["b_state","CN",69126],["b_fedcn","CN",50483205],["b_local","DS",155564363],["b_state","DS",3693999],["CN","food",52105472],["DS","debt",149228071],["GF","instr",452900627],["GF","isup",24954237],["GF","lead",69376811],["GF","stud",64725108],["GF","trans",22731086],["GF","food",390940],["GF","extra",20321670],["GF","admin",26130271],["GF","ops",144264117],["GF","comm",5146066],["GF","debt",3000000],["GF","build",1500000],["GF","inter",11385097],["bal_in","GF",45322341],["CN","bal_out",623792],["DS","bal_out",10030291]]},"2025":{"doc":"Budget Book 2024-2025 (Budget: All Funds, p.14) and 2024-25 Adopted Budget","adopted":"June 11, 2024","total":1060502059,"rev":{"b_local":619832455,"b_state":361114848,"b_fed":16403057,"b_fedcn":45501350},"use":{"instr":459868354,"isup":19827114,"lead":66183218,"stud":58751362,"trans":23488331,"food":48188796,"extra":20757789,"admin":26765833,"ops":149500533,"comm":4617764,"debt":170554189,"build":1130000,"inter":10868776},"links":[["b_local","GF",462692852],["b_state","GF",347462185],["b_fed","GF",16403057],["b_local","CN",2161260],["b_state","CN",176817],["b_fedcn","CN",45501350],["b_local","DS",154978343],["b_state","DS",13475846],["CN","food",47839427],["DS","debt",168454189],["GF","instr",459868354],["GF","isup",19827114],["GF","lead",66183218],["GF","stud",58751362],["GF","trans",23488331],["GF","food",349369],["GF","extra",20757789],["GF","admin",26765833],["GF","ops",149500533],["GF","comm",4617764],["GF","debt",2100000],["GF","build",1130000],["GF","inter",10868776],["bal_in","GF",17650349]]},"2026":{"doc":"2025-26 Adopted Budget (General Fund) + TEA PEIMS budget file for Food Service and Debt Service","adopted":"June 10, 2025","total":1078279872,"rev":{"b_local":590283254,"b_state":379944420,"b_fed":7517250,"b_other":600000,"b_fedcn":44307974},"use":{"instr":486291299,"isup":20964822,"lead":65251558,"stud":59450777,"trans":22462312,"food":58916030,"extra":21466336,"admin":25047448,"ops":145923218,"comm":4143198,"debt":151822237,"build":3365424,"inter":13175213},"links":[["b_local","GF",457911481],["b_state","GF",360143391],["b_fed","GF",7517250],["b_other","GF",600000],["b_local","CN",2279864],["b_state","CN",170701],["b_fedcn","CN",44307974],["b_local","DS",130091909],["b_state","DS",19630328],["CN","food",58825772],["DS","debt",149722237],["GF","instr",486291299],["GF","isup",20964822],["GF","lead",65251558],["GF","stud",59450777],["GF","trans",22462312],["GF","food",90258],["GF","extra",21466336],["GF","admin",25047448],["GF","ops",145923218],["GF","comm",4143198],["GF","debt",2100000],["GF","build",3365424],["GF","inter",13175213],["bal_in","GF",43559741],["bal_in","CN",12067233]]},"2027":{"doc":"2026-27 Adopted Budget (all official funds combined; no fund split published)","adopted":"June 23, 2026","total":1098722601,"rev":{"b_local":596480769,"b_state":399475770,"b_fed":52922449},"use":{"instr":510911184,"isup":21327966,"lead":75401392,"stud":61364168,"trans":24405852,"food":49444138,"extra":21608807,"admin":23306173,"ops":145258817,"comm":4035237,"debt":147551976,"build":3244891,"inter":10862000},"links":[["b_local","OFF",596480769],["b_state","OFF",399475770],["b_fed","OFF",52922449],["OFF","instr",510911184],["OFF","isup",21327966],["OFF","lead",75401392],["OFF","stud",61364168],["OFF","trans",24405852],["OFF","food",49444138],["OFF","extra",21608807],["OFF","admin",23306173],["OFF","ops",145258817],["OFF","comm",4035237],["OFF","debt",147551976],["OFF","build",3244891],["OFF","inter",10862000],["bal_in","OFF",49843613]]}},"meals":{"2016":{"sy":"2015-16","sites":130,"octSites":130,"sitesAllFree":86,"enroll":89561,"freeElig":74359,"redElig":2449,"breakfasts":5407712,"lunches":10655099,"snacks":614483,"paidLunches":524627,"reimbB":10483212,"reimbL":32017583,"reimbS":515885,"monthly":{"2015-08":1393265,"2015-09":5161941,"2015-10":5109129,"2015-11":4003621,"2015-12":3405585,"2016-01":4398716,"2016-02":4892467,"2016-03":4142545,"2016-04":5108076,"2016-05":5032323,"2016-06":369011},"ssoReimb":461171,"ssoMeals":169866,"cacfpReimb":0,"cacfpMeals":0},"2017":{"sy":"2016-17","sites":130,"octSites":130,"sitesAllFree":86,"enroll":88442,"freeElig":73907,"redElig":2942,"breakfasts":5464138,"lunches":10514999,"snacks":544549,"paidLunches":547799,"reimbB":10832944,"reimbL":32400225,"reimbS":468289,"monthly":{"2016-08":1908881,"2016-09":5297317,"2016-10":4938337,"2016-11":4274589,"2016-12":3934202,"2017-01":3718032,"2017-02":4701481,"2017-03":4471296,"2017-04":4731898,"2017-05":5355522,"2017-06":369902},"ssoReimb":462704,"ssoMeals":166373,"cacfpReimb":0,"cacfpMeals":0},"2018":{"sy":"2017-18","sites":130,"octSites":129,"sitesAllFree":85,"enroll":86462,"freeElig":72237,"redElig":3175,"breakfasts":5577351,"lunches":10063370,"snacks":560365,"paidLunches":524223,"reimbB":11328056,"reimbL":31680646,"reimbS":481717,"monthly":{"2017-08":2104899,"2017-09":4991282,"2017-10":5207331,"2017-11":4299345,"2017-12":3690584,"2018-01":3803379,"2018-02":4715031,"2018-03":3974919,"2018-04":5243778,"2018-05":5303950,"2018-06":155921},"ssoReimb":447102,"ssoMeals":156086,"cacfpReimb":0,"cacfpMeals":0},"2019":{"sy":"2018-19","sites":130,"octSites":129,"sitesAllFree":96,"enroll":84936,"freeElig":73472,"redElig":2054,"breakfasts":5439226,"lunches":9808998,"snacks":525908,"paidLunches":458167,"reimbB":11434734,"reimbL":31828462,"reimbS":464037,"monthly":{"2018-08":2384292,"2018-09":4852561,"2018-10":5522890,"2018-11":4288886,"2018-12":3694526,"2019-01":3990145,"2019-02":4803453,"2019-03":3710704,"2019-04":5232356,"2019-05":5244750,"2019-06":2670},"ssoReimb":507621,"ssoMeals":174119,"cacfpReimb":0,"cacfpMeals":0},"2020":{"sy":"2019-20","sites":129,"octSites":129,"sitesAllFree":96,"enroll":83349,"freeElig":71306,"redElig":1726,"breakfasts":3742875,"lunches":6494196,"snacks":290044,"paidLunches":346682,"reimbB":8072466,"reimbL":21588066,"reimbS":264075,"monthly":{"2019-08":2307560,"2019-09":4967379,"2019-10":5347775,"2019-11":3889156,"2019-12":3568530,"2020-01":4289657,"2020-02":4374294,"2020-03":1180257},"ssoReimb":4350372,"ssoMeals":1506368,"cacfpReimb":0,"cacfpMeals":0},"2021":{"sy":"2020-21","ssoReimb":29680126,"ssoMeals":9343764,"cacfpReimb":0,"cacfpMeals":0},"2022":{"sy":"2021-22","sites":84,"octSites":0,"sitesAllFree":0,"enroll":0,"freeElig":0,"redElig":0,"breakfasts":0,"lunches":0,"snacks":256032,"paidLunches":0,"reimbB":0,"reimbL":0,"reimbS":256032,"monthly":{"2021-09":19621,"2021-10":29430,"2021-11":27887,"2021-12":20594,"2022-01":24744,"2022-02":21370,"2022-03":32647,"2022-04":54573,"2022-05":25081,"2022-06":85},"ssoReimb":32047054,"ssoMeals":9255492,"cacfpReimb":0,"cacfpMeals":0},"2023":{"sy":"2022-23","sites":129,"octSites":129,"sitesAllFree":110,"enroll":74849,"freeElig":66339,"redElig":767,"breakfasts":3640762,"lunches":6756507,"snacks":311226,"paidLunches":312581,"reimbB":9603004,"reimbL":28796690,"reimbS":335274,"monthly":{"2022-08":2789183,"2022-09":4670828,"2022-10":4464250,"2022-11":3732838,"2022-12":2531968,"2023-01":4088421,"2023-02":3777041,"2023-03":3956663,"2023-04":4467349,"2023-05":4253434,"2023-06":2993},"ssoReimb":804054,"ssoMeals":215362,"cacfpReimb":0,"cacfpMeals":0},"2024":{"sy":"2023-24","sites":130,"octSites":130,"sitesAllFree":0,"enroll":73840,"freeElig":69114,"redElig":0,"breakfasts":3657119,"lunches":7073312,"snacks":357140,"paidLunches":452695,"reimbB":9424999,"reimbL":29026031,"reimbS":417249,"monthly":{"2023-08":2970513,"2023-09":4355828,"2023-10":4623713,"2023-11":3729069,"2023-12":3427113,"2024-01":3344154,"2024-02":4583942,"2024-03":3155498,"2024-04":5000934,"2024-05":3672739,"2024-06":4776},"ssoReimb":676781,"ssoMeals":179717,"cacfpReimb":156834,"cacfpMeals":64416},"2025":{"sy":"2024-25","sites":128,"octSites":128,"sitesAllFree":0,"enroll":72010,"freeElig":67403,"redElig":0,"breakfasts":3443692,"lunches":6869750,"snacks":0,"paidLunches":439667,"reimbB":9227393,"reimbL":29425600,"reimbS":0,"monthly":{"2024-08":2796967,"2024-09":4529462,"2024-10":5092634,"2024-11":3497066,"2024-12":3229282,"2025-01":3567641,"2025-02":4261828,"2025-03":3383927,"2025-04":4841277,"2025-05":3448184,"2025-06":4725},"ssoReimb":387628,"ssoMeals":97955,"cacfpReimb":1951283,"cacfpMeals":598786},"2026":{"sy":"2025-26","sites":126,"octSites":126,"sitesAllFree":0,"enroll":69154,"freeElig":55264,"redElig":0,"breakfasts":3160445,"lunches":6463195,"snacks":0,"paidLunches":1297813,"reimbB":7679807,"reimbL":25042746,"reimbS":0,"monthly":{"2025-08":2525085,"2025-09":4066683,"2025-10":4091456,"2025-11":2801703,"2025-12":2736352,"2026-01":2805502,"2026-02":3737247,"2026-03":3081726,"2026-04":4112261,"2026-05":2759980,"2026-06":4560},"ssoReimb":436946,"ssoMeals":106743,"cacfpReimb":1752625,"cacfpMeals":356657}}};/*/DATA*/</script>
+<script>
+(() => {
+const D = window.FWISD;
+const $ = (s, r = document) => r.querySelector(s);
+const NS = "http://www.w3.org/2000/svg";
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const ACT_YEARS = Object.keys(D.actual).map(Number).sort((a, b) => a - b);
+const BUD_YEARS = Object.keys(D.budget).map(Number).sort((a, b) => a - b);
+const BUD_ENROLL = { 2023: D.actual[2023].enroll, 2024: D.actual[2024].enroll, 2025: D.actual[2025].enroll, 2026: 67491, 2027: 63072 };
+const REAL_BASE = 2026;
+
+const S = { mode: "actual", year: 2025, dollars: "nominal", basis: "total", fixed: true, fedOnly: false };
+const years = () => S.mode === "actual" ? ACT_YEARS : BUD_YEARS;
+const rec = y => S.mode === "actual" ? D.actual[y] : D.budget[y];
+const enrollOf = y => S.mode === "actual" ? D.actual[y].enroll : BUD_ENROLL[y];
+
+// ---- units
+function conv(v, y, opts = {}) {
+  let x = v;
+  if (S.dollars === "real") x *= D.cpi[REAL_BASE] / D.cpi[y];
+  if (S.basis === "pupil" && !opts.noPupil) x /= enrollOf(y);
+  return x;
+}
+function money(v, opts = {}) {
+  const pupil = S.basis === "pupil" && !opts.noPupil;
+  const a = Math.abs(v), sg = v < 0 ? "−" : "";
+  if (pupil) return sg + "$" + Math.round(a).toLocaleString();
+  if (a >= 1e9) return sg + "$" + (a / 1e9).toFixed(2) + "B";
+  if (a >= 1e8) return sg + "$" + Math.round(a / 1e6) + "M";
+  if (a >= 1e6) return sg + "$" + (a / 1e6).toFixed(1) + "M";
+  if (a >= 1e3) return sg + "$" + Math.round(a / 1e3) + "K";
+  return sg + "$" + Math.round(a);
+}
+const pct = (v, d = 1) => (v >= 0 ? "+" : "−") + Math.abs(v * 100).toFixed(d) + "%";
+const fyLabel = y => "FY" + y;
+const syLabel = y => (y - 1) + "-" + String(y).slice(2);
+const unitNote = () => [S.dollars === "real" ? "fiscal 2026 dollars" : "nominal dollars", S.basis === "pupil" ? "per enrolled student" : null].filter(Boolean).join(", ");
+
+// ---- svg helpers
+function el(tag, attrs = {}, parent) {
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+function svgRoot(container, w, h) {
+  container.innerHTML = "";
+  const s = el("svg", { viewBox: `0 0 ${w} ${h}`, role: "img" });
+  container.appendChild(s);
+  return s;
+}
+function niceMax(v) {
+  if (v <= 0) return 1;
+  const p = Math.pow(10, Math.floor(Math.log10(v))), n = v / p;
+  return (n <= 1 ? 1 : n <= 2 ? 2 : n <= 2.5 ? 2.5 : n <= 5 ? 5 : 10) * p;  // step sizes 1, 2, 2.5, 5
+}
+function ticks(max, n = 4) {
+  const step = niceMax(max / n), top = step * Math.max(1, Math.ceil(max / step - 1e-9));
+  const out = []; for (let v = 0; v <= top + 1e-9; v += step) out.push(v);
+  return { max: top, ticks: out };
+}
+function shortMoney(v) {
+  const a = Math.abs(v);
+  if (S.basis === "pupil") return "$" + (a >= 1e3 ? (a / 1e3).toFixed(a % 1000 ? 1 : 0) + "K" : Math.round(a));
+  if (a >= 1e9) return "$" + (a / 1e9).toFixed(a % 1e9 ? 1 : 0) + "B";
+  if (a >= 1e6) return "$" + Math.round(a / 1e6) + "M";
+  if (a >= 1e3) return "$" + Math.round(a / 1e3) + "K";
+  return "$" + Math.round(a);
+}
+
+// ---- tooltip
+const tip = $("#tip");
+function showTip(ev, html) {
+  tip.innerHTML = html; tip.style.opacity = 1;
+  const pad = 14, r = tip.getBoundingClientRect();
+  let x = ev.clientX + pad, y = ev.clientY + pad;
+  if (x + r.width > innerWidth - 8) x = ev.clientX - r.width - pad;
+  if (y + r.height > innerHeight - 8) y = ev.clientY - r.height - pad;
+  tip.style.left = Math.max(8, x) + "px"; tip.style.top = Math.max(8, y) + "px";
+}
+const hideTip = () => { tip.style.opacity = 0; };
+const trow = (label, val, color) => `<div class="tr"><span>${color ? `<i style="background:${color}"></i>` : ""}${label}</span><b>${val}</b></div>`;
+
+// ---- stacked bar chart
+function stackedBars(container, { yrs, series, selected, onSelect, height = 300, label = fyLabel, total = true, fmt = v => money(v), axisFmt = v => shortMoney(v), width = 760 }) {
+  const W = width, H = height, m = { l: 54, r: 10, t: 14, b: 26 };
+  const s = svgRoot(container, W, H);
+  const iw = W - m.l - m.r, ih = H - m.t - m.b;
+  const totals = yrs.map(y => series.reduce((a, sr) => a + Math.max(0, sr.values[y] || 0), 0));
+  const { max, ticks: tk } = ticks(Math.max(...totals) || 1);
+  const yS = v => m.t + ih - v / max * ih;
+  const g = el("g", { class: "axis" }, s);
+  tk.forEach(t => {
+    el("line", { x1: m.l, x2: W - m.r, y1: yS(t), y2: yS(t), stroke: css("--grid"), "stroke-width": 1 }, g);
+    el("text", { x: m.l - 6, y: yS(t) + 4, "text-anchor": "end" }, g).textContent = axisFmt(t);
+  });
+  const bw = iw / yrs.length, barW = Math.min(44, bw * 0.68);
+  yrs.forEach((y, i) => {
+    const cx = m.l + bw * i + bw / 2;
+    const col = el("g", { style: "cursor:pointer" }, s);
+    if (y === selected) el("rect", { x: m.l + bw * i + 1, y: m.t, width: bw - 2, height: ih, fill: css("--surface-2"), rx: 4 }, col);
+    let acc = 0;
+    const segs = series.map(sr => ({ sr, v: Math.max(0, sr.values[y] || 0) })).filter(d => d.v > 0);
+    segs.forEach((d, j) => {
+      const y0 = yS(acc), y1 = yS(acc + d.v); acc += d.v;
+      const h = Math.max(0, y0 - y1 - (j < segs.length - 1 ? 2 : 0));
+      const top = j === segs.length - 1;
+      if (top && h > 4) {
+        const r = 4, x = cx - barW / 2, yy = y0 - h;
+        el("path", { d: `M${x},${y0}V${yy + r}Q${x},${yy} ${x + r},${yy}H${x + barW - r}Q${x + barW},${yy} ${x + barW},${yy + r}V${y0}Z`, fill: d.sr.color }, col);
+      } else el("rect", { x: cx - barW / 2, y: y0 - h, width: barW, height: Math.max(h, 0.5), fill: d.sr.color }, col);
+    });
+    el("text", { x: cx, y: H - 8, "text-anchor": "middle", class: "axis", style: `font-size:${W < 600 && yrs.length > 8 ? 9.5 : yrs.length > 12 ? 10 : 11}px;fill:${y === selected ? css("--text") : css("--text-3")};font-weight:${y === selected ? 650 : 400}` }, s).textContent = label(y).replace(/^FY20/, "’").replace(/^20(\d\d)-/, "$1-");
+    const hit = el("rect", { x: m.l + bw * i, y: m.t, width: bw, height: ih + m.b, fill: "transparent" }, col);
+    hit.addEventListener("mousemove", ev => {
+      const rows = series.slice().reverse().map(sr => trow(sr.label, fmt(sr.values[y] || 0), sr.color)).join("");
+      showTip(ev, `<div class="tt">${label(y)}</div>${rows}${total ? trow("Total", fmt(totals[i])) : ""}`);
+    });
+    hit.addEventListener("mouseleave", hideTip);
+    if (onSelect) hit.addEventListener("click", () => onSelect(y));
+  });
+  return s;
+}
+function legend(container, series) {
+  container.innerHTML = series.map(sr => `<span><i style="background:${sr.color}"></i>${sr.label}</span>`).join("");
+}
+
+// ---- line chart
+function lineChart(container, { xs, series, height = 240, label = String, yFmt = shortMoney, valFmt = money, yMax, yMin = 0, xLabelEvery = 1, width = 760 }) {
+  const W = width, H = height, m = { l: 54, r: 14, t: 14, b: 26 };
+  const s = svgRoot(container, W, H);
+  const iw = W - m.l - m.r, ih = H - m.t - m.b;
+  const all = series.flatMap(sr => xs.map(x => sr.values[x]).filter(v => v != null));
+  const t = ticks(yMax ?? Math.max(...all));
+  const max = yMax ?? t.max;
+  const tk = yMax ? [0, .25, .5, .75, 1].map(f => yMin + (max - yMin) * f) : t.ticks;
+  const xS = i => m.l + (xs.length === 1 ? iw / 2 : i / (xs.length - 1) * iw);
+  const yS = v => m.t + ih - (v - yMin) / (max - yMin) * ih;
+  const g = el("g", { class: "axis" }, s);
+  tk.forEach(v => {
+    el("line", { x1: m.l, x2: W - m.r, y1: yS(v), y2: yS(v), stroke: css("--grid") }, g);
+    el("text", { x: m.l - 6, y: yS(v) + 4, "text-anchor": "end" }, g).textContent = yFmt(v);
+  });
+  xs.forEach((x, i) => { if (i % xLabelEvery === 0 || i === xs.length - 1) el("text", { x: xS(i), y: H - 8, "text-anchor": "middle" }, g).textContent = label(x); });
+  series.forEach(sr => {
+    const pts = xs.map((x, i) => [i, sr.values[x]]).filter(p => p[1] != null);
+    let d = "", pen = false;
+    xs.forEach((x, i) => { const v = sr.values[x]; if (v == null) { pen = false; return; } d += (pen ? "L" : "M") + xS(i) + "," + yS(v); pen = true; });
+    el("path", { d, fill: "none", stroke: sr.color, "stroke-width": 2, "stroke-dasharray": sr.dash || "none", "stroke-linejoin": "round" }, s);
+    pts.forEach(([i, v]) => el("circle", { cx: xS(i), cy: yS(v), r: sr.dash ? 2.5 : 3.5, fill: sr.color, stroke: css("--surface"), "stroke-width": 2 }, s));
+  });
+  const cross = el("line", { y1: m.t, y2: m.t + ih, stroke: css("--text-3"), "stroke-width": 1, opacity: 0 }, s);
+  const ov = el("rect", { x: m.l - 10, y: m.t, width: iw + 20, height: ih, fill: "transparent" }, s);
+  ov.addEventListener("mousemove", ev => {
+    const r = s.getBoundingClientRect(), px = (ev.clientX - r.left) / r.width * W;
+    const i = Math.max(0, Math.min(xs.length - 1, Math.round((px - m.l) / iw * (xs.length - 1))));
+    cross.setAttribute("x1", xS(i)); cross.setAttribute("x2", xS(i)); cross.setAttribute("opacity", .5);
+    showTip(ev, `<div class="tt">${label(xs[i])}</div>` + series.map(sr => trow(sr.label, sr.values[xs[i]] == null ? "—" : valFmt(sr.values[xs[i]]), sr.color)).join(""));
+  });
+  ov.addEventListener("mouseleave", () => { cross.setAttribute("opacity", 0); hideTip(); });
+}
+
+// ---- Sankey
+const SRC = Object.fromEntries(D.sources.map(([k, l, g]) => [k, { label: l, group: g }]));
+const BSRC = {
+  b_local: { label: "Local (mostly property tax)", group: "local" },
+  b_state: { label: "State", group: "state" },
+  b_fedcn: { label: "Federal: USDA child nutrition", group: "cn" },
+  b_fed: { label: "Federal", group: "federal" },  // General Fund federal, or all federal in FY2027
+  b_other: { label: "Other resources", group: "neutral" },
+};
+const USE = Object.fromEntries(D.uses);
+const groupColor = g => css({ local: "--local", state: "--state", federal: "--federal", cn: "--cn", neutral: "--neutral" }[g] || "--neutral");
+function nodeInfo(k) {
+  if (SRC[k]) return { col: 0, label: SRC[k].label, group: k === "fed_cn" ? "cn" : SRC[k].group };
+  if (BSRC[k]) return { col: 0, ...BSRC[k] };
+  if (k === "bal_in") return { col: 0, label: S.mode === "actual" ? "Fund balance, bonds & transfers" : "Drawn from fund balance", group: "neutral" };
+  if (D.funds[k]) return { col: 1, label: D.funds[k], group: k === "CN" ? "cn" : k === "FG" ? "federal" : "fund" };
+  if (k === "OFF") return { col: 1, label: "Official budget (General, Food, Debt)", group: "fund" };
+  if (k === "bal_out") return { col: 2, label: "Added to fund balance", group: "neutral" };
+  return { col: 2, label: USE[k] || k, group: "use" };
+}
+const SRC_ORDER = ["tax_mo", "tax_is", "loc_oth", "b_local", "st_fsp", "st_trs", "st_oth", "b_state", "fed_cn", "b_fedcn", "fed_t1", "fed_sped", "fed_covid", "fed_arra", "fed_med", "fed_oth", "b_fed", "b_other", "bal_in"];
+const FUND_ORDER = ["GF", "OFF", "CN", "FG", "SL", "DS", "CP"];
+const USE_ORDER = D.uses.map(u => u[0]).concat(["bal_out"]);
+const orderOf = k => { for (const arr of [SRC_ORDER, FUND_ORDER, USE_ORDER]) { const i = arr.indexOf(k); if (i >= 0) return i; } return 99; };
+
+let sankeyMaxCache = {};
+function sankeyMax() {
+  const key = S.mode + S.dollars + S.basis;
+  if (sankeyMaxCache[key]) return sankeyMaxCache[key];
+  let mx = 0;
+  for (const y of years()) {
+    const cols = [0, 0, 0];
+    const nodes = {};
+    rec(y).links.forEach(([a, b, v]) => { nodes[a] = nodes[a] || [0, 0]; nodes[b] = nodes[b] || [0, 0]; nodes[a][1] += v; nodes[b][0] += v; });
+    for (const k in nodes) cols[nodeInfo(k).col] += conv(Math.max(...nodes[k]), y);
+    mx = Math.max(mx, ...cols);
+  }
+  return sankeyMaxCache[key] = mx;
+}
+
+function drawSankey() {
+  const y = S.year, r = rec(y);
+  const W = 1000, H = 760, padY = 6, nodeW = 14;
+  const colX = [290, 505, 722];
+  const nodes = {};
+  r.links.forEach(([a, b, v]) => {
+    for (const k of [a, b]) if (!nodes[k]) nodes[k] = { k, ...nodeInfo(k), vin: 0, vout: 0, inL: [], outL: [] };
+  });
+  const links = r.links.map(([a, b, v]) => ({ s: nodes[a], t: nodes[b], v: conv(v, y), raw: v }));
+  links.forEach(l => { l.s.vout += l.v; l.t.vin += l.v; l.s.outL.push(l); l.t.inL.push(l); });
+  const cols = [[], [], []];
+  Object.values(nodes).forEach(n => { n.v = Math.max(n.vin, n.vout); cols[n.col].push(n); });
+  cols.forEach(c => c.sort((a, b) => orderOf(a.k) - orderOf(b.k)));
+  const colTot = cols.map(c => c.reduce((a, n) => a + n.v, 0));
+  const maxN = Math.max(...cols.map(c => c.length));
+  const avail = H - 20 - padY * (maxN - 1);
+  const ref = S.fixed ? Math.max(sankeyMax(), ...colTot) : Math.max(...colTot);
+  const k = avail / ref;
+  cols.forEach((c, ci) => {
+    let yy = 10;
+    c.forEach(n => { n.x = colX[ci]; n.y = yy; n.h = Math.max(1, n.v * k); yy += n.h + padY; });
+  });
+  // link offsets
+  Object.values(nodes).forEach(n => {
+    n.outL.sort((a, b) => a.t.y - b.t.y); n.inL.sort((a, b) => a.s.y - b.s.y);
+    let o = 0; n.outL.forEach(l => { l.sy = n.y + o + l.v * k / 2; o += l.v * k; });
+    o = 0; n.inL.forEach(l => { l.ty = n.y + o + l.v * k / 2; o += l.v * k; });
+  });
+  const usedH = Math.max(...cols.map(c => c.length ? c[c.length - 1].y + c[c.length - 1].h : 0)) + 12;
+  const s = svgRoot($("#sankey"), W, Math.max(260, usedH));
+  s.setAttribute("aria-label", `Sankey diagram of ${fyLabel(y)} revenue sources, funds and spending`);
+  const gl = el("g", {}, s);
+  const isFed = l => ["federal", "cn"].includes(l.s.group) || (l.s.k === "FG") || (l.s.k === "CN");
+  links.forEach(l => {
+    const x0 = l.s.x + nodeW, x1 = l.t.x, xm = (x0 + x1) / 2;
+    let color;
+    if (l.s.col === 0) color = groupColor(l.s.group);
+    else if (l.s.k === "CN") color = css("--cn");
+    else if (l.s.k === "FG") color = css("--federal");
+    else color = css("--neutral-link");
+    const dim = S.fedOnly && !isFed(l);
+    const p = el("path", {
+      d: `M${x0},${l.sy}C${xm},${l.sy} ${xm},${l.ty} ${x1},${l.ty}`,
+      fill: "none", stroke: color, "stroke-width": Math.max(1, l.v * k), "stroke-opacity": dim ? 0.08 : (l.s.col === 0 ? 0.42 : 0.5),
+    }, gl);
+    p.addEventListener("mousemove", ev => {
+      p.setAttribute("stroke-opacity", 0.8);
+      const share = l.v / l.s.vout;
+      showTip(ev, `<div class="tt">${l.s.label} → ${l.t.label}</div>${trow(fyLabel(y), money(l.v))}${trow("Share of what leaves " + l.s.label, (share * 100).toFixed(1) + "%")}`);
+    });
+    p.addEventListener("mouseleave", () => { p.setAttribute("stroke-opacity", dim ? 0.08 : (l.s.col === 0 ? 0.42 : 0.5)); hideTip(); });
+  });
+  const total = colTot[0];
+  Object.values(nodes).forEach(n => {
+    const fill = n.group === "use" || n.group === "fund" ? css("--text-3") : groupColor(n.group);
+    const dim = S.fedOnly && !["federal", "cn"].includes(n.group);
+    const rect = el("rect", { x: n.x, y: n.y, width: nodeW, height: n.h, fill, rx: 2, opacity: dim ? 0.35 : 1 }, s);
+    rect.addEventListener("mousemove", ev => showTip(ev, `<div class="tt">${n.label}</div>${trow(fyLabel(y), money(n.v))}${trow("Share of column", (n.v / colTot[n.col] * 100).toFixed(1) + "%")}`));
+    rect.addEventListener("mouseleave", hideTip);
+    if (n.h >= 6 || (n.col === 1 && n.h >= 3)) {
+      const left = n.col === 0, mid = n.col === 1;
+      const tx = left ? n.x - 6 : n.x + nodeW + 6;
+      const t = el("text", { x: tx, y: n.y + n.h / 2 + 4, "text-anchor": left ? "end" : "start", class: "sankey-node-label", opacity: dim ? 0.5 : 1 }, s);
+      t.textContent = n.label;
+      if (!mid || n.h > 18) {
+        const vt = el("tspan", { class: "sankey-node-val", dx: 6 }, t);
+        vt.textContent = money(n.v);
+      }
+    }
+  });
+  // header
+  const yrLbl = S.mode === "actual" ? `${fyLabel(y)} actual (${syLabel(y)} school year)` : `${fyLabel(y)} adopted budget (${syLabel(y)})`;
+  $("#sankeyTitle").textContent = "Money flow, " + yrLbl;
+  const fed = links.filter(l => l.s.col === 0 && ["federal", "cn"].includes(l.s.group)).reduce((a, l) => a + l.v, 0);
+  const rev = links.filter(l => l.s.col === 0 && l.s.k !== "bal_in").reduce((a, l) => a + l.v, 0);
+  const sp = links.filter(l => l.t.col === 2 && l.t.k !== "bal_out").reduce((a, l) => a + l.v, 0);
+  $("#sankeySub").innerHTML = `Revenue ${money(rev)} · spending ${money(sp)} · federal share of revenue <b>${(fed / rev * 100).toFixed(1)}%</b>. ${unitNote()}. ` +
+    (S.mode === "actual" ? "Left: where the money comes from. Middle: the fund it lands in. Right: what it pays for." : `Source: ${r.doc}; adopted ${r.adopted}. Only the General, Food Service and Debt Service funds are adopted, so federal grants such as Title I and IDEA aren't shown.`);
+  drawChanges();
+}
+
+function drawChanges() {
+  const ys = years(), i = ys.indexOf(S.year), box = $("#changes");
+  if (i <= 0) { box.innerHTML = `<p class="muted">No earlier ${S.mode === "actual" ? "actual" : "budget"} year to compare with.</p>`; return; }
+  const p = ys[i - 1], a = rec(S.year), b = rec(p);
+  const name = k => (SRC[k] || BSRC[k] || {}).label || USE[k] || k;
+  const diff = (oa, ob, keys) => keys.map(k => ({ k, v: conv(oa[k] || 0, S.year) - conv(ob[k] || 0, p), base: conv(ob[k] || 0, p) })).filter(d => Math.abs(d.v) > 0).sort((x, y) => Math.abs(y.v) - Math.abs(x.v)).slice(0, 6);
+  // budgets: FY2027 has no fund split, so compare federal as one line
+  const revOf = r => { if (r.src) return r.src; const o = { ...r.rev }; o.b_fed = (o.b_fed || 0) + (o.b_fedcn || 0); delete o.b_fedcn; return o; };
+  const ra = revOf(a), rb = revOf(b);
+  const keysS = [...new Set([...Object.keys(ra), ...Object.keys(rb)])];
+  const keysU = [...new Set([...Object.keys(a.use), ...Object.keys(b.use)])];
+  const rowsS = diff(ra, rb, keysS), rowsU = diff(a.use, b.use, keysU);
+  const fmt = d => `<div class="chg"><span>${name(d.k)}</span><b class="${d.v < 0 ? "dn" : "upc"}">${d.v < 0 ? "−" : "+"}${money(Math.abs(d.v)).replace("−", "")}${d.base ? ` (${pct(d.v / d.base, 0)})` : ""}</b></div>`;
+  box.innerHTML = `<div><h3>Biggest revenue changes vs ${fyLabel(p)}</h3>${rowsS.map(fmt).join("")}</div><div><h3>Biggest spending changes vs ${fyLabel(p)}</h3>${rowsU.map(fmt).join("")}</div>`;
+}
+
+// ---- revenue trend
+function drawRevenue() {
+  const ys = years();
+  const grp = { local: {}, state: {}, federal: {} };
+  ys.forEach(y => {
+    const r = rec(y);
+    if (S.mode === "actual") for (const [k, v] of Object.entries(r.src)) grp[SRC[k].group][y] = (grp[SRC[k].group][y] || 0) + conv(v, y);
+    else for (const [k, v] of Object.entries(r.rev)) { const g = BSRC[k].group; const gg = g === "cn" ? "federal" : g === "neutral" ? "local" : g; grp[gg][y] = (grp[gg][y] || 0) + conv(v, y); }
+  });
+  const series = [
+    { key: "federal", label: "Federal", color: css("--federal"), values: grp.federal },
+    { key: "state", label: "State", color: css("--state"), values: grp.state },
+    { key: "local", label: "Local", color: css("--local"), values: grp.local },
+  ];
+  legend($("#revLegend"), series.slice().reverse());
+  stackedBars($("#revChart"), { yrs: ys, series, selected: S.year, onSelect: setYear });
+  const first = ys[0], last = ys[ys.length - 1];
+  const t = y => series.reduce((a, s) => a + (s.values[y] || 0), 0);
+  $("#revSub").textContent = `${S.mode === "actual" ? "All funds, audited" : "Adopted budgets, official funds"}. ${unitNote()}. Total ${fyLabel(first)} ${money(t(first))}, ${fyLabel(last)} ${money(t(last))} (${pct(t(last) / t(first) - 1, 0)}). Click a bar to move the Sankey to that year.`;
+}
+
+// ---- federal trend
+const FEDCATS = [
+  ["fed_t1", "Title I", "--s1"], ["fed_covid", "COVID relief (ESSER)", "--s2"], ["fed_sped", "Special ed (IDEA)", "--s3"],
+  ["fed_arra", "2009 stimulus / Ed Jobs", "--s4"], ["fed_med", "Medicaid (SHARS)", "--s5"], ["fed_oth", "Other federal", "--s6"], ["fed_cn", "USDA child nutrition", "--s7"],
+];
+function drawFederal() {
+  const ys = years();
+  let series;
+  if (S.mode === "actual") {
+    series = FEDCATS.map(([k, l, c]) => ({ key: k, label: l, color: css(c), values: Object.fromEntries(ys.map(y => [y, conv(D.actual[y].src[k] || 0, y)])) }));
+  } else {
+    series = [
+      { key: "b_fed", label: "Federal in General Fund", color: css("--s6"), values: Object.fromEntries(ys.map(y => [y, conv(D.budget[y].rev.b_fed || 0, y)])) },
+      { key: "b_fedcn", label: "USDA child nutrition (Food Service Fund)", color: css("--s7"), values: Object.fromEntries(ys.map(y => [y, conv(D.budget[y].rev.b_fedcn || 0, y)])) },
+    ];
+  }
+  legend($("#fedLegend"), series.slice().reverse());
+  stackedBars($("#fedChart"), { yrs: ys, series, selected: S.year, onSelect: setYear });
+  if (S.mode === "actual") {
+    const f = y => FEDCATS.reduce((a, [k]) => a + (D.actual[y].src[k] || 0), 0);
+    const tot = y => Object.values(D.actual[y].src).reduce((a, b) => a + b, 0);
+    $("#fedSub").textContent = `All funds, audited. ${unitNote()}. Federal share of revenue: ${(f(2019) / tot(2019) * 100).toFixed(1)}% in FY2019, ${(f(2022) / tot(2022) * 100).toFixed(1)}% at the FY2022 peak, ${(f(2025) / tot(2025) * 100).toFixed(1)}% in FY2025.`;
+    $("#fedCallout").innerHTML = `<b>Two federal waves:</b> the 2009 stimulus (FY2011–13) and COVID relief (FY2020–25), which brought in ${money(ACT_YEARS.reduce((a, y) => a + (D.actual[y].src.fed_covid || 0), 0), { noPupil: true })} in all. ESSER III had to be obligated by September 2024, and FY2025 federal revenue fell back to about the pre-pandemic level. Title I (about $35–40M a year) and IDEA ($14–18M) have stayed nearly flat in nominal dollars, so they've lost value to inflation. School meals are the second-largest steady federal stream.`;
+  } else {
+    $("#fedSub").textContent = `Adopted budgets only show federal money in the General Fund and the Food Service Fund. ${unitNote()}. The FY2027 adopted budget gives one combined federal line.`;
+    $("#fedCallout").innerHTML = `The FY2027 adopted budget lists <b>${money(D.budget[2027].rev.b_fed, { noPupil: true })}</b> in federal revenue across official funds, with no split by fund. In earlier years about 85–95% of budgeted federal revenue was USDA child nutrition. Grant funds like Title I, IDEA and ESSER are budgeted separately through TEA grant applications, so they never appear here.`;
+  }
+}
+
+// ---- spending small multiples
+function drawMultiples() {
+  const ys = years(), box = $("#multiples"); box.innerHTML = "";
+  D.uses.forEach(([k, label]) => {
+    const vals = ys.map(y => conv(rec(y).use[k] || 0, y));
+    if (vals.every(v => v === 0)) return;
+    const div = document.createElement("div"); div.className = "mini";
+    const i = ys.indexOf(S.year), first = vals.find(v => v > 0) ?? 0, last = vals[vals.length - 1];
+    div.innerHTML = `<div class="t">${label}</div><div class="n">${fyLabel(S.year)}: <b>${money(vals[i])}</b> · ${first ? pct(last / first - 1, 0) : "—"}</div>`;
+    const c = document.createElement("div"); div.appendChild(c); box.appendChild(div);
+    const W = 220, H = 70, m = 6;
+    const s = svgRoot(c, W, H);
+    const mx = Math.max(...vals) || 1;
+    const xS = j => m + j / (ys.length - 1) * (W - 2 * m), yS = v => H - m - v / mx * (H - 2 * m - 6);
+    el("line", { x1: m, x2: W - m, y1: H - m, y2: H - m, stroke: css("--grid") }, s);
+    el("path", { d: vals.map((v, j) => (j ? "L" : "M") + xS(j) + "," + yS(v)).join(""), fill: "none", stroke: k === "food" ? css("--cn") : css("--accent"), "stroke-width": 2 }, s);
+    el("circle", { cx: xS(i), cy: yS(vals[i]), r: 4, fill: k === "food" ? css("--cn") : css("--accent"), stroke: css("--surface"), "stroke-width": 2 }, s);
+    const ov = el("rect", { x: 0, y: 0, width: W, height: H, fill: "transparent", style: "cursor:pointer" }, s);
+    const pick = ev => { const r = s.getBoundingClientRect(); return Math.max(0, Math.min(ys.length - 1, Math.round(((ev.clientX - r.left) / r.width * W - m) / (W - 2 * m) * (ys.length - 1)))); };
+    ov.addEventListener("mousemove", ev => { const j = pick(ev); showTip(ev, `<div class="tt">${label}</div>${trow(fyLabel(ys[j]), money(vals[j]))}`); });
+    ov.addEventListener("mouseleave", hideTip);
+    ov.addEventListener("click", ev => setYear(ys[pick(ev)]));
+  });
+}
+
+// ---- meals section (independent of mode; nominal dollars, no per-student)
+const nomMoney = v => money(v, { noPupil: true });
+const nomShort = v => v >= 1e6 ? "$" + Math.round(v / 1e6) + "M" : v ? "$" + Math.round(v / 1e3) + "K" : "$0";
+const MY = Object.keys(D.meals).map(Number).sort((a, b) => a - b);
+function drawMeals() {
+  const M = D.meals, a = M[2025], b = M[2026];
+  const rA = a.reimbB + a.reimbL + a.reimbS, rB = b.reimbB + b.reimbL + b.reimbS;
+  const mA = a.breakfasts + a.lunches, mB = b.breakfasts + b.lunches;
+  const perA = rA / mA, perB = rB / mB;
+  const freeA = a.freeElig / a.enroll, freeB = b.freeElig / b.enroll;
+  $("#mealTiles").innerHTML = [
+    ["USDA school-year meal reimbursement, 2025-26", "$" + (rB / 1e6).toFixed(1) + "M", `${pct(rB / rA - 1)} vs 2024-25 ($${(rA / 1e6).toFixed(1)}M)`],
+    ["Students claimed at free rate", (freeB * 100).toFixed(1) + "%", `down from ${(freeA * 100).toFixed(1)}%; implied ISP ${(freeA / 1.6 * 100).toFixed(1)}% → ${(freeB / 1.6 * 100).toFixed(1)}%`],
+    ["Average USDA payment per meal", "$" + perB.toFixed(2), `${pct(perB / perA - 1)} vs $${perA.toFixed(2)}, while USDA's per-meal rates rose`],
+    ["Breakfasts + lunches claimed", (mB / 1e6).toFixed(2) + "M", `${pct(mB / mA - 1)} vs 2024-25; enrollment on claims ${pct(b.enroll / a.enroll - 1)}`],
+  ].map(([k, v, d]) => `<div class="tile"><div class="k">${k}</div><div class="v">${v}</div><div class="d">${d}</div></div>`).join("");
+
+  // decomposition
+  const volEff = (mB - mA) * perA, rateEff = mB * (perB - perA);
+  $("#mealCallout").innerHTML = `<b>What changed in 2025-26.</b> School-year reimbursement fell <b>$${((rA - rB) / 1e6).toFixed(1)}M</b>. About <b>$${(-volEff / 1e6).toFixed(1)}M</b> of that is fewer meals: enrollment kept falling and meal counts fell ${pct(mB / mA - 1, 0)}. About <b>$${(-rateEff / 1e6).toFixed(1)}M</b> is a lower payment per meal. The district's CEP claiming rate dropped from 93.75% free to 80% free, so 1 in 5 meals is now reimbursed at the much lower "paid" rate (${(b.paidLunches / 1e6).toFixed(2)}M paid-rate lunches vs ${(a.paidLunches / 1e6).toFixed(2)}M). Students still eat free, and the district covers the gap. An 80% free share means about half of students (${(freeB / 1.6 * 100).toFixed(0)}%) were directly certified, down from ${(freeA / 1.6 * 100).toFixed(0)}%. SNAP is the main source of direct certification. The district then budgeted <b>${money(D.budget[2027].use.food, { noPupil: true })}</b> for food service in FY2027, down from ${money(D.budget[2026].use.food, { noPupil: true })} in FY2026.`;
+
+  // CN revenue chart (actual, nominal)
+  const cnSeries = [
+    ["lunch", "Lunch", "--s1"], ["breakfast", "Breakfast", "--s2"], ["commodities", "USDA Foods (commodities)", "--s3"], ["other", "Other USDA", "--s4"],
+  ].map(([k, l, c]) => ({ key: k, label: l, color: css(c), values: Object.fromEntries(ACT_YEARS.map(y => [y, D.actual[y].cn[k] || 0])) }));
+  legend($("#cnLegend"), cnSeries);
+  stackedBars($("#cnChart"), { yrs: ACT_YEARS, series: cnSeries, selected: S.mode === "actual" ? S.year : null, onSelect: y => { setMode("actual"); setYear(y); }, height: 270, width: 460, fmt: nomMoney, axisFmt: nomShort });
+
+  // meals chart
+  const mealSeries = [
+    ["lunches", "School lunch", "--s1"], ["breakfasts", "School breakfast", "--s2"], ["snacks", "After-school snacks", "--s3"],
+    ["ssoMeals", "Summer / pandemic (SSO)", "--s4"], ["cacfpMeals", "After-school supper (CACFP)", "--s5"],
+  ].map(([k, l, c]) => ({ key: k, label: l, color: css(c), values: Object.fromEntries(MY.map(y => [y, M[y][k] || 0])) }));
+  legend($("#mealLegend"), mealSeries);
+  stackedBars($("#mealChart"), { yrs: MY, series: mealSeries, selected: null, label: syLabel, height: 270, width: 460, fmt: v => (v / 1e6).toFixed(2) + "M meals", axisFmt: v => (v / 1e6).toFixed(0) + "M" });
+
+  // free share chart
+  const freeVals = {}, ispVals = {};
+  MY.forEach(y => { if (M[y].enroll) { freeVals[y] = M[y].freeElig / M[y].enroll; if (M[y].sitesAllFree === 0 || y >= 2024) ispVals[y] = freeVals[y] / 1.6; } });
+  lineChart($("#freeChart"), {
+    xs: MY, label: y => syLabel(y).slice(2), xLabelEvery: 2, yMax: 1, yFmt: v => Math.round(v * 100) + "%", valFmt: v => (v * 100).toFixed(1) + "%", height: 250, width: 460,
+    series: [{ label: "Claimed at free rate", color: css("--cn"), values: freeVals }, { label: "Implied ISP (district-wide CEP)", color: css("--text-2"), dash: "5 4", values: ispVals }],
+  });
+
+  // monthly
+  const months = ["08", "09", "10", "11", "12", "01", "02", "03", "04", "05"];
+  const mn = ["Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar", "Apr", "May"];
+  const mon = y => Object.fromEntries(months.map((mm, i) => { const yr = i < 5 ? y - 1 : y; return [i, D.meals[y].monthly[`${yr}-${mm}`] ?? null]; }));
+  const monSeries = [{ label: "2024-25", color: css("--text-3"), values: mon(2025) }, { label: "2025-26", color: css("--cn"), values: mon(2026) }];
+  legend($("#monLegend"), monSeries);
+  lineChart($("#monthChart"), { xs: months.map((_, i) => i), label: i => mn[i], series: monSeries, height: 250, width: 460, valFmt: v => "$" + (v / 1e6).toFixed(2) + "M", yFmt: v => v ? "$" + (v / 1e6).toFixed(0) + "M" : "$0" });
+
+  // food budget bars
+  const fb = { key: "food", label: "Food service (function 35)", color: css("--cn"), values: Object.fromEntries(BUD_YEARS.map(y => [y, D.budget[y].use.food])) };
+  stackedBars($("#foodBudget"), { yrs: BUD_YEARS, series: [fb], selected: S.mode === "budget" ? S.year : null, onSelect: y => { setMode("budget"); setYear(y); }, height: 220, width: 460, total: false, fmt: nomMoney, axisFmt: nomShort });
+}
+
+// ---- tiles
+function drawTiles() {
+  const a25 = D.actual[2025], tot = Object.values(a25.src).reduce((a, b) => a + b, 0);
+  const fed = FEDCATS.reduce((a, [k]) => a + (a25.src[k] || 0), 0);
+  const peak = Math.max(...ACT_YEARS.map(y => D.actual[y].enroll));
+  const peakY = ACT_YEARS.find(y => D.actual[y].enroll === peak);
+  const fed22 = FEDCATS.reduce((a, [k]) => a + (D.actual[2022].src[k] || 0), 0);
+  $("#tiles").innerHTML = [
+    ["FY2025 revenue, all funds", "$" + (tot / 1e9).toFixed(2) + "B", `${money(tot / a25.enroll, { noPupil: true }).replace("K", "K")} per student · ${a25.enroll.toLocaleString()} students`],
+    ["Federal revenue, FY2025", "$" + Math.round(fed / 1e6) + "M", `${(fed / tot * 100).toFixed(1)}% of revenue, down from $${Math.round(fed22 / 1e6)}M in FY2022`],
+    ["USDA school meals, FY2025", "$" + (a25.src.fed_cn / 1e6).toFixed(1) + "M", `${(a25.src.fed_cn / fed * 100).toFixed(0)}% of all federal money`],
+    ["Enrollment since FY" + peakY, pct(a25.enroll / peak - 1, 0), `${peak.toLocaleString()} → ${a25.enroll.toLocaleString()} students`],
+    ["FY2027 adopted budget", "$" + (D.budget[2027].total / 1e9).toFixed(2) + "B", `spending, official funds; adopted ${D.budget[2027].adopted}`],
+  ].map(([k, v, d]) => `<div class="tile"><div class="k">${k}</div><div class="v">${v}</div><div class="d">${d}</div></div>`).join("");
+}
+
+// ---- table
+function drawTable() {
+  const ys = years();
+  let head, rows;
+  if (S.mode === "actual") {
+    head = ["Fiscal year", "Enrollment", "Local", "State", "Federal", "of which USDA meals", "of which COVID relief", "Total revenue", "Total spending"];
+    rows = ys.map(y => {
+      const r = D.actual[y], g = { local: 0, state: 0, federal: 0 };
+      for (const [k, v] of Object.entries(r.src)) g[SRC[k].group] += v;
+      const spend = Object.values(r.use).reduce((a, b) => a + b, 0);
+      return [fyLabel(y), r.enroll.toLocaleString(), money(conv(g.local, y)), money(conv(g.state, y)), money(conv(g.federal, y)), money(conv(r.src.fed_cn || 0, y)), money(conv(r.src.fed_covid || 0, y)), money(conv(g.local + g.state + g.federal, y)), money(conv(spend, y))];
+    });
+  } else {
+    head = ["Fiscal year", "Enrollment basis", "Local", "State", "Federal (GF)", "Federal (USDA meals)", "Other", "Total revenue", "Total spending", "Food service"];
+    rows = ys.map(y => {
+      const r = D.budget[y].rev, tr = Object.values(r).reduce((a, b) => a + b, 0);
+      return [fyLabel(y), BUD_ENROLL[y].toLocaleString(), money(conv(r.b_local || 0, y)), money(conv(r.b_state || 0, y)), money(conv(r.b_fed || 0, y)), r.b_fedcn ? money(conv(r.b_fedcn, y)) : "in Federal", money(conv(r.b_other || 0, y)), money(conv(tr, y)), money(conv(D.budget[y].total, y)), money(conv(D.budget[y].use.food, y))];
+    });
+  }
+  const mealHead = ["School year", "Sites", "Enrollment (Oct claims)", "Free share", "Breakfasts", "Lunches", "SSO meals", "CACFP meals", "School-year reimbursement", "SSO reimbursement", "CACFP reimbursement"];
+  const mealRows = MY.map(y => { const m = D.meals[y]; return [syLabel(y), m.sites ?? "—", m.enroll ? m.enroll.toLocaleString() : "—", m.enroll ? (m.freeElig / m.enroll * 100).toFixed(1) + "%" : "—", (m.breakfasts || 0).toLocaleString(), (m.lunches || 0).toLocaleString(), (m.ssoMeals || 0).toLocaleString(), (m.cacfpMeals || 0).toLocaleString(), "$" + (((m.reimbB || 0) + (m.reimbL || 0) + (m.reimbS || 0)) / 1e6).toFixed(2) + "M", "$" + (m.ssoReimb / 1e6).toFixed(2) + "M", "$" + (m.cacfpReimb / 1e6).toFixed(2) + "M"]; });
+  const t = (h, rs) => `<table><thead><tr>${h.map(x => `<th>${x}</th>`).join("")}</tr></thead><tbody>${rs.map(r => `<tr>${r.map(c => `<td>${c}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+  $("#table").innerHTML = t(head, rows) + `<h3 style="margin-top:18px">School meals (TDA claims, nominal)</h3>` + t(mealHead, mealRows);
+}
+
+// ---- controls
+function setSeg(id, v) { document.querySelectorAll(`#${id} button`).forEach(b => b.setAttribute("aria-pressed", b.dataset.v === v)); }
+function drawYearBtns() {
+  const box = $("#yearBtns");
+  box.innerHTML = years().map(y => `<button data-y="${y}" aria-pressed="${y === S.year}" title="${syLabel(y)} school year">${fyLabel(y)}</button>`).join("");
+  box.querySelectorAll("button").forEach(b => b.addEventListener("click", () => setYear(+b.dataset.y)));
+}
+function setYear(y) { S.year = y; renderAll(); }
+function setMode(m) {
+  if (S.mode === m) return;
+  S.mode = m; setSeg("modeSeg", m);
+  if (!years().includes(S.year)) S.year = years()[years().length - 1];
+  renderAll();
+}
+function renderAll() {
+  drawYearBtns(); drawSankey(); drawRevenue(); drawFederal(); drawMultiples(); drawMeals(); drawTable();
+}
+$("#modeSeg").addEventListener("click", e => { const b = e.target.closest("button"); if (b) setMode(b.dataset.v); });
+$("#dollarSeg").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; S.dollars = b.dataset.v; setSeg("dollarSeg", S.dollars); renderAll(); });
+$("#basisSeg").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; S.basis = b.dataset.v; setSeg("basisSeg", S.basis); renderAll(); });
+$("#fixedScale").addEventListener("change", e => { S.fixed = e.target.checked; drawSankey(); });
+$("#fedOnly").addEventListener("change", e => { S.fedOnly = e.target.checked; drawSankey(); });
+$("#themeSeg").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  const v = b.dataset.v; setSeg("themeSeg", v);
+  if (v === "auto") document.documentElement.removeAttribute("data-theme"); else document.documentElement.setAttribute("data-theme", v);
+  try { localStorage.setItem("fwisd-theme", v); } catch (_) {}
+  drawTiles(); renderAll();
+});
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => renderAll());
+document.addEventListener("keydown", e => {
+  if (e.target.closest("input")) return;
+  const ys = years(), i = ys.indexOf(S.year);
+  if (e.key === "ArrowLeft" && i > 0) setYear(ys[i - 1]);
+  if (e.key === "ArrowRight" && i < ys.length - 1) setYear(ys[i + 1]);
+});
+try { const t = localStorage.getItem("fwisd-theme"); if (t && t !== "auto") { document.documentElement.setAttribute("data-theme", t); setSeg("themeSeg", t); } } catch (_) {}
+let rz; addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(renderAll, 150); });
+drawTiles(); renderAll();
+})();
+</script>
+</body>
+</html>
