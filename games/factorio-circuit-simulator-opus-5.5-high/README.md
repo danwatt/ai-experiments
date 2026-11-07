@@ -9,6 +9,14 @@ A browser sandbox for learning how Factorio's circuit network behaves. The node 
 - **Buildings:** lamp (circuit condition, colour mode), signal display (a probe), storage chest, assembling machine (enable condition, read contents, consumption), push button (one-tick pulse or toggle), and a small electric grid: solar panel with a day/night cycle, steam generator, accumulator (charge % as a signal) and factory load.
 - **Nine guided examples:** lamp, red vs green, arithmetic and Each, decider filtering, clock, memory cell and counter, selector, stock control with hysteresis, and backup power with an SR latch.
 
+**Looks like the game's GUI.** Each box is styled after Factorio's entity windows:
+- beige titles, dark inset panels, light grey buttons that turn orange on hover;
+- signal slots that open a "Select a signal" window (Items / Signals tabs, with a Constant or Value field where it applies; right-click a slot to clear it);
+- orange R/G checkboxes, and decider condition rows that turn green while true, with AND groups bracketed and AND/OR toggle buttons in the margin;
+- constant combinators and chests as slot grids with counts, and Input/Output signal grids on every combinator.
+
+The item and building icons are simple SVG drawings, not the game's artwork. The UI font is Titillium Web, loaded from Google Fonts.
+
 Not modelled: quality, rocket capacity, multiple constant-combinator sections, trains, and the many other entities with circuit connections.
 
 Building connection points are single points: the left and right sockets of a building are the same point, which lets you daisy-chain wires. Rete connections are directed, so a wire is always dragged from a right-hand socket to a left-hand socket. The simulator ignores the direction when it builds networks.
@@ -19,7 +27,7 @@ Building connection points are single points: the left and right sockets of a bu
 | --- | --- |
 | `src/sim.js`, `src/signals.js` | Simulation engine and signal catalogue. Pure JS with no DOM, so they can be unit tested in Node. |
 | `src/editor.js` | Rete editor setup, node/wire/socket views, wiring rules, save/load. |
-| `src/ui/` | Node settings editors, live read-outs, and help text. |
+| `src/ui/` | Factorio-style widgets (slots, signal picker, checkboxes, condition rows), node settings editors, live read-outs, and help text. |
 | `src/main.js`, `src/examples.js` | App shell (toolbar, palette, side panel, run loop, autosave) and example circuits. |
 | `vendor/rete-bundle.js` | Rete 2, its area/connection/React plugins, React 18 and htm, bundled with esbuild. |
 | `vendor-src/` | `package.json` and entry file for that bundle, plus `build.sh`. |

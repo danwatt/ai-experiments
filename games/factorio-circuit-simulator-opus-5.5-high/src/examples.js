@@ -40,8 +40,8 @@ export const EXAMPLES = [
     data: {
       nodes: [
         n('c', 'chest', 0, 0, { items: [sig('iron-plate', 150), sig('coal', 30)] }),
-        n('l', 'lamp', 380, 0, { condition: cond('iron-plate', '>', 100) }),
-        n('d', 'display', 760, 0),
+        n('l', 'lamp', 360, 0, { condition: cond('iron-plate', '>', 100) }),
+        n('d', 'display', 720, 0),
       ],
       wires: [w('c', 'l'), w('l', 'd')],
     },
@@ -50,17 +50,17 @@ export const EXAMPLES = [
     key: 'colors',
     title: '2 · Red, green and summing',
     html: `<p>Two constant combinators: one on a <b>red</b> wire (10 iron), one on a <b>green</b> wire (5 iron). The display shows the two networks separately.</p>
-      <p>Arithmetic combinator 1 reads <b>both</b> colours, so it sees 15. Arithmetic combinator 2 has its R/G toggle set to <b>red only</b>, so it sees 10.</p>
-      <h4>Try</h4><ul><li>Toggle the R/G buttons on the arithmetic combinators.</li><li>Add a second red constant combinator into the same red network: the values add up.</li></ul>`,
+      <p>Arithmetic combinator 1 reads <b>both</b> colours, so it sees 15. Arithmetic combinator 2 has only its <b>R</b> checkbox ticked, so it sees 10.</p>
+      <h4>Try</h4><ul><li>Tick and untick the R/G checkboxes on the arithmetic combinators.</li><li>Add a second red constant combinator into the same red network: the values add up.</li></ul>`,
     data: {
       nodes: [
         n('kr', 'constant', 0, 0, { signals: [sig('iron-plate', 10)] }, 'Red source'),
-        n('kg', 'constant', 0, 260, { signals: [sig('iron-plate', 5)] }, 'Green source'),
+        n('kg', 'constant', 0, 299, { signals: [sig('iron-plate', 5)] }, 'Green source'),
         n('d', 'display', 360, -40),
-        n('a1', 'arithmetic', 360, 240, { left: { kind: 'signal', id: 'iron-plate' }, op: '+', right: { kind: 'const', value: 0 }, output: 'iron-plate' }, 'Both colours'),
-        n('a2', 'arithmetic', 360, 520, { left: { kind: 'signal', id: 'iron-plate' }, leftNets: R, op: '+', right: { kind: 'const', value: 0 }, output: 'iron-plate' }, 'Red only'),
-        n('d1', 'display', 760, 240),
-        n('d2', 'display', 760, 520),
+        n('a1', 'arithmetic', 360, 318, { left: { kind: 'signal', id: 'iron-plate' }, op: '+', right: { kind: 'const', value: 0 }, output: 'iron-plate' }, 'Both colours'),
+        n('a2', 'arithmetic', 360, 732, { left: { kind: 'signal', id: 'iron-plate' }, leftNets: R, op: '+', right: { kind: 'const', value: 0 }, output: 'iron-plate' }, 'Red only'),
+        n('d1', 'display', 760, 318),
+        n('d2', 'display', 760, 732),
       ],
       wires: [w('kr', 'd'), w('kg', 'd', 'green'), w('kr', 'a1'), w('kg', 'a1', 'green'), w('kr', 'a2'), w('kg', 'a2', 'green'), w('a1', 'd1'), w('a2', 'd2')],
     },
@@ -74,10 +74,10 @@ export const EXAMPLES = [
     data: {
       nodes: [
         n('k', 'constant', 0, 100, { signals: [sig('signal-A', 6), sig('signal-B', 7)] }),
-        n('a1', 'arithmetic', 340, 0, { left: { kind: 'signal', id: 'signal-A' }, op: '*', right: { kind: 'signal', id: 'signal-B' }, output: 'signal-C' }),
-        n('a2', 'arithmetic', 340, 300, { left: { kind: 'signal', id: 'signal-each' }, op: '*', right: { kind: 'const', value: 10 }, output: 'signal-each' }),
-        n('d1', 'display', 720, 0),
-        n('d2', 'display', 720, 300),
+        n('a1', 'arithmetic', 360, 0, { left: { kind: 'signal', id: 'signal-A' }, op: '*', right: { kind: 'signal', id: 'signal-B' }, output: 'signal-C' }),
+        n('a2', 'arithmetic', 360, 414, { left: { kind: 'signal', id: 'signal-each' }, op: '*', right: { kind: 'const', value: 10 }, output: 'signal-each' }),
+        n('d1', 'display', 760, 0),
+        n('d2', 'display', 760, 414),
       ],
       wires: [w('k', 'a1'), w('k', 'a2', 'green'), w('a1', 'd1'), w('a2', 'd2', 'green')],
     },
@@ -92,12 +92,12 @@ export const EXAMPLES = [
     data: {
       nodes: [
         n('k', 'constant', 0, 300, { signals: [sig('iron-plate', 120), sig('copper-plate', 40), sig('coal', 300), sig('stone', 5), sig('iron-gear', 75)] }),
-        n('d1', 'decider', 330, 0, { conditions: [cond('signal-each', '>', 50)], outputs: [{ signal: 'signal-each', mode: 'input', value: 1, nets: { ...B } }] }),
-        n('d2', 'decider', 330, 360, { conditions: [cond('signal-each', '>', 50)], outputs: [{ signal: 'signal-N', mode: 'one', value: 1, nets: { ...B } }] }),
-        n('d3', 'decider', 330, 720, { conditions: [cond('signal-anything', '<', 10)], outputs: [{ signal: 'signal-everything', mode: 'input', value: 1, nets: { ...B } }] }),
-        n('x1', 'display', 800, 0),
-        n('x2', 'display', 800, 360),
-        n('x3', 'display', 800, 720),
+        n('d1', 'decider', 360, 0, { conditions: [cond('signal-each', '>', 50)], outputs: [{ signal: 'signal-each', mode: 'input', value: 1, nets: { ...B } }] }),
+        n('d2', 'decider', 360, 528, { conditions: [cond('signal-each', '>', 50)], outputs: [{ signal: 'signal-N', mode: 'one', value: 1, nets: { ...B } }] }),
+        n('d3', 'decider', 360, 1056, { conditions: [cond('signal-anything', '<', 10)], outputs: [{ signal: 'signal-everything', mode: 'input', value: 1, nets: { ...B } }] }),
+        n('x1', 'display', 850, 0),
+        n('x2', 'display', 850, 528),
+        n('x3', 'display', 850, 1056),
       ],
       wires: [w('k', 'd1'), w('k', 'd2'), w('k', 'd3'), w('d1', 'x1'), w('d2', 'x2'), w('d3', 'x3')],
     },
@@ -111,9 +111,9 @@ export const EXAMPLES = [
     data: {
       nodes: [
         n('k', 'constant', 0, 0, { signals: [sig('signal-C', 1)] }, 'Tick +1'),
-        n('d', 'decider', 330, 0, { conditions: [cond('signal-C', '<', 60)], outputs: [{ signal: 'signal-C', mode: 'input', value: 1, nets: { ...B } }] }, 'Counter'),
-        n('l', 'lamp', 820, -40, { condition: cond('signal-C', '>', 30) }),
-        n('x', 'display', 820, 280),
+        n('d', 'decider', 360, 0, { conditions: [cond('signal-C', '<', 60)], outputs: [{ signal: 'signal-C', mode: 'input', value: 1, nets: { ...B } }] }, 'Counter'),
+        n('l', 'lamp', 850, -40, { condition: cond('signal-C', '>', 30) }),
+        n('x', 'display', 850, 377),
       ],
       wires: [w('k', 'd'), w('d', 'd'), w('d', 'l'), w('d', 'x')],
     },
@@ -127,10 +127,10 @@ export const EXAMPLES = [
     data: {
       nodes: [
         n('inc', 'button', 0, -40, { signal: 'signal-C', value: 1, mode: 'pulse' }, '+1'),
-        n('rst', 'button', 0, 280, { signal: 'signal-R', value: 1, mode: 'pulse' }, 'Reset'),
-        n('m', 'decider', 330, 60, { conditions: [cond('signal-R', '=', 0)], outputs: [{ signal: 'signal-everything', mode: 'input', value: 1, nets: { ...B } }] }, 'Memory'),
-        n('x', 'display', 820, -40),
-        n('l', 'lamp', 820, 250, { condition: cond('signal-C', '>=', 5) }),
+        n('rst', 'button', 0, 361, { signal: 'signal-R', value: 1, mode: 'pulse' }, 'Reset'),
+        n('m', 'decider', 340, 60, { conditions: [cond('signal-R', '=', 0)], outputs: [{ signal: 'signal-everything', mode: 'input', value: 1, nets: { ...B } }] }, 'Memory'),
+        n('x', 'display', 830, -40),
+        n('l', 'lamp', 830, 268, { condition: cond('signal-C', '>=', 5) }),
       ],
       wires: [w('inc', 'm'), w('rst', 'm'), w('m', 'm'), w('m', 'x'), w('m', 'l')],
     },
@@ -144,12 +144,12 @@ export const EXAMPLES = [
     data: {
       nodes: [
         n('c', 'chest', 0, 220, { items: [sig('iron-ore', 40), sig('copper-ore', 90), sig('coal', 70), sig('stone', 10)] }),
-        n('s1', 'selector', 340, 0, { mode: 'select', descending: true, index: { kind: 'const', value: 0 } }),
-        n('s2', 'selector', 340, 280, { mode: 'count', countSignal: 'signal-N' }),
-        n('s3', 'selector', 340, 520, { mode: 'stack' }),
-        n('x1', 'display', 720, 0),
-        n('x2', 'display', 720, 280),
-        n('x3', 'display', 720, 520),
+        n('s1', 'selector', 360, 0, { mode: 'select', descending: true, index: { kind: 'const', value: 0 } }),
+        n('s2', 'selector', 360, 464, { mode: 'count', countSignal: 'signal-N' }),
+        n('s3', 'selector', 360, 896, { mode: 'stack' }),
+        n('x1', 'display', 730, 0),
+        n('x2', 'display', 730, 464),
+        n('x3', 'display', 730, 896),
       ],
       wires: [w('c', 's1'), w('c', 's2'), w('c', 's3'), w('s1', 'x1'), w('s2', 'x2'), w('s3', 'x3')],
     },
@@ -164,9 +164,9 @@ export const EXAMPLES = [
     data: {
       nodes: [
         n('a1', 'assembler', 0, -60, { recipe: 'iron-gear', craftSeconds: 0.25, demandPerSecond: 1.5, condition: cond('iron-gear', '<', 100) }, 'Simple'),
-        n('x1', 'display', 400, -60),
-        n('a2', 'assembler', 0, 350, { recipe: 'iron-gear', craftSeconds: 0.25, demandPerSecond: 1.5, condition: cond('signal-S', '>', 0) }, 'Latched'),
-        n('l', 'decider', 400, 350, {
+        n('x1', 'display', 370, -60),
+        n('a2', 'assembler', 0, 508, { recipe: 'iron-gear', craftSeconds: 0.25, demandPerSecond: 1.5, condition: cond('signal-S', '>', 0) }, 'Latched'),
+        n('l', 'decider', 370, 508, {
           conditions: [
             cond('iron-gear', '<', 50, { firstNets: { ...R } }),
             cond('signal-S', '>', 0, { join: 'or' }),
@@ -174,7 +174,7 @@ export const EXAMPLES = [
           ],
           outputs: [{ signal: 'signal-S', mode: 'one', value: 1, nets: { ...B } }],
         }, 'SR latch'),
-        n('x2', 'display', 900, 350),
+        n('x2', 'display', 860, 508),
       ],
       wires: [w('a1', 'x1'), w('a2', 'l'), w('l', 'l', 'green'), w('l', 'a2', 'green'), w('a2', 'x2')],
     },
@@ -188,9 +188,9 @@ export const EXAMPLES = [
     data: {
       nodes: [
         n('sol', 'solar', 0, -120, { peakKW: 300, daySeconds: 40 }),
-        n('load', 'load', 0, 110, { demandKW: 220 }),
-        n('acc', 'accumulator', 0, 330, { capacityKJ: 6000, maxKW: 800, startPercent: 60 }),
-        n('l', 'decider', 340, 300, {
+        n('load', 'load', 0, 139, { demandKW: 220 }),
+        n('acc', 'accumulator', 0, 487, { capacityKJ: 6000, maxKW: 800, startPercent: 60 }),
+        n('l', 'decider', 360, 300, {
           conditions: [
             cond('signal-A', '<', 20),
             cond('signal-S', '>', 0, { join: 'or' }),
@@ -198,8 +198,8 @@ export const EXAMPLES = [
           ],
           outputs: [{ signal: 'signal-S', mode: 'one', value: 1, nets: { ...B } }],
         }, 'SR latch'),
-        n('gen', 'generator', 840, 220, { outputKW: 450, condition: cond('signal-S', '>', 0) }),
-        n('lamp', 'lamp', 840, 520, { condition: cond('signal-S', '>', 0) }, 'Backup on'),
+        n('gen', 'generator', 850, 220, { outputKW: 450, condition: cond('signal-S', '>', 0) }),
+        n('lamp', 'lamp', 850, 638, { condition: cond('signal-S', '>', 0) }, 'Backup on'),
       ],
       wires: [w('acc', 'l'), w('l', 'l', 'green'), w('l', 'gen', 'green'), w('gen', 'lamp', 'green')],
     },

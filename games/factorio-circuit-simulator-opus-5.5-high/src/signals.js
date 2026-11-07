@@ -2,22 +2,22 @@
 // Pure module: no DOM, no vendor imports (used by the simulator and its tests).
 
 const items = [
-  // id, name, short label, colour, stack size, shape
-  ['iron-ore', 'Iron ore', 'Fe', '#5d7a91', 50, 'ore'],
-  ['copper-ore', 'Copper ore', 'Cu', '#b8653a', 50, 'ore'],
-  ['coal', 'Coal', 'C', '#2b2b2b', 50, 'ore'],
-  ['stone', 'Stone', 'St', '#9a8e72', 50, 'ore'],
-  ['wood', 'Wood', 'Wd', '#8a5a2b', 100, 'plate'],
-  ['iron-plate', 'Iron plate', 'Fe', '#a9b8c6', 100, 'plate'],
-  ['copper-plate', 'Copper plate', 'Cu', '#e08a54', 100, 'plate'],
-  ['steel-plate', 'Steel plate', 'Stl', '#d5dbe0', 100, 'plate'],
-  ['iron-gear', 'Iron gear', '⚙', '#8796a3', 100, 'plate'],
-  ['copper-cable', 'Copper cable', 'Cb', '#d77b3f', 200, 'plate'],
-  ['circuit-board', 'Circuit board', 'CB', '#3fae49', 200, 'plate'],
-  ['adv-circuit', 'Advanced circuit', 'AC', '#c0392b', 200, 'plate'],
-  ['plastic-bar', 'Plastic bar', 'Pl', '#e9e9e9', 100, 'plate'],
-  ['sulfur', 'Sulfur', 'S', '#e4d23a', 50, 'ore'],
-  ['battery', 'Battery', 'Bt', '#6f9e3a', 200, 'plate'],
+  // id, name, short label, colour, stack size, shape, icon
+  ['iron-ore', 'Iron ore', 'Fe', '#5d7a91', 50, 'ore', 'ore'],
+  ['copper-ore', 'Copper ore', 'Cu', '#b8653a', 50, 'ore', 'ore'],
+  ['coal', 'Coal', 'C', '#2b2b2b', 50, 'ore', 'ore'],
+  ['stone', 'Stone', 'St', '#9a8e72', 50, 'ore', 'ore'],
+  ['wood', 'Wood', 'Wd', '#8a5a2b', 100, 'plate', 'wood'],
+  ['iron-plate', 'Iron plate', 'Fe', '#a9b8c6', 100, 'plate', 'plate'],
+  ['copper-plate', 'Copper plate', 'Cu', '#e08a54', 100, 'plate', 'plate'],
+  ['steel-plate', 'Steel plate', 'Stl', '#d5dbe0', 100, 'plate', 'plate'],
+  ['iron-gear', 'Iron gear', '⚙', '#8796a3', 100, 'plate', 'gear'],
+  ['copper-cable', 'Copper cable', 'Cb', '#d77b3f', 200, 'plate', 'cable'],
+  ['circuit-board', 'Circuit board', 'CB', '#3fae49', 200, 'plate', 'board'],
+  ['adv-circuit', 'Advanced circuit', 'AC', '#c0392b', 200, 'plate', 'board'],
+  ['plastic-bar', 'Plastic bar', 'Pl', '#e9e9e9', 100, 'plate', 'bar'],
+  ['sulfur', 'Sulfur', 'S', '#e4d23a', 50, 'ore', 'ore'],
+  ['battery', 'Battery', 'Bt', '#6f9e3a', 200, 'plate', 'battery'],
 ];
 
 const colors = [
@@ -41,8 +41,8 @@ function add(s) {
   SIGNAL_BY_ID.set(s.id, s);
 }
 
-for (const [id, name, label, color, stack, shape] of items) {
-  add({ id, name, label, color, stack, shape, type: 'item' });
+for (const [id, name, label, color, stack, shape, icon] of items) {
+  add({ id, name, label, color, stack, shape, icon, type: 'item' });
 }
 for (const ch of 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789') {
   add({ id: `signal-${ch}`, name: `Signal ${ch}`, label: ch, color: '#3a3f44', type: 'virtual', shape: 'virtual' });

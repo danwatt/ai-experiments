@@ -4,7 +4,7 @@ import { app, store, useStore, onUserChange } from './state.js';
 import { TICKS_PER_SECOND } from './sim.js';
 import { createEditor, addNode, load, serialize, zoomToFit, resetSimulation, removeNode, selectedNode, flash } from './editor.js';
 import { META, PALETTE } from './ui/nodes.js';
-import { SignalList, Chip } from './ui/components.js';
+import { SignalList, Chip, EntityIcon, PickerHost } from './ui/components.js';
 import { EXAMPLES, WELCOME } from './examples.js';
 
 const SAVE_KEY = 'circuit-sim-autosave-v1';
@@ -94,7 +94,7 @@ function Toolbar() {
   useStore();
   const toggle = () => { app.running = !app.running; store.bump(); };
   return html`<div className="toolbar">
-    <div className="brand"><span className="logo">⧉</span> Circuit Network Simulator <span className="muted small">a Factorio learning aid</span></div>
+    <div className="brand"><${EntityIcon} kind="decider" size=${30} /> Circuit Network Simulator <span className="muted small">a Factorio learning aid</span></div>
     <div className="tb-group">
       <button className=${`tb-btn primary ${app.running ? '' : 'paused'}`} onClick=${toggle} title="Space">${app.running ? '❚❚ Pause' : '▶ Run'}</button>
       <button className="tb-btn" disabled=${app.running} onClick=${() => app.stepOnce()} title="Advance one tick (.)">Step +1 tick</button>
@@ -124,7 +124,7 @@ function Palette() {
     ${PALETTE.map(([cat, kinds]) => html`<div className="pal-group" key=${cat}>
       <div className="pal-head">${cat}</div>
       ${kinds.map((k) => html`<button className=${`pal-btn kind-${k}`} key=${k} onClick=${async () => { await addNode(k); flash(`Added ${META[k].title}`); }} title=${`Add ${META[k].title}`}>
-        <span className="pal-icon">${META[k].icon}</span>${META[k].title}
+        <${EntityIcon} kind=${k} size=${28} /><span>${META[k].title}</span>
       </button>`)}
     </div>`)}
     <div className="pal-foot">
@@ -162,7 +162,7 @@ function Inspect() {
   const points = (node.kind === 'arithmetic' || node.kind === 'decider' || node.kind === 'selector') ? [['in', 'Input point'], ['out', 'Output point']] : [['main', 'Connection point']];
   const hasPoints = node.kind !== 'solar';
   return html`<div className="inspect">
-    <h3><span className="cnode-icon">${meta.icon}</span> ${node.label} <span className="muted small">${meta.title}</span></h3>
+    <h3><${EntityIcon} kind=${node.kind} size=${26} /> ${node.label} <span className="muted small">${meta.title}</span></h3>
     <div className="help" dangerouslySetInnerHTML=${{ __html: meta.help }}></div>
     ${hasPoints && html`<h4>Live</h4>
       ${points.map(([p, label]) => {
@@ -220,6 +220,7 @@ async function boot() {
   createRoot(document.getElementById('toolbar')).render(html`<${Toolbar} />`);
   createRoot(document.getElementById('palette')).render(html`<${Palette} />`);
   createRoot(document.getElementById('side')).render(html`<${Side} />`);
+  createRoot(document.getElementById('picker')).render(html`<${PickerHost} />`);
 
   const container = document.getElementById('editor');
   await createEditor(container);

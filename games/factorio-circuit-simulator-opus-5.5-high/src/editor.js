@@ -6,7 +6,7 @@ import {
 import { app, store, useStore, userChanged } from './state.js';
 import { KINDS } from './sim.js';
 import { META } from './ui/nodes.js';
-import { stop } from './ui/components.js';
+import { stop, EntityIcon } from './ui/components.js';
 
 const { RefSocket, useConnection } = ReactPresets.classic;
 
@@ -67,18 +67,42 @@ function SocketView({ data }) {
   return html`<div className=${`sock sock-${data.name}`} title=${`${data.name} wire: drag to another ${data.name} socket`}></div>`;
 }
 
-function SocketRow({ node, side, emit }) {
-  const pts = KINDS[node.kind].points;
-  const dual = pts.length === 2;
+function Sockets({ node, side, emit }) {
   const ports = side === 'input' ? node.inputs : node.outputs;
-  const label = dual ? (side === 'input' ? 'input' : 'output') : 'wire';
   return html`<div className=${`sockets ${side}`}>
     ${COLORS.map((c) => ports[c] && html`<div className=${`srow ${c}`} key=${c}>
-      ${side === 'input' && html`<${RefSocket} name="sref" side="input" socketKey=${c} nodeId=${node.id} emit=${emit} payload=${ports[c].socket} />`}
-      <span className="slabel">${c === 'red' ? `${label}` : ''}</span>
-      ${side === 'output' && html`<${RefSocket} name="sref" side="output" socketKey=${c} nodeId=${node.id} emit=${emit} payload=${ports[c].socket} />`}
+      <${RefSocket} name="sref" side=${side} socketKey=${c} nodeId=${node.id} emit=${emit} payload=${ports[c].socket} />
     </div>`)}
   </div>`;
+}
+
+/** "Connected to: R1 G2" in the game's style, using this simulator's network ids. */
+function NetIds({ node, point, prefix = true }) {
+  const r = app.sim.network(node.id, point, 'red');
+  const g = app.sim.network(node.id, point, 'green');
+  if (!r && !g) return html`<span className="muted">not connected</span>`;
+  return html`<span title="Connected networks">${prefix && 'Connected to: '}${r && html`<span className="net-text red">${r.id}</span>`} ${g && html`<span className="net-text green">${g.id}</span>`}</span>`;
+}
+
+function ConnectionBar({ node, emit }) {
+  useStore();
+  const dual = KINDS[node.kind].points.length === 2;
+  return html`<div className="f-conn">
+    <${Sockets} node=${node} side="input" emit=${emit} />
+    ${dual
+      ? html`<span className="f-conn-side"><b>Input:</b> <${NetIds} node=${node} point="in" prefix=${false} /></span>
+          <span className="f-conn-mid" title="Combinators write their result one tick after reading">→ 1 tick →</span>
+          <span className="f-conn-side right"><b>Output:</b> <${NetIds} node=${node} point="out" prefix=${false} /></span>`
+      : html`<span className="f-conn-side center" title="Single connection point: both sides are the same point"><b>Circuit:</b> <${NetIds} node=${node} point="main" /></span>`}
+    <${Sockets} node=${node} side="output" emit=${emit} />
+  </div>`;
+}
+
+function StatusLine({ node }) {
+  useStore();
+  const st = META[node.kind].status?.(node.state);
+  if (!st) return null;
+  return html`<div className="f-status"><span className=${`f-led ${st[0]}`}></span>${st[1]}</div>`;
 }
 
 function NodeView({ data, emit }) {
@@ -86,24 +110,20 @@ function NodeView({ data, emit }) {
   const [, force] = React.useReducer((x) => x + 1, 0);
   const onChange = React.useCallback(() => { force(); userChanged(); }, []);
   const hasSockets = KINDS[data.kind].points.length > 0;
-  const dual = KINDS[data.kind].points.length === 2;
   const { Body, Live, Extra } = meta;
-  return html`<div className=${`cnode kind-${data.kind} ${data.selected ? 'selected' : ''}`} style=${{ width: `${meta.width}px` }} data-testid="node">
-    <div className="cnode-head">
-      <span className="cnode-icon">${meta.icon}</span>
-      <span className="cnode-title" title=${meta.title}>${data.label}</span>
-      <span className="cnode-kind">${meta.title}</span>
-      <button className="cnode-del" title="Delete (Del)" onPointerDown=${stop} onClick=${() => removeNode(data.id)}>×</button>
+  return html`<div className=${`cnode f-window kind-${data.kind} ${data.selected ? 'selected' : ''}`} style=${{ width: `${meta.width}px` }} data-testid="node">
+    <div className="f-titlebar">
+      <${EntityIcon} kind=${data.kind} size=${22} />
+      <span className="f-title" title=${meta.title}>${data.label}</span>
+      <span className="f-drag"></span>
+      ${data.label !== meta.title && html`<span className="f-kind">${meta.title}</span>`}
+      <button className="f-close" title="Delete (Del)" onPointerDown=${stop} onClick=${() => removeNode(data.id)}>✕</button>
     </div>
-    ${hasSockets && html`<div className=${`cnode-sockets ${dual ? 'dual' : 'single'}`}>
-      <${SocketRow} node=${data} side="input" emit=${emit} />
-      ${!dual && html`<span className="same-point" title="Single connection point: both sides are the same point">⟷ same point ⟷</span>`}
-      ${dual && html`<span className="same-point">→ 1 tick →</span>`}
-      <${SocketRow} node=${data} side="output" emit=${emit} />
-    </div>`}
-    <div className="cnode-body" onPointerDown=${stop} onDoubleClick=${stop}>
-      ${Body && html`<${Body} node=${data} onChange=${onChange} />`}
+    ${hasSockets && html`<${ConnectionBar} node=${data} emit=${emit} />`}
+    <div className="cnode-body" onPointerDown=${stop} onDoubleClick=${stop} onContextMenu=${stop}>
+      <${StatusLine} node=${data} />
       ${Live && html`<${Live} node=${data} />`}
+      ${Body && html`<${Body} node=${data} onChange=${onChange} />`}
       ${Extra && html`<${Extra} node=${data} />`}
     </div>
   </div>`;
