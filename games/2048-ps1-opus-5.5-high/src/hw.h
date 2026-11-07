@@ -109,9 +109,4 @@ extern u32 frame_count;
 void pad_init(void);
 u16  pad_read(void);
 
-/* spu.c */
-void spu_init(void);
-void spu_tone(int midi_note, int frames, int vol);
-void spu_update(void);
-
 #endif

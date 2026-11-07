@@ -2,9 +2,7 @@
  * slide directions. Axial coordinates (q, r); a tile slides along a
  * direction until it hits the edge or another tile, merging once with an
  * equal neighbour per move. */
-#include "hw.h"
-
-void spu_play(int note, int frames, int vol, int delay);
+#include "audio.h"
 
 #define NCELLS  19
 #define CELL    24          /* layout circumradius */
@@ -32,6 +30,7 @@ static int can_undo;
 static u32 score, best;
 static int won, pending_win, pending_over;
 static int state, menu_sel;
+static int music_on = 1, music_song = -1;
 
 static struct { u8 from, to, v; } anim[NCELLS];
 static int nanim;
@@ -162,9 +161,10 @@ static void new_game(void)
     nanim = 0;
     anim_t = SLIDE_T;                       /* skip slide, play the grow */
     state = ST_PLAY;
-    spu_play(67, 6, 0x1400, 0);
+    music_song = -1;                        /* restart the in-game song */
+    spu_play(69, 6, 0x1400, 0);
     spu_play(72, 6, 0x1400, 5);
-    spu_play(79, 10, 0x1400, 10);
+    spu_play(76, 10, 0x1400, 10);
 }
 
 static const u8 merge_note[] = { 0, 60, 62, 64, 67, 69, 72, 74, 76, 79, 81, 84, 86, 88, 91, 93, 96, 98 };
@@ -235,9 +235,10 @@ static void finish_anim(void)
     } else if (pending_over) {
         pending_over = 0;
         state = ST_OVER;
-        spu_play(67, 10, 0x1800, 1);
-        spu_play(63, 10, 0x1800, 12);
-        spu_play(60, 24, 0x1800, 23);
+        spu_play(76, 10, 0x1800, 1);
+        spu_play(72, 10, 0x1800, 12);
+        spu_play(69, 12, 0x1800, 23);
+        spu_play(57, 30, 0x1800, 34);
     }
 }
 
@@ -270,6 +271,24 @@ static int dpad_dir(u16 btn)
     if (v == PAD_UP) return h == PAD_LEFT ? DIR_NW : h == PAD_RIGHT ? DIR_NE : DIR_N;
     if (v == PAD_DOWN) return h == PAD_LEFT ? DIR_SW : h == PAD_RIGHT ? DIR_SE : DIR_S;
     return DIR_NONE;
+}
+
+/* Pick the song, its volume and how many layers play from the game state.
+ * Layers: 0 pad/bass/drums, 1 +arpeggio (16 tile), 2 +lead (64), 3 +bell (256). */
+static void direct_music(void)
+{
+    int i, top = 0, g;
+    if (state == ST_OVER) {
+        if (music_song >= 0) { music_fade_out(); music_song = -1; }
+        return;
+    }
+    i = state == ST_TITLE ? SONG_TITLE : SONG_GAME;
+    if (i != music_song) { music_play(i); music_song = i; }
+    for (i = 0; i < NCELLS; i++)
+        if (grid[i] > top) top = grid[i];
+    music_set_layers(state == ST_TITLE ? 3 : top >= 8 ? 3 : top >= 6 ? 2 : top >= 4 ? 1 : 0);
+    g = state == ST_PAUSE ? 90 : state == ST_WIN ? 110 : 256;
+    music_set_gain(music_on ? g : 0);
 }
 
 void game_init(void)
@@ -319,9 +338,13 @@ void game_update(u16 btn)
         break;
 
     case ST_PAUSE:
-        if (press & (PAD_UP | PAD_DOWN)) { menu_sel ^= 1; spu_play(60, 3, 0x0C00, 0); }
-        if (press & (PAD_START | PAD_CROSS | PAD_CIRCLE)) {
-            if (menu_sel) new_game(); else state = ST_PLAY;
+        if (press & PAD_UP)   { menu_sel = (menu_sel + 2) % 3; spu_play(64, 3, 0x0C00, 0); }
+        if (press & PAD_DOWN) { menu_sel = (menu_sel + 1) % 3; spu_play(64, 3, 0x0C00, 0); }
+        if (menu_sel == 1 && (press & (PAD_LEFT | PAD_RIGHT | PAD_START | PAD_CROSS | PAD_CIRCLE))) {
+            music_on ^= 1;
+            spu_play(music_on ? 76 : 64, 4, 0x0C00, 0);
+        } else if (press & (PAD_START | PAD_CROSS | PAD_CIRCLE)) {
+            if (menu_sel == 2) new_game(); else state = ST_PLAY;
         }
         break;
 
@@ -343,6 +366,7 @@ void game_update(u16 btn)
         }
         break;
     }
+    direct_music();
 }
 
 /* ------------------------------------------------------------- drawing */
@@ -520,6 +544,7 @@ static void draw_title(void)
 
 void game_draw(void)
 {
+    int i;
     gpu_begin(0x000000);
     draw_background();
     if (state == ST_TITLE) {
@@ -534,8 +559,18 @@ void game_draw(void)
     if (state == ST_PAUSE) {
         dim_board();
         text_center(BX, 80, "PAUSED", 512, 0xFFFFFF);
-        text_center(BX, 116, menu_sel == 0 ? "> RESUME <" : "RESUME", 512, menu_sel == 0 ? 0xEDC22E : 0xCDC1B4);
-        text_center(BX, 140, menu_sel == 1 ? "> NEW GAME <" : "NEW GAME", 512, menu_sel == 1 ? 0xEDC22E : 0xCDC1B4);
+        {
+            static const char *items[3][2] = {
+                { "RESUME", "> RESUME <" },
+                { "MUSIC: OFF", "> MUSIC: OFF <" },
+                { "NEW GAME", "> NEW GAME <" },
+            };
+            static const char *music_on_txt[2] = { "MUSIC: ON", "> MUSIC: ON <" };
+            for (i = 0; i < 3; i++) {
+                const char *t = (i == 1 && music_on) ? music_on_txt[menu_sel == i] : items[i][menu_sel == i];
+                text_center(BX, 112 + i * 22, t, 512, menu_sel == i ? 0xEDC22E : 0xCDC1B4);
+            }
+        }
     } else if (state == ST_OVER) {
         char buf[12];
         dim_board();

@@ -9,12 +9,19 @@ CFLAGS  = -march=r3000 -mtune=r3000 -mabi=32 -msoft-float -mno-abicalls -fno-pic
 LDFLAGS = -nostdlib -static -T src/ps1.ld -Wl,--build-id=none -Wl,--gc-sections
 
 SRCS = src/crt0.s src/main.c src/game.c src/gpu.c src/pad.c src/spu.c src/font.c
-OBJS = $(patsubst src/%,build/%.o,$(SRCS))
+OBJS = $(patsubst src/%,build/%.o,$(SRCS)) build/audio_data.c.o
 
 all: hex2048.exe
 
-build/%.o: src/%
+build/%.o: src/% src/hw.h src/audio.h
 	@mkdir -p build
+	$(CC) $(CFLAGS) -ffunction-sections -fdata-sections -c $< -o $@
+
+build/audio_data.c: tools/gen_audio.py music/hexsong.py
+	@mkdir -p build
+	python3 -B tools/gen_audio.py > $@.tmp && mv $@.tmp $@
+
+build/audio_data.c.o: build/audio_data.c src/audio.h src/hw.h
 	$(CC) $(CFLAGS) -ffunction-sections -fdata-sections -c $< -o $@
 
 build/hex2048.elf: $(OBJS) src/ps1.ld

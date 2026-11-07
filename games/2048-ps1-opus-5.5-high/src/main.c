@@ -1,4 +1,4 @@
-#include "hw.h"
+#include "audio.h"
 
 void game_init(void);
 void game_update(u16 buttons);
