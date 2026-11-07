@@ -1,0 +1,3 @@
+# fetch.sh default download dir (~450 MB) and Python cache
+raw/
+__pycache__/
