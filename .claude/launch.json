@@ -222,6 +222,18 @@
         "games/hexahedron-n64-opus-5.5"
       ],
       "port": 8819
+    },
+    {
+      "name": "factorio-circuit-sim",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8823",
+        "-d",
+        "games/factorio-circuit-simulator-opus-5.5-high"
+      ],
+      "port": 8823
     }
   ]
 }
