@@ -3,8 +3,8 @@
 - **Model:** claude-opus-5-5
 - **Effort:** high
 - **Session(s):** c6d9482a-504a-4630-b20c-8ee1b9a34906
-- **Tokens (whole session):** input 470, output 275737, cache read 52790019, cache write 897386
-- **Cost (tokscale estimate):** $23.25 for the whole session. The session first built the [Fort Worth ISD](../fwisd-budget-opus-5.5-high/prompt.html) and [Tarrant County](../tarrant-isd-compare-opus-5.5-high/prompt.html) explorers, whose prompts are left out here; the session stood at $15.38 when the Tarrant demo was committed, so this statewide page is roughly $7.87.
+- **Tokens (whole session):** input 628, output 382160, cache read 88424114, cache write 1056586
+- **Cost (tokscale estimate):** $33.78 for the whole session, which also built the [Fort Worth ISD](../fwisd-budget-opus-5.5-high/prompt.html), [Tarrant County](../tarrant-isd-compare-opus-5.5-high/prompt.html) and [Fort Worth area schools](../fort-worth-area-schools-opus-5.5-high/prompt.html) pages; their prompts are left out here. The statewide page (first build plus the recapture update) is roughly $11.81.
 
 ## You
 
@@ -122,6 +122,72 @@ The statewide page is built: [politics/texas-isd-statewide-opus-5.5-high/index.h
 - **Charter schools:** about 435,000 students, left out as before.
 
 I also added the `demos.js` card, a screenshot of the county map at `screenshots/projects/texas-isd-statewide-opus-5.5-high.webp`, a README, and a `.gitignore` for `raw/`. The commit would include only those files, the page and the two build scripts. The roughly 450 MB of raw downloads are in the scratchpad, outside the repo.
+
+## You
+
+Yes, prompt + commit
+
+## Claude
+
+The statewide explorer is committed as `c235c9f` (28 files) and pushed. `origin/master` is up to date.
+
+**prompt.md:** this session also built the Fort Worth and Tarrant demos, so I removed their prompts. The file starts at "Lets expand this analysis to the state of Texas as a whole", and only that part's 20 screenshots are left in `prompt-assets/`.
+
+**Cost:** the whole session comes to $23.25. It stood at $15.38 when the Tarrant demo was committed, so the header puts the statewide page at roughly $7.87. It also links to the other two demos' prompt pages.
+
+**Landing-page card:** now links to the prompt and the README.
+
+I haven't checked that the Pages deploy ran or that the live site updated.
+
+## You
+
+Lets update the statewide - I want to see on the state county map an option for recapture - basically, is there a net positive or net negative flow of money due to recapture at the county level. Then, on the detailed report, I would like to see what counties / ISDs pay the most in recapture, or which benefit the most from recapture.
+
+## Claude
+
+Recapture section and map measures written. Rebuilding the data with recapture payments and state aid, then checking in the browser.
+
+![screenshot 76](prompt-assets/076.webp)
+
+Switched the recapture numbers to TEA's official recapture-paid file, which matches our ledger figures within about 1% and adds near-final FY2026 and preliminary FY2027. Checking the page.
+
+![screenshot 77](prompt-assets/077.webp)
+
+![screenshot 78](prompt-assets/078.webp)
+
+![screenshot 79](prompt-assets/079.webp)
+
+![screenshot 80](prompt-assets/080.webp)
+
+![screenshot 81](prompt-assets/081.webp)
+
+![screenshot 82](prompt-assets/082.webp)
+
+I've added recapture to the statewide page, both as a county map option and as a new section of rankings. I checked it at desktop and phone widths with no console errors. Nothing is committed yet.
+
+**How the money flow is measured**
+- **Paid** is what TEA records each district paying. I used TEA's official [recapture paid by district](https://tea.texas.gov/about-tea/state-funding/state-funding-reports-and-data/recapture-paid-by-district.xlsx) file. Its figures match the recapture payments in district books within about 1% a year (FY2025: $2.96B in TEA's file, $2.95B in the books). It also adds FY2026 (near-final) and FY2027 (preliminary).
+- **Received** isn't recorded anywhere, because recapture goes into the state's general school fund rather than to particular districts. I estimate it by dividing each year's total recapture in proportion to each district's basic state aid (the Foundation School Program). Net = estimated share − amount paid, so the statewide net is zero.
+- **Limit of the estimate:** the page says that, in practice, the Legislature sets total state aid and recapture reduces how much other state money it has to put in. No district's aid actually rises or falls dollar for dollar with recapture.
+
+**What's new on the page**
+- **County map:** two new options, "Recapture: estimated net flow per student" and "Recapture paid per student". On the net map, orange counties send money out and blue counties come out ahead. Each color side is scaled on its own, because a few oil counties run as low as −$65,000 per student and would otherwise wash out the ~+$1,000 gains everywhere else.
+- **Recapture section:**
+  - summary boxes;
+  - a chart of statewide recapture paid, FY2011–FY2027, with the near-final and preliminary years in a lighter shade;
+  - a note on the selected district and its county;
+  - tables of who pays the most and who gains the most, switchable between districts and counties, and between totals and per student. Your district or county is shown at the bottom if it isn't in the top 15. Clicking a row follows it.
+
+**Findings (FY2025)**
+- **Total:** districts paid $2.96B, about 6% of all local revenue. That's down from $4.53B in FY2023. TEA puts FY2026 at $2.49B and FY2027 at $2.18B.
+- **Largest payers:** Austin ISD paid $770M, about a quarter of the state's total. Next are Pecos-Barstow-Toyah ($198M), Plano ($136M), Wink-Loving ($123M) and Eanes ($93M).
+- **By county:** most counties come out ahead. The ones that send money out are the oil-rich Permian Basin and Eagle Ford counties, plus Travis, Midland and Collin. Dallas County is close to even.
+- **Tarrant County:** it gains an estimated $98M (+$300 per student). Over FY2011–FY2025 that adds up to about $1.04B.
+- **Fort Worth ISD pays recapture too:** $5.2M in FY2025, which surprised me, so I checked it. FWISD is on TEA's 2024-25 list of districts that owe recapture, and TEA's file shows the same amount. Its estimated share back is about $38M, for a net of +$33M.
+
+I also updated the README with these findings and the estimation method, and `fetch.sh` now downloads TEA's recapture file.
+
+Sources: [TEA Excess Local Revenue](https://tea.texas.gov/about-tea/state-funding/excess-local-revenue), [2024-25 Excess Local Revenue Districts](https://tea.texas.gov/finance-and-grants/state-funding/excess-local-revenue/2024-2025-excess-local-revenue-districts.pdf), [TEA recapture one-pager](https://tea.texas.gov/finance-and-grants/state-funding/state-funding-manuals/excess-local-revenue-recapture-one-pager-feb2025.pdf)
 
 ## You
 

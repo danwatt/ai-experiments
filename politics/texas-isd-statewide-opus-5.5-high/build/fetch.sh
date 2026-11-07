@@ -32,6 +32,8 @@ for line in $ACT; do
   [ -s "$z" ] || curl -sSL -A "$UA" -o "$z" "${line#*|}" &
 done
 [ -s "$RAW/zip/summarized.xlsx" ] || curl -sSL -A "$UA" -o "$RAW/zip/summarized.xlsx" "$T/media/423296" &
+# TEA recapture paid by district, FY1994-FY2027 (FY2026 near-final, FY2027 preliminary)
+curl -sSL -A "$UA" -o "$RAW/zip/recapture-paid.xlsx" "$T/about-tea/state-funding/state-funding-reports-and-data/recapture-paid-by-district.xlsx" &
 # County outlines (Census, via plotly's sample GeoJSON); build_data.py keeps Texas (FIPS 48) only
 [ -s "$RAW/geo/counties.json" ] || curl -sSL -o "$RAW/geo/counties.json" https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json &
 wait

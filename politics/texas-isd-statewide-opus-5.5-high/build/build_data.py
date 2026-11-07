@@ -36,7 +36,12 @@ SPEND = [("instr", ("11", "95")), ("supp", ("12", "13", "21", "23")), ("stud", (
          ("food", ("35",)), ("extra", ("36",)), ("admin", ("41", "92")), ("ops", ("51", "52", "53")), ("comm", ("61",)),
          ("cap", ("71", "81")), ("inter", ("91", "93", "94", "96", "97", "99"))]
 FUNC2S = {fn: k for k, fns in SPEND for fn in fns}
-KEYS = REV + [k for k, _ in SPEND]
+# Extra key, overlapping "state" (not added into totals):
+#   fsp  Foundation School Program state aid (objects 5811, 5812), used to apportion the recapture pool.
+# Recapture paid comes from TEA's own recapture-paid-by-district file (FY1994-FY2027), which matches the
+# General Fund function 91 payments in these books to within about 1% statewide.
+EXTRA = ["fsp"]
+KEYS = REV + [k for k, _ in SPEND] + EXTRA
 KI = {k: i for i, k in enumerate(KEYS)}
 
 def fed_cat(fund, obj, yr):
@@ -70,12 +75,17 @@ def read_year(path):
                 fund, obj = r[iF], r[iO]
                 if not fund_group(fund): continue
                 k = rev_of(fund, obj, yr)
+                extra = None
                 if k is None:
                     if obj[:1] != "6": continue
                     fn = r[iFn]
                     k = FUNC2S.get(fn) or ("admin" if fn == "41" else "ops")
-                try: acc[r[iD]][KI[k]] += float(r[iA])
-                except ValueError: pass
+                elif obj in ("5811", "5812"): extra = "fsp"
+                try: a = float(r[iA])
+                except ValueError: continue
+                row = acc[r[iD]]
+                row[KI[k]] += a
+                if extra: row[KI[extra]] += a
     return yr, {d: [round(v / 1000) for v in vals] for d, vals in acc.items()}
 
 def main():
@@ -203,6 +213,19 @@ def main():
         row["match"] = [x, z]
         mealout[d] = row
 
+    # TEA recapture paid by district; FY2026 is near-final and FY2027 preliminary
+    ws = openpyxl.load_workbook(f"{RAW}/zip/recapture-paid.xlsx", read_only=True).worksheets[0]
+    rr = list(ws.iter_rows(values_only=True))
+    hi = next(k for k, r in enumerate(rr) if r and r[0] == "CDN")
+    ycol = {int(re.search(r"(\d{4})", c).group(1)): j for j, c in enumerate(rr[hi]) if isinstance(c, str) and "Total Recapture" in c}
+    RY = [y for y in sorted(ycol) if y >= YEARS[0]]
+    rcp = {}
+    for r in rr[hi + 1:]:
+        if not r or not r[0] or not str(r[0]).strip("'").isdigit(): continue
+        d = str(r[0]).strip("'").zfill(6)
+        vals = [round((r[ycol[y]] or 0) / 1000) if isinstance(r[ycol[y]], (int, float)) else 0 for y in RY]
+        if any(vals): rcp[d] = vals
+
     CPI = {2011: 221.09, 2012: 227.56, 2013: 231.35, 2014: 234.97, 2015: 236.68, 2016: 238.27, 2017: 242.66,
            2018: 248.13, 2019: 253.27, 2020: 257.23, 2021: 263.15, 2022: 282.03, 2023: 299.69, 2024: 309.57,
            2025: 317.73, 2026: 327.67}
@@ -213,6 +236,7 @@ def main():
         "dist": [[d, nice(names.get(d, d)), d[:3], region.get(d)] for d in dists],
         "fin": fin, "meals": mealout,
         "counties": counties,
+        "rcp": rcp, "rcpYears": RY,
     }
     blob = "window.TX=" + json.dumps(data, separators=(",", ":")) + ";"
     page = open(OUT).read()
