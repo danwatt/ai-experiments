@@ -1,0 +1,85 @@
+# Road-trip planner. Everything runs here; the host needs only Docker.
+#   make up      start valhalla (builds tiles on first run) and the api
+#   make logs    follow both
+services:
+  valhalla:
+    # Pinned release. The tag has linux/amd64 and linux/arm64 images
+    # (checked with `docker manifest inspect`).
+    image: ghcr.io/valhalla/valhalla-scripted:3.9.1
+    # Settings are lowercase environment variables read by the image's
+    # entrypoint scripts. See /valhalla/scripts/configure_valhalla.sh.
+    environment:
+      # Space-separated list of PBFs to download when no tiles exist yet.
+      tile_urls: ${REGION_URLS:-https://download.geofabrik.de/north-america/us/colorado-latest.osm.pbf}
+      build_admins: "True"
+      build_time_zones: "True"
+      build_elevation: "False"
+      # Once tiles exist, start serving them and never look at the PBFs again.
+      use_tiles_ignore_pbf: "True"
+      # Use OSM's maxspeed tags for speeds. The image's default is a table of
+      # speeds per road class (OpenStreetMapSpeeds) that replaces every edge's
+      # speed, tagged or not. With a single-state extract Valhalla's admin db
+      # comes out empty (no country boundary), the lookup falls back to the
+      # world table, and US-285 ends up at 62 km/h. See notes/phase-1.md.
+      # start.sh also removes the table from valhalla.json.
+      use_default_speeds_config: "False"
+      # `make rebuild-tiles` sets this for one start.
+      force_rebuild: ${VALHALLA_FORCE_REBUILD:-False}
+      # Worker threads. The image defaults to one per CPU (14 here), and each
+      # thread keeps its own tile cache (see max_cache_size in start.sh), which
+      # filled the 8 GB Docker VM and restarted the container. Four threads
+      # still answer the api's six parallel matrix batches in about the same time.
+      server_threads: ${VALHALLA_THREADS:-4}
+    # start.sh raises the exclude_polygons size limits, then runs the image's
+    # own entrypoint with the same default command.
+    entrypoint: ["/valhalla/start.sh"]
+    command: ["build_tiles"]
+    volumes:
+      - ./valhalla/start.sh:/valhalla/start.sh:ro
+      - ./data/valhalla:/custom_files
+    ports:
+      - "127.0.0.1:${VALHALLA_PORT:-8002}:8002"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8002/status"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      # First start downloads and builds tiles, which takes a while.
+      start_period: 30m
+    restart: unless-stopped
+
+  api:
+    build: ./backend
+    image: road-trip-planner-backend
+    environment:
+      VALHALLA_URL: http://valhalla:8002
+    volumes:
+      - ./backend:/app
+      - ./frontend:/frontend:ro
+      - ./data:/data
+      # Saved trips, the zone library and the defaults (plain JSON, gitignored).
+      - ./trips:/trips
+      # The example trips and the starting zone library, committed.
+      - ./examples:/examples:ro
+    ports:
+      - "127.0.0.1:${API_PORT:-8000}:8000"
+    depends_on:
+      - valhalla
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request as u; u.urlopen('http://localhost:8000/api/status', timeout=4)"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # One-shot: reads the PBF Valhalla downloaded and writes data/pois.sqlite.
+  # `make import` runs it. Not started by `make up` (profile "tools").
+  importer:
+    build: ./backend
+    image: road-trip-planner-backend
+    profiles: ["tools"]
+    volumes:
+      - ./backend:/app
+      - ./data:/data
+    command: python -m app.pois

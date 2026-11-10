@@ -51,6 +51,7 @@ window.DEMOS = [
   { s: "data", t: "tx-lege", href: "tx-lege/demo/", img: "screenshots/projects/tx-lege.webp", d: "Full legislative history of a Texas bill: actions, versions, amendments. Shows sample reports here.", model: null, effort: null, links: [["prompt", "tx-lege/prompt.html"], ["README", "tx-lege/README.html"]] },
   // Tools
   { s: "tools", t: "Overhead", href: "overhead-opus-5.5-high/", img: "screenshots/projects/overhead-opus-5.5-high.webp", d: "Live aircraft around you: 2D map, tilted 3D map, and sky dome. Runs a recorded demo here.", model: "Opus 5.5", effort: "high", links: [["prompt", "overhead-opus-5.5-high/prompt.html"], ["README", "overhead-opus-5.5-high/README.html"]] },
+  { s: "tools", t: "Road trip planner", href: "route-planner-opus-5.5-extra/README.html", img: "screenshots/projects/route-planner-opus-5.5-extra.webp", d: "Plans multi-day drives the way Streets & Trips did: a break every N minutes or M miles at real rest areas, exits and towns, plus meals, fuel, overnights and zones drawn on the map. Python, Valhalla and Leaflet in Docker; runs locally, so this page shows screenshots. Planned in one session, built phase by phase by six more.", model: "Opus 5.5 + Sonnet 5.5", effort: "xhigh / high", links: [["prompt", "route-planner-opus-5.5-extra/prompt.html"], ["README", "route-planner-opus-5.5-extra/README.html"], ["design mockups", "route-planner-opus-5.5-extra/design/"]] },
 
 
   // Video & vision

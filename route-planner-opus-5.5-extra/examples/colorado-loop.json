@@ -1,0 +1,134 @@
+{
+  "version": 1,
+  "pace": 1.05,
+  "search_miles": 2.0,
+  "options": {
+    "avoid_tolls": false,
+    "avoid_ferries": false,
+    "avoid_unpaved": false,
+    "alternates": 2
+  },
+  "breaks": {
+    "settings": {
+      "every_minutes": 120.0,
+      "every_miles": 150.0,
+      "minutes": 15.0,
+      "window_start": 0.75,
+      "window_end": 1.0,
+      "hard_max": 1.1,
+      "max_detour_each_way": 5.0,
+      "stop_order": [
+        "rest_area",
+        "service_plaza",
+        "services",
+        "any"
+      ]
+    },
+    "meals": {
+      "lunch": {
+        "on": true,
+        "start": "11:30",
+        "end": "13:30",
+        "minutes": 45.0
+      },
+      "dinner": {
+        "on": true,
+        "start": "17:30",
+        "end": "19:30",
+        "minutes": 60.0
+      },
+      "food": "all",
+      "resets_break_clock": true
+    },
+    "fuel": {
+      "on": true,
+      "range_miles": 400.0,
+      "refuel_after": 0.75,
+      "fill_at_overnight": true,
+      "minutes": 10.0,
+      "merge_minutes": 20.0
+    },
+    "days": {
+      "driving_minutes": 480.0,
+      "arrive_by": "19:00",
+      "auto_overnights": true,
+      "min_lodging": 2,
+      "stop_at_sunset": false,
+      "start": "08:00"
+    },
+    "lodging": {
+      "brands": [],
+      "rule": "prefer"
+    },
+    "warn_closures": true,
+    "pins": [],
+    "skips": []
+  },
+  "name": "Colorado loop",
+  "saved_at": null,
+  "depart": "2027-09-25T08:00",
+  "waypoints": [
+    {
+      "id": "loop-a",
+      "lat": 39.7392,
+      "lon": -104.9903,
+      "name": "Denver, CO",
+      "type": "stop",
+      "minutes": 30,
+      "nights": 1
+    },
+    {
+      "id": "loop-b",
+      "lat": 40.4413,
+      "lon": -105.7546,
+      "name": "Trail Ridge Road",
+      "type": "through",
+      "minutes": 30,
+      "nights": 1
+    },
+    {
+      "id": "loop-c",
+      "lat": 38.0228,
+      "lon": -107.6714,
+      "name": "Ouray",
+      "type": "through",
+      "minutes": 30,
+      "nights": 1
+    },
+    {
+      "id": "loop-d",
+      "lat": 37.2753,
+      "lon": -107.8801,
+      "name": "Durango, CO",
+      "type": "overnight",
+      "minutes": 30,
+      "nights": 2
+    },
+    {
+      "id": "loop-e",
+      "lat": 37.7326,
+      "lon": -105.5122,
+      "name": "Great Sand Dunes National Park",
+      "type": "stop",
+      "minutes": 180,
+      "nights": 1
+    },
+    {
+      "id": "loop-f",
+      "lat": 39.7392,
+      "lon": -104.9903,
+      "name": "Denver, CO",
+      "type": "stop",
+      "minutes": 30,
+      "nights": 1
+    }
+  ],
+  "zones": [],
+  "library_on": [
+    "boulder-downtown",
+    "denver-metro",
+    "montrose",
+    "glenwood-springs"
+  ],
+  "summary": null
+}

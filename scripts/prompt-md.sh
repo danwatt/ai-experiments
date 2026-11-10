@@ -141,7 +141,12 @@ fmt() { jq -r "$1" <<<"$usage"; }
 claude_events() {
   jq -c '
     select(.isSidechain | not)
-    | if .type == "user" and .origin.kind == "human" and (.isMeta | not) then
+    | "Background (from the session that started this one)" as $brief
+    | if .type == "user" and (.isMeta | not) and .origin == null
+         and (.message.content | type) == "string" and (.message.content | contains($brief)) then
+        # A session started by another session: its brief, minus any reminder text in front of it.
+        .message.content as $c | {role: "user", text: $c[($c | index($brief)):]}
+      elif .type == "user" and .origin.kind == "human" and (.isMeta | not) then
         .message.content
         | if type == "string" then {role: "user", text: .}
           else .[] | if .type == "text" then {role: "user", text: .text}

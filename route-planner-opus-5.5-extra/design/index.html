@@ -1,0 +1,1185 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- end-standalone-head: everything above this line is dropped when publishing as an artifact -->
+<title>Road Trip Planner Mockups</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: a single reading column of screen mockups. Each mockup is a fixed 1280-wide app frame scaled to fit.
+   Tokens come from the GeoTagger design system (dark only), plus map and print tokens this app adds. */
+:root {
+  color-scheme: dark;
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  /* GeoTagger surfaces */
+  --canvas: #1a1a1a; --canvas-deep: #0d0d0d; --pane: #1e1e1e; --rail: #1d1d1d; --card: #232323;
+  --chrome: #252525; --chrome-alt: #2d2d2d; --overlay: #2a2a2a; --field: #333333; --control: #383838;
+  --control-hover: #4a4a4a; --hairline: #333333; --rule: #2e2e2e; --field-border: #444444;
+  --control-border: #555555; --panel-border: #383838;
+  /* GeoTagger ink */
+  --ink: #dddddd; --ink-strong: #eeeeee; --ink-page: #e0e0e0; --ink-secondary: #cccccc;
+  --ink-muted: #aaaaaa; --ink-soft: #999999; --ink-dim: #888888; --ink-faint: #777777;
+  /* GeoTagger accent */
+  --accent: #4a90d9; --accent-text: #7ab8f5; --accent-fill: #2a4a6e; --accent-fill-deep: #1e3a5e;
+  --accent-fill-strong: #3a5f8a; --on-accent: #cfe6ff; --accent-quiet: #9ab8d8; --accent-header: #1e2a3a;
+  --accent-header-border: #3a5a7a; --accent-card: #1a2230; --accent-card-border: #2a3d54;
+  /* GeoTagger status */
+  --success: #5cb85c; --success-quiet: #8ec88e; --success-surface: #1c2d1c; --success-border: #2a5a2a;
+  --warn: #d9a441; --warn-text: #e0b878; --warn-surface: #2a2218; --warn-border: #4a3a28;
+  --danger: #d9534f; --danger-text: #f88888; --danger-border: #aa3333;
+  --highlight: #ffdd00; --on-highlight: #111111; --white: #ffffff;
+  --shadow-control: 0 2px 8px rgba(0, 0, 0, 0.5); --shadow-popup: 0 3px 12px rgba(0, 0, 0, 0.6);
+  --shadow-float: 0 6px 20px rgba(0, 0, 0, 0.8); --shadow-ring: 0 0 0 2px rgba(0, 0, 0, 0.55);
+  /* Map basemap (this app): dark, slightly cool, quieter than the route */
+  --map-land: #202327; --map-water: #14171b; --map-border: #4a4f56; --map-road: #34383e;
+  --map-int: #4b5058; --map-label: #8f949b; --map-label-major: #c3c7cd; --map-shield: #2b2f35;
+  --map-divide: #7489a6; --map-pass: #b8bdc4;
+  --route-casing: #0b1220; --alt-route: #8a8f96;
+  --zone-avoid: rgba(217, 83, 79, 0.10); --zone-avoid-line: rgba(217, 83, 79, 0.5);
+  --zone-warn: rgba(217, 164, 65, 0.13); --zone-prefer: rgba(92, 184, 92, 0.14);
+  --zone-new: rgba(74, 144, 217, 0.12); --band: rgba(122, 184, 245, 0.22); --label-bg: rgba(20, 22, 25, 0.88);
+  /* Print preview (this app): the one light object on the page, because it is paper */
+  --paper: #f6f5f1; --paper-ink: #1c1c1c; --paper-dim: #5b5b5b; --paper-rule: #d8d6cf; --paper-band: #e9e7e0;
+}
+html, body { background: var(--canvas); color: var(--ink-page); }
+body {
+  margin: 0; font: 14px/20px var(--font);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 56px;
+}
+a { color: var(--accent-text); }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.page { max-width: 1320px; margin: 0 auto; }
+
+/* ---------- page chrome ---------- */
+.hero { padding-block: 32px 8px; display: grid; gap: 10px; }
+.eyebrow { font-size: 10px; line-height: 14px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-dim); }
+h1 { margin: 0; font-size: 24px; line-height: 30px; font-weight: 700; color: var(--ink-strong); text-wrap: balance; }
+.lede { margin: 0; max-width: 72ch; color: var(--ink-secondary); }
+.lede b { color: var(--ink-strong); font-weight: 600; }
+.index { display: flex; flex-wrap: wrap; gap: 6px; padding-block: 8px 4px; }
+.index a { font-size: 12px; text-decoration: none; color: var(--ink); background: var(--control); border: 1px solid var(--control-border); border-radius: 20px; padding: 3px 10px; }
+.index a:hover { background: var(--control-hover); }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 18px; padding: 10px 12px; background: var(--card); border: 1px solid var(--hairline); border-radius: 8px; font-size: 12px; color: var(--ink-secondary); align-items: center; }
+.legend .k { display: inline-flex; align-items: center; gap: 6px; }
+.legend .mk { position: static; transform: none; }
+.legend .mk.thru { transform: rotate(45deg); }
+.legend .sw { width: 22px; height: 12px; border-radius: 2px; display: inline-block; }
+
+section.screen { padding-block: 40px 0; display: grid; gap: 12px; scroll-margin-top: 12px; }
+section.screen h2 { margin: 0; font-size: 18px; line-height: 24px; font-weight: 700; color: var(--ink-strong); text-wrap: balance; }
+section.screen > p { margin: 0; max-width: 80ch; color: var(--ink-secondary); }
+.notes { list-style: none; margin: 4px 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 8px 20px; }
+.notes li { display: grid; grid-template-columns: 22px 1fr; gap: 8px; align-items: start; color: var(--ink); font-size: 13px; line-height: 18px; min-width: 0; }
+.notes .num { width: 20px; height: 20px; border-radius: 50%; background: var(--highlight); color: var(--on-highlight); font: 800 11px/20px var(--font); text-align: center; }
+
+/* ---------- frame scaling ---------- */
+.frame-wrap { position: relative; width: 100%; overflow: hidden; border-radius: 8px; }
+.app { position: absolute; top: 0; left: 0; transform-origin: 0 0; }
+
+/* ---------- app shell ---------- */
+.app { background: var(--canvas); border: 1px solid var(--hairline); border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; font: 13px/18px var(--font); color: var(--ink); }
+.tb { height: 40px; flex-shrink: 0; display: flex; align-items: center; gap: 8px; padding: 0 10px; background: var(--chrome-alt); border-bottom: 1px solid var(--hairline); }
+.brand { font-weight: 700; font-size: 14px; color: var(--ink-strong); margin-right: 6px; white-space: nowrap; }
+.grow { flex: 1; }
+.btn { font: 12px/16px var(--font); color: var(--ink); background: var(--control); border: 1px solid var(--control-border); border-radius: 4px; padding: 4px 10px; white-space: nowrap; display: inline-flex; gap: 5px; align-items: center; }
+.btn.primary { background: var(--accent-fill); border-color: var(--accent); color: var(--on-accent); }
+.btn.on { background: var(--accent-fill-strong); border-color: var(--accent); color: var(--white); }
+.btn.quiet { background: transparent; border-color: var(--field-border); }
+.btn.sm { padding: 2px 8px; font-size: 11px; line-height: 15px; }
+.trip-pick { background: var(--field); border: 1px solid var(--field-border); border-radius: 4px; padding: 4px 10px; color: var(--ink-strong); font-size: 12px; white-space: nowrap; }
+.tb-data { font-size: 11px; color: var(--ink-soft); white-space: nowrap; }
+.dot-ok { color: var(--success); }
+.body { flex: 1; display: flex; min-height: 0; }
+.mapcol { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.map { position: relative; flex: 1; overflow: hidden; background: var(--map-land); }
+.map svg { position: absolute; inset: 0; display: block; }
+.status { height: 22px; line-height: 22px; flex-shrink: 0; background: var(--rail); border-top: 1px solid var(--hairline); font-size: 11px; color: var(--ink-soft); padding: 0 10px; display: flex; gap: 14px; white-space: nowrap; }
+.status b { color: var(--ink-secondary); font-weight: 600; }
+
+/* map furniture */
+.m-land { fill: var(--map-land); } .m-water { fill: var(--map-water); }
+.m-border { fill: none; stroke: var(--map-border); stroke-width: 1; stroke-dasharray: 5 3; }
+.m-hwy { fill: none; stroke: var(--map-road); stroke-width: 1.3; stroke-linejoin: round; }
+.m-int { fill: none; stroke: var(--map-int); stroke-width: 2.2; stroke-linejoin: round; }
+.m-case { fill: none; stroke: var(--route-casing); stroke-width: 9; stroke-linejoin: round; stroke-linecap: round; }
+.m-route { fill: none; stroke: var(--accent); stroke-width: 4.5; stroke-linejoin: round; stroke-linecap: round; }
+.m-route.sel { stroke: var(--accent-text); stroke-width: 5.5; }
+.m-alt { fill: none; stroke: var(--alt-route); stroke-width: 3.5; stroke-dasharray: 8 6; stroke-linejoin: round; }
+.m-band { fill: none; stroke: var(--band); stroke-width: 26; stroke-linecap: round; stroke-linejoin: round; }
+.m-ghost { fill: none; stroke: var(--accent-text); stroke-width: 3; stroke-dasharray: 6 5; stroke-linejoin: round; }
+.m-dot { fill: var(--map-label); }
+.m-lab { font: 11px var(--font); fill: var(--map-label); paint-order: stroke; stroke: var(--map-land); stroke-width: 3px; stroke-linejoin: round; }
+.m-lab.t1 { font-size: 12px; font-weight: 600; fill: var(--map-label-major); }
+.m-shield rect { fill: var(--map-shield); stroke: var(--map-int); stroke-width: 1; }
+.m-shield text { font: 700 9px var(--font); fill: var(--ink-secondary); }
+.z-avoid { stroke: var(--danger); stroke-width: 1.6; }
+.z-warn { fill: var(--zone-warn); stroke: var(--warn); stroke-width: 1.6; stroke-dasharray: 5 3; }
+.z-prefer { fill: var(--zone-prefer); stroke: var(--success); stroke-width: 1.6; }
+.z-new { fill: var(--zone-new); stroke: var(--accent-text); stroke-width: 1.6; stroke-dasharray: 6 4; }
+.z-handle { fill: var(--canvas); stroke: var(--accent-text); stroke-width: 1.6; }
+
+.tools { position: absolute; top: 10px; left: 10px; display: flex; flex-direction: column; gap: 2px; background: var(--overlay); border: 1px solid var(--field-border); border-radius: 6px; padding: 4px; box-shadow: var(--shadow-control); z-index: 5; }
+.tool { display: flex; gap: 7px; align-items: center; font-size: 12px; line-height: 16px; padding: 4px 8px; border-radius: 4px; color: var(--ink-secondary); border: 1px solid transparent; white-space: nowrap; }
+.tool .g { width: 16px; text-align: center; }
+.tool.on { background: var(--accent-fill); border-color: var(--accent); color: var(--on-accent); }
+.tools hr { border: 0; border-top: 1px solid var(--hairline); margin: 3px 2px; }
+.zoomc { position: absolute; top: 10px; right: 10px; display: flex; flex-direction: column; background: var(--overlay); border: 1px solid var(--field-border); border-radius: 6px; box-shadow: var(--shadow-control); overflow: hidden; z-index: 5; }
+.zoomc span { width: 28px; height: 26px; display: grid; place-items: center; font-size: 16px; color: var(--ink-secondary); }
+.zoomc span + span { border-top: 1px solid var(--hairline); }
+.scale { position: absolute; left: 10px; bottom: 8px; font-size: 10px; color: var(--ink-secondary); z-index: 5; }
+.scale i { display: block; height: 5px; border: 1.5px solid var(--ink-secondary); border-top: 0; margin-bottom: 2px; }
+.attr { position: absolute; right: 0; bottom: 0; font-size: 10px; color: var(--ink-dim); background: var(--label-bg); padding: 1px 6px; z-index: 5; }
+
+/* markers */
+.mk { position: absolute; transform: translate(-50%, -50%); width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; background: var(--overlay); border: 2px solid var(--accent); font-size: 12px; line-height: 1; box-shadow: var(--shadow-ring); z-index: 3; }
+.mk.wp { width: 26px; height: 26px; background: var(--accent-fill-strong); border-color: var(--on-accent); color: var(--white); font-weight: 700; font-size: 13px; }
+.mk.thru { width: 17px; height: 17px; border-radius: 3px; transform: translate(-50%, -50%) rotate(45deg); background: var(--canvas); border-color: var(--accent-text); color: var(--accent-text); font-weight: 700; font-size: 10px; }
+.mk.thru > span { transform: rotate(-45deg); }
+.mk.pill { width: auto; height: 24px; border-radius: 12px; padding: 0 5px; gap: 1px; display: flex; }
+.mk.night { border-color: var(--accent-text); background: var(--accent-header); }
+.mk.cand { width: 20px; height: 20px; border: 1.5px solid var(--ink-dim); background: var(--card); color: var(--ink-secondary); font-size: 10px; font-weight: 700; }
+.mk.cand.best { width: 26px; height: 26px; border: 2px solid var(--accent-text); background: var(--accent-fill); color: var(--on-accent); font-size: 12px; }
+.mk.cand.off { border-style: dashed; color: var(--ink-faint); background: var(--canvas); }
+.mk.sel { box-shadow: 0 0 0 3px var(--accent), 0 0 0 5px rgba(0, 0, 0, 0.55); }
+.mk.tz { width: 20px; height: 20px; border-color: var(--ink-muted); font-size: 11px; }
+.mk.cursor { width: 14px; height: 14px; border: 2px solid var(--white); background: transparent; box-shadow: var(--shadow-ring); }
+.mk.cross { width: 20px; height: 20px; background: transparent; border: 0; box-shadow: none; color: var(--white); font-size: 20px; font-weight: 300; text-shadow: 0 0 3px #000; }
+.mklab { position: absolute; z-index: 4; background: var(--label-bg); border: 1px solid var(--field-border); border-radius: 3px; padding: 0 5px; font-size: 11px; line-height: 16px; color: var(--ink-secondary); white-space: nowrap; }
+.mklab b { color: var(--ink-strong); font-weight: 600; }
+.mklab.s-r { transform: translate(17px, -50%); } .mklab.s-l { transform: translate(calc(-100% - 17px), -50%); }
+.mklab.s-t { transform: translate(-50%, calc(-100% - 15px)); } .mklab.s-b { transform: translate(-50%, 15px); }
+.mklab.off { color: var(--ink-faint); }
+.mklab.best { border-color: var(--accent); color: var(--on-accent); background: var(--accent-fill-deep); }
+.zlab { position: absolute; z-index: 4; transform: translate(-50%, 0); font-size: 11px; line-height: 16px; padding: 0 7px; border-radius: 20px; border: 1px solid; background: var(--label-bg); white-space: nowrap; }
+.zlab.avoid { color: var(--danger-text); border-color: var(--danger-border); }
+.zlab.warn { color: var(--warn-text); border-color: var(--warn-border); }
+.zlab.prefer { color: var(--success-quiet); border-color: var(--success-border); }
+.zlab.new { color: var(--accent-text); border-color: var(--accent); }
+.ov { position: absolute; z-index: 6; }
+.chipmap { background: var(--label-bg); border: 1px solid var(--field-border); border-radius: 20px; padding: 1px 9px; font-size: 11px; line-height: 17px; color: var(--ink-secondary); white-space: nowrap; }
+.chipmap b { color: var(--ink-strong); font-weight: 600; }
+.chipmap.day { border-color: var(--accent-header-border); color: var(--accent-quiet); background: var(--accent-header); }
+.chipmap.day.sel { border-color: var(--accent); color: var(--on-accent); background: var(--accent-fill); }
+.chipmap.alt { border-style: dashed; }
+.pop { background: var(--overlay); border: 1px solid var(--field-border); border-radius: 6px; box-shadow: var(--shadow-popup); padding: 10px 12px; font-size: 12px; line-height: 16px; color: var(--ink); display: grid; gap: 6px; }
+.pop h5 { margin: 0; font-size: 13px; line-height: 18px; color: var(--ink-strong); font-weight: 700; }
+.pop .m { color: var(--ink-soft); font-size: 11px; line-height: 15px; }
+.pop .acts { display: flex; gap: 6px; flex-wrap: wrap; padding-top: 2px; }
+.cands { display: grid; gap: 0; border: 1px solid var(--hairline); border-radius: 4px; overflow: hidden; }
+.cand { display: grid; grid-template-columns: 16px 1fr auto; gap: 8px; padding: 5px 8px; border-top: 1px solid var(--rule); align-items: center; font-size: 12px; }
+.cand:first-child { border-top: 0; }
+.cand .when { font-variant-numeric: tabular-nums; color: var(--ink-secondary); font-size: 11px; text-align: right; }
+.cand small { display: block; color: var(--ink-dim); font-size: 11px; line-height: 14px; }
+.cand.on { background: var(--accent-fill); }
+.cand.on small, .cand.on .when { color: var(--on-accent); }
+.cand.no { color: var(--ink-faint); }
+.cand.no small { color: var(--warn-text); }
+.menu { background: var(--overlay); border: 1px solid var(--field-border); border-radius: 6px; box-shadow: var(--shadow-float); padding: 4px 0; width: 236px; font-size: 12px; }
+.menu .hd { padding: 3px 12px 5px; font-size: 11px; color: var(--ink-dim); font-variant-numeric: tabular-nums; }
+.menu .mi { padding: 5px 12px; display: flex; gap: 8px; align-items: center; color: var(--ink); }
+.menu .mi .g { width: 16px; text-align: center; }
+.menu .mi.hover { background: var(--accent-fill); color: var(--on-accent); }
+.menu .mi small { margin-left: auto; color: var(--ink-dim); font-size: 11px; }
+.menu hr { border: 0; border-top: 1px solid var(--hairline); margin: 4px 0; }
+.tip { background: var(--accent-fill); border: 1px solid var(--accent); color: var(--on-accent); border-radius: 4px; padding: 3px 8px; font-size: 11px; white-space: nowrap; box-shadow: var(--shadow-control); }
+.seg { display: inline-flex; border: 1px solid var(--control-border); border-radius: 4px; overflow: hidden; }
+.seg span { padding: 3px 9px; font-size: 12px; background: var(--control); color: var(--ink); white-space: nowrap; }
+.seg span + span { border-left: 1px solid var(--control-border); }
+.seg span.on { background: var(--accent-fill-strong); color: var(--white); }
+.fld { background: var(--field); border: 1px solid var(--field-border); border-radius: 4px; padding: 2px 7px; color: var(--ink-strong); font-size: 12px; line-height: 16px; font-variant-numeric: tabular-nums; display: inline-block; white-space: nowrap; }
+.fld.wide { display: block; color: var(--ink-faint); padding: 5px 8px; }
+.fld.focus { border-color: var(--accent); }
+.kv { display: grid; grid-template-columns: 74px 1fr; gap: 6px 8px; align-items: center; font-size: 12px; }
+.kv > span:nth-child(odd) { color: var(--ink-soft); font-size: 11px; }
+.ann { position: absolute; z-index: 20; width: 20px; height: 20px; border-radius: 50%; background: var(--highlight); color: var(--on-highlight); font: 800 11px/20px var(--font); text-align: center; font-style: normal; transform: translate(-50%, -50%); box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.6); }
+.ann.in { position: absolute; transform: none; }
+
+/* sidebar */
+.side { width: 360px; flex-shrink: 0; background: var(--pane); border-left: 1px solid var(--hairline); display: flex; flex-direction: column; min-height: 0; position: relative; }
+.sum { padding: 12px 12px 10px; border-bottom: 1px solid var(--hairline); display: grid; gap: 3px; }
+.sum-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.sum h3 { margin: 0; font-size: 15px; line-height: 20px; font-weight: 700; color: var(--ink-strong); }
+.sub { font-size: 11px; line-height: 15px; color: var(--ink-dim); }
+.stats { display: flex; gap: 14px; white-space: nowrap; margin-top: 5px; font-size: 11px; color: var(--ink-dim); }
+.stats b { color: var(--ink-strong); font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; margin-right: 3px; }
+.tabs { display: flex; border-bottom: 1px solid var(--hairline); background: var(--chrome); flex-shrink: 0; }
+.tab { padding: 7px 12px 6px; font-size: 12px; color: var(--ink-soft); border-bottom: 2px solid transparent; white-space: nowrap; }
+.tab.on { color: var(--accent-text); border-bottom-color: var(--accent); }
+.list { flex: 1; position: relative; }
+.dayh { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 6px 10px; background: var(--accent-header); border-bottom: 1px solid var(--accent-header-border); color: var(--accent-quiet); font-weight: 700; font-size: 12px; position: relative; }
+.dayh .r { font-weight: 400; display: flex; gap: 6px; align-items: center; font-variant-numeric: tabular-nums; }
+.dayh.closed { background: var(--chrome); border-color: var(--hairline); color: var(--ink-secondary); font-weight: 600; display: grid; grid-template-columns: 1fr auto; gap: 1px 8px; }
+.dayh.closed .r { color: var(--ink-soft); }
+.dayh.closed .d2 { grid-column: 1 / -1; font-weight: 400; font-size: 11px; color: var(--ink-dim); }
+.row { display: grid; grid-template-columns: 44px 1fr auto; gap: 8px; padding: 6px 10px; border-bottom: 1px solid var(--rule); align-items: start; position: relative; }
+.row .t { font-variant-numeric: tabular-nums; color: var(--ink-strong); font-size: 12px; line-height: 16px; }
+.row .t small { display: block; color: var(--ink-dim); font-size: 10px; line-height: 12px; }
+.row .what { font-size: 12px; line-height: 16px; color: var(--ink); }
+.row .what b { color: var(--ink-strong); font-weight: 600; }
+.row .meta { font-size: 11px; line-height: 15px; color: var(--ink-dim); }
+.row .chips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+.row .acts { display: flex; gap: 2px; }
+.ib { width: 22px; height: 22px; display: grid; place-items: center; border-radius: 4px; font-size: 11px; color: var(--ink-muted); border: 1px solid transparent; }
+.ib.on { background: var(--control); border-color: var(--control-border); }
+.row.sel { background: var(--accent-fill); }
+.row.sel .meta, .row.sel .t small { color: var(--accent-quiet); }
+.row.note { grid-template-columns: 44px 1fr; padding: 4px 10px; font-size: 11px; line-height: 15px; color: var(--ink-soft); background: var(--canvas); }
+.row.note .t { font-size: 11px; color: var(--ink-dim); }
+.wpd { display: inline-grid; place-items: center; width: 16px; height: 16px; border-radius: 50%; background: var(--accent-fill-strong); color: var(--white); font-size: 10px; font-weight: 700; vertical-align: -3px; margin-right: 2px; }
+.wpd.thru { border-radius: 2px; width: 12px; height: 12px; transform: rotate(45deg); background: var(--canvas); border: 1.5px solid var(--accent-text); vertical-align: -1px; margin: 0 4px 0 2px; }
+.chip { display: inline-block; font-size: 10px; line-height: 15px; padding: 0 7px; border-radius: 20px; border: 1px solid var(--field-border); color: var(--ink-secondary); white-space: nowrap; }
+.chip.warn { color: var(--warn-text); border-color: var(--warn-border); background: var(--warn-surface); }
+.chip.ok { color: var(--success-quiet); border-color: var(--success-border); background: var(--success-surface); }
+.chip.bad { color: var(--danger-text); border-color: var(--danger-border); }
+.chip.acc { color: var(--accent-text); border-color: var(--accent-card-border); background: var(--accent-card); }
+.side-foot { flex-shrink: 0; border-top: 1px solid var(--hairline); padding: 8px 10px; display: flex; flex-wrap: wrap; gap: 4px; align-items: center; background: var(--chrome); }
+.side-foot .lnk { margin-left: auto; font-size: 11px; color: var(--accent-text); }
+.panel { padding: 10px; display: grid; gap: 8px; border-bottom: 1px solid var(--hairline); }
+.panel h6 { margin: 0; font-size: 10px; line-height: 14px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-dim); }
+.hint { background: var(--accent-card); border: 1px solid var(--accent-card-border); color: var(--on-accent); border-radius: 5px; padding: 6px 9px; font-size: 11px; line-height: 15px; }
+.zrow { display: grid; grid-template-columns: 30px 1fr; gap: 8px; align-items: start; padding: 7px 10px; border-bottom: 1px solid var(--rule); position: relative; }
+.zrow .n { font-size: 12px; line-height: 16px; color: var(--ink-strong); }
+.zrow .n .ty { font-weight: 600; }
+.zrow .n .ty.avoid { color: var(--danger-text); } .zrow .n .ty.warn { color: var(--warn-text); } .zrow .n .ty.prefer { color: var(--success-quiet); }
+.zrow .meta { font-size: 11px; line-height: 15px; color: var(--ink-dim); }
+.zrow.off .n { color: var(--ink-muted); }
+.tg { width: 28px; height: 16px; border-radius: 20px; background: var(--control); border: 1px solid var(--control-border); position: relative; display: inline-block; flex-shrink: 0; margin-top: 1px; }
+.tg::after { content: ""; position: absolute; top: 2px; left: 2px; width: 10px; height: 10px; border-radius: 50%; background: var(--ink-muted); }
+.tg.on { background: var(--accent-fill-strong); border-color: var(--accent); }
+.tg.on::after { left: 14px; background: var(--white); }
+.wprow { display: grid; grid-template-columns: 12px 22px 1fr auto; gap: 8px; align-items: center; padding: 7px 10px; border-bottom: 1px solid var(--rule); position: relative; }
+.wprow .h { color: var(--ink-faint); font-size: 12px; }
+.wprow .n { font-size: 12px; color: var(--ink-strong); line-height: 16px; }
+.wprow .meta { font-size: 11px; color: var(--ink-dim); line-height: 15px; }
+.wprow.sel { background: var(--accent-fill); }
+.wprow.sel .meta { color: var(--accent-quiet); }
+.wprow .mk { position: static; transform: none; }
+.wprow .mk.thru { transform: rotate(45deg); width: 14px; height: 14px; margin-left: 4px; }
+.optrow { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--ink-secondary); }
+
+/* timeline strip */
+.timeline { height: 72px; flex-shrink: 0; background: var(--rail); border-top: 1px solid var(--hairline); position: relative; overflow: hidden; }
+.tl-left { position: absolute; left: 0; top: 0; bottom: 0; width: 92px; border-right: 1px solid var(--hairline); padding: 4px 8px; display: grid; align-content: start; gap: 1px; font-size: 11px; line-height: 14px; color: var(--ink-soft); }
+.tl-left b { color: var(--ink-strong); font-size: 12px; }
+.tl-day { font-size: 10px; line-height: 12px; padding: 0 5px; border-radius: 3px; color: var(--ink-soft); white-space: nowrap; }
+.tl-day.on { background: var(--accent-fill); color: var(--on-accent); }
+.tl-blk { position: absolute; top: 25px; height: 22px; border-radius: 3px; display: grid; place-items: center; font-size: 11px; overflow: hidden; white-space: nowrap; }
+.tl-drive { background: var(--accent-fill); border: 1px solid var(--accent-card-border); color: var(--accent-quiet); }
+.tl-stop { background: var(--control-hover); border: 1px solid var(--control-border); color: var(--ink-strong); }
+.tl-stop.sel { box-shadow: 0 0 0 2px var(--accent); }
+.tl-night { background: var(--accent-header); border: 1px solid var(--accent-header-border); color: var(--accent-quiet); }
+.tl-end { position: absolute; top: 24px; width: 24px; height: 24px; transform: translateX(-50%); border-radius: 50%; display: grid; place-items: center; background: var(--accent-fill-strong); border: 2px solid var(--on-accent); color: var(--white); font-size: 11px; font-weight: 700; }
+.tl-thru { position: absolute; top: 30px; width: 11px; height: 11px; transform: translateX(-50%) rotate(45deg); background: var(--canvas); border: 1.5px solid var(--accent-text); }
+.tl-win { position: absolute; top: 20px; height: 32px; border: 1px dashed var(--accent); background: var(--zone-new); border-radius: 3px; }
+.tl-win.strong { border-style: solid; background: var(--band); }
+.tl-win span { position: absolute; left: 4px; top: -15px; font-size: 10px; color: var(--accent-text); white-space: nowrap; }
+.tl-due { position: absolute; top: 18px; height: 36px; border-left: 1px dashed var(--ink-muted); }
+.tl-due span { position: absolute; top: -14px; left: 0; transform: translateX(-50%); font-size: 9px; line-height: 12px; color: var(--ink-muted); white-space: nowrap; }
+.tl-mark { position: absolute; top: 4px; bottom: 18px; border-left: 1px solid var(--warn); }
+.tl-mark span { position: absolute; top: -2px; left: 3px; font-size: 10px; line-height: 13px; color: var(--warn-text); white-space: nowrap; }
+.tl-mark.l span { left: auto; right: 3px; }
+.tl-mark.tz { border-left-color: var(--ink-muted); }
+.tl-mark.tz span { color: var(--ink-secondary); }
+.tl-tick { position: absolute; bottom: 4px; font-size: 10px; line-height: 12px; color: var(--ink-dim); transform: translateX(-50%); font-variant-numeric: tabular-nums; }
+.tl-tick::before { content: ""; position: absolute; left: 50%; top: -4px; height: 3px; border-left: 1px solid var(--field-border); }
+
+/* settings page */
+.settings { flex: 1; overflow: hidden; padding: 14px 18px; display: grid; gap: 12px; align-content: start; position: relative; }
+.set-head { display: flex; align-items: center; gap: 12px; }
+.set-head h3 { margin: 0; font-size: 15px; line-height: 20px; color: var(--ink-strong); }
+.set-head .sub { font-size: 12px; }
+.sgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; align-items: start; }
+.card { background: var(--card); border: 1px solid var(--hairline); border-radius: 8px; padding: 12px 14px; position: relative; }
+.card h4 { color: var(--accent-text); font-size: 14px; line-height: 18px; font-weight: 600; margin: 0 0 6px; display: flex; gap: 6px; }
+.fr { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 5px 0; border-bottom: 1px solid var(--rule); font-size: 12px; line-height: 16px; position: relative; }
+.fr:last-child { border-bottom: 0; }
+.fr > span:first-child { color: var(--ink-secondary); font-weight: 500; }
+.fr .help { display: block; font-weight: 400; color: var(--ink-dim); font-size: 11px; line-height: 14px; }
+.sent { font-size: 12px; line-height: 24px; color: var(--ink); padding: 4px 0 6px; border-bottom: 1px solid var(--rule); position: relative; }
+.ladder { display: grid; gap: 3px; padding: 4px 0 6px; border-bottom: 1px solid var(--rule); position: relative; }
+.ladder div { display: grid; grid-template-columns: 12px 16px 1fr; gap: 6px; align-items: center; font-size: 12px; background: var(--field); border: 1px solid var(--field-border); border-radius: 4px; padding: 3px 7px; }
+.ladder .h { color: var(--ink-faint); }
+.ladder .i { color: var(--ink-dim); font-variant-numeric: tabular-nums; }
+.svc { display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; padding: 6px 0; border-bottom: 1px solid var(--rule); font-size: 12px; line-height: 16px; }
+.svc .meta { grid-column: 1 / -1; font-size: 11px; line-height: 15px; color: var(--ink-dim); }
+.svc b { color: var(--ink-strong); font-weight: 600; }
+.ok-word { color: var(--success); font-size: 11px; }
+
+/* export screen */
+.exp { flex: 1; display: flex; min-height: 0; }
+.preview { flex: 1; background: var(--canvas-deep); position: relative; overflow: hidden; display: grid; place-items: start center; padding-top: 18px; }
+.paper { width: 640px; background: var(--paper); color: var(--paper-ink); border-radius: 2px; box-shadow: 0 6px 24px rgba(0, 0, 0, 0.6); padding: 26px 30px; font: 11px/15px var(--font); position: relative; }
+.paper h4 { margin: 0; font-size: 18px; line-height: 22px; font-weight: 700; }
+.paper .pm { color: var(--paper-dim); margin-top: 3px; }
+.paper .strip { margin: 14px 0 10px; position: relative; height: 34px; }
+.paper .strip .ln { position: absolute; left: 0; right: 0; top: 13px; border-top: 3px solid var(--paper-ink); }
+.paper .strip .tk { position: absolute; top: 6px; width: 14px; height: 14px; border-radius: 50%; background: var(--paper); border: 2px solid var(--paper-ink); transform: translateX(-50%); font-size: 8px; display: grid; place-items: center; font-weight: 700; }
+.paper .strip .tk.th { border-radius: 2px; transform: translateX(-50%) rotate(45deg); width: 10px; height: 10px; top: 9px; }
+.paper .strip .mi { position: absolute; top: 23px; transform: translateX(-50%); font-size: 9px; color: var(--paper-dim); font-variant-numeric: tabular-nums; }
+.paper table { width: 100%; border-collapse: collapse; }
+.paper th { text-align: left; font-size: 9px; letter-spacing: 0.07em; text-transform: uppercase; color: var(--paper-dim); border-bottom: 1.5px solid var(--paper-ink); padding: 3px 6px 3px 0; }
+.paper td { border-bottom: 1px solid var(--paper-rule); padding: 5px 6px 5px 0; vertical-align: top; }
+.paper td:first-child { font-variant-numeric: tabular-nums; font-weight: 700; white-space: nowrap; }
+.paper td small { display: block; color: var(--paper-dim); }
+.paper tr.band td { background: var(--paper-band); }
+.paper .foot { margin-top: 10px; color: var(--paper-dim); display: flex; justify-content: space-between; }
+.expside { width: 400px; flex-shrink: 0; background: var(--pane); border-left: 1px solid var(--hairline); padding: 12px; display: grid; gap: 10px; align-content: start; position: relative; }
+.expside h3 { margin: 0; font-size: 15px; line-height: 20px; color: var(--ink-strong); }
+.ck { display: flex; gap: 7px; align-items: center; font-size: 12px; color: var(--ink-secondary); padding: 2px 0; }
+.ck i { width: 13px; height: 13px; border-radius: 3px; border: 1px solid var(--control-border); background: var(--field); display: grid; place-items: center; font-style: normal; font-size: 9px; color: var(--white); }
+.ck i.on { background: var(--accent-fill-strong); border-color: var(--accent); }
+.ck.dim { color: var(--ink-dim); }
+.linkrow { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center; font-size: 12px; padding: 4px 0; border-top: 1px solid var(--rule); }
+.linkrow small { color: var(--ink-dim); font-size: 11px; }
+.m-divide { fill: none; stroke: var(--map-divide); stroke-width: 1.6; stroke-dasharray: 1 4; stroke-linecap: round; }
+.m-divlab { font: italic 10px var(--font); fill: var(--map-divide); letter-spacing: 0.06em; paint-order: stroke; stroke: var(--map-land); stroke-width: 3px; }
+.m-pass { fill: var(--map-pass); stroke: var(--map-land); stroke-width: 1; }
+.m-plab { font: 10px var(--font); fill: var(--map-label); paint-order: stroke; stroke: var(--map-land); stroke-width: 3px; stroke-linejoin: round; }
+.legend svg { overflow: visible; }
+.tl-mark.pass { border-left-color: var(--ink-muted); }
+.tl-mark.pass span { color: var(--ink-secondary); }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="page">
+  <header class="hero">
+    <div class="eyebrow">route-planner-opus-5.5-extra · design</div>
+    <h1>Road trip planner: screen designs</h1>
+    <p class="lede">Seven screens for the planner described in <b>PLAN.md</b>, all set in Colorado, the development region: a one-day drive from Denver to Durango, a five-day sightseeing loop with a through point, a timed stop and zones, picking a stop, drawing zones, editing on the map, settings, and exports. The look follows the <b>GeoTagger</b> design system: dark, dense, system font, one blue accent, emoji icons always paired with a word. Places, times, counts and mile figures are illustrative; the real ones will come from Valhalla and OpenStreetMap.</p>
+    <p class="lede">Yellow numbered dots are design notes, not part of the app. Each screen lists them underneath.</p>
+    <nav class="index" aria-label="Screens">
+      <a href="#simple">1 · Denver to Durango</a>
+      <a href="#multi-day">2 · Colorado loop</a>
+      <a href="#stop-picker">3 · Choosing a stop</a>
+      <a href="#zones">4 · Drawing zones</a>
+      <a href="#editing">5 · Editing on the map</a>
+      <a href="#trip-settings">6 · Settings</a>
+      <a href="#export">7 · Day sheets and export</a>
+    </nav>
+    <div class="legend" aria-label="Map key">
+      <span class="k"><span class="mk wp">A</span> waypoint (start, stop, end)</span>
+      <span class="k"><span class="mk thru"><span>B</span></span> through point, no stop</span>
+      <span class="k"><span class="mk">☕</span> break</span>
+      <span class="k"><span class="mk">🍴</span> meal</span>
+      <span class="k"><span class="mk">⛽</span> fuel</span>
+      <span class="k"><span class="mk night">🛏</span> overnight</span>
+      <span class="k"><svg width="12" height="10" aria-hidden="true"><path class="m-pass" d="M6 1 L11 9 L1 9 Z"/></svg> mountain pass</span>
+      <span class="k"><svg width="26" height="6" aria-hidden="true"><path class="m-divide" d="M2 3 H24"/></svg> Continental Divide</span>
+      <span class="k"><span class="sw" style="background:var(--zone-avoid);border:1.5px solid var(--danger)"></span> avoid zone</span>
+      <span class="k"><span class="sw" style="background:var(--zone-warn);border:1.5px dashed var(--warn)"></span> no stops / no meals / no overnight</span>
+      <span class="k"><span class="sw" style="background:var(--zone-prefer);border:1.5px solid var(--success)"></span> prefer stops</span>
+    </div>
+  </header>
+
+  <!-- ============ 1. SIMPLE ============ -->
+  <section class="screen" id="simple">
+    <div class="eyebrow">Screen 1</div>
+    <h2>One-day drive: Denver to Durango</h2>
+    <p>The plainest case. Two waypoints over four mountain passes, a break every two hours, lunch inside its window, and a fuel stop folded into the afternoon break because nothing sells fuel on Wolf Creek Pass.</p>
+    <div class="frame-wrap" data-w="1280" data-h="800"><div class="app">
+      <header class="tb">
+        <span class="brand">🧭 Road trip planner</span>
+        <span class="trip-pick">Denver → Durango ▾</span>
+        <span class="btn">＋ New trip</span><span class="btn">💾 Save</span><span class="btn">📤 Export</span>
+        <span class="grow"></span>
+        <span class="tb-data"><span class="dot-ok">●</span> map data: Colorado · OSM 2026-11-01</span>
+        <span class="btn">⚙ Settings</span>
+      </header>
+      <div class="body">
+        <div class="mapcol">
+          <div class="map" data-map="simple"></div>
+          <div class="timeline" data-tl="simple"></div>
+        </div>
+        <aside class="side">
+          <div class="sum">
+            <div class="sum-top"><h3>Denver → Durango</h3><span class="chip">1 day</span></div>
+            <div class="sub">Fri, Sep 24, 2027 · depart 08:30 MT</div>
+            <div class="stats"><span><b>338</b>mi</span><span><b>6 h 45</b>driving</span><span><b>16:30</b>arrive</span></div>
+          </div>
+          <nav class="tabs"><span class="tab on">Itinerary</span><span class="tab">Waypoints · 2</span><span class="tab">Zones · 0</span></nav>
+          <div class="list">
+            <div class="dayh"><span>Day 1 · Fri Sep 24</span><span class="r">338 mi · 6 h 45</span></div>
+            <div class="row"><div class="t">08:30<small>MT</small></div><div><div class="what"><span class="wpd">A</span> <b>Depart Denver</b></div><div class="meta">Home</div></div><div class="acts"></div></div>
+            <div class="row"><div class="t">10:20</div><div><div class="what">☕ <b>Break</b> · 15 min</div><div class="meta">Fairplay · US-285 · mile 85 · 1 min off route · 3 fuel · 5 food<br>just over Kenosha Pass, 10,001 ft</div></div><div class="acts"><span class="ib" title="Pin this stop">📌</span></div></div>
+            <div class="row"><div class="t">11:40</div><div><div class="what">🍴 <b>Lunch</b> · 45 min</div><div class="meta">Poncha Springs · US-285 at US-50 · mile 142 · on route · 4 food · 2 fuel</div></div><div class="acts"><span class="ib" title="Pin this stop">📌</span></div></div>
+            <div class="row sel"><i class="ann in" style="left:-10px;top:6px">6</i><div class="t">14:15</div><div><div class="what">☕ <b>Break</b> + ⛽ <b>fuel</b> · 15 min</div><div class="meta">South Fork · US-160 · mile 252 · 1 min off route · 3 fuel · 6 food</div><div class="chips"><span class="chip acc">merged: no fuel for 46 mi over Wolf Creek Pass</span></div></div><div class="acts"><span class="ib on" title="Pin this stop">📌</span></div></div>
+            <div class="row"><div class="t">16:30</div><div><div class="what"><span class="wpd">B</span> <b>Arrive Durango</b></div><div class="meta">mile 338 · sunset 19:03 · 2 h 33 of daylight to spare</div></div><div class="acts"></div></div>
+            <div class="row note"><div class="t"></div><div>The next break would fall due at 16:30, as you arrive.</div></div>
+          </div>
+          <div class="side-foot"><span class="chip">☕ every 2 h or 150 mi</span><span class="chip">🍴 lunch 11:30–13:30</span><span class="chip">8 h a day</span><span class="lnk">Edit settings</span></div>
+        </aside>
+      </div>
+      <footer class="status"><span><b>338 mi</b> · 6 h 45 driving · 1 h 15 stopped · arrive 16:30 MT</span><span class="grow"></span><span>Valhalla <span class="dot-ok">●</span> 37 ms</span><span>912 places within 2 mi of the route</span></footer>
+    </div></div>
+    <ol class="notes">
+      <li><span class="num">1</span><span>Click the map to add a waypoint. The first one is the start and the last one is the end. Drag any waypoint to move it.</span></li>
+      <li><span class="num">2</span><span>Breaks land on real places. US-285 has no rest areas near the two-hour mark, so this one is a town with services.</span></li>
+      <li><span class="num">3</span><span>Click a stop for its details. Pinning keeps it in place when anything else changes.</span></li>
+      <li><span class="num">4</span><span>Alternate routes stay on the map in grey with their extra time. Click one to use it.</span></li>
+      <li><span class="num">5</span><span>The day strip shows driving, stops, the lunch window and when each break falls due.</span></li>
+      <li><span class="num">6</span><span>Every row says where the stop is and what it costs you: mile, detour, what is there. Merged stops say why.</span></li>
+    </ol>
+  </section>
+
+  <!-- ============ 2. MULTI-DAY ============ -->
+  <section class="screen" id="multi-day">
+    <div class="eyebrow">Screen 2</div>
+    <h2>Colorado loop: five days with a through point, a timed stop and zones</h2>
+    <p>A → B → C → D → E. B (Trail Ridge Road) only shapes the route, C (Durango) is two nights, D (Great Sand Dunes) is a three-hour stop, and E brings the loop back to Denver. Four zones are on: one to avoid, one to drive through without stopping, one to skip for meals, one preferred for stops. Day 1 is selected.</p>
+    <div class="frame-wrap" data-w="1280" data-h="800"><div class="app">
+      <header class="tb">
+        <span class="brand">🧭 Road trip planner</span>
+        <span class="trip-pick">Colorado loop ▾</span>
+        <span class="btn">＋ New trip</span><span class="btn">💾 Save</span><span class="btn">📤 Export</span>
+        <span class="grow"></span>
+        <span class="tb-data"><span class="dot-ok">●</span> map data: Colorado · OSM 2026-11-01</span>
+        <span class="btn">⚙ Settings</span>
+      </header>
+      <div class="body">
+        <div class="mapcol">
+          <div class="map" data-map="multi"></div>
+          <div class="timeline" data-tl="day1"></div>
+        </div>
+        <aside class="side">
+          <div class="sum">
+            <div class="sum-top"><h3>Colorado loop</h3><span class="chip">5 days</span></div>
+            <div class="sub">Sat Sep 25 – Wed Sep 29, 2027 · depart 08:00 MT</div>
+            <div class="stats"><span><b>950</b>mi</span><span><b>20 h 10</b>driving</span><span><b>4</b>nights</span><span><b>11</b>stops</span></div>
+          </div>
+          <nav class="tabs"><span class="tab on">Itinerary</span><span class="tab">Waypoints · 5</span><span class="tab">Zones · 4 on</span></nav>
+          <div class="list">
+            <div class="dayh"><i class="ann in" style="left:-10px;top:4px">6</i><span>Day 1 · Sat Sep 25</span><span class="r">295 mi · 6 h 30</span></div>
+            <div class="row"><div class="t">08:00<small>MT</small></div><div><div class="what"><span class="wpd">A</span> <b>Depart Denver</b></div></div><div class="acts"></div></div>
+            <div class="row note"><div class="t">08:20</div><div>⛔ Avoiding “Boulder”: I-25 and CO-66, +6 min</div></div>
+            <div class="row"><div class="t">09:30</div><div><div class="what">☕ <b>Break</b> · 15 min</div><div class="meta">Estes Park · US-36 · mile 70 · 22 food · 5 fuel</div><div class="chips"><span class="chip acc">early: no services on Trail Ridge Road</span></div></div><div class="acts"><span class="ib">📌</span></div></div>
+            <div class="row"><i class="ann in" style="left:-10px;top:6px">7</i><div class="t">10:45</div><div><div class="what"><span class="wpd thru"></span><b>Through Trail Ridge Road</b> (B)</div><div class="meta">Alpine Visitor Center · 11,796 ft · mile 92 · no stop</div><div class="chips"><span class="chip warn">seasonal road: closes mid-October</span></div></div><div class="acts"></div></div>
+            <div class="row"><div class="t">11:30</div><div><div class="what">🍴 <b>Lunch</b> · 45 min</div><div class="meta">Grand Lake · US-34 · mile 118 · 12 food · 2 fuel</div></div><div class="acts"><span class="ib">📌</span></div></div>
+            <div class="row"><div class="t">14:10</div><div><div class="what">☕ <b>Break</b> · 15 min</div><div class="meta">Vail Pass rest area · I-70 Exit 190 · mile 213</div></div><div class="acts"><span class="ib">📌</span></div></div>
+            <div class="row"><div class="t">15:45</div><div><div class="what">🛏 <b>Overnight</b> + ⛽ <b>fuel</b></div><div class="meta">Glenwood Springs · Exit 116 · mile 295 · 31 lodging</div><div class="chips"><span class="chip ok">⭐ prefer zone</span><span class="chip">Grand Junction: 7 h 50</span></div></div><div class="acts"><span class="ib">📌</span></div></div>
+            <div class="dayh closed"><span>Day 2 · Sun Sep 26</span><span class="r">228 mi · 5 h 30</span><span class="d2">Glenwood Springs → Durango (C) · arrive 15:00</span></div>
+            <div class="dayh closed"><span>Day 3 · Mon Sep 27</span><span class="r">no driving · Durango</span></div>
+            <div class="dayh closed"><span>Day 4 · Tue Sep 28</span><span class="r">282 mi · 5 h 15</span><span class="d2">Durango → Great Sand Dunes (D, 3 h) → Salida</span></div>
+            <div class="dayh closed"><span>Day 5 · Wed Sep 29</span><span class="r">145 mi · 2 h 55</span><span class="d2">Salida → Denver (E) · arrive 11:10</span></div>
+          </div>
+        </aside>
+      </div>
+      <footer class="status"><span><b>950 mi</b> · 20 h 10 driving · 5 days · 4 nights</span><span class="grow"></span><span>Valhalla <span class="dot-ok">●</span> 96 ms</span><span>2,418 places within 2 mi of the route</span></footer>
+    </div></div>
+    <ol class="notes">
+      <li><span class="num">1</span><span>B is a through point. The route has to pass it, but nothing is planned there. Here it pulls day 1 over Trail Ridge Road instead of I-70.</span></li>
+      <li><span class="num">2</span><span>Avoid zones are sent to the router as exclusions. The itinerary notes what the detour cost.</span></li>
+      <li><span class="num">3</span><span>A no-meals zone is fine to drive through. Day 2's lunch skipped Montrose and moved to Ouray (screen 3).</span></li>
+      <li><span class="num">4</span><span>Prefer zones win close calls. Day 1 ends early to sleep in Glenwood Springs, and the row says what the alternative was.</span></li>
+      <li><span class="num">5</span><span>D is a timed stop: three hours at Great Sand Dunes. There is no food there, so day 4's lunch moves to Alamosa before it.</span></li>
+      <li><span class="num">6</span><span>Days fold. Clicking a day highlights its part of the route and switches the day strip.</span></li>
+      <li><span class="num">7</span><span>Roads that close for winter are flagged against the trip date.</span></li>
+    </ol>
+  </section>
+
+  <!-- ============ 3. STOP PICKER ============ -->
+  <section class="screen" id="stop-picker">
+    <div class="eyebrow">Screen 3</div>
+    <h2>Choosing a stop</h2>
+    <p>Day 2, lunch, on US-550. The shaded stretch of road is where lunch can happen at this pace. Every candidate is on the map with its arrival time; the planner's pick is highlighted, and the ones it ruled out say why.</p>
+    <div class="frame-wrap" data-w="1280" data-h="800"><div class="app">
+      <header class="tb">
+        <span class="brand">🧭 Road trip planner</span>
+        <span class="trip-pick">Colorado loop ▾</span>
+        <span class="btn">＋ New trip</span><span class="btn">💾 Save</span><span class="btn">📤 Export</span>
+        <span class="grow"></span>
+        <span class="tb-data"><span class="dot-ok">●</span> map data: Colorado · OSM 2026-11-01</span>
+        <span class="btn">⚙ Settings</span>
+      </header>
+      <div class="body">
+        <div class="mapcol">
+          <div class="map" data-map="picker"></div>
+          <div class="timeline" data-tl="day2"></div>
+        </div>
+        <aside class="side">
+          <div class="sum">
+            <div class="sum-top"><h3>Colorado loop</h3><span class="chip">5 days</span></div>
+            <div class="sub">Sat Sep 25 – Wed Sep 29, 2027 · depart 08:00 MT</div>
+            <div class="stats"><span><b>950</b>mi</span><span><b>20 h 10</b>driving</span><span><b>4</b>nights</span><span><b>11</b>stops</span></div>
+          </div>
+          <nav class="tabs"><span class="tab on">Itinerary</span><span class="tab">Waypoints · 5</span><span class="tab">Zones · 4 on</span></nav>
+          <div class="list">
+            <div class="dayh closed"><span>Day 1 · Sat Sep 25</span><span class="r">295 mi · 6 h 30</span></div>
+            <div class="dayh"><span>Day 2 · Sun Sep 26</span><span class="r">228 mi · 5 h 30</span></div>
+            <div class="row"><div class="t">08:30</div><div><div class="what">🛏 <b>Leave Glenwood Springs</b></div><div class="meta">this day starts at 08:30 (default 08:00)</div></div><div class="acts"></div></div>
+            <div class="row"><div class="t">10:15</div><div><div class="what">☕ <b>Break</b> · 15 min</div><div class="meta">Paonia · CO-133 · mile 70 · on route · 2 fuel · 6 food<br>after McClure Pass, 8,755 ft</div></div><div class="acts"><span class="ib">📌</span></div></div>
+            <div class="row sel"><i class="ann in" style="left:-10px;top:6px">4</i><div class="t">12:15</div><div><div class="what">🍴 <b>Lunch</b> · 45 min</div><div class="meta">Ouray · US-550 · mile 157 · on route · 14 food</div><div class="chips"><span class="chip warn">moved from Montrose: no-meals zone</span></div></div><div class="acts"><span class="ib">📌</span></div></div>
+            <div class="row note"><div class="t">13:20</div><div>▲ Red Mountain Pass, 11,018 ft: the slowest stretch of the day</div></div>
+            <div class="row"><div class="t">15:00</div><div><div class="what"><span class="wpd">C</span> <b>Arrive Durango</b></div><div class="meta">mile 228 · staying 2 nights · sunset 18:58</div></div><div class="acts"></div></div>
+            <div class="dayh closed"><span>Day 3 · Mon Sep 27</span><span class="r">no driving</span></div>
+            <div class="dayh closed"><span>Day 4 · Tue Sep 28</span><span class="r">282 mi · 5 h 15</span></div>
+            <div class="dayh closed"><span>Day 5 · Wed Sep 29</span><span class="r">145 mi · 2 h 55</span></div>
+            <div class="panel">
+              <h6>What is at Ouray</h6>
+              <div class="kv">
+                <span>food</span><span>14 · American 5 · café 4 · pizza 3 · Mexican 2</span>
+                <span>fuel</span><span>2</span>
+                <span>lodging</span><span>22</span>
+                <span>show</span><span><span class="seg"><span class="on">All food</span><span>Sit-down</span><span>Fast food</span></span></span>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+      <footer class="status"><span><b>Lunch, day 2</b> · 6 candidates near the window · 2 ruled out</span><span class="grow"></span><span>Valhalla <span class="dot-ok">●</span> detours checked in 58 ms</span></footer>
+    </div></div>
+    <ol class="notes">
+      <li><span class="num">1</span><span>The shaded stretch is the lunch window, 11:30 to 13:30, laid onto the road at the planned pace.</span></li>
+      <li><span class="num">2</span><span>A candidate ruled out by a zone or by the window stays visible, dashed and greyed, with the reason in the list.</span></li>
+      <li><span class="num">3</span><span>Pick another place, pin this one, or skip it for this trip. Pinned stops hold and the rest of the day re-plans around them.</span></li>
+      <li><span class="num">4</span><span>Rows the planner changed say why.</span></li>
+      <li><span class="num">5</span><span>You can also drag a stop marker along the route. It snaps to the nearest candidate and becomes pinned.</span></li>
+    </ol>
+  </section>
+
+  <!-- ============ 4. ZONES ============ -->
+  <section class="screen" id="zones">
+    <div class="eyebrow">Screen 4</div>
+    <h2>Drawing zones</h2>
+    <p>The box tool is active. A rectangle is being drawn around Aspen, and the new-zone card asks what it means. The sidebar shows the zone library with this trip's switches.</p>
+    <div class="frame-wrap" data-w="1280" data-h="800"><div class="app">
+      <header class="tb">
+        <span class="brand">🧭 Road trip planner</span>
+        <span class="trip-pick">Colorado loop ▾</span>
+        <span class="btn">＋ New trip</span><span class="btn">💾 Save</span><span class="btn">📤 Export</span>
+        <span class="grow"></span>
+        <span class="tb-data"><span class="dot-ok">●</span> map data: Colorado · OSM 2026-11-01</span>
+        <span class="btn">⚙ Settings</span>
+      </header>
+      <div class="body">
+        <div class="mapcol">
+          <div class="map" data-map="zones"></div>
+          <div class="timeline" data-tl="day1"></div>
+        </div>
+        <aside class="side">
+          <div class="sum">
+            <div class="sum-top"><h3>Colorado loop</h3><span class="chip">5 days</span></div>
+            <div class="sub">Sat Sep 25 – Wed Sep 29, 2027 · depart 08:00 MT</div>
+          </div>
+          <nav class="tabs"><span class="tab">Itinerary</span><span class="tab">Waypoints · 5</span><span class="tab on">Zones · 4 on</span></nav>
+          <div class="list">
+            <div class="panel"><div class="hint">▭ Drawing a box. Drag on the map, then choose what the zone means. Esc cancels.</div></div>
+            <div class="panel" style="border-bottom:0;padding-bottom:4px"><h6>On for this trip</h6></div>
+            <div class="zrow"><i class="ann in" style="left:-10px;top:8px">3</i><span class="tg on"></span><div><div class="n"><span class="ty avoid">⛔ Avoid</span> · Boulder</div><div class="meta">Box · route takes I-25 and CO-66 to Lyons, +6 min</div></div></div>
+            <div class="zrow"><span class="tg on"></span><div><div class="n"><span class="ty warn">🚫 No stops</span> · Denver metro</div><div class="meta">Polygon · driven through on days 1 and 5, no stops planned</div></div></div>
+            <div class="zrow"><span class="tg on"></span><div><div class="n"><span class="ty warn">🍴 No meals</span> · Montrose</div><div class="meta">Box · lunch on day 2 moved to Ouray</div></div></div>
+            <div class="zrow"><span class="tg on"></span><div><div class="n"><span class="ty prefer">⭐ Prefer stops</span> · Glenwood Springs</div><div class="meta">Box · chosen for night 1</div></div></div>
+            <div class="panel" style="border-bottom:0;padding-bottom:4px"><h6>In the library, off for this trip</h6></div>
+            <div class="zrow off"><span class="tg"></span><div><div class="n"><span class="ty warn">🌙 No overnight</span> · DFW core</div><div class="meta">Polygon · not near this route</div></div></div>
+            <div class="zrow off"><i class="ann in" style="left:-10px;top:8px">4</i><span class="tg"></span><div><div class="n"><span class="ty avoid">⛔ Avoid</span> · I-70 Glenwood Canyon</div><div class="meta">Box · turning it on would add 2 h 35 to day 1</div></div></div>
+          </div>
+          <div class="side-foot"><span class="chip">6 zones in the library</span><span class="lnk">Import GeoJSON</span></div>
+        </aside>
+      </div>
+      <footer class="status"><span><b>Drawing</b> · 16 × 14 mi · click and drag, Shift for a square</span><span class="grow"></span><span>Valhalla <span class="dot-ok">●</span> 96 ms</span></footer>
+    </div></div>
+    <ol class="notes">
+      <li><span class="num">1</span><span>Draw a box or a polygon right on the map. The size shows while you drag; corner handles reshape it later.</span></li>
+      <li><span class="num">2</span><span>Pick what the zone means. Avoid changes the route. The other four only change where stops go.</span></li>
+      <li><span class="num">3</span><span>Zones live in a library shared by every trip. Each trip switches them on or off.</span></li>
+      <li><span class="num">4</span><span>Each zone says what it does to this trip, including what an off zone would cost if switched on.</span></li>
+    </ol>
+  </section>
+
+  <!-- ============ 5. EDITING ============ -->
+  <section class="screen" id="editing">
+    <div class="eyebrow">Screen 5</div>
+    <h2>Editing on the map</h2>
+    <p>Three gestures shown at once, which in use would happen one at a time: a right-click menu, dragging day 2's route over to Telluride, and the card that opens when you click a waypoint. The sidebar shows the same waypoints as a list.</p>
+    <div class="frame-wrap" data-w="1280" data-h="800"><div class="app">
+      <header class="tb">
+        <span class="brand">🧭 Road trip planner</span>
+        <span class="trip-pick">Colorado loop ▾</span>
+        <span class="btn">＋ New trip</span><span class="btn">💾 Save</span><span class="btn">📤 Export</span>
+        <span class="grow"></span>
+        <span class="tb-data"><span class="dot-ok">●</span> map data: Colorado · OSM 2026-11-01</span>
+        <span class="btn">⚙ Settings</span>
+      </header>
+      <div class="body">
+        <div class="mapcol">
+          <div class="map" data-map="edit"></div>
+          <div class="timeline" data-tl="day2plain"></div>
+        </div>
+        <aside class="side">
+          <div class="sum">
+            <div class="sum-top"><h3>Colorado loop</h3><span class="chip">5 days</span></div>
+            <div class="sub">Sat Sep 25 – Wed Sep 29, 2027 · depart 08:00 MT</div>
+          </div>
+          <nav class="tabs"><span class="tab">Itinerary</span><span class="tab on">Waypoints · 5</span><span class="tab">Zones · 4 on</span></nav>
+          <div class="list">
+            <div class="wprow"><i class="ann in" style="left:-10px;top:10px">4</i><span class="h">⠿</span><span class="mk wp" style="width:22px;height:22px;font-size:11px">A</span><div><div class="n">Denver, CO</div><div class="meta">Start · Sat Sep 25, 08:00</div></div><span class="ib">✕</span></div>
+            <div class="wprow"><span class="h">⠿</span><span class="mk thru"><span>B</span></span><div><div class="n">Trail Ridge Road</div><div class="meta">◇ Through · Alpine Visitor Center</div></div><span class="ib">✕</span></div>
+            <div class="wprow sel"><span class="h">⠿</span><span class="mk wp" style="width:22px;height:22px;font-size:11px">C</span><div><div class="n">Durango, CO</div><div class="meta">🛏 2 nights · arrive Sun 15:00 · leave Tue 08:00</div></div><span class="ib">✕</span></div>
+            <div class="wprow"><span class="h">⠿</span><span class="mk wp" style="width:22px;height:22px;font-size:11px">D</span><div><div class="n">Great Sand Dunes National Park</div><div class="meta">📍 Stop · 3 h · arrive Tue 12:30</div></div><span class="ib">✕</span></div>
+            <div class="wprow"><span class="h">⠿</span><span class="mk wp" style="width:22px;height:22px;font-size:11px">E</span><div><div class="n">Denver, CO</div><div class="meta">End · arrive Wed 11:10</div></div><span class="ib">✕</span></div>
+            <div class="panel">
+              <span class="fld wide">🔎 Search a place or paste coordinates</span>
+              <div class="meta" style="font-size:11px;color:var(--ink-dim)">Drag rows to reorder. The order is yours; the planner never reorders waypoints.</div>
+            </div>
+            <div class="panel">
+              <h6>Roads</h6>
+              <div class="optrow">Avoid toll roads <span class="tg on"></span></div>
+              <div class="optrow">Avoid ferries <span class="tg on"></span></div>
+              <div class="optrow">Avoid unpaved roads <span class="tg on"></span></div>
+              <div class="optrow">Show alternate routes <span class="seg"><span>0</span><span>1</span><span class="on">2</span></span></div>
+            </div>
+            <div class="panel" style="border-bottom:0">
+              <h6>Departure</h6>
+              <div class="optrow">Leave Denver <span><span class="fld">2027-09-25</span> <span class="fld">08:00</span></span></div>
+            </div>
+          </div>
+        </aside>
+      </div>
+      <footer class="status"><span><b>Dragging the route</b> · release to add a through point at Telluride</span><span class="grow"></span><span>Valhalla <span class="dot-ok">●</span> preview 41 ms</span></footer>
+    </div></div>
+    <ol class="notes">
+      <li><span class="num">1</span><span>Right-click anywhere: add a stop, a through point or an overnight, move the start or end, start a zone, or see what is nearby.</span></li>
+      <li><span class="num">2</span><span>Drag the route line to bend it. A dashed preview follows the pointer; letting go adds a through point.</span></li>
+      <li><span class="num">3</span><span>Click a waypoint to choose what happens there: pass through, stop for a set time, or stay one or more nights.</span></li>
+      <li><span class="num">4</span><span>The same waypoints as a list. Drag rows to reorder, search to add, ✕ to remove.</span></li>
+    </ol>
+  </section>
+
+  <!-- ============ 6. SETTINGS ============ -->
+  <section class="screen" id="trip-settings">
+    <div class="eyebrow">Screen 6</div>
+    <h2>Settings</h2>
+    <p>Every rule the planner follows, on one page. These are the defaults agreed in the plan. A trip can override them, and the scope switch says which you are editing.</p>
+    <div class="frame-wrap" data-w="1280" data-h="860"><div class="app">
+      <header class="tb">
+        <span class="brand">🧭 Road trip planner</span>
+        <span class="trip-pick">Colorado loop ▾</span>
+        <span class="btn">＋ New trip</span><span class="btn">💾 Save</span><span class="btn">📤 Export</span>
+        <span class="grow"></span>
+        <span class="tb-data"><span class="dot-ok">●</span> map data: Colorado · OSM 2026-11-01</span>
+        <span class="btn on">⚙ Settings</span>
+      </header>
+      <div class="settings">
+        <div class="set-head"><span class="btn quiet">← Back to map</span><h3>Settings</h3><i class="ann" style="position:relative;transform:none;display:inline-block;flex-shrink:0">1</i><span class="seg"><span class="on">This trip</span><span>Defaults for new trips</span></span><span class="sub">Changes re-plan the trip right away.</span></div>
+        <div class="sgrid">
+          <div class="card"><h4>🕐 Schedule</h4>
+            <div class="fr"><span>Depart</span><span><span class="fld">2027-09-25</span> <span class="fld">08:00</span></span></div>
+            <div class="fr"><span>Start each later day at</span><span class="fld">08:00</span></div>
+            <div class="fr"><span>Driving per day, at most</span><span class="fld">8 h 00</span></div>
+            <div class="fr"><span>Arrive by</span><span class="fld">19:00</span></div>
+            <div class="fr"><span>Stop driving at sunset<span class="help">Off: arriving after dark shows a warning</span></span><span class="tg"></span></div>
+          </div>
+          <div class="card"><h4>☕ Breaks</h4>
+            <div class="sent"><i class="ann" style="left:-22px;top:14px">2</i>Take a break every <span class="fld">120</span> min or <span class="fld">150</span> mi, whichever comes first, for <span class="fld">15</span> min.</div>
+            <div class="fr"><span>Aim for<span class="help">Share of the interval where a stop may land</span></span><span class="fld">75–100%</span></div>
+            <div class="fr"><span>Never go past<span class="help">Hard limit, 2 h 12 at these settings</span></span><span class="fld">+10%</span></div>
+            <div class="fr"><span>Merge fuel and breaks within</span><span class="fld">20 min</span></div>
+          </div>
+          <div class="card"><h4>🍴 Meals</h4>
+            <div class="fr"><span>Lunch</span><span><span class="fld">11:30–13:30</span> <span class="fld">45 min</span></span></div>
+            <div class="fr"><span>Dinner</span><span><span class="fld">17:30–19:30</span> <span class="fld">60 min</span></span></div>
+            <div class="fr"><span>Breakfast</span><span class="seg"><span class="on">At the hotel</span><span>On the road</span></span></div>
+            <div class="fr"><span>A meal resets the break clock</span><span class="tg on"></span></div>
+            <div class="fr"><span>Food</span><span class="seg"><span class="on">All</span><span>Sit-down</span><span>Fast food</span></span></div>
+          </div>
+          <div class="card"><h4>⛽ Fuel</h4>
+            <div class="fr"><span>Range on a full tank</span><span class="fld">400 mi</span></div>
+            <div class="fr"><span>Refuel when used<span class="help">300 mi at these settings</span></span><span class="fld">75%</span></div>
+            <div class="fr"><span>Fill up at each overnight stop</span><span class="tg on"></span></div>
+          </div>
+          <div class="card"><h4>📍 Where to stop</h4>
+            <div class="ladder"><i class="ann" style="left:-22px;top:20px">3</i>
+              <div><span class="h">⠿</span><span class="i">1</span><span>Rest area</span></div>
+              <div><span class="h">⠿</span><span class="i">2</span><span>Service plaza</span></div>
+              <div><span class="h">⠿</span><span class="i">3</span><span>Exit or town with fuel and food</span></div>
+              <div><span class="h">⠿</span><span class="i">4</span><span>Any exit</span></div>
+            </div>
+            <div class="fr"><span>Detour, each way, at most</span><span class="fld">5 min</span></div>
+            <div class="fr"><span>Look this far from the route</span><span class="fld">2 mi</span></div>
+          </div>
+          <div class="card"><h4>🛏 Lodging</h4>
+            <div class="fr"><span>A place to stay has at least</span><span><span class="fld">2</span> lodgings within <span class="fld">2 mi</span></span></div>
+            <div class="fr"><span>Brands</span><span style="display:flex;gap:4px"><span class="chip acc">Hilton ✕</span><span class="chip acc">Marriott ✕</span><span class="chip">＋ Add</span></span></div>
+            <div class="fr"><span>Brand rule</span><span class="seg"><span class="on">Prefer</span><span>Only these</span></span></div>
+          </div>
+          <div class="card"><h4>🛣 Roads</h4>
+            <div class="fr"><span>Avoid toll roads</span><span class="tg on"></span></div>
+            <div class="fr"><span>Avoid ferries</span><span class="tg on"></span></div>
+            <div class="fr"><span>Avoid unpaved roads</span><span class="tg on"></span></div>
+            <div class="fr"><span>Warn about roads closed for winter<span class="help">Checked against each day's date</span></span><span class="tg on"></span></div>
+            <div class="fr"><span>Pace<span class="help">Driving times run 5% slower than the router's estimate</span></span><span class="fld">1.05×</span></div>
+          </div>
+          <div class="card" style="grid-column: span 2"><i class="ann" style="left:-8px;top:14px">4</i><h4>🗺 Map data</h4>
+            <div class="svc"><span><b>Routing</b> · Valhalla container</span><span class="ok-word">● running</span><span class="meta">Colorado · tiles built 2026-11-02 from OSM 2026-11-01 (369 MB extract) · 0.7 GB in data/valhalla</span></div>
+            <div class="svc"><span><b>Places</b> · pois.sqlite</span><span class="ok-word">● ready</span><span class="meta">12,284 places: 146 rest areas, 912 exits, 1,708 fuel, 7,622 food, 1,896 lodging</span></div>
+            <div class="svc"><span><b>Basemap</b></span><span class="seg"><span class="on">Online tiles</span><span>Offline file (not installed)</span></span><span class="meta">Online tiles need internet. Routing and places work without it.</span></div>
+            <div class="fr" style="padding-top:8px"><span>Region<span class="help">Adding a state downloads its extract and rebuilds tiles</span></span><span style="display:flex;gap:6px"><span class="btn sm">＋ Add a state</span><span class="btn sm primary">⟳ Update to latest OSM</span></span></div>
+          </div>
+        </div>
+      </div>
+      <footer class="status"><span><b>Settings</b> · this trip · 2 changes from the defaults (Lodging brands)</span><span class="grow"></span><span>Valhalla <span class="dot-ok">●</span> ready</span></footer>
+    </div></div>
+    <ol class="notes">
+      <li><span class="num">1</span><span>Edit this trip, or the defaults that new trips start from.</span></li>
+      <li><span class="num">2</span><span>Rules read as sentences, with each number editable in place. Derived limits are spelled out underneath.</span></li>
+      <li><span class="num">3</span><span>Drag to change which kinds of places win when several are close to the target time.</span></li>
+      <li><span class="num">4</span><span>Map data and routing run in Docker. This card shows their state and starts updates, which report progress in the button label.</span></li>
+    </ol>
+  </section>
+
+  <!-- ============ 7. EXPORT ============ -->
+  <section class="screen" id="export">
+    <div class="eyebrow">Screen 7</div>
+    <h2>Day sheets and export</h2>
+    <p>The plan leaves the app three ways: a printed sheet per driving day, a GPX file for a phone or Garmin, and a Google Maps link per day for turn-by-turn on the road.</p>
+    <div class="frame-wrap" data-w="1280" data-h="800"><div class="app">
+      <header class="tb">
+        <span class="brand">🧭 Road trip planner</span>
+        <span class="trip-pick">Colorado loop ▾</span>
+        <span class="btn">＋ New trip</span><span class="btn">💾 Save</span><span class="btn on">📤 Export</span>
+        <span class="grow"></span>
+        <span class="tb-data"><span class="dot-ok">●</span> map data: Colorado · OSM 2026-11-01</span>
+        <span class="btn">⚙ Settings</span>
+      </header>
+      <div class="exp">
+        <div class="preview">
+          <div class="paper"><i class="ann" style="left:-10px;top:20px">1</i>
+            <h4>Day 1 · Saturday, September 25, 2027</h4>
+            <div class="pm">Denver → Glenwood Springs · 295 mi · 6 h 30 driving · depart 08:00 · arrive 15:45 · all times MT</div>
+            <div class="strip">
+              <div class="ln"></div>
+              <span class="tk" style="left:0%">A</span><span class="mi" style="left:0%">0</span>
+              <span class="tk" style="left:23.7%"></span><span class="mi" style="left:23.7%">70</span>
+              <span class="tk th" style="left:31.2%"></span><span class="mi" style="left:31.2%">92</span>
+              <span class="tk" style="left:40%"></span><span class="mi" style="left:40%">118</span>
+              <span class="tk" style="left:72.2%"></span><span class="mi" style="left:72.2%">213</span>
+              <span class="tk" style="left:100%">🛏</span><span class="mi" style="left:100%">295</span>
+            </div>
+            <table>
+              <thead><tr><th>Time</th><th>Stop</th><th>Where</th><th>Mile · notes</th></tr></thead>
+              <tbody>
+                <tr><td>08:00</td><td>Depart</td><td>Denver<small>I-25 north, CO-66 west (avoids Boulder)</small></td><td>0</td></tr>
+                <tr><td>09:30</td><td>Break, 15 min</td><td>Estes Park<small>US-36 at US-34</small></td><td>70 · 22 food, 5 fuel · last services for 48 mi</td></tr>
+                <tr class="band"><td>10:30</td><td>Highest point</td><td>Trail Ridge Road, 12,183 ft<small>seasonal road, open late May to mid-October</small></td><td>88</td></tr>
+                <tr><td>10:45</td><td>Pass through</td><td>Alpine Visitor Center</td><td>92 · 11,796 ft</td></tr>
+                <tr><td>11:30</td><td>Lunch, 45 min</td><td>Grand Lake<small>US-34</small></td><td>118 · 12 food, 2 fuel</td></tr>
+                <tr><td>14:10</td><td>Break, 15 min</td><td>Vail Pass rest area<small>I-70 Exit 190, both directions</small></td><td>213 · restrooms</td></tr>
+                <tr><td>15:45</td><td>Overnight + fuel</td><td>Glenwood Springs<small>I-70 Exit 116</small></td><td>295 · 31 lodging · sunset 18:59</td></tr>
+              </tbody>
+            </table>
+            <div class="foot"><span>Colorado loop · page 1 of 4</span><span>Road trip planner · OSM 2026-11-01</span></div>
+          </div>
+        </div>
+        <div class="expside">
+          <h3>Export · Colorado loop</h3>
+          <div class="card"><h4>🖨 Day sheets</h4>
+            <div class="ck"><i class="on">✓</i>Day 1 · Sat · Denver → Glenwood Springs</div>
+            <div class="ck"><i class="on">✓</i>Day 2 · Sun · Glenwood Springs → Durango</div>
+            <div class="ck dim"><i></i>Day 3 · Mon · no driving</div>
+            <div class="ck"><i class="on">✓</i>Day 4 · Tue · Durango → Salida</div>
+            <div class="ck"><i class="on">✓</i>Day 5 · Wed · Salida → Denver</div>
+            <div style="border-top:1px solid var(--rule);margin:6px 0 4px"></div>
+            <div class="ck"><i class="on">✓</i>Exit numbers and what is there</div>
+            <div class="ck"><i class="on">✓</i>Mile strip</div>
+            <div class="ck"><i></i>Alternate routes</div>
+            <div style="padding-top:6px"><span class="btn primary">🖨 Print 4 day sheets</span></div>
+          </div>
+          <div class="card" style="position:relative"><i class="ann" style="left:-8px;top:14px">2</i><h4>📍 GPX file</h4>
+            <div style="font-size:12px;color:var(--ink-secondary)">The route as a track and every stop as a waypoint, for a phone app or a Garmin.</div>
+            <div style="display:flex;gap:8px;align-items:center;padding-top:8px"><span class="btn">💾 Save GPX</span><span class="sub">colorado-loop.gpx · 4 tracks · 16 waypoints</span></div>
+          </div>
+          <div class="card" style="position:relative"><i class="ann" style="left:-8px;top:14px">3</i><h4>🗺 Google Maps</h4>
+            <div style="font-size:12px;color:var(--ink-secondary);padding-bottom:4px">One link per driving day, for turn-by-turn on the phone. Google takes about 10 stops per link, so a long day becomes two links.</div>
+            <div class="linkrow"><span>Day 1 <small>· 7 stops</small></span><span class="btn sm">⧉ Copy link</span></div>
+            <div class="linkrow"><span>Day 2 <small>· 4 stops</small></span><span class="btn sm">⧉ Copy link</span></div>
+            <div class="linkrow"><span>Day 4 <small>· 6 stops</small></span><span class="btn sm">⧉ Copy link</span></div>
+            <div class="linkrow"><span>Day 5 <small>· 3 stops</small></span><span class="btn sm">⧉ Copy link</span></div>
+          </div>
+          <div class="card"><h4>📂 Trip file</h4>
+            <div style="font-size:12px;color:var(--ink-secondary)">trips/colorado-loop.json</div>
+            <div class="sub">saved 14:02 · plain JSON, safe to keep in git</div>
+          </div>
+        </div>
+      </div>
+      <footer class="status"><span><b>Export</b> · 4 driving days · 11 stops · 5 waypoints</span><span class="grow"></span><span>Valhalla <span class="dot-ok">●</span> ready</span></footer>
+    </div></div>
+    <ol class="notes">
+      <li><span class="num">1</span><span>One page per driving day: a mile strip, then every stop with its time, exit and what is there. The day's high point gets a shaded row.</span></li>
+      <li><span class="num">2</span><span>GPX carries the route and the stops to a phone or a Garmin.</span></li>
+      <li><span class="num">3</span><span>Google Maps links are split per day to stay under its stop limit.</span></li>
+    </ol>
+  </section>
+</div>
+
+<script>
+/* ---------- geography (approximate, for mockups only) ---------- */
+const P = {
+  DEN:[-104.99,39.74], BOU:[-105.27,40.01], LYO:[-105.27,40.22], LON:[-105.10,40.17], EST:[-105.52,40.38], TRH:[-105.72,40.41],
+  AVC:[-105.75,40.44], GRL:[-105.82,40.25], GBY:[-105.94,40.09], KRE:[-106.39,40.06], SLV:[-106.07,39.63], FRI:[-106.10,39.57],
+  VPS:[-106.22,39.53], VAI:[-106.37,39.64], MIN:[-106.43,39.59], EAG:[-106.83,39.66], DOT:[-107.05,39.64], GWS:[-107.32,39.55],
+  CBD:[-107.21,39.40], BAS:[-107.03,39.37], ASP:[-106.82,39.19], TWL:[-106.38,39.08], MCP:[-107.29,39.12], PAO:[-107.59,38.87],
+  HOT:[-107.71,38.80], DEL:[-108.07,38.74], MTJ:[-107.88,38.48], COL:[-107.78,38.33], RID:[-107.76,38.15], OUR:[-107.67,38.02],
+  RMP:[-107.71,37.90], SIL:[-107.66,37.81], MOL:[-107.69,37.74], CBP:[-107.78,37.70], DUR:[-107.88,37.27], BAY:[-107.60,37.23],
+  PGS:[-107.01,37.27], WCP:[-106.80,37.48], SFK:[-106.64,37.67], DNO:[-106.35,37.68], MVI:[-106.15,37.58], ALS:[-105.87,37.47],
+  CEN:[-106.11,37.75], MOS:[-105.87,37.65], HOO:[-105.88,37.75], GSD:[-105.51,37.73], MOF:[-105.91,38.00], MHS:[-105.93,38.17],
+  SAG:[-106.14,38.09], VGR:[-105.95,38.25], PPS:[-106.09,38.42], PSP:[-106.08,38.51], SAL:[-106.00,38.53], NAT:[-106.07,38.75],
+  JVL:[-106.11,38.81], BVA:[-106.13,38.84], TCP:[-105.98,38.91], ANT:[-105.90,38.99], FAI:[-106.00,39.22], JEF:[-105.80,39.38],
+  KEN:[-105.76,39.41], BAI:[-105.47,39.41], CON:[-105.30,39.52], GJT:[-108.55,39.06], RIF:[-107.78,39.53], PAR:[-108.05,39.45],
+  CRA:[-107.55,40.52], STB:[-106.83,40.48], REP:[-106.62,40.38], MEE:[-107.91,40.04], RNG:[-108.80,40.09], FCO:[-105.08,40.59],
+  GRE:[-104.71,40.42], LOV:[-105.07,40.40], CSP:[-104.82,38.83], PUE:[-104.61,38.25], CCY:[-105.24,38.44], WAL:[-104.78,37.62],
+  TRI:[-104.50,37.17], LVP:[-105.18,37.60], FGA:[-105.43,37.43], GUN:[-106.93,38.55], MON:[-106.33,38.50], CRB:[-106.99,38.87],
+  LEA:[-106.29,39.25], TNP:[-106.31,39.36], FMP:[-106.19,39.37], BRK:[-106.04,39.48], HSP:[-106.06,39.36], TEL:[-107.81,37.94],
+  SOT:[-107.87,37.95], PLA:[-108.05,38.02], LHP:[-107.91,37.81], RIC:[-108.03,37.69], DOL:[-108.50,37.47], CTZ:[-108.59,37.35],
+  MAN:[-108.29,37.35], LKC:[-107.32,38.03], CRE:[-106.93,37.85], LIM:[-103.69,39.26], STE:[-103.21,40.63], BUR:[-102.27,39.30],
+  LJU:[-103.54,37.98], LAM:[-102.62,38.09], FMO:[-103.80,40.25], CRK:[-104.86,39.37], WPA:[-105.06,38.99], HAR:[-105.80,39.02],
+  IDS:[-105.51,39.74], GEO:[-105.70,39.71], EIS:[-105.92,39.68], EMP:[-105.68,39.76], BTP:[-105.78,39.80], WPK:[-105.79,39.89],
+  WAD:[-106.28,40.73], ANO:[-106.01,37.08], CIM:[-107.55,38.44], CHE:[-104.82,41.14], LAR:[-105.59,41.31], MOA:[-109.55,38.57],
+  TAO:[-105.57,36.41], FMN:[-108.21,36.73], RAT:[-104.44,36.90]
+};
+const CITIES = [
+  ['DEN','Denver',1], ['CSP','Colorado Springs',1], ['GJT','Grand Junction',1], ['FCO','Fort Collins',1], ['PUE','Pueblo',1],
+  ['DUR','Durango',1], ['BOU','Boulder',1], ['GWS','Glenwood Springs',1],
+  ['EST','Estes Park',2], ['ASP','Aspen',2], ['VAI','Vail',2], ['STB','Steamboat Springs',2], ['MTJ','Montrose',2], ['GUN','Gunnison',2],
+  ['ALS','Alamosa',2], ['SAL','Salida',2], ['BVA','Buena Vista',2], ['LEA','Leadville',2], ['PGS','Pagosa Springs',2], ['TEL','Telluride',2],
+  ['CTZ','Cortez',2], ['OUR','Ouray',2], ['SIL','Silverton',2], ['CRA','Craig',2], ['DEL','Delta',2], ['TRI','Trinidad',2],
+  ['CCY','Cañon City',2], ['LIM','Limon',2], ['STE','Sterling',2], ['LJU','La Junta',2], ['LAM','Lamar',2], ['GRE','Greeley',2],
+  ['WAL','Walsenburg',2], ['MEE','Meeker',2], ['KRE','Kremmling',2], ['GRL','Grand Lake',2], ['GBY','Granby',2], ['BRK','Breckenridge',2],
+  ['FAI','Fairplay',2], ['CRB','Crested Butte',2], ['LKC','Lake City',2], ['CRE','Creede',2], ['RIF','Rifle',2], ['BUR','Burlington',2],
+  ['CHE','Cheyenne',2], ['LAR','Laramie',2], ['MOA','Moab',2], ['TAO','Taos',2], ['FMN','Farmington',2], ['RAT','Raton',2],
+  ['FMO','Fort Morgan',2], ['GSD','Great Sand Dunes',2],
+  ['LYO','Lyons',3], ['LON','Longmont',3], ['LOV','Loveland',3], ['CON','Conifer',3], ['BAI','Bailey',3], ['JEF','Jefferson',3],
+  ['SLV','Silverthorne',3], ['FRI','Frisco',3], ['EAG','Eagle',3], ['MIN','Minturn',3], ['CBD','Carbondale',3], ['BAS','Basalt',3],
+  ['TWL','Twin Lakes',3], ['PAO','Paonia',3], ['HOT','Hotchkiss',3], ['RID','Ridgway',3], ['COL','Colona',3], ['DNO','Del Norte',3],
+  ['SFK','South Fork',3], ['MVI','Monte Vista',3], ['BAY','Bayfield',3], ['MAN','Mancos',3], ['DOL','Dolores',3], ['RIC','Rico',3],
+  ['PLA','Placerville',3], ['SAG','Saguache',3], ['CEN','Center',3], ['VGR','Villa Grove',3], ['PSP','Poncha Springs',3], ['NAT','Nathrop',3],
+  ['MOF','Moffat',3], ['HOO','Hooper',3], ['MOS','Mosca',3], ['FGA','Fort Garland',3], ['WPK','Winter Park',3], ['IDS','Idaho Springs',3],
+  ['GEO','Georgetown',3], ['CRK','Castle Rock',3], ['WPA','Woodland Park',3], ['HAR','Hartsel',3], ['PAR','Parachute',3], ['RNG','Rangely',3],
+  ['ANO','Antonito',3], ['CIM','Cimarron',3], ['WAD','Walden',3]
+];
+const PASSES = [
+  ['Trail Ridge Road','12,183',-105.72,40.41], ['Berthoud Pass','11,307',-105.78,39.80], ['Rabbit Ears Pass','9,426',-106.62,40.38],
+  ['Vail Pass','10,662',-106.22,39.53], ['Hoosier Pass','11,542',-106.06,39.36], ['Fremont Pass','11,318',-106.19,39.37],
+  ['Tennessee Pass','10,424',-106.31,39.36], ['Independence Pass','12,095',-106.56,39.11], ['McClure Pass','8,755',-107.29,39.12],
+  ['Monarch Pass','11,312',-106.33,38.50], ['Kenosha Pass','10,001',-105.76,39.41], ['Trout Creek Pass','9,487',-105.98,38.91],
+  ['Poncha Pass','9,010',-106.09,38.42], ['Wolf Creek Pass','10,857',-106.80,37.48], ['Red Mountain Pass','11,018',-107.71,37.90],
+  ['Molas Pass','10,910',-107.69,37.74], ['Coal Bank Pass','10,640',-107.78,37.70], ['Lizard Head Pass','10,222',-107.91,37.81],
+  ['La Veta Pass','9,413',-105.18,37.60]
+];
+const DIVIDE = [[-106.95,41.0],[-106.85,40.75],[-106.62,40.38],[-106.3,40.42],[-106.09,40.35],[-105.95,40.45],[-105.81,40.42],[-105.68,40.25],
+  [-105.65,40.0],[-105.78,39.80],[-105.88,39.66],[-106.0,39.5],[-106.06,39.36],[-106.19,39.37],[-106.31,39.36],[-106.45,39.2],[-106.56,39.11],
+  [-106.41,38.83],[-106.33,38.50],[-106.25,38.39],[-106.6,38.17],[-106.9,37.95],[-107.16,37.94],[-107.39,37.68],[-107.1,37.55],[-106.80,37.48],
+  [-106.6,37.2],[-106.48,36.9]];
+const INTERSTATES = [
+  [[-109.6,38.95],[-109.0,39.13],'GJT',[-108.3,39.13],'PAR','RIF','GWS','DOT','EAG','MIN','VAI','VPS','FRI','SLV','EIS','GEO','IDS',[-105.25,39.72],'DEN',[-104.6,39.75],[-104.2,39.55],'LIM','BUR',[-101.5,39.3]],
+  [[-104.82,41.4],'CHE',[-104.98,40.9],[-104.98,40.58],[-104.98,40.40],[-104.99,40.19],[-104.99,40.0],'DEN','CRK','CSP','PUE','WAL','TRI','RAT',[-104.6,36.5]],
+  ['DEN',[-104.6,40.0],'FMO','STE',[-102.3,41.0]]
+];
+const HIGHWAYS = [
+  ['DEN',[-105.08,39.65],'CON','BAI','KEN','JEF','FAI','ANT','TCP','JVL','NAT','PSP','PPS','VGR','MHS','SAG','CEN','MVI','ALS','ANO',[-106.0,36.8]],
+  ['CEN','DNO'],
+  ['CTZ','MAN','DUR','BAY','PGS','WCP','SFK','DNO','MVI','ALS',[-105.53,37.48],'FGA','LVP','WAL'],
+  [[-107.95,36.8],'DUR','CBP','MOL','SIL','RMP','OUR','RID','COL','MTJ'],
+  ['GJT',[-108.3,38.9],'DEL','MTJ','CIM',[-107.2,38.47],'GUN','MON','PSP','SAL',[-105.7,38.48],'CCY','PUE','LJU','LAM',[-101.9,38.05]],
+  ['GWS','CBD','BAS','ASP',[-106.56,39.11],'TWL',[-106.31,39.12]],
+  ['MIN','TNP','LEA',[-106.31,39.12],'BVA','JVL'], ['ANT','HAR','WPA','CSP'], ['LEA','FMP',[-106.15,39.5]],
+  ['CBD','MCP','PAO','HOT','DEL'],
+  ['EST',[-105.62,40.40],'TRH','AVC',[-105.85,40.36],'GRL','GBY'], ['LOV','EST'],
+  ['DEN',[-105.10,39.90],'BOU','LYO',[-105.40,40.30],'EST'], [[-104.99,40.19],'LON','LYO'],
+  ['IDS','EMP','BTP','WPK','GBY','KRE',[-106.45,40.25],'REP','STB','CRA',[-108.6,40.45],[-109.4,40.45]],
+  ['KRE',[-106.28,39.85],'SLV'], ['FRI','BRK','HSP','FAI'],
+  ['RID',[-107.90,38.08],'PLA','SOT','TEL'], ['SOT','LHP','RIC','DOL','CTZ'], ['DOL','MAN'],
+  ['MHS','MOF','HOO','MOS','ALS'], [[-105.53,37.48],'GSD'], ['MOS',[-105.7,37.69],'GSD'],
+  ['SFK','CRE',[-107.15,37.9],'LKC',[-107.1,38.35],'GUN'], ['GUN','CRB'],
+  ['RIF','MEE','CRA'], ['MEE','RNG'], ['CSP','CCY'], ['FCO','LAR'], ['LOV','GRE','FMO'], ['CTZ',[-109.05,37.6],[-109.4,37.9]],
+  ['CSP',[-104.2,39.0],'LIM'], ['LIM',[-103.1,38.7],'LAM'], ['FCO','LOV',[-105.1,40.3],'LON'], ['KRE',[-106.2,40.5],'WAD']
+];
+const BORDERS = [
+  [[-112,41],[-100,41]], [[-112,37],[-100,37]], [[-109.05,35],[-109.05,43]], [[-102.05,37],[-102.05,41]],
+  [[-104.05,41],[-104.05,43]], [[-102.05,40],[-100,40]], [[-103.0,37],[-103.0,35]], [[-103.0,36.5],[-100,36.5]]
+];
+const WATER = [
+  [[-106.10,39.64],[-106.03,39.62],[-106.02,39.58],[-106.07,39.57],[-106.11,39.60]],
+  [[-105.90,40.20],[-105.83,40.19],[-105.84,40.13],[-105.90,40.14]],
+  [[-107.35,38.47],[-107.20,38.46],[-107.05,38.48],[-107.03,38.46],[-107.20,38.44],[-107.35,38.45]],
+  [[-105.85,40.27],[-105.81,40.26],[-105.82,40.23],[-105.85,40.24]]
+];
+const SHIELDS = [
+  ['70',-108.3,39.13], ['70',-106.6,39.65], ['70',-105.6,39.73], ['70',-103.0,39.28], ['25',-104.99,39.95], ['25',-104.84,39.1],
+  ['25',-104.7,37.9], ['76',-103.5,40.45], ['285',-105.62,39.41], ['285',-106.02,38.335], ['160',-106.72,37.575], ['160',-107.74,37.25],
+  ['550',-107.715,38.085], ['50',-107.3,38.47], ['50',-105.6,38.48], ['34',-105.86,40.33], ['40',-106.17,40.075], ['82',-107.12,39.385],
+  ['133',-107.44,39.0], ['9',-106.2,39.75], ['145',-107.97,37.75], ['24',-106.2,39.0], ['17',-105.9,37.9]
+];
+const ROUTE_SIMPLE = ['DEN',[-105.08,39.65],'CON','BAI','KEN','JEF','FAI','ANT','TCP','JVL','NAT','PSP','PPS','VGR','MHS','SAG','CEN','DNO','SFK','WCP','PGS','BAY','DUR'];
+const ROUTE_ALT = ['DEN','CRK','CSP','PUE','WAL','LVP','FGA',[-105.53,37.48],'ALS','MVI','DNO'];
+const DAY1 = ['DEN',[-104.99,40.0],[-104.99,40.19],'LON','LYO',[-105.40,40.30],'EST',[-105.62,40.40],'TRH','AVC',[-105.85,40.36],'GRL','GBY','KRE',[-106.28,39.85],'SLV','FRI','VPS','VAI','MIN','EAG','DOT','GWS'];
+const DAY2 = ['GWS','CBD','MCP','PAO','HOT','DEL','MTJ','COL','RID','OUR','RMP','SIL','MOL','CBP','DUR'];
+const DAY4 = ['DUR','BAY','PGS','WCP','SFK','DNO','MVI','ALS',[-105.53,37.48],'GSD',[-105.7,37.69],'MOS','HOO','MOF','MHS','VGR','PPS','PSP','SAL'];
+const DAY5 = ['SAL','PSP','NAT','JVL','TCP','ANT','FAI','JEF','KEN','BAI','CON',[-105.08,39.65],'DEN'];
+
+const ZONES = {
+  boulder: { box:[-105.33,39.95,-105.15,40.08], type:'avoid', lab:'⛔ Avoid · Boulder' },
+  denver: { poly:[[-105.12,39.90],[-104.72,39.93],[-104.68,39.60],[-104.95,39.52],[-105.17,39.62]], type:'warn', lab:'🚫 No stops · Denver metro' },
+  montrose: { box:[-107.98,38.42,-107.80,38.54], type:'warn', lab:'🍴 No meals · Montrose' },
+  glenwood: { box:[-107.42,39.48,-107.24,39.62], type:'prefer', lab:'⭐ Prefer · Glenwood Springs' }
+};
+
+/* ---------- screen configs ---------- */
+const MAPS = {
+  simple: {
+    bbox:[-108.3,37.0,-104.6,40.0], tier:2, hide:['DEN','DUR','FAI'], tools:'add', divLab:[-107.45,40.05],
+    passes:['Kenosha Pass','Trout Creek Pass','Wolf Creek Pass','Red Mountain Pass','Monarch Pass','La Veta Pass','Independence Pass'],
+    pside:{'Wolf Creek Pass':'l'},
+    alts:[ROUTE_ALT], routes:[[ROUTE_SIMPLE,'sel']],
+    markers:[
+      {at:'DEN', k:'wp', t:'A', lab:'<b>Denver</b> · 08:30', side:'r'},
+      {at:'FAI', k:'stop', t:'☕', lab:'10:20 · break', side:'r'},
+      {at:'PSP', k:'stop', t:'🍴', lab:'11:40 · lunch', side:'r'},
+      {at:'SFK', k:'pill', t:'☕⛽', cls:'sel', lab:'14:15 · break + fuel', side:'t'},
+      {at:'DUR', k:'wp', t:'B', lab:'<b>Durango</b> · 16:30', side:'t'}
+    ],
+    over:[
+      {at:'SFK', dx:-268, dy:-190, html:`<div class="pop" style="width:250px"><h5>☕ Break + ⛽ fuel · South Fork</h5><div class="m">14:15–14:30 · mile 252 · 1 min off route</div><div>3 fuel · 6 food · 4 lodging</div><div class="m">Fuel moved here: it was due by mile 300, and the next station is 46 mi on, past Wolf Creek Pass.</div><div class="acts"><span class="btn sm">Change stop</span><span class="btn sm on">📌 Pinned</span></div></div>`},
+      {at:[-105.6,38.05], dx:0, dy:0, html:`<span class="chipmap alt">Alternate · via Walsenburg · <b>372 mi</b> · +18 min · <span style="color:var(--accent-text)">Use this</span></span>`},
+      {at:[-105.4,38.75], dx:0, dy:0, html:`<span class="chipmap">US-285 · <b>338 mi</b> · 6 h 45</span>`}
+    ],
+    ann:[{at:'DEN',dx:-4,dy:-26,n:1},{at:'FAI',dx:-20,dy:-14,n:2},{at:'SFK',dx:-268,dy:-196,n:3},{at:[-105.6,38.05],dx:-10,dy:8,n:4}]
+  },
+  multi: {
+    bbox:[-109.2,36.9,-102.0,41.1], tier:1, extra:['STB','ASP','GUN','LEA','TEL','CTZ','TRI','LIM','STE','LJU','LAM','CRA','CCY','WAL'],
+    hide:['DEN','DUR','GWS','BOU'], tools:'add', divLab:[-107.05,40.9],
+    passes:['Wolf Creek Pass','Red Mountain Pass'], pside:{'Wolf Creek Pass':'l','Red Mountain Pass':'l'},
+    zones:['boulder','denver','montrose','glenwood'], zl:{boulder:{pos:'t',dx:-70}, denver:{dx:70}},
+    routes:[[DAY2,''],[DAY4,''],[DAY5,''],[DAY1,'sel']],
+    markers:[
+      {at:'DEN', k:'wp', t:'A', lab:'<b>Denver</b> · start and end (E)', side:'r'},
+      {at:'AVC', k:'thru', t:'B', lab:'<b>Trail Ridge Road</b> · through', side:'l'},
+      {at:'DUR', k:'wp', t:'C', lab:'<b>Durango</b> · 2 nights', side:'l'},
+      {at:'GSD', k:'wp', t:'D', lab:'<b>Great Sand Dunes</b> · 3 h', side:'r'},
+      {at:'EST', k:'stop', t:'☕'}, {at:'GRL', k:'stop', t:'🍴'}, {at:'VPS', k:'stop', t:'☕'}, {at:'GWS', k:'night', t:'🛏'},
+      {at:'PAO', k:'stop', t:'☕'}, {at:'OUR', k:'stop', t:'🍴'}, {at:'SFK', k:'pill', t:'☕⛽'}, {at:'ALS', k:'stop', t:'🍴'},
+      {at:'SAL', k:'night', t:'🛏'}, {at:'BAI', k:'stop', t:'☕'}
+    ],
+    over:[
+      {at:[-106.95,40.75], dx:0, dy:0, html:`<span class="chipmap day sel">Day 1 · <b style="color:var(--white)">295 mi</b> · 6 h 30</span>`},
+      {at:[-109.1,38.25], dx:0, dy:0, html:`<span class="chipmap day">Day 2 · 228 mi</span>`},
+      {at:[-106.75,37.1], dx:0, dy:0, html:`<span class="chipmap day">Day 4 · 282 mi</span>`},
+      {at:[-105.3,38.95], dx:0, dy:0, html:`<span class="chipmap day">Day 5 · 145 mi</span>`}
+    ],
+    ann:[{at:'AVC',dx:14,dy:-20,n:1},{at:[-105.15,39.95],dx:12,dy:2,n:2},{at:[-107.80,38.54],dx:12,dy:-8,n:3},{at:[-107.24,39.62],dx:12,dy:-8,n:4},{at:'GSD',dx:14,dy:-22,n:5}]
+  },
+  picker: {
+    bbox:[-108.4,37.65,-107.3,38.85], tier:3, hide:['DEL','MTJ','COL','RID','OUR','SIL','HOT','PAO'], tools:null,
+    passes:['Red Mountain Pass','Molas Pass','Coal Bank Pass','Lizard Head Pass'], pside:{'Coal Bank Pass':'l','Lizard Head Pass':'l'},
+    zones:['montrose'],
+    band:['MTJ','COL','RID','OUR','RMP','SIL',[-107.68,37.74]],
+    routes:[[DAY2,'sel']],
+    markers:[
+      {at:'DEL', k:'cand', cls:'off', t:'18', lab:'11:05 · Delta · before the window', side:'r', lcls:'off'},
+      {at:'MTJ', k:'cand', cls:'off', t:'30', lab:'11:30 · Montrose', side:'l', lcls:'off'},
+      {at:'COL', k:'cand', t:'1', lab:'11:45 · Colona', side:'r'},
+      {at:'RID', k:'cand', t:'6', lab:'12:00 · Ridgway', side:'l'},
+      {at:'OUR', k:'cand', cls:'best sel', t:'🍴', lab:'12:15 · Ouray · 14 food', side:'l', lcls:'best'},
+      {at:'SIL', k:'cand', t:'12', lab:'13:05 · Silverton', side:'l'}
+    ],
+    over:[
+      {at:'OUR', dx:26, dy:-300, html:`<div class="pop" style="width:330px"><h5>🍴 Lunch, day 2 · pick a stop</h5><div class="m">Window 11:30–13:30 · numbers on the map are food places</div>
+        <div class="cands">
+          <div class="cand on"><span>✓</span><span>Ouray · US-550<small>14 food · on route · best match</small></span><span class="when">12:15</span></div>
+          <div class="cand"><span></span><span>Silverton · US-550<small>12 food · 1 min off route</small></span><span class="when">13:05</span></div>
+          <div class="cand"><span></span><span>Ridgway · US-550 at CO-62<small>6 food · on route</small></span><span class="when">12:00</span></div>
+          <div class="cand no"><span>🚫</span><span>Montrose · US-50<small>in “No meals · Montrose” zone</small></span><span class="when">11:30</span></div>
+          <div class="cand no"><span>🚫</span><span>Delta · US-50<small>before the lunch window</small></span><span class="when">11:05</span></div>
+        </div>
+        <div class="acts"><span class="btn sm on">📌 Pin Ouray</span><span class="btn sm">Use Silverton</span><span class="btn sm quiet">Skip Ouray on this trip</span></div></div>`},
+      {at:[-108.35,38.25], dx:0, dy:0, html:`<span class="chipmap">lunch window · 11:30–13:30</span>`}
+    ],
+    ann:[{at:[-108.35,38.25],dx:-12,dy:8,n:1},{at:'MTJ',dx:18,dy:-16,n:2},{at:'OUR',dx:26,dy:-300,n:3},{at:'OUR',dx:-30,dy:22,n:5}]
+  },
+  zones: {
+    bbox:[-108.6,37.7,-106.2,39.8], tier:2, hide:['GWS','SAL','OUR','PAO'], tools:'box', divLab:[-106.75,38.12],
+    passes:['Independence Pass','McClure Pass','Monarch Pass','Red Mountain Pass'],
+    zones:['glenwood','montrose'], newZone:[-106.98,39.10,-106.68,39.30],
+    routes:[[DAY4,''],[DAY5,''],[DAY2,''],[DAY1,'sel']],
+    markers:[
+      {at:'GWS', k:'night', t:'🛏'}, {at:'PAO', k:'stop', t:'☕'}, {at:'OUR', k:'stop', t:'🍴'}, {at:'SAL', k:'night', t:'🛏'},
+      {at:'VPS', k:'stop', t:'☕'}, {at:[-106.68,39.10], k:'cross', t:'+'}
+    ],
+    over:[
+      {at:[-106.68,39.30], dx:16, dy:-69, html:`<div class="pop" style="width:248px"><h5>New zone · 16 × 14 mi</h5>
+        <div class="cands">
+          <div class="cand"><span>⛔</span><span>Avoid driving through</span><span></span></div>
+          <div class="cand"><span>🚫</span><span>No stops</span><span></span></div>
+          <div class="cand on"><span>🌙</span><span>No overnight</span><span>✓</span></div>
+          <div class="cand"><span>🍴</span><span>No meals</span><span></span></div>
+          <div class="cand"><span>⭐</span><span>Prefer stops</span><span></span></div>
+        </div>
+        <div class="m">No overnight: the route can still pass through, and breaks and meals can still stop here.</div>
+        <div class="kv"><span>Name</span><span class="fld focus">Aspen</span><span>Save to</span><span class="seg"><span class="on">Library</span><span>This trip only</span></span></div>
+        <div class="acts"><span class="btn sm primary">Save zone</span><span class="btn sm quiet">Cancel</span></div></div>`}
+    ],
+    ann:[{at:[-106.98,39.10],dx:-12,dy:12,n:1},{at:[-106.68,39.30],dx:16,dy:-69,n:2}]
+  },
+  edit: {
+    bbox:[-108.6,36.95,-106.4,37.95], tier:3, hide:['DUR'], tools:'add',
+    passes:['Red Mountain Pass','Molas Pass','Coal Bank Pass','Lizard Head Pass','Wolf Creek Pass'], pside:{'Coal Bank Pass':'l','Lizard Head Pass':'l'},
+    routes:[[DAY2,'sel']],
+    ghost:['PLA','SOT','TEL','SOT','LHP','RIC','DOL','MAN','DUR'],
+    markers:[
+      {at:'DUR', k:'wp', t:'C', cls:'sel', lab:'<b>Durango</b> · 2 nights', side:'l'},
+      {at:'TEL', k:'thru', t:'+'},
+      {at:[-107.0,37.75], k:'cursor', t:''}
+    ],
+    over:[
+      {at:[-107.0,37.75], dx:6, dy:6, html:`<div class="menu"><div class="hd">37.75, −107.00 · right-click</div>
+        <div class="mi"><span class="g">📍</span>Add a stop here</div>
+        <div class="mi hover"><span class="g">◇</span>Route through here</div>
+        <div class="mi"><span class="g">🛏</span>Stay overnight here</div>
+        <div class="mi"><span class="g">🏁</span>Start the trip here</div>
+        <div class="mi"><span class="g">🏁</span>End the trip here</div><hr>
+        <div class="mi"><span class="g">▭</span>Draw a zone from here</div><hr>
+        <div class="mi"><span class="g">🔎</span>What's near here<small>Creede · 9 mi</small></div></div>`},
+      {at:'TEL', dx:16, dy:-28, html:`<span class="tip">Release to add a through point · +52 min</span>`},
+      {at:'DUR', dx:20, dy:14, html:`<div class="pop" style="width:256px"><h5>C · Durango, CO</h5>
+        <span class="seg"><span>◇ Through</span><span>📍 Stop</span><span class="on">🛏 Overnight</span></span>
+        <div class="kv"><span>Nights</span><span><span class="fld">− 2 ＋</span></span><span>Arrive</span><span>Sun Sep 26, 15:00 <span class="m">planned</span></span><span>Leave</span><span><span class="fld">Tue Sep 28</span> <span class="fld">08:00</span></span></div>
+        <div class="acts"><span class="btn sm">Move</span><span class="btn sm quiet" style="color:var(--danger-text);border-color:var(--danger-border)">Remove</span></div></div>`}
+    ],
+    ann:[{at:[-107.0,37.75],dx:-12,dy:-12,n:1},{at:'TEL',dx:-20,dy:-12,n:2},{at:'DUR',dx:20,dy:14,n:3}]
+  }
+};
+
+const LOOP_DAYS = n => [['Day 1 · Sat'],['Day 2 · Sun'],['Day 3 · Mon'],['Day 4 · Tue'],['Day 5 · Wed']].map((d, i) => i === n ? [d[0], 1] : d);
+const TIMELINES = {
+  simple: { from:480, to:1020, left:'<b>Fri Sep 24</b>Day 1 of 1<br>MT',
+    ev:[[510,620,'drive'],[620,635,'stop','☕'],[635,700,'drive'],[700,745,'stop','🍴'],[745,855,'drive'],[855,870,'stop','☕⛽',' sel'],[870,990,'drive'],[990,0,'end','B']],
+    win:[690,810,'lunch window'], due:[[630,'break due'],[865,'due']], marks:[[900,'▲ Wolf Creek Pass','pass']], ann:[{t:560,y:14,n:5}] },
+  day1: { from:450, to:990, days:LOOP_DAYS(0),
+    ev:[[480,570,'drive'],[570,585,'stop','☕'],[585,690,'drive'],[645,0,'thru'],[690,735,'stop','🍴'],[735,850,'drive'],[850,865,'stop','☕'],[865,945,'drive'],[945,990,'night','🛏']],
+    win:[690,810,'lunch'], due:[[600,'due'],[855,'due']], marks:[[630,'▲ 12,183 ft','pass']] },
+  day2: { from:480, to:960, days:LOOP_DAYS(1),
+    ev:[[510,615,'drive'],[615,630,'stop','☕'],[630,735,'drive'],[735,780,'stop','🍴',' sel'],[780,900,'drive'],[900,0,'end','C']],
+    win:[690,810,'lunch window',' strong'], due:[[630,'due']], marks:[[800,'▲ Red Mountain Pass','pass']] },
+  day2plain: { from:480, to:960, days:LOOP_DAYS(1),
+    ev:[[510,615,'drive'],[615,630,'stop','☕'],[630,735,'drive'],[735,780,'stop','🍴'],[780,900,'drive'],[900,0,'end','C']],
+    win:[690,810,'lunch'], due:[[630,'due']], marks:[[800,'▲ Red Mountain Pass','pass']] }
+};
+
+/* ---------- rendering ---------- */
+const pt = k => typeof k === 'string' ? P[k] : k;
+function projector(bbox, w, h) {
+  const [x0, y0, x1, y1] = bbox, kx = Math.cos((y0 + y1) / 2 * Math.PI / 180);
+  const s = Math.min(w / ((x1 - x0) * kx), h / (y1 - y0)), cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+  const f = k => { const [lon, lat] = pt(k); return [w / 2 + (lon - cx) * kx * s, h / 2 - (lat - cy) * s]; };
+  f.s = s; return f;
+}
+const d = (pr, arr, close) => arr.map((k, i) => { const [x, y] = pr(k); return (i ? 'L' : 'M') + x.toFixed(1) + ' ' + y.toFixed(1); }).join('') + (close ? 'Z' : '');
+const at = (pr, k, dx = 0, dy = 0) => { const [x, y] = pr(k); return `left:${(x + dx).toFixed(1)}px;top:${(y + dy).toFixed(1)}px`; };
+
+function renderMap(el, cfg, id) {
+  const W = el.offsetWidth, H = el.offsetHeight, pr = projector(cfg.bbox, W, H);
+  const inside = (x, y, m = 6) => x > m && y > m && x < W - m && y < H - m;
+  let s = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" aria-hidden="true"><defs><pattern id="hatch-${id}" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="7" height="7" style="fill:var(--zone-avoid)"/><line x1="0" y1="0" x2="0" y2="7" style="stroke:var(--zone-avoid-line);stroke-width:2"/></pattern></defs>`;
+  s += `<rect class="m-land" width="${W}" height="${H}"/>`;
+  WATER.forEach(p => s += `<path class="m-water" d="${d(pr, p, true)}"/>`);
+  BORDERS.forEach(p => s += `<path class="m-border" d="${d(pr, p)}"/>`);
+  s += `<path class="m-divide" d="${d(pr, DIVIDE)}"/>`;
+  if (cfg.divLab) { const [x, y] = pr(cfg.divLab); s += `<text class="m-divlab" x="${x.toFixed(1)}" y="${y.toFixed(1)}">Continental Divide</text>`; }
+  HIGHWAYS.forEach(p => s += `<path class="m-hwy" d="${d(pr, p)}"/>`);
+  INTERSTATES.forEach(p => s += `<path class="m-int" d="${d(pr, p)}"/>`);
+  let html = '';
+  (cfg.zones || []).forEach(z => {
+    const Z = ZONES[z], pts = Z.poly || [[Z.box[0], Z.box[1]], [Z.box[2], Z.box[1]], [Z.box[2], Z.box[3]], [Z.box[0], Z.box[3]]];
+    const style = Z.type === 'avoid' ? ` style="fill:url(#hatch-${id})"` : '';
+    s += `<path class="z-${Z.type}"${style} d="${d(pr, pts, true)}"/>`;
+    const xs = pts.map(p => pr(p)[0]), ys = pts.map(p => pr(p)[1]);
+    const cx = (Math.min(...xs) + Math.max(...xs)) / 2, by = Math.max(...ys);
+    const o = (cfg.zl || {})[z] || {}, ty = o.pos === 't' ? Math.min(...ys) - 20 : by + 4;
+    html += `<span class="zlab ${Z.type}" style="left:${(cx + (o.dx || 0)).toFixed(1)}px;top:${ty.toFixed(1)}px">${Z.lab}</span>`;
+  });
+  if (cfg.newZone) {
+    const b = cfg.newZone, pts = [[b[0], b[1]], [b[2], b[1]], [b[2], b[3]], [b[0], b[3]]];
+    s += `<path class="z-new" d="${d(pr, pts, true)}"/>`;
+    pts.forEach(p => { const [x, y] = pr(p); s += `<rect class="z-handle" x="${x - 4}" y="${y - 4}" width="8" height="8"/>`; });
+  }
+  if (cfg.band) s += `<path class="m-band" d="${d(pr, cfg.band)}"/>`;
+  (cfg.alts || []).forEach(r => s += `<path class="m-alt" d="${d(pr, r)}"/>`);
+  (cfg.routes || []).forEach(([r]) => s += `<path class="m-case" d="${d(pr, r)}"/>`);
+  (cfg.routes || []).forEach(([r, c]) => s += `<path class="m-route ${c}" d="${d(pr, r)}"/>`);
+  if (cfg.ghost) s += `<path class="m-ghost" d="${d(pr, cfg.ghost)}"/>`;
+  SHIELDS.forEach(([n, lon, lat]) => {
+    const [x, y] = pr([lon, lat]); if (!inside(x, y)) return;
+    const w = 8 + n.length * 6;
+    s += `<g class="m-shield"><rect x="${(x - w / 2).toFixed(1)}" y="${(y - 7).toFixed(1)}" width="${w}" height="14" rx="3"/><text x="${x.toFixed(1)}" y="${(y + 3).toFixed(1)}" text-anchor="middle">${n}</text></g>`;
+  });
+  PASSES.filter(p => (cfg.passes || []).includes(p[0])).forEach(([name, elev, lon, lat]) => {
+    const [x, y] = pr([lon, lat]); if (!inside(x, y)) return;
+    const left = (cfg.pside || {})[name] === 'l';
+    s += `<path class="m-pass" d="M${x.toFixed(1)} ${(y - 5).toFixed(1)} L${(x + 5).toFixed(1)} ${(y + 4).toFixed(1)} L${(x - 5).toFixed(1)} ${(y + 4).toFixed(1)} Z"/>`;
+    s += `<text class="m-plab" x="${(x + (left ? -8 : 8)).toFixed(1)}" y="${(y + 3).toFixed(1)}" text-anchor="${left ? 'end' : 'start'}">${name} · ${elev} ft</text>`;
+  });
+  const hide = new Set(cfg.hide || []), extra = new Set(cfg.extra || []);
+  CITIES.forEach(([k, name, tier, side]) => {
+    if (hide.has(k) || (tier > cfg.tier && !extra.has(k))) return;
+    const [x, y] = pr(k); if (x < -40 || y < 0 || x > W + 40 || y > H) return;
+    const t1 = tier === 1 ? ' t1' : '', left = side === 'l';
+    s += `<circle class="m-dot" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${tier === 1 ? 3 : 2.2}"/>`;
+    s += `<text class="m-lab${t1}" x="${(x + (left ? -6 : 6)).toFixed(1)}" y="${(y + 4).toFixed(1)}" text-anchor="${left ? 'end' : 'start'}">${name}</text>`;
+  });
+  s += '</svg>';
+  (cfg.markers || []).forEach(m => {
+    const inner = m.k === 'thru' ? `<span>${m.t}</span>` : m.t;
+    const kind = m.k === 'pill' ? 'pill' : m.k === 'stop' ? '' : m.k;
+    html += `<div class="mk ${kind} ${m.cls || ''}" style="${at(pr, m.at)}">${inner}</div>`;
+    if (m.lab) html += `<div class="mklab s-${m.side || 'r'} ${m.lcls || ''}" style="${at(pr, m.at)}">${m.lab}</div>`;
+  });
+  (cfg.over || []).forEach(o => html += `<div class="ov" style="${at(pr, o.at, o.dx, o.dy)}">${o.html}</div>`);
+  (cfg.ann || []).forEach(a => html += `<i class="ann" style="${at(pr, a.at, a.dx, a.dy)}">${a.n}</i>`);
+  if (cfg.tools !== null) {
+    const T = [['add', '📍', 'Waypoint'], ['thru', '◇', 'Through point'], ['box', '▭', 'Box zone'], ['poly', '⬠', 'Polygon zone']];
+    html += `<div class="tools">${T.map(([k, g, l]) => `<span class="tool${cfg.tools === k ? ' on' : ''}"><span class="g">${g}</span>${l}</span>`).join('')}<hr><span class="tool"><span class="g">🗂</span>Layers</span></div>`;
+  }
+  html += `<div class="zoomc"><span>+</span><span>−</span></div>`;
+  const miPerPx = 69 / pr.s, nice = [5, 10, 20, 25, 50, 100, 200].find(m => m / miPerPx >= 70) || 200;
+  html += `<div class="scale"><i style="width:${(nice / miPerPx).toFixed(0)}px"></i>${nice} mi</div>`;
+  html += `<div class="attr">© OpenStreetMap contributors · © CARTO</div>`;
+  el.insertAdjacentHTML('afterbegin', s);
+  el.insertAdjacentHTML('beforeend', html);
+}
+
+function renderTimeline(el, cfg) {
+  const W = el.offsetWidth, L = 104, R = 14, span = cfg.to - cfg.from;
+  const X = t => L + (t - cfg.from) / span * (W - L - R);
+  const hm = t => `${String(Math.floor(t / 60)).padStart(2, '0')}:${String(t % 60).padStart(2, '0')}`;
+  let h = '<div class="tl-left">';
+  if (cfg.days) h += cfg.days.map(([n, on]) => `<span class="tl-day${on ? ' on' : ''}">${n}</span>`).join('');
+  else h += cfg.left;
+  h += '</div>';
+  if (cfg.win) h += `<div class="tl-win${cfg.win[3] || ''}" style="left:${X(cfg.win[0])}px;width:${X(cfg.win[1]) - X(cfg.win[0])}px"><span>${cfg.win[2]}</span></div>`;
+  cfg.ev.forEach(([a, b, k, txt = '', extra = '']) => {
+    if (k === 'end') h += `<span class="tl-end" style="left:${X(a)}px">${txt}</span>`;
+    else if (k === 'thru') h += `<span class="tl-thru" style="left:${X(a)}px"></span>`;
+    else h += `<div class="tl-blk tl-${k}${extra}" style="left:${X(a)}px;width:${Math.max(X(b) - X(a) - 1, 3)}px">${txt}</div>`;
+  });
+  (cfg.due || []).forEach(([t, lab]) => { if (t <= cfg.to) h += `<span class="tl-due" style="left:${X(t)}px"><span>${lab}</span></span>`; });
+  (cfg.marks || []).forEach(([t, lab, cls]) => { if (t <= cfg.to) h += `<span class="tl-mark ${cls || ''}" style="left:${X(t)}px"><span>${lab}</span></span>`; });
+  for (let t = Math.ceil(cfg.from / 60) * 60; t <= cfg.to; t += 60) h += `<span class="tl-tick" style="left:${X(t)}px">${hm(t)}</span>`;
+  (cfg.ann || []).forEach(a => h += `<i class="ann" style="left:${X(a.t)}px;top:${a.y}px">${a.n}</i>`);
+  el.innerHTML = h;
+}
+
+/* ---------- scale each 1280-wide frame to the column ---------- */
+function fit() {
+  document.querySelectorAll('.frame-wrap').forEach(w => {
+    const W = +w.dataset.w, Hh = +w.dataset.h, app = w.firstElementChild;
+    w.style.maxWidth = W + 'px'; w.style.aspectRatio = `${W} / ${Hh}`;
+    app.style.width = W + 'px'; app.style.height = Hh + 'px';
+    app.style.transform = `scale(${Math.min(1, w.clientWidth / W)})`;
+  });
+}
+fit();
+addEventListener('resize', fit);
+/* frames have their fixed design size now, so maps and strips can measure themselves */
+document.querySelectorAll('[data-map]').forEach((el, i) => renderMap(el, MAPS[el.dataset.map], i));
+document.querySelectorAll('[data-tl]').forEach(el => renderTimeline(el, TIMELINES[el.dataset.tl]));
+</script>

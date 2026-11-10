@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Road trip planner</title>
+<link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+<link rel="stylesheet" href="vendor/geoman/leaflet-geoman.css">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app">
+  <header class="tb">
+    <span class="brand" title="Road trip planner">🧭 Road trip planner</span>
+    <span class="pick-wrap">
+      <button class="trip-pick trip-btn" id="trip-btn" aria-haspopup="true" aria-label="Trips"><span class="nm"></span><span class="unsaved" hidden>●</span><span class="car">▾</span></button>
+      <div class="trip-panel" id="trip-panel" hidden></div>
+    </span>
+    <button class="btn" id="btn-new" title="Start an empty trip">＋ New trip</button>
+    <button class="btn" id="btn-save" title="Save this trip to trips/">💾 Save</button>
+    <button class="btn" id="btn-here" title="Make where you are the new start, leaving now">📍 Start from here</button>
+    <button class="btn" id="btn-export" title="Day sheets, GPX, Google Maps links">📤 Export</button>
+    <span class="grow"></span>
+    <span class="tb-data" id="tb-data"><span class="dot-wait">●</span> checking Valhalla…</span>
+    <button class="btn" id="btn-settings" title="All the rules the planner follows">⚙ Settings</button>
+  </header>
+
+  <section class="settings" id="view-settings" hidden></section>
+  <section class="exp" id="view-export" hidden></section>
+
+  <div class="body" id="view-map">
+    <div class="mapcol">
+      <div class="map" id="map">
+        <div class="banner" id="banner" hidden></div>
+      </div>
+      <div class="timeline" id="daystrip" hidden></div>
+    </div>
+
+    <aside class="side">
+      <div class="sum">
+        <div class="sum-top"><h3 id="sum-title">Trip</h3><span class="chip" id="sum-chip"></span></div>
+        <div class="sub" id="sum-sub"></div>
+        <div class="stats" id="sum-stats"></div>
+      </div>
+      <nav class="tabs" role="tablist">
+        <button class="tab on" data-tab="itinerary" role="tab">Itinerary</button>
+        <button class="tab" data-tab="waypoints" role="tab">Waypoints</button>
+        <button class="tab" data-tab="zones" role="tab">Zones</button>
+      </nav>
+      <div class="list" id="tab-itinerary"></div>
+      <div class="list" id="tab-waypoints" hidden></div>
+      <div class="list" id="tab-zones" hidden></div>
+      <div class="side-foot" id="side-foot"></div>
+    </aside>
+  </div>
+
+  <footer class="status" id="status">
+    <span id="status-main">No route yet</span>
+    <span class="grow"></span>
+    <span id="status-msg"></span>
+    <span id="status-valhalla"></span>
+  </footer>
+</div>
+
+<div class="menu" id="ctx-menu" hidden></div>
+
+<script src="vendor/leaflet/leaflet.js"></script>
+<script src="vendor/geoman/leaflet-geoman.js"></script>
+<script type="module" src="app.js"></script>
+</body>
+</html>

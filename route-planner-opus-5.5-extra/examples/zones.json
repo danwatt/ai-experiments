@@ -1,0 +1,97 @@
+{
+  "version": 1,
+  "zones": [
+    {
+      "id": "boulder-downtown",
+      "name": "Boulder downtown",
+      "type": "avoid",
+      "shape": "rectangle",
+      "ring": [
+        [-105.295, 40.005],
+        [-105.255, 40.005],
+        [-105.255, 40.03],
+        [-105.295, 40.03],
+        [-105.295, 40.005]
+      ]
+    },
+    {
+      "id": "denver-metro",
+      "name": "Denver metro",
+      "type": "no_stops",
+      "shape": "rectangle",
+      "ring": [
+        [-105.15, 39.55],
+        [-104.75, 39.55],
+        [-104.75, 39.92],
+        [-105.15, 39.92],
+        [-105.15, 39.55]
+      ]
+    },
+    {
+      "id": "montrose",
+      "name": "Montrose",
+      "type": "no_meals",
+      "shape": "rectangle",
+      "ring": [
+        [-107.93, 38.44],
+        [-107.83, 38.44],
+        [-107.83, 38.52],
+        [-107.93, 38.52],
+        [-107.93, 38.44]
+      ]
+    },
+    {
+      "id": "glenwood-springs",
+      "name": "Glenwood Springs",
+      "type": "prefer",
+      "shape": "rectangle",
+      "ring": [
+        [-107.38, 39.5],
+        [-107.28, 39.5],
+        [-107.28, 39.58],
+        [-107.38, 39.58],
+        [-107.38, 39.5]
+      ]
+    },
+    {
+      "id": "aspen",
+      "name": "Aspen",
+      "type": "no_overnight",
+      "shape": "rectangle",
+      "ring": [
+        [-106.9, 39.15],
+        [-106.75, 39.15],
+        [-106.75, 39.23],
+        [-106.9, 39.23],
+        [-106.9, 39.15]
+      ]
+    },
+    {
+      "id": "glenwood-canyon",
+      "name": "I-70 Glenwood Canyon",
+      "type": "avoid",
+      "shape": "rectangle",
+      "ring": [
+        [-107.32, 39.55],
+        [-107.0, 39.55],
+        [-107.0, 39.62],
+        [-107.32, 39.62],
+        [-107.32, 39.55]
+      ]
+    },
+    {
+      "id": "dfw-core",
+      "name": "DFW core",
+      "type": "no_overnight",
+      "shape": "polygon",
+      "ring": [
+        [-97.1, 32.6],
+        [-96.6, 32.6],
+        [-96.55, 33.0],
+        [-96.95, 33.1],
+        [-97.2, 32.9],
+        [-97.1, 32.6]
+      ]
+    }
+  ]
+}
