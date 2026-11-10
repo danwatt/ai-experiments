@@ -32,6 +32,8 @@ jobs:
             --exclude='/_site' --exclude='.git*' --exclude='.claude' --exclude='.idea' \
             --exclude='.serena' --exclude='scripts' --exclude='.DS_Store' \
             --exclude='node_modules' --exclude='.venv' \
+            --exclude='tests/' --exclude='**/data/raw/' --exclude='__pycache__' \
+            --exclude='.pytest_cache' --exclude='.dockerignore' \
             ./ _site/
           scripts/render-md.sh _site
 
