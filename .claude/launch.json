@@ -234,6 +234,18 @@
         "games/factorio-circuit-simulator-opus-5.5-high"
       ],
       "port": 8823
+    },
+    {
+      "name": "politics",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8827",
+        "-d",
+        "politics"
+      ],
+      "port": 8827
     }
   ]
 }

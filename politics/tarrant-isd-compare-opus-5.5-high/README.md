@@ -1,5 +1,7 @@
 # Tarrant County ISDs compared
 
+> Merged into the [Tarrant County schools](../tarrant-county-schools-fable-5.2-medium/) page (county view). This page is kept as it was built, with its original prompt.
+
 `index.html` is one self-contained page (no external scripts, data inlined). Open it directly.
 
 It compares the 16 independent school districts in Tarrant County on the same measures as the [Fort Worth ISD explorer](../fwisd-budget-opus-5.5-high/), using the same fund and program categories.

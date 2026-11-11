@@ -1,5 +1,7 @@
 # Fort Worth area schools
 
+> Merged into the [Tarrant County schools](../tarrant-county-schools-fable-5.2-medium/) page (schools view, now all 16 districts). This page is kept as it was built, with its original prompt.
+
 School-by-school spending, federal grants and USDA school meals for four districts in northwest Tarrant County: Fort Worth, Eagle Mountain-Saginaw, Lake Worth and Castleberry. It covers FY2011–FY2025, with meal claims through 2025-26.
 
 `index.html` holds all the data (about 0.33 MB). The map loads [Leaflet](https://leafletjs.com/) from cdnjs and base-map tiles from Esri, so it needs an internet connection. Everything else works offline.

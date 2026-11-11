@@ -1,5 +1,7 @@
 # Fort Worth ISD budget explorer
 
+> Merged into the [Tarrant County schools](../tarrant-county-schools-fable-5.2-medium/) page (district view). This page is kept as it was built, with its original prompt.
+
 `index.html` is one self-contained page (no external scripts, data inlined). Open it directly.
 
 ## What's in it
