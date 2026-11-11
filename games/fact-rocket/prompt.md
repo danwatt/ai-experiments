@@ -3,8 +3,8 @@
 - **Model:** claude-fable-5-2, claude-opus-5-5
 - **Effort:** high, medium
 - **Session(s):** 7fed538a-66d8-4213-8d85-43dd474e6b3a eac6e170-3645-4413-892c-d3d7b7f71ea2
-- **Tokens:** input 180, output 112694, cache read 12308682, cache write 595884
-- **Cost (tokscale estimate):** $11.01
+- **Tokens:** input 200, output 125882, cache read 13888920, cache write 615338
+- **Cost (tokscale estimate):** $12.17
 
 ## You
 
@@ -331,6 +331,54 @@ Things to know:
 - **Best times still saved** in data, just not shown.
 - **Existing stars count** toward unlocks right away.
 - **Not tested:** iPad mini size, and unlock thresholds are my guess (~15–25 stars per round, so first unlock after round 2, last after ~45 rounds). Costs sit in `SKINS` at top of script.
+
+## You
+
+Commit the working tree changes with a sensible message.
+
+## Claude
+
+Committed `d95680a` on `master`: "Fact Rocket: rocket unlocks, mastery progress and kid star map". Not pushed; `20244ed` from earlier also still local.
+
+- **In commit:** [index.html](games/fact-rocket/index.html), regenerated [prompt.md](games/fact-rocket/prompt.md), four new screenshots in `prompt-assets/` (015–018).
+- **Left out:** same unrelated edits as before — `politics/texas-isd-statewide-opus-5.5-high/`, `route-planner-opus-5.5-extra/`, `watt-logo-variations/`.
+
+## You
+
+Lets address items 10-12, skipping 9 for now
+
+## Claude
+
+Edits in. Measuring layout at phone and iPad sizes.
+
+![screenshot 19](prompt-assets/019.webp)
+
+Items 10–12 done. Not committed. Checked in desktop browser at emulated sizes only; not on real iPhone or iPad.
+
+**10. Home-screen app.**
+- New [manifest.webmanifest](games/fact-rocket/manifest.webmanifest), [icon.svg](games/fact-rocket/icon.svg), and PNG icons at 180 / 192 / 512. All load (HTTP 200).
+- [index.html](games/fact-rocket/index.html) links them, plus iOS full-screen tags. "Add to Home Screen" in Safari gives app icon, no browser bars.
+- `100vh` now `100dvh`; padding respects notch and home-bar safe areas.
+
+**11. Keypad on touch-down.** Keys fire on `pointerdown`, not release. Keyboard focus + Enter still works. Wrong-answer flow driven through synthetic pointer taps: digits typed, hint shown.
+
+**12. iPad mini portrait bigger.** Card to 640px wide (was 520), keypad to 560px (was 420), keys ~91–97px tall (was 70), larger digits, hint and tag.
+
+Keypad position, measured in three card states (one-line, stacked, wrong-answer hint with two ten-frames):
+
+| Screen | Keypad top (all three states) | Scrolls? |
+|---|---|---|
+| iPad mini portrait 768×954 | same | no |
+| iPad mini 6 portrait 744×1026 | same | no |
+| iPad mini 6 landscape 1133×670 | same | no |
+| Small phone 375×667 | same | no |
+
+Also fixed in passing: landscape at Safari height (~690px) scrolled by ~10px before this change. Screens under 700px tall now use tighter gaps.
+
+Things to know:
+- **Home-screen app starts empty on iOS.** Installed app keeps its own storage, separate from Safari. Progress made in Safari won't show there, and no import yet (item 9 skipped). Pick one and stick with it, or do import first.
+- **No offline support.** Still needs network to load; no service worker added.
+- **Real touch untested.** Touch-down firing and safe-area padding need a look on actual device.
 
 ## You
 

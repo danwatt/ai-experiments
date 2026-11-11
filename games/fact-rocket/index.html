@@ -2,8 +2,16 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b1033">
+<!-- "Add to Home Screen" runs it full screen like an app -->
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Fact Rocket">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Fact Rocket</title>
 <style>
 :root{
@@ -17,7 +25,8 @@ body{margin:0;background:radial-gradient(ellipse at 50% -10%,#2c3290 0%,var(--bg
   font-family:ui-rounded,"SF Pro Rounded","Nunito","Avenir Next","Segoe UI",system-ui,sans-serif;overflow-x:hidden;
   -webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
 #sky{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
-main{position:relative;z-index:1;max-width:720px;margin:0 auto;padding:16px 16px 36px;min-height:100vh;display:flex;flex-direction:column}
+main{position:relative;z-index:1;max-width:720px;margin:0 auto;display:flex;flex-direction:column;min-height:100vh;min-height:100dvh;
+  padding:calc(16px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) calc(36px + env(safe-area-inset-bottom)) calc(16px + env(safe-area-inset-left))}
 .screen{display:none;flex:1;flex-direction:column}
 .screen.on{display:flex}
 button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;touch-action:manipulation}
@@ -136,6 +145,27 @@ button:focus-visible{outline:4px solid var(--gold);outline-offset:3px}
 .pad .del{font-size:24px}
 .burst{position:absolute;left:50%;top:-8px;transform:translateX(-50%);font-size:24px;font-weight:900;color:var(--gold);pointer-events:none;
   animation:floatUp 1.1s ease-out forwards;white-space:nowrap;text-shadow:0 2px 0 rgba(0,0,0,.45);z-index:3}
+
+/* tall tablets (iPad mini portrait): use the spare room for a bigger card and keypad */
+@media (min-width:700px) and (min-height:900px){
+  .card{--vf:clamp(46px,min(12vw,9vh),110px);max-width:640px}
+  .problem{font-size:min(120px,13.5cqi)}
+  .card.helpmode .problem{font-size:clamp(30px,10cqi,72px)}
+  .help{--dot:clamp(16px,4.5cqi,34px)}
+  .help .tip{font-size:clamp(15px,3.6cqi,24px)}
+  .tag{font-size:16px}
+  .streak{font-size:22px}
+  .pad{max-width:560px;gap:12px;margin-top:26px}
+  .pad button{height:clamp(70px,9.5vh,100px);font-size:40px;border-radius:22px}
+  .pad .del{font-size:32px}
+}
+
+/* short screens (small phones, iPad mini on its side in Safari): tighten gaps so the mission never scrolls */
+@media (max-height:700px){
+  main{padding-bottom:calc(12px + env(safe-area-inset-bottom))}
+  .streak{margin:2px 0}
+  .pad{margin-top:14px}
+}
 
 /* ---------- results ---------- */
 .launchzone{position:relative;height:250px;display:flex;justify-content:center;margin-top:6px}
@@ -675,7 +705,13 @@ let G = null;
 
 $('#pad').innerHTML = [1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => `<button data-k="${n}">${n}</button>`).join('')
   + `<button data-k="del" class="del" aria-label="Erase">⌫</button><button data-k="0">0</button><button data-k="ok" class="ok" aria-label="Check">✓</button>`;
-$('#pad').addEventListener('click', e => { const b = e.target.closest('button'); if (b) press(b.dataset.k); });
+// Keys fire on touch-down, not on release, so the pad feels instant and timing is accurate.
+// Clicks are still handled when they come from the keyboard (detail 0), for focus + Enter/Space.
+$('#pad').addEventListener('pointerdown', e => {
+  const b = e.target.closest('button');
+  if (b && e.button === 0) press(b.dataset.k);
+});
+$('#pad').addEventListener('click', e => { const b = e.target.closest('button'); if (b && e.detail === 0) press(b.dataset.k); });
 document.addEventListener('keydown', e => {
   if (!G || !$('#play').classList.contains('on')) return;
   let k = null;
