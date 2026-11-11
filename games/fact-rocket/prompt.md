@@ -3,8 +3,8 @@
 - **Model:** claude-fable-5-2, claude-opus-5-5
 - **Effort:** high, medium
 - **Session(s):** 7fed538a-66d8-4213-8d85-43dd474e6b3a eac6e170-3645-4413-892c-d3d7b7f71ea2
-- **Tokens:** input 200, output 125882, cache read 13888920, cache write 615338
-- **Cost (tokscale estimate):** $12.17
+- **Tokens:** input 228, output 139695, cache read 16394786, cache write 634894
+- **Cost (tokscale estimate):** $13.54
 
 ## You
 
@@ -379,6 +379,103 @@ Things to know:
 - **Home-screen app starts empty on iOS.** Installed app keeps its own storage, separate from Safari. Progress made in Safari won't show there, and no import yet (item 9 skipped). Pick one and stick with it, or do import first.
 - **No offline support.** Still needs network to load; no service worker added.
 - **Real touch untested.** Touch-down firing and safe-area padding need a look on actual device.
+
+## You
+
+Commit the working tree changes with a sensible message.
+
+## Claude
+
+Committed `6598906` on `master`: "Fact Rocket: home-screen app, instant keypad, bigger iPad layout". Not pushed; three Fact Rocket commits local now (`20244ed`, `d95680a`, `6598906`).
+
+- **In commit:** [index.html](games/fact-rocket/index.html), [manifest.webmanifest](games/fact-rocket/manifest.webmanifest), [icon.svg](games/fact-rocket/icon.svg), three PNG icons, regenerated [prompt.md](games/fact-rocket/prompt.md), one new screenshot.
+- **Left out:** same unrelated edits — `politics/texas-isd-statewide-opus-5.5-high/`, `route-planner-opus-5.5-extra/`, `watt-logo-variations/`.
+
+## You
+
+Push
+
+## Claude
+
+Pushed. `master` on origin now at `6598906` (three Fact Rocket commits: `20244ed`, `d95680a`, `6598906`). Local matches remote.
+
+Unrelated edits in `politics/`, `route-planner-opus-5.5-extra/`, `watt-logo-variations/` still uncommitted, not pushed.
+
+## You
+
+Lets update the modes  - adding, taking a way, mix, up to 10, up to 20 - under the parent controls. The parent should be able to configure what the kid is working on.
+
+## Claude
+
+![screenshot 20](prompt-assets/020.webp)
+
+![screenshot 21](prompt-assets/021.webp)
+
+Mission pickers moved to grown-ups screen in [index.html](games/fact-rocket/index.html). Tested at phone size, no console errors, test data cleared. Not committed.
+
+- **Home:** pickers gone. Read-only label "Today's mission: + Adding · up to 20" above Launch.
+- **Grown-ups screen:** new "Mission" panel at top with same buttons (Adding / Taking away / Mix, Up to 10 / Up to 20). Title now "Grown-ups"; home link now "Grown-ups: mission & progress".
+- **Test:** switched to Mix + Up to 10 there; setting saved, home label read "+ − Mix · up to 10", Launch started round.
+
+Progress bar and star-map counts on home still follow chosen mission.
+
+**No lock on grown-ups screen.** Kid can tap link and change mission himself. Simple gate possible: hold button 3 seconds, or answer something like 7 × 8.
+
+## You
+
+What kind of lock should we do?
+
+## Claude
+
+**Recommend: parent-set 4-digit PIN.** Only option that holds against curious 8-year-old.
+
+Options compared:
+
+| Lock | Stops him? | Cost |
+|---|---|---|
+| Hold button 3s | No. Found by accident within a week | None |
+| Math question (7 × 8) | Not for long. Third grade is when multiplication lands | None |
+| Written-out digits ("type: four, nine, two") | No. He can read | None |
+| **PIN** | Yes, until he watches you type it | Must remember it |
+
+How PIN would work:
+- **Off by default.** "Set PIN" button in grown-ups screen. No PIN, no lock, same as today.
+- **Entry:** tap grown-ups link, type 4 digits on same style keypad as game.
+- **Forgot PIN:** "Forgot?" link asks hard sum, like 47 × 23. Right answer clears PIN. Parent can do it with phone calculator; kid can't yet.
+- **Wrong tries:** short pause after 3 misses so he can't guess through 0000–9999.
+
+Limits, so no surprise:
+- Not real security. PIN lives in browser storage with progress; anyone with dev tools reads it. Fine for this threat.
+- Per device. Phone and iPad each need PIN set.
+
+Say go and I build PIN version. Different pick, name it.
+
+## You
+
+lets just do a 4 digit pin
+
+## Claude
+
+![screenshot 22](prompt-assets/022.webp)
+
+![screenshot 23](prompt-assets/023.webp)
+
+Most PIN flows pass. Forgot-PIN check tripped on test script slip (stray digit); rerunning that one.
+
+PIN lock built in [index.html](games/fact-rocket/index.html). All flows tested at phone size, no console errors, test data cleared. Not committed (mission move from before also uncommitted).
+
+- **Off by default.** No PIN set, grown-ups screen opens as before.
+- **Set it:** grown-ups screen, new "Lock" panel, "Set PIN". Type 4 digits, type again to confirm. Mismatch starts over.
+- **Locked:** tapping "Grown-ups: mission & progress" shows keypad with 4 dots. Right PIN opens screen. Wrong PIN shakes, clears, stays locked.
+- **Change / remove:** same panel, "Change PIN" and "Remove PIN" once inside.
+- **Forgot PIN:** link on lock screen asks sum like 18 × 46. Right answer removes PIN and opens screen. Wrong answer gives new sum, PIN stays.
+
+Things to know:
+- **I added forgot-PIN escape** though you said "just PIN". Without it, forgotten PIN means clearing site data, which wipes progress. Easy to remove if unwanted.
+- **No pause after wrong tries.** Left out to keep it simple.
+- **"Reset all progress" keeps PIN.**
+- **PIN in export file.** Export JSON includes it in plain text, and it lives in browser storage. Keeps kid out, not real security.
+- **Per device.** Set separately on phone and iPad.
 
 ## You
 

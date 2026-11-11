@@ -64,6 +64,8 @@ button:focus-visible{outline:4px solid var(--gold);outline-offset:3px}
 .today{display:flex;justify-content:center;align-items:center;gap:6px;margin-top:12px;font-weight:800;color:var(--soft);font-size:15px}
 .today i{width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,.35);display:inline-block}
 .today i.on{background:var(--gold);border-color:var(--gold);box-shadow:0 0 8px rgba(255,200,61,.7)}
+.mission{text-align:center;font-size:20px}
+.mission .pill{display:inline-block;padding:10px 20px}
 .seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:8px;margin-bottom:10px}
 .seg button{background:var(--glass);border:2px solid var(--glass-line);border-radius:16px;padding:14px 6px;font-weight:800;font-size:17px;line-height:1.15}
 .seg button small{display:block;font-size:12px;font-weight:700;color:var(--muted);margin-top:3px}
@@ -190,7 +192,12 @@ button:focus-visible{outline:4px solid var(--gold);outline-offset:3px}
 
 /* ---------- grown-ups ---------- */
 #stats{user-select:text;-webkit-user-select:text}
-#stats h1,#map h1{font-size:26px;margin:0}
+#stats h1,#map h1,#lock h1{font-size:26px;margin:0}
+.locknote{text-align:center;color:var(--soft);font-weight:700;font-size:17px;margin:34px 0 0;min-height:48px;line-height:1.4}
+.pins{display:flex;justify-content:center;align-items:center;gap:16px;height:56px;font-size:40px;font-weight:900;font-variant-numeric:tabular-nums}
+.pins i{width:20px;height:20px;border-radius:50%;border:2px solid rgba(255,255,255,.55)}
+.pins i.on{background:#fff;border-color:#fff}
+.pins.shake{animation:shake .4s}
 .panel{background:var(--glass);border:1px solid var(--glass-line);border-radius:20px;padding:16px;margin-top:14px}
 .panel h2{font-size:16px;margin:0 0 4px}
 .panel .note{font-size:13px;color:var(--soft);margin:0 0 12px;line-height:1.45}
@@ -256,16 +263,8 @@ td.num,th.num{text-align:right}
       <div class="today" id="today"></div>
     </div>
 
-    <div class="lbl">Pick your mission</div>
-    <div class="seg" id="opSeg">
-      <button data-op="add">+<small>Adding</small></button>
-      <button data-op="sub">−<small>Taking away</small></button>
-      <button data-op="mix">+ −<small>Mix</small></button>
-    </div>
-    <div class="seg" id="rangeSeg">
-      <button data-range="10">Up to 10</button>
-      <button data-range="20">Up to 20</button>
-    </div>
+    <div class="lbl">Today’s mission</div>
+    <div class="mission"><span class="pill" id="missionLine"></span></div>
 
     <button class="big" id="launchBtn">🚀 Launch!</button>
     <button class="prog" id="progBtn" aria-label="Open my star map">
@@ -284,7 +283,7 @@ td.num,th.num{text-align:right}
     </div>
 
     <div class="warn" id="warn" hidden>Progress can’t be saved in this browser (private window?). It will reset when the page closes.</div>
-    <button class="link" id="parentBtn">Grown-ups: see progress</button>
+    <button class="link" id="parentBtn">Grown-ups: mission &amp; progress</button>
   </section>
 
   <!-- PLAY -->
@@ -350,11 +349,46 @@ td.num,th.num{text-align:right}
     </div>
   </section>
 
+  <!-- PIN LOCK for the grown-ups screen -->
+  <section id="lock" class="screen" aria-label="Grown-ups lock">
+    <div class="top">
+      <h1 id="lockTitle"></h1>
+      <button class="iconbtn" id="lockBack" aria-label="Back">✕</button>
+    </div>
+    <p class="locknote" id="lockNote" aria-live="polite"></p>
+    <div class="pins" id="pins"></div>
+    <div class="pad" id="lockPad"></div>
+    <button class="link" id="forgotBtn">Forgot PIN?</button>
+  </section>
+
   <!-- GROWN-UPS -->
   <section id="stats" class="screen" aria-label="Progress for grown-ups">
     <div class="top">
-      <h1>Progress</h1>
+      <h1>Grown-ups</h1>
       <button class="iconbtn" id="statsBack" aria-label="Back">✕</button>
+    </div>
+
+    <div class="panel">
+      <h2>Mission</h2>
+      <p class="note">Choose what he practices. The home screen shows this mission and only has a Launch button.</p>
+      <div class="seg" id="opSeg">
+        <button data-op="add">+<small>Adding</small></button>
+        <button data-op="sub">−<small>Taking away</small></button>
+        <button data-op="mix">+ −<small>Mix</small></button>
+      </div>
+      <div class="seg" id="rangeSeg" style="margin-bottom:0">
+        <button data-range="10">Up to 10</button>
+        <button data-range="20">Up to 20</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Lock</h2>
+      <p class="note" id="pinNote"></p>
+      <div class="statbtns">
+        <button id="pinSet"></button>
+        <button id="pinClear" class="danger">Remove PIN</button>
+      </div>
     </div>
 
     <div class="panel">
@@ -652,6 +686,7 @@ function renderHome() {
   $('#starTotal').textContent = `⭐ ${S.stars}`;
   document.querySelectorAll('#opSeg button').forEach(b => b.classList.toggle('sel', b.dataset.op === op));
   document.querySelectorAll('#rangeSeg button').forEach(b => b.classList.toggle('sel', +b.dataset.range === range));
+  $('#missionLine').textContent = `${{add: '+', sub: '−', mix: '+ −'}[op]} ${OP_NAME[op]} · up to ${range}`;
 
   const t = tally(op, range);
   $('#barM').style.width = t.mastered / t.total * 100 + '%';
@@ -698,7 +733,70 @@ $('#progBtn').addEventListener('click', () => {
   renderMap(); show('map');
 });
 $('#launchBtn').addEventListener('click', startBatch);
-$('#parentBtn').addEventListener('click', () => { renderStats(); show('stats'); });
+$('#parentBtn').addEventListener('click', () => S.settings.pin ? openLock('enter') : openStats());
+
+/* ================= PIN lock ================= */
+// Keeps a child out of the grown-ups screen. Not real security: the PIN sits in localStorage.
+// modes: "enter" (unlock), "set" (choose, then confirm), "forgot" (a hard sum removes the PIN)
+let L = null;
+const openStats = () => { L = null; renderStats(); show('stats'); };
+function openLock(mode, msg) {
+  L = {mode, input: '', first: null, need: 4};
+  if (mode === 'forgot') {
+    const a = 12 + Math.floor(Math.random() * 38), b = 12 + Math.floor(Math.random() * 38);
+    L.q = `${a} × ${b}`; L.ans = String(a * b); L.need = L.ans.length;
+  }
+  renderLock(msg); show('lock');
+}
+function renderLock(msg) {
+  const m = L.mode;
+  $('#lockTitle').textContent = m === 'enter' ? 'Grown-ups only' : m === 'forgot' ? 'Forgot PIN' : L.first ? 'Type it again' : 'Choose a PIN';
+  $('#lockNote').textContent = (msg ? msg + ' ' : '') + (m === 'enter' ? 'Type the 4-digit PIN.'
+    : m === 'forgot' ? `What is ${L.q}? The right answer removes the PIN.`
+    : L.first ? 'Type the same 4 digits to confirm.' : 'Pick 4 digits.');
+  $('#pins').innerHTML = m === 'forgot' ? (L.input || '?')
+    : Array.from({length: 4}, (_, i) => `<i class="${i < L.input.length ? 'on' : ''}"></i>`).join('');
+  $('#forgotBtn').hidden = m !== 'enter';
+}
+function lockFail(msg) {
+  L.input = '';
+  renderLock(msg);
+  const p = $('#pins'); p.classList.remove('shake'); void p.offsetWidth; p.classList.add('shake');
+  tone([247, 196], {type: 'triangle', gap: 0.14, dur: 0.2, vol: 0.12});
+}
+function lockPress(k) {
+  if (!L) return;
+  if (k === 'del') { L.input = L.input.slice(0, -1); return renderLock(); }
+  if (L.input.length >= L.need) return;
+  L.input += k;
+  renderLock();
+  if (L.input.length < L.need) return;
+  const v = L.input;
+  if (L.mode === 'enter') return v === S.settings.pin ? openStats() : lockFail('Not the PIN.');
+  if (L.mode === 'forgot') {
+    if (v !== L.ans) { openLock('forgot', 'Not right. Try this one.'); return; }
+    delete S.settings.pin; save(); return openStats();
+  }
+  if (!L.first) { L.first = v; L.input = ''; return renderLock(); }
+  if (v !== L.first) { L.first = null; return lockFail('Those didn’t match.'); }
+  S.settings.pin = v; save(); openStats();
+}
+$('#lockPad').innerHTML = [1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => `<button data-k="${n}">${n}</button>`).join('')
+  + `<span></span><button data-k="0">0</button><button data-k="del" class="del" aria-label="Erase">⌫</button>`;
+$('#lockPad').addEventListener('pointerdown', e => { const b = e.target.closest('button'); if (b && e.button === 0) lockPress(b.dataset.k); });
+$('#lockPad').addEventListener('click', e => { const b = e.target.closest('button'); if (b && e.detail === 0) lockPress(b.dataset.k); });
+document.addEventListener('keydown', e => {
+  if (!L || !$('#lock').classList.contains('on')) return;
+  if (/^[0-9]$/.test(e.key)) lockPress(e.key);
+  else if (e.key === 'Backspace' || e.key === 'Delete') lockPress('del');
+});
+$('#forgotBtn').addEventListener('click', () => openLock('forgot'));
+$('#lockBack').addEventListener('click', () => {
+  if (L && L.mode === 'set') return openStats();
+  L = null; renderHome(); show('home');
+});
+$('#pinSet').addEventListener('click', () => openLock('set'));
+$('#pinClear').addEventListener('click', () => { delete S.settings.pin; save(); renderStats(); });
 
 /* ================= play ================= */
 let G = null;
@@ -1005,6 +1103,12 @@ function renderStats() {
       B.length > 5 && earlyAvgMs ? `first 5 rockets: ${secs(earlyAvgMs)}s` : 'last 5 rockets'],
     [mastered, 'Mastered', `of ${statuses.length} facts`],
   ].map(([v, l, e]) => `<div class="tile"><b>${v}</b><span>${l}</span><em>${e}</em></div>`).join('');
+
+  const pin = !!S.settings.pin;
+  $('#pinNote').textContent = pin ? 'This screen asks for your 4-digit PIN. It is saved in this browser only.'
+    : 'No PIN set: anyone can open this screen. Set a 4-digit PIN to keep the mission and progress settings to yourself.';
+  $('#pinSet').textContent = pin ? 'Change PIN' : 'Set PIN';
+  $('#pinClear').hidden = !pin;
 
   renderGrid();
   renderTricky();
