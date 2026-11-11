@@ -234,6 +234,9 @@ td.num,th.num{text-align:right}
 .statbtns button{padding:10px 14px;border-radius:12px;background:rgba(255,255,255,.1);font-weight:800;font-size:14px}
 .statbtns .danger{background:rgba(255,107,107,.18);color:#ffc3bd}
 .none{color:var(--soft);font-size:14px}
+#xferText{display:block;width:100%;margin-top:12px;padding:10px;border-radius:12px;border:1px solid var(--glass-line);background:rgba(0,0,0,.3);color:#fff;
+  font:16px/1.35 ui-monospace,Menlo,monospace;word-break:break-all;resize:vertical;user-select:text;-webkit-user-select:text}
+#xferMsg:empty{display:none}
 
 /* ---------- motion ---------- */
 @keyframes bob{50%{transform:translateY(-10px)}}
@@ -435,6 +438,24 @@ td.num,th.num{text-align:right}
       <h2>Recent rockets</h2>
       <p class="note">Flight time counts only time spent on cards (not feedback animations or time with the tab hidden). Avg answer is thinking time per fact: until he starts typing his first answer (capped at 20s).</p>
       <div id="history"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Move to another device</h2>
+      <p class="note">Get a transfer code here, send it to the other device (copy and paste, Messages, AirDrop), then enter it there. Progress on both devices is combined, so nothing is lost. The PIN is not included.</p>
+      <div class="statbtns">
+        <button id="xferGet">Get transfer code</button>
+        <button id="xferEnter">Enter transfer code</button>
+      </div>
+      <div id="xferBox" hidden>
+        <textarea id="xferText" rows="4" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" aria-label="Transfer code"></textarea>
+        <div class="statbtns">
+          <button id="xferCopy">Copy code</button>
+          <button id="xferShare">Share…</button>
+          <button id="xferLoad">Load progress</button>
+        </div>
+      </div>
+      <p id="xferMsg" class="detail" role="status"></p>
     </div>
 
     <div class="panel">
@@ -675,6 +696,12 @@ function fmtTime(ms) {
   return s < 60 ? `${s}s` : `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 }
 const secs = ms => (ms / 1000).toFixed(1);
+// Average thinking time for a rocket. Rockets that arrived by transfer code carry only the average.
+const batchAvg = b => {
+  if (b.avg != null) return b.avg;
+  const first = b.items.filter(x => !x.retry);
+  return first.length ? first.reduce((t, x) => t + x.ms, 0) / first.length : null;
+};
 const isToday = t => new Date(t).toDateString() === new Date().toDateString();
 const planetAt = i => i < PLANETS.length ? PLANETS[i]
   : [`Star System ${i + 1}`, ...PLANETS[i % PLANETS.length].slice(1)];
@@ -1157,7 +1184,7 @@ let gridOp = 'add', selKey = null;
 function renderStats() {
   const B = S.batches;
   const avgFirst = list => {
-    const ms = list.flatMap(b => b.items.filter(x => !x.retry).map(x => x.ms));
+    const ms = list.map(batchAvg).filter(x => x !== null);
     return ms.length ? ms.reduce((t, x) => t + x, 0) / ms.length : null;
   };
   const last10 = B.slice(-10);
@@ -1289,11 +1316,10 @@ function renderHistory() {
   if (!rows.length) { $('#history').innerHTML = '<p class="none">No rockets launched yet.</p>'; return; }
   $('#history').innerHTML = `<table><thead><tr><th>When</th><th>Mission</th><th class="num">First try</th><th class="num">Time</th><th class="num">Avg answer</th></tr></thead><tbody>` +
     rows.map(b => {
-      const first = b.items.filter(x => !x.retry);
-      const avg = first.reduce((t, x) => t + x.ms, 0) / (first.length || 1);
+      const avg = batchAvg(b);
       const d = new Date(b.t);
       return `<tr><td>${d.toLocaleDateString(undefined, {month: 'short', day: 'numeric'})} ${d.toLocaleTimeString(undefined, {hour: 'numeric', minute: '2-digit'})}</td>` +
-        `<td>${OP_NAME[b.op]}, ${sizeLabel(b.op, b.range)}</td><td class="num">${b.first}/${BATCH}</td><td class="num">${fmtTime(b.ms)}</td><td class="num">${secs(avg)}s</td></tr>`;
+        `<td>${OP_NAME[b.op]}, ${sizeLabel(b.op, b.range)}</td><td class="num">${b.first}/${BATCH}</td><td class="num">${fmtTime(b.ms)}</td><td class="num">${avg === null ? '–' : secs(avg) + 's'}</td></tr>`;
     }).join('') + '</tbody></table>';
 }
 
@@ -1312,6 +1338,123 @@ $('#resetBtn').addEventListener('click', () => {
   S = structuredClone(DEFAULT);
   S.settings = settings;
   save(); selKey = null; renderStats();
+});
+
+/* ================= transfer code ================= */
+// A transfer code is the progress, packed small, gzipped and base64url-encoded: "FR1z.<data>".
+// It carries facts, rockets (without per-card detail), stars and the mission. Never the PIN.
+const sec = t => t ? Math.round(t / 1000) : 0;
+
+function packState() {
+  const f = {};
+  for (const [k, s] of Object.entries(S.facts))
+    f[k] = [s.n, s.ok, s.sumOk, sec(s.last), ...s.recent.flatMap(x => [x.ok ? x.ms : -x.ms - 1, sec(x.t)])];
+  const {op, range, level, skin} = S.settings;
+  return {v: 1, at: sec(Date.now()), set: [op, range, level, skin], stars: S.stars, launches: S.launches, best: S.best, f,
+    b: S.batches.map(b => [sec(b.t), b.op, b.range, b.ms, b.first, b.stars, b.streak, Math.round(batchAvg(b) ?? -1)])};
+}
+
+// Turn a decoded code back into state-shaped data, dropping anything that is not what we expect.
+function unpackState(P) {
+  const num = x => typeof x === 'number' && isFinite(x) && x >= 0;
+  if (!P || P.v !== 1 || typeof P.f !== 'object' || !Array.isArray(P.b)) throw new Error('bad code');
+  const facts = {};
+  for (const [k, a] of Object.entries(P.f)) {
+    if (!parseKey(k) || !Array.isArray(a) || a.length < 4 || a.length % 2 || !a.every(x => typeof x === 'number' && isFinite(x))) continue;
+    const recent = [];
+    for (let i = 4; i < a.length && recent.length < 6; i += 2) {
+      const e = a[i] >= 0 ? {ms: a[i], ok: true} : {ms: -a[i] - 1, ok: false};
+      if (a[i + 1] > 0) e.t = a[i + 1] * 1000;
+      recent.push(e);
+    }
+    facts[k] = {n: a[0], ok: a[1], sumOk: a[2], recent, last: a[3] * 1000};
+  }
+  const batches = P.b.filter(b => Array.isArray(b) && OP_NAME[b[1]] && [0, 2, 3, 4, 5, 6].every(i => num(b[i])))
+    .map(b => ({t: b[0] * 1000, op: b[1], range: b[2], ms: b[3], first: b[4], stars: b[5], streak: b[6], avg: b[7] >= 0 ? b[7] : null, items: []}));
+  const best = {};
+  for (const [k, v] of Object.entries(P.best || {})) if (/^[a-z]+-\d+$/.test(k) && num(v)) best[k] = v;
+  const [op, range, level, skin] = Array.isArray(P.set) ? P.set : [];
+  const set = OP_NAME[op] && [10, 20].includes(range) && [1, 2].includes(level) ? {op, range, level, skin: SKINS[skin] ? skin : 0} : null;
+  return {at: num(P.at) ? P.at * 1000 : 0, facts, batches, best, set, stars: num(P.stars) ? Math.round(P.stars) : 0, launches: num(P.launches) ? Math.round(P.launches) : 0};
+}
+
+// Combine incoming progress with what is here. Safe to run twice with the same code.
+function mergeState(P) {
+  const fresh = !S.batches.length && !Object.keys(S.facts).length;
+  let facts = 0;
+  for (const [k, s] of Object.entries(P.facts)) {
+    const mine = S.facts[k];
+    if (!mine || sec(mine.last) < sec(s.last)) { S.facts[k] = s; facts++; }   // newer history wins
+  }
+  const have = new Set(S.batches.map(b => sec(b.t)));
+  const add = P.batches.filter(b => !have.has(sec(b.t)));
+  S.batches = S.batches.concat(add).sort((a, b) => a.t - b.t).slice(-500);
+  S.stars = Math.max(P.stars, S.stars + add.reduce((t, b) => t + b.stars, 0));
+  S.launches = Math.max(P.launches, S.launches + add.length);
+  for (const [k, v] of Object.entries(P.best)) if (!S.best[k] || v < S.best[k]) S.best[k] = v;
+  if (fresh && P.set) Object.assign(S.settings, P.set);   // a new device also takes the mission and rocket
+  save();
+  return {facts, rockets: add.length};
+}
+
+const b64 = bytes => {
+  let s = '';
+  for (let i = 0; i < bytes.length; i += 8192) s += String.fromCharCode(...bytes.subarray(i, i + 8192));
+  return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+};
+const unb64 = str => Uint8Array.from(atob(str.replace(/-/g, '+').replace(/_/g, '/')), c => c.charCodeAt(0));
+const pipe = async (bytes, stream) => new Uint8Array(await new Response(new Blob([bytes]).stream().pipeThrough(stream)).arrayBuffer());
+
+async function makeCode() {
+  const raw = new TextEncoder().encode(JSON.stringify(packState()));
+  if (typeof CompressionStream === 'undefined') return 'FR1j.' + b64(raw);   // old browsers: no gzip
+  return 'FR1z.' + b64(await pipe(raw, new CompressionStream('gzip')));
+}
+async function readCode(text) {
+  const m = /^FR1([zj])\.([\w-]+)$/.exec(text.replace(/\s+/g, ''));
+  if (!m) throw new Error('bad code');
+  let bytes = unb64(m[2]);
+  if (m[1] === 'z') bytes = await pipe(bytes, new DecompressionStream('gzip'));   // gzip checksum catches a cut-off paste
+  return unpackState(JSON.parse(new TextDecoder().decode(bytes)));
+}
+
+function xferMsg(text, bad) { $('#xferMsg').textContent = text; $('#xferMsg').style.color = bad ? '#ffc3bd' : ''; }
+function xferOpen(get) {
+  $('#xferBox').hidden = false;
+  $('#xferText').value = '';
+  $('#xferText').readOnly = get;
+  $('#xferText').placeholder = get ? '' : 'Paste the transfer code here';
+  $('#xferCopy').hidden = !get;
+  $('#xferShare').hidden = !get || !navigator.share;
+  $('#xferLoad').hidden = get;
+  xferMsg('');
+}
+$('#xferGet').addEventListener('click', async () => {
+  xferOpen(true);
+  try {
+    const code = await makeCode();
+    $('#xferText').value = code;
+    xferMsg(`Code ready: ${S.batches.length} rockets, ⭐ ${S.stars}. Copy it, then use “Enter transfer code” on the other device.`);
+  } catch (e) { xferMsg('Could not make a code in this browser.', true); }
+});
+$('#xferEnter').addEventListener('click', () => { xferOpen(false); $('#xferText').focus(); });
+$('#xferCopy').addEventListener('click', async () => {
+  const el = $('#xferText');
+  try { await navigator.clipboard.writeText(el.value); }
+  catch (e) { el.focus(); el.select(); document.execCommand('copy'); }
+  xferMsg('Copied. Paste it on the other device.');
+});
+$('#xferShare').addEventListener('click', () => { navigator.share({text: $('#xferText').value}).catch(() => {}); });
+$('#xferLoad').addEventListener('click', async () => {
+  let P;
+  try { P = await readCode($('#xferText').value); }
+  catch (e) { return xferMsg('That code does not look right. Copy the whole code and try again.', true); }
+  const when = P.at ? ` from ${new Date(P.at).toLocaleDateString(undefined, {month: 'short', day: 'numeric'})}` : '';
+  if (!confirm(`This code${when} holds ${P.batches.length} rockets, ${P.stars} stars and ${Object.keys(P.facts).length} practiced facts.\n\nCombine it with the progress on this device?`)) return;
+  const r = mergeState(P);
+  applySkin(); gridOp = missionTab(); selKey = null; renderStats();
+  $('#xferBox').hidden = true;
+  xferMsg(r.rockets || r.facts ? `Done. Added ${r.rockets} rocket${r.rockets === 1 ? '' : 's'} and updated ${r.facts} fact${r.facts === 1 ? '' : 's'}. ⭐ ${S.stars} total.` : 'Done. This device already had everything in that code.');
 });
 
 /* ================= starfield ================= */

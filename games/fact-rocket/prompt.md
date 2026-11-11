@@ -3,8 +3,8 @@
 - **Model:** claude-fable-5-2, claude-opus-5-5
 - **Effort:** high, medium
 - **Session(s):** 7fed538a-66d8-4213-8d85-43dd474e6b3a eac6e170-3645-4413-892c-d3d7b7f71ea2
-- **Tokens:** input 258, output 170837, cache read 19647849, cache write 681055
-- **Cost (tokscale estimate):** $16.17
+- **Tokens:** input 300, output 190852, cache read 22327081, cache write 742405
+- **Cost (tokscale estimate):** $18.49
 
 ## You
 
@@ -556,3 +556,93 @@ Not committed; multiplication and division work from last round also still uncom
 ## You
 
 Commit the working tree changes with a sensible message.
+
+## Claude
+
+Committed `88b9994` on `master`: "Fact Rocket: add multiplication and division missions". Not pushed; `75c63aa` (mission move + PIN) also still local.
+
+- **In commit:** [index.html](games/fact-rocket/index.html), regenerated [prompt.md](games/fact-rocket/prompt.md), new screenshots in `prompt-assets/`.
+- **Left out:** same unrelated edits — `politics/texas-isd-statewide-opus-5.5-high/`, `route-planner-opus-5.5-extra/`, `watt-logo-variations/`.
+
+## You
+
+Push
+
+## Claude
+
+Pushed. Origin `master` now at `88b9994` (adds `75c63aa` mission move + PIN, `88b9994` multiplication and division). Local matches remote.
+
+Unrelated edits in `politics/`, `route-planner-opus-5.5-extra/`, `watt-logo-variations/` still uncommitted, not pushed.
+
+## You
+
+If I wanted to transfer to another device.... is there a way we could do this without JSON? Maybe a QR code transfer? Or.... something else?
+
+## Claude
+
+Yes. Three real options, plus one trap.
+
+**1. QR, scanned inside app (recommend)**
+- Old device: Grown-ups > "Send to another device" shows QR.
+- New device: Grown-ups > "Receive" opens camera, scans, merges.
+- Works with home-screen app on both ends, no server, nothing leaves the room.
+- Cost: current JSON too big for one QR (limit ~3KB, comfortable ~1.5KB). Need compact packing (few bytes per fact, deflate). Typical progress should fit one code; worst case (all ~800 facts seen) needs 2–4 codes cycling on screen, scanner collects all.
+- Cost: iOS Safari has no built-in QR reader API, so a scanner library must ship beside `index.html` (size not checked yet, likely 50–130KB). QR generator small.
+- Camera needs HTTPS: fine on GitHub Pages, not on plain LAN IP.
+
+**2. Transfer code, copy and paste**
+- Same compact payload, shown as text blob with Copy button; other device has Paste box.
+- Apple Universal Clipboard: copy on iPhone, paste on iPad, no typing. Also works via Messages/AirDrop.
+- Zero libraries, about an hour of work. Less magic, and blob is long (not typeable by hand).
+
+**3. Sync code with small backend**
+- Type 6-character code on second device; could become real two-way sync, not one-shot transfer.
+- Needs server (Cloudflare Worker or similar), kid's data leaves device, more to maintain. Overkill unless two devices get used in parallel.
+
+**Trap: QR as link for the iPhone Camera app**
+- QR holds URL with data in `#hash`, no scanner library needed. But the Camera app opens Safari, and Safari storage is separate from the home-screen app's storage, so progress lands in the wrong place. Only good if kid plays in a Safari tab.
+
+Recommendation: build 2's payload first, then put 1 on top. Same packing and merge code serves both, and paste stays as fallback when camera permission fails. Merge rule: per fact, keep whichever device has newer history; stars and launches take max.
+
+Want 1 + 2 together, or just 2 for now?
+
+## You
+
+lets go with a transfer code
+
+## Claude
+
+Code written; now testing round trip in browser.
+
+![screenshot 32](prompt-assets/032.webp)
+
+Round trip works; cleaning up test data and viewport.
+
+Transfer code built. Grown-ups screen has new panel "Move to another device" in [index.html](games/fact-rocket/index.html).
+
+**How it works**
+- "Get transfer code": shows code (`FR1z.…`) with Copy button, plus Share button where browser supports it (Messages, AirDrop).
+- "Enter transfer code": paste box, "Load progress". Confirm dialog shows what code holds (rockets, stars, facts, date) before anything changes.
+- Whitespace and line breaks in pasted code ignored. Cut-off or altered code rejected, nothing touched.
+
+**What moves**
+- Fact history, rockets, stars, best times.
+- Mission and rocket choice, only when receiving device is empty.
+- Not PIN, not mute.
+- Per-card detail inside each rocket dropped (only average answer time kept). History table and summary still work; JSON export still has full detail.
+
+**Merge rules**
+- Per fact: newer history wins.
+- Rockets: union, no duplicates. Stars and launches: local plus rockets only the other side had.
+- Same code twice: no change.
+
+**Size**
+- Test state (338 facts, 60 rockets): 132KB JSON became 10.7K-character code. Fine for clipboard and Messages, not for typing by hand.
+
+**Tested** in desktop browser: round trip to empty device (all 338 facts identical), garbage / truncated / altered codes, repeat import, merge with newer local progress. Layout checked at phone width.
+
+**Not tested**: real iPhone or iPad, Universal Clipboard, Share sheet. Not committed yet.
+
+## You
+
+Lets commit and push these changes (just this directory)
