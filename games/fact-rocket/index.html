@@ -117,6 +117,10 @@ button:focus-visible{outline:4px solid var(--gold);outline-offset:3px}
 .tag:empty{display:none}
 .problem{flex:1 1 auto;min-height:0;font-size:min(92px,13.5cqi);font-weight:900;display:flex;justify-content:center;align-items:center;gap:.2em;line-height:1.1;font-variant-numeric:tabular-nums}
 .problem .op{color:var(--accent)}
+.problem.long:not(.vertical){font-size:min(120px,11cqi)}  /* "144 ÷ 12 = 12" still fits on one line */
+.skips{display:flex;flex-wrap:wrap;justify-content:center;gap:4px}
+.skips i{font-style:normal;font-weight:800;font-size:clamp(12px,3.4cqi,20px);padding:1px 6px;border-radius:8px;background:#f1eee2;color:#4b5078;font-variant-numeric:tabular-nums}
+.skips i.last{background:var(--accent);color:#fff}
 .ans{min-width:1.6em;padding:0 .12em;border-radius:16px;background:#eef0ff;color:var(--accent);border-bottom:6px solid #c9ceff}
 /* stacked "column" layout: ones digits line up on the right, answer under the bar */
 .problem.vertical{display:grid;grid-template-columns:auto auto;justify-content:center;align-content:center;gap:0;font-size:var(--vf);line-height:1.05}
@@ -209,8 +213,8 @@ table{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:ta
 th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:800;padding:6px 6px}
 td{padding:8px 6px;border-top:1px solid rgba(255,255,255,.08)}
 td.num,th.num{text-align:right}
-.tabs{display:flex;gap:6px;margin-bottom:12px}
-.tabs button{padding:8px 14px;border-radius:12px;background:rgba(255,255,255,.06);font-weight:800;font-size:14px}
+.tabs{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:6px;margin-bottom:12px}
+.tabs button{padding:8px 2px;border-radius:12px;background:rgba(255,255,255,.06);font-weight:800;font-size:13px;white-space:nowrap}
 .tabs button.sel{background:var(--accent)}
 .fgrid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:3px;font-size:11px;font-variant-numeric:tabular-nums}
 .fgrid div{aspect-ratio:1;display:grid;place-items:center;border-radius:5px;font-weight:800;min-width:0}
@@ -336,8 +340,10 @@ td.num,th.num{text-align:right}
     <div class="panel">
       <p class="note" id="mapNote"></p>
       <div class="tabs" id="mapTabs">
-        <button data-g="add">Adding</button>
-        <button data-g="sub">Taking away</button>
+        <button data-g="add">Add</button>
+        <button data-g="sub">Take away</button>
+        <button data-g="mul">Times</button>
+        <button data-g="div">Divide</button>
       </div>
       <div class="fgrid" id="mgrid"></div>
       <div class="legend">
@@ -371,15 +377,20 @@ td.num,th.num{text-align:right}
     <div class="panel">
       <h2>Mission</h2>
       <p class="note">Choose what he practices. The home screen shows this mission and only has a Launch button.</p>
-      <div class="seg" id="opSeg">
-        <button data-op="add">+<small>Adding</small></button>
-        <button data-op="sub">−<small>Taking away</small></button>
-        <button data-op="mix">+ −<small>Mix</small></button>
+      <div id="opSeg">
+        <div class="seg">
+          <button data-op="add">+<small>Adding</small></button>
+          <button data-op="sub">−<small>Taking away</small></button>
+          <button data-op="mix">+ −<small>Mix</small></button>
+        </div>
+        <div class="seg">
+          <button data-op="mul">×<small>Times</small></button>
+          <button data-op="div">÷<small>Dividing</small></button>
+          <button data-op="mixmd">× ÷<small>Mix</small></button>
+        </div>
       </div>
-      <div class="seg" id="rangeSeg" style="margin-bottom:0">
-        <button data-range="10">Up to 10</button>
-        <button data-range="20">Up to 20</button>
-      </div>
+      <div class="lbl" style="margin:12px 0 8px">How far</div>
+      <div class="seg" id="rangeSeg" style="margin-bottom:0"></div>
     </div>
 
     <div class="panel">
@@ -399,8 +410,10 @@ td.num,th.num{text-align:right}
       <h2>Fact map</h2>
       <p class="note">Each square is one fact. The number is the average seconds for recent correct answers. Tap a square for details.</p>
       <div class="tabs" id="gridTabs">
-        <button data-g="add" class="sel">Addition</button>
-        <button data-g="sub">Subtraction</button>
+        <button data-g="add">Add</button>
+        <button data-g="sub">Subtract</button>
+        <button data-g="mul">Multiply</button>
+        <button data-g="div">Divide</button>
       </div>
       <div class="fgrid" id="fgrid"></div>
       <div class="legend">
@@ -479,13 +492,19 @@ const PLANETS = [
   ['Alpha Centauri', '#fff3a8', '#ff9a1f'],
   ['the Andromeda Galaxy', '#e3c8ff', '#6a2bd1', 'ring'],
 ];
-const OP_NAME = {add: 'Adding', sub: 'Taking away', mix: 'Mix'};
+// Missions come in two families. Adding/taking away is sized by range (10 or 20);
+// times/dividing by level: 1 = one number up to 5, the other up to 9; 2 = everything up to 12 × 12.
+const OP_NAME = {add: 'Adding', sub: 'Taking away', mix: 'Mix', mul: 'Times', div: 'Dividing', mixmd: 'Times & dividing'};
+const OP_ICON = {add: '+', sub: '−', mix: '+ −', mul: '×', div: '÷', mixmd: '× ÷'};
+const SYM = {'+': '+', '-': '−', 'x': '×', '/': '÷'};
+const isMul = op => op === 'mul' || op === 'div' || op === 'mixmd';
+const sizeLabel = (op, size) => !isMul(op) ? `up to ${size}` : size === 1 ? 'up to 5 × 9' : 'up to 12 × 12';
 
 const $ = s => document.querySelector(s);
 const now = () => performance.now();
 
 /* ================= storage ================= */
-const DEFAULT = {v: 1, settings: {op: 'add', range: 20, muted: false, skin: 0}, facts: {}, batches: [], stars: 0, launches: 0, best: {}};
+const DEFAULT = {v: 1, settings: {op: 'add', range: 20, level: 1, muted: false, skin: 0}, facts: {}, batches: [], stars: 0, launches: 0, best: {}};
 let S, storageOk = true;
 
 function load() {
@@ -505,8 +524,22 @@ function save() {
 }
 
 /* ================= facts ================= */
+// Size of the current mission: range for adding/taking away, level for times/dividing.
+const missionSize = () => isMul(S.settings.op) ? S.settings.level : S.settings.range;
+// Have times/dividing facts come into play yet? (Keeps them out of a young pilot's maps until then.)
+const mulInPlay = () => isMul(S.settings.op) || Object.keys(S.facts).some(k => /[x/]/.test(k));
+
 function allFacts(op, range) {
   const out = [];
+  if (isMul(op)) {
+    const max = range === 1 ? 9 : 12;
+    for (let a = 0; a <= max; a++) for (let b = 0; b <= max; b++) {
+      if (range === 1 && Math.min(a, b) > 5) continue;
+      if (op !== 'div') out.push({k: `${a}x${b}`, a, b, op: 'x', ans: a * b, fam: `x${Math.min(a, b)},${Math.max(a, b)}`});
+      if (op !== 'mul' && b > 0) out.push({k: `${a * b}/${b}`, a: a * b, b, op: '/', ans: a, fam: `/${a * b},${b}`});
+    }
+    return out;
+  }
   for (let a = 0; a <= 10; a++) for (let b = 0; b <= 10; b++) {
     if (range === 10 && a + b > 10) continue;
     if (op !== 'sub') out.push({k: `${a}+${b}`, a, b, op: '+', ans: a + b, fam: `+${Math.min(a, b)},${Math.max(a, b)}`});
@@ -515,15 +548,15 @@ function allFacts(op, range) {
   return out;
 }
 function parseKey(k) {
-  const plus = k.includes('+');
-  const [a, b] = k.split(plus ? '+' : '-').map(Number);
-  return {k, a, b, op: plus ? '+' : '-', ans: plus ? a + b : a - b};
+  const [, x, op, y] = k.match(/^(\d+)([-+x/])(\d+)$/), a = +x, b = +y;
+  return {k, a, b, op, ans: op === '+' ? a + b : op === '-' ? a - b : op === 'x' ? a * b : a / b};
 }
-const showFact = f => `${f.a} ${f.op === '+' ? '+' : '−'} ${f.b}`;
+const showFact = f => `${f.a} ${SYM[f.op]} ${f.b}`;
 
-// 0s, 1s and "x − x" facts are easy wins; show them less often.
+// 0s, 1s, "x − x" and "x ÷ x" facts are easy wins; show them less often.
 function trivial(f) {
-  if (f.op === '+') return f.a <= 1 || f.b <= 1;
+  if (f.op === '+' || f.op === 'x') return f.a <= 1 || f.b <= 1;
+  if (f.op === '/') return f.b === 1 || f.ans <= 1;
   return f.b <= 1 || f.ans === 0;
 }
 
@@ -681,12 +714,13 @@ function tally(op, range) {
 
 /* ================= home ================= */
 function renderHome() {
-  const {op, range} = S.settings;
+  const op = S.settings.op, range = missionSize();
   applySkin();
   $('#starTotal').textContent = `⭐ ${S.stars}`;
   document.querySelectorAll('#opSeg button').forEach(b => b.classList.toggle('sel', b.dataset.op === op));
-  document.querySelectorAll('#rangeSeg button').forEach(b => b.classList.toggle('sel', +b.dataset.range === range));
-  $('#missionLine').textContent = `${{add: '+', sub: '−', mix: '+ −'}[op]} ${OP_NAME[op]} · up to ${range}`;
+  $('#rangeSeg').innerHTML = (isMul(op) ? [[1, 'Level 1', 'up to 5 × 9'], [2, 'Level 2', 'up to 12 × 12']] : [[10, 'Up to 10'], [20, 'Up to 20']])
+    .map(([v, t, sub]) => `<button data-size="${v}" class="${v === range ? 'sel' : ''}">${t}${sub ? `<small>${sub}</small>` : ''}</button>`).join('');
+  $('#missionLine').textContent = `${OP_ICON[op]} ${OP_NAME[op]} · ${sizeLabel(op, range)}`;
 
   const t = tally(op, range);
   $('#barM').style.width = t.mastered / t.total * 100 + '%';
@@ -718,10 +752,13 @@ function renderHome() {
 $('#opSeg').addEventListener('click', e => {
   const b = e.target.closest('button'); if (!b) return;
   S.settings.op = b.dataset.op; save(); renderHome();
+  gridOp = missionTab(); selKey = null; renderStats();  // fact map and totals follow the new mission
 });
+// Which map tab matches the current mission.
+const missionTab = () => ({sub: 'sub', mul: 'mul', mixmd: 'mul', div: 'div'})[S.settings.op] || 'add';
 $('#rangeSeg').addEventListener('click', e => {
   const b = e.target.closest('button'); if (!b) return;
-  S.settings.range = +b.dataset.range; save(); renderHome();
+  S.settings[isMul(S.settings.op) ? 'level' : 'range'] = +b.dataset.size; save(); renderHome();
 });
 $('#skins').addEventListener('click', e => {
   const b = e.target.closest('button'); if (!b || b.disabled) return;
@@ -729,7 +766,7 @@ $('#skins').addEventListener('click', e => {
   tone([523, 784], {gap: 0.08});
 });
 $('#progBtn').addEventListener('click', () => {
-  mapOp = S.settings.op === 'sub' ? 'sub' : 'add'; mapKey = null;
+  mapOp = missionTab(); mapKey = null;
   renderMap(); show('map');
 });
 $('#launchBtn').addEventListener('click', startBatch);
@@ -739,7 +776,7 @@ $('#parentBtn').addEventListener('click', () => S.settings.pin ? openLock('enter
 // Keeps a child out of the grown-ups screen. Not real security: the PIN sits in localStorage.
 // modes: "enter" (unlock), "set" (choose, then confirm), "forgot" (a hard sum removes the PIN)
 let L = null;
-const openStats = () => { L = null; renderStats(); show('stats'); };
+const openStats = () => { L = null; gridOp = missionTab(); selKey = null; renderStats(); show('stats'); };
 function openLock(mode, msg) {
   L = {mode, input: '', first: null, need: 4};
   if (mode === 'forgot') {
@@ -834,7 +871,7 @@ document.addEventListener('visibilitychange', () => {
 });
 
 function startBatch() {
-  const {op, range} = S.settings;
+  const op = S.settings.op, range = missionSize();
   G = {op, range, queue: pickBatch(op, range).map(f => ({f, retry: false})), cells: Array(BATCH).fill(''),
        done: 0, firstTry: 0, stars: 0, streak: 0, bestStreak: 0, ms: 0, items: [], missed: []};
   G.wasMastered = new Set(G.queue.filter(c => status(S.facts[c.f.k]) === 'mastered').map(c => c.f.k));
@@ -849,10 +886,12 @@ function next() {
   Object.assign(G, {input: '', phase: 'ask', cardStart: now(), paused: 0, hiddenAt: document.hidden ? now() : null, firstMs: 0, keyAt: 0});
   const f = c.f;
   $('#pA').textContent = f.a;
-  $('#pOp').textContent = f.op === '+' ? '+' : '−';
+  $('#pOp').textContent = SYM[f.op];
   $('#pB').textContent = f.b;
-  c.vertical = Math.random() < 0.5;
+  c.vertical = f.op !== '/' && Math.random() < 0.5;  // division is never written stacked
   $('.problem').classList.toggle('vertical', c.vertical);
+  $('.problem').classList.toggle('long', `${f.a}${f.b}${f.ans}`.length >= 6);
+  G.maxLen = isMul(G.op) ? 3 : 2;
   const tag = $('#cardTag');
   tag.className = 'tag' + (c.retry ? ' comeback' : '');
   tag.textContent = c.retry ? '🔁 Comeback card!' : (!S.facts[f.k] ? '✨ New fact' : '');
@@ -885,7 +924,7 @@ function press(k) {
   if (!G || G.phase === 'wait') return;
   if (k === 'del') G.input = G.input.slice(0, -1);
   else if (k === 'ok') return submit();
-  else if (G.input.length < 2) {
+  else if (G.input.length < G.maxLen) {
     if (!G.input) G.keyAt = elapsed();  // when he started typing this answer
     G.input = (G.input === '0' ? '' : G.input) + k;
   }
@@ -966,7 +1005,13 @@ function showHelp(f, wrong) {
 }
 
 // Ten-frames: addition shows a (blue) then b (orange); subtraction shows a with b crossed out.
+// Times and dividing get skip-counting instead: 7 × 6 shows 7, 14, 21, 28, 35, 42.
 function framesHtml(f) {
+  if (f.op === 'x' || f.op === '/') {
+    const [by, n] = f.op === 'x' ? [Math.max(f.a, f.b), Math.min(f.a, f.b)] : [f.b, f.ans];
+    if (!by || !n) return '';
+    return '<div class="skips">' + Array.from({length: n}, (_, i) => `<i class="${i === n - 1 ? 'last' : ''}">${by * (i + 1)}</i>`).join('') + '</div>';
+  }
   const total = f.op === '+' ? f.a + f.b : f.a;
   const frames = Math.max(1, Math.ceil(total / 10));
   let html = '';
@@ -984,7 +1029,33 @@ function framesHtml(f) {
   return html;
 }
 
+function mulTip(f) {
+  const {a, b} = f, p = a * b, has = n => a === n || b === n, other = n => a === n ? b : a;
+  let n;
+  if (has(0)) return 'Anything times 0 is 0.';
+  if (has(1)) return 'Anything times 1 stays the same.';
+  if (has(10)) return `Times 10: ${other(10)} tens is ${p}.`;
+  if (has(2)) { n = other(2); return `Double it: ${n} + ${n} = ${p}.`; }
+  if (has(5)) { n = other(5); return `Count by 5s, or take half of ${n} × 10 = ${n * 10}: ${p}.`; }
+  if (has(9)) { n = other(9); return `${n} × 10 = ${n * 10}, then take away ${n}: ${p}.`; }
+  if (has(11) && other(11) <= 9) { n = other(11); return `Times 11: ${n} tens and ${n} ones is ${p}.`; }
+  if (a === b) return `Square number! ${a} × ${a} = ${p}.`;
+  if (has(4)) { n = other(4); return `Double, then double again: ${n * 2}, ${p}.`; }
+  if (has(12)) { n = other(12); return `${n} × 10 = ${n * 10} and ${n} × 2 = ${n * 2}. Together: ${p}.`; }
+  if (has(3)) { n = other(3); return `Double ${n} is ${n * 2}, plus one more ${n} is ${p}.`; }
+  if (has(6)) { n = other(6); return `${n} × 5 = ${n * 5}, plus one more ${n} is ${p}.`; }
+  if (has(8)) { n = other(8); return `Double three times: ${n * 2}, ${n * 4}, ${p}.`; }
+  return `Count by ${Math.max(a, b)}s.`;
+}
+
 function tip(f) {
+  if (f.op === 'x') return mulTip(f);
+  if (f.op === '/') {
+    if (f.b === 1) return 'Dividing by 1 changes nothing.';
+    if (f.a === 0) return '0 shared out is still 0.';
+    if (f.ans === 1) return 'Any number divided by itself is 1.';
+    return `Think times: ${f.b} × ? = ${f.a}. Since ${f.b} × ${f.ans} = ${f.a}, the answer is ${f.ans}.`;
+  }
   if (f.op === '-') {
     if (f.b === 0) return `Take away nothing and you still have ${f.a}.`;
     if (f.ans === 0) return `Take away all of it and nothing is left.`;
@@ -1092,7 +1163,7 @@ function renderStats() {
   const last10 = B.slice(-10);
   const firstPct = last10.length ? Math.round(last10.reduce((t, b) => t + b.first, 0) / (last10.length * BATCH) * 100) : null;
   const recentAvgMs = avgFirst(B.slice(-5)), earlyAvgMs = avgFirst(B.slice(0, 5));
-  const statuses = allFacts('mix', 20).map(f => status(S.facts[f.k]));
+  const statuses = [...allFacts('mix', 20), ...(mulInPlay() ? allFacts('mixmd', 2) : [])].map(f => status(S.facts[f.k]));
   const mastered = statuses.filter(s => s === 'mastered').length;
   const practicedDays = new Set(B.map(b => new Date(b.t).toDateString())).size;
 
@@ -1121,21 +1192,35 @@ function cellHtml(k) {
   return `<div class="f s-${st}${k === selKey ? ' sel' : ''}" data-k="${k}" title="${showFact(parseKey(k))}">${text}</div>`;
 }
 // Grid of every fact for one operation; `cell` renders one square from its key.
-function gridHtml(op, cell) {
-  let html = `<div class="h corner">${op === 'add' ? '+' : '−'}</div>`;
-  for (let b = 0; b <= 10; b++) html += `<div class="h">${b}</div>`;
-  for (let r = 0; r <= (op === 'add' ? 10 : 20); r++) {
+// [symbol, first column, last column, last row, key for (row, column) or null, what rows and columns mean, biggest mission size]
+const GRIDS = {
+  add: ['+', 0, 10, 10, (r, c) => `${r}+${c}`, 'Rows: first number. Columns: second number.', 20],
+  sub: ['−', 0, 10, 20, (r, c) => c <= r && r - c <= 10 ? `${r}-${c}` : null, 'Rows: starting number. Columns: number taken away.', 20],
+  mul: ['×', 0, 12, 12, (r, c) => `${r}x${c}`, 'Rows: first number. Columns: second number.', 2],
+  div: ['÷', 1, 12, 12, (r, c) => `${r * c}/${c}`, 'Rows: the answer. Columns: the number you divide by.', 2],
+};
+function fillGrid(el, op, cell) {
+  const [sym, c0, c1, r1, key] = GRIDS[op];
+  let html = `<div class="h corner">${sym}</div>`;
+  for (let c = c0; c <= c1; c++) html += `<div class="h">${c}</div>`;
+  for (let r = 0; r <= r1; r++) {
     html += `<div class="h">${r}</div>`;
-    for (let b = 0; b <= 10; b++) {
-      if (op === 'add') html += cell(`${r}+${b}`);
-      else html += (b <= r && r - b <= 10) ? cell(`${r}-${b}`) : '<div></div>';
-    }
+    for (let c = c0; c <= c1; c++) { const k = key(r, c); html += k ? cell(k) : '<div></div>'; }
   }
-  return html;
+  el.style.gridTemplateColumns = `repeat(${c1 - c0 + 2},minmax(0,1fr))`;
+  el.innerHTML = html;
+}
+// Tabs for one map. On the kid's star map, times and dividing stay hidden until those facts are in play.
+function renderTabs(sel, cur, hideUnused) {
+  const hide = hideUnused && !mulInPlay();
+  document.querySelectorAll(`${sel} button`).forEach(b => {
+    b.classList.toggle('sel', b.dataset.g === cur);
+    b.hidden = hide && (b.dataset.g === 'mul' || b.dataset.g === 'div');
+  });
 }
 function renderGrid() {
-  document.querySelectorAll('#gridTabs button').forEach(b => b.classList.toggle('sel', b.dataset.g === gridOp));
-  $('#fgrid').innerHTML = gridHtml(gridOp, cellHtml);
+  renderTabs('#gridTabs', gridOp);
+  fillGrid($('#fgrid'), gridOp, cellHtml);
   renderDetail();
 }
 
@@ -1143,14 +1228,14 @@ function renderGrid() {
 let mapOp = 'add', mapKey = null;
 const kidStatus = k => ({unseen: 'unseen', mastered: 'mastered'})[status(S.facts[k])] || 'learning';
 function renderMap() {
-  document.querySelectorAll('#mapTabs button').forEach(b => b.classList.toggle('sel', b.dataset.g === mapOp));
-  const t = tally(mapOp, 20);
+  renderTabs('#mapTabs', mapOp, true);
+  const t = tally(mapOp, GRIDS[mapOp][6]);
   $('#mapNote').textContent = `${t.mastered} of ${t.total} stars are gold. Answer a fact quickly on two different days to turn its star gold. Tap a star to see its fact.`;
-  $('#mgrid').innerHTML = gridHtml(mapOp, k => {
+  fillGrid($('#mgrid'), mapOp, k => {
     const st = kidStatus(k);
     return `<div class="f ${st === 'unseen' ? 's-unseen' : 'k-' + st}${k === mapKey ? ' sel' : ''}" data-k="${k}">${st === 'unseen' ? '·' : '★'}</div>`;
   });
-  let text = mapOp === 'add' ? 'Rows: first number. Columns: second number.' : 'Rows: starting number. Columns: number taken away.';
+  let text = GRIDS[mapOp][5];
   if (mapKey) {
     const f = parseKey(mapKey), st = kidStatus(mapKey);
     text = st === 'unseen' ? `${showFact(f)}: not met yet.`
@@ -1168,7 +1253,7 @@ $('#mgrid').addEventListener('click', e => {
 });
 $('#mapBack').addEventListener('click', () => { renderHome(); show('home'); });
 function renderDetail() {
-  if (!selKey) { $('#detail').textContent = gridOp === 'add' ? 'Rows: first number. Columns: second number.' : 'Rows: starting number. Columns: number taken away.'; return; }
+  if (!selKey) { $('#detail').textContent = GRIDS[gridOp][5]; return; }
   const f = parseKey(selKey), s = S.facts[selKey];
   if (!s) { $('#detail').textContent = `${showFact(f)} = ${f.ans}: not practiced yet.`; return; }
   const avg = recentAvg(s);
@@ -1208,7 +1293,7 @@ function renderHistory() {
       const avg = first.reduce((t, x) => t + x.ms, 0) / (first.length || 1);
       const d = new Date(b.t);
       return `<tr><td>${d.toLocaleDateString(undefined, {month: 'short', day: 'numeric'})} ${d.toLocaleTimeString(undefined, {hour: 'numeric', minute: '2-digit'})}</td>` +
-        `<td>${OP_NAME[b.op]} ≤${b.range}</td><td class="num">${b.first}/${BATCH}</td><td class="num">${fmtTime(b.ms)}</td><td class="num">${secs(avg)}s</td></tr>`;
+        `<td>${OP_NAME[b.op]}, ${sizeLabel(b.op, b.range)}</td><td class="num">${b.first}/${BATCH}</td><td class="num">${fmtTime(b.ms)}</td><td class="num">${secs(avg)}s</td></tr>`;
     }).join('') + '</tbody></table>';
 }
 

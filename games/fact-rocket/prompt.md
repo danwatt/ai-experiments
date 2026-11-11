@@ -3,8 +3,8 @@
 - **Model:** claude-fable-5-2, claude-opus-5-5
 - **Effort:** high, medium
 - **Session(s):** 7fed538a-66d8-4213-8d85-43dd474e6b3a eac6e170-3645-4413-892c-d3d7b7f71ea2
-- **Tokens:** input 228, output 139695, cache read 16394786, cache write 634894
-- **Cost (tokscale estimate):** $13.54
+- **Tokens:** input 258, output 170837, cache read 19647849, cache write 681055
+- **Cost (tokscale estimate):** $16.17
 
 ## You
 
@@ -476,6 +476,82 @@ Things to know:
 - **"Reset all progress" keeps PIN.**
 - **PIN in export file.** Export JSON includes it in plain text, and it lives in browser storage. Keeps kid out, not real security.
 - **Per device.** Set separately on phone and iPad.
+
+## You
+
+Commit the working tree changes with a sensible message.
+
+## Claude
+
+Committed `75c63aa` on `master`: "Fact Rocket: move mission choice to grown-ups screen, add PIN lock". Not pushed.
+
+- **In commit:** [index.html](games/fact-rocket/index.html), regenerated [prompt.md](games/fact-rocket/prompt.md), four new screenshots (020–023).
+- **Left out:** same unrelated edits — `politics/texas-isd-statewide-opus-5.5-high/`, `route-planner-opus-5.5-extra/`, `watt-logo-variations/`.
+
+## You
+
+Lets add support for multiplication and division - up to 12x12 and 144/12. But, lets gate it at two levels - (0-5) x (0-9), and (0-12) x (0-12)
+
+## Claude
+
+Facts, picker, card, hints in. Now maps and stats.
+
+![screenshot 24](prompt-assets/024.webp)
+
+![screenshot 25](prompt-assets/025.webp)
+
+Multiplication and division in [index.html](games/fact-rocket/index.html). Played full mixed round, no console errors, test data cleared. Not committed.
+
+**Missions (grown-ups screen).** Second row of buttons: × Times, ÷ Dividing, × ÷ Mix. "How far" buttons switch by family: Up to 10 / Up to 20 for adding, Level 1 / Level 2 for times.
+
+| Level | Times facts | Dividing facts |
+|---|---|---|
+| 1: up to 5 × 9 | 84 | 74 |
+| 2: up to 12 × 12 | 169 | 156 (up to 144 ÷ 12) |
+
+**Decision for you — Level 1 includes both orders.** I read "(0–5) × (0–9)" as one number up to 5, other up to 9, so 3 × 7 and 7 × 3 both appear. Strict reading (first number 0–5 only) would drop 7 × 3. One-line change if wanted.
+
+**What else changed:**
+- **Dividing:** no divide-by-zero. Level 1 dividing is those same facts turned around (35 ÷ 5, 35 ÷ 7). Always shown on one line, never stacked.
+- **Answers:** up to 3 digits on times missions (144).
+- **Wrong-answer hint:** skip-counting chips in place of ten-frames (2 × 12 shows "12 24"), plus tip per fact: doubles, times 10, times 9 as ten-minus-one, squares, double-double for 4s, "think times" for dividing.
+- **Easy facts** (×0, ×1, ÷1, n ÷ n) show less often, same as 0s and 1s in adding.
+- **Star map and grown-ups fact map:** tabs now + − × ÷. × and ÷ tabs stay hidden until times mission chosen or times fact answered.
+- **Same engine:** needs-work slots, new-fact cap, two-day mastery, stars all apply unchanged.
+
+**Layout check** — 12 × 12 = 144 one-line and stacked, 144 ÷ 12 = 12, and biggest hint (12 chips + longest tip), measured at 375×667, 768×954, 1133×670: everything inside card, keypad same spot in every state, no scroll.
+
+Not tested: real device; full round at Level 1 (fact counts confirmed, round played was Level 2 mix).
+
+## You
+
+Uh, lets update the fact map to show progress on multiplication and division
+
+## Claude
+
+![screenshot 26](prompt-assets/026.webp)
+
+![screenshot 27](prompt-assets/027.webp)
+
+![screenshot 28](prompt-assets/028.webp)
+
+![screenshot 29](prompt-assets/029.webp)
+
+![screenshot 30](prompt-assets/030.webp)
+
+![screenshot 31](prompt-assets/031.webp)
+
+Fixed in [index.html](games/fact-rocket/index.html). My miss last round: I hid Multiply and Divide tabs on grown-ups fact map until times facts were "in play", and map didn't refresh when mission changed on that same screen. So picking Times left map showing only add and subtract.
+
+Now:
+- **Fact map always has four tabs:** Add, Subtract, Multiply, Divide. Word labels, since ÷ in this font looked like +.
+- **Map follows mission.** Open grown-ups screen or change mission, map jumps to matching tab (Times and mix go to Multiply, Dividing to Divide).
+- **Totals refresh** on mission change too ("Mastered of N facts" counts times and dividing once in play).
+- **Kid star map:** same word tabs (Add, Take away, Times, Divide). There, Times and Divide still hidden until times mission chosen or times fact answered.
+
+Checked at phone size with seeded progress: multiply grid 13 × 13, divide grid 12 × 13, cells coloured right (mastered green with seconds, learning yellow, needs-work red), tap gives detail, trickiest facts list shows 7 × 8 and 56 ÷ 7. Tabs fit one row, no console errors. Test data cleared.
+
+Not committed; multiplication and division work from last round also still uncommitted.
 
 ## You
 
