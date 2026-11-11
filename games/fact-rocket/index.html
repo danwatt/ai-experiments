@@ -294,7 +294,7 @@ td.num,th.num{text-align:right}
       </div>
       <div class="fgrid" id="fgrid"></div>
       <div class="legend">
-        <span><i class="s-mastered"></i>Mastered (right &amp; under 3s, 3× in a row)</span>
+        <span><i class="s-mastered"></i>Mastered (right &amp; under 3s, 3× in a row, over 2+ days)</span>
         <span><i class="s-learning"></i>Learning</span>
         <span><i class="s-trouble"></i>Needs work (misses or over 6s)</span>
         <span><i class="s-unseen"></i>Not seen yet</span>
@@ -310,7 +310,7 @@ td.num,th.num{text-align:right}
 
     <div class="panel">
       <h2>Recent rockets</h2>
-      <p class="note">Flight time counts only time spent on cards (not feedback animations or time with the tab hidden). Avg answer is time to first answer per fact.</p>
+      <p class="note">Flight time counts only time spent on cards (not feedback animations or time with the tab hidden). Avg answer is thinking time per fact: until he starts typing his first answer (capped at 20s).</p>
       <div id="history"></div>
     </div>
 
@@ -333,6 +333,9 @@ td.num,th.num{text-align:right}
 const KEY = 'factRocket.v1';
 const BATCH = 10;
 const FAST = 3000, SLOW = 6000;           // ms thresholds for stars / mastery
+const TROUBLE_MAX = 4, NEW_MAX = 3;       // per round: facts to fix, brand-new facts
+const TYPING = 2000;                      // ms allowed for tapping the answer before it counts as thinking
+const MAX_MS = 20000;                     // cap on a recorded answer time (walked away from the card)
 const ROCKET = `<svg class="rocket" viewBox="0 0 64 124" aria-hidden="true">
   <path class="flame" d="M23 92 Q32 126 41 92Z" fill="#ffad3b"/>
   <path class="flame" d="M27 92 Q32 112 37 92Z" fill="#fff27a"/>
@@ -403,10 +406,14 @@ function trivial(f) {
   return f.b <= 1 || f.ans === 0;
 }
 
+// Entries saved before timestamps existed all count as one unknown day.
+const dayOf = x => x.t ? new Date(x.t).toDateString() : 'old';
+
 function status(s) {
   if (!s || !s.recent.length) return 'unseen';
   const r = s.recent, last3 = r.slice(-3);
-  if (last3.length === 3 && last3.every(x => x.ok && x.ms < FAST)) return 'mastered';
+  // Mastered = three quick, correct answers in a row that span at least two days.
+  if (last3.length === 3 && last3.every(x => x.ok && x.ms < FAST) && new Set(last3.map(dayOf)).size >= 2) return 'mastered';
   const ok = r.filter(x => x.ok);
   const acc = ok.length / r.length;
   const avg = ok.length ? ok.reduce((t, x) => t + x.ms, 0) / ok.length : Infinity;
@@ -423,30 +430,52 @@ function weight(f) {
   let w = {unseen: 3, mastered: 0.4, trouble: 6, learning: 2.5}[status(s)];
   if (s) w += Math.min((Date.now() - s.last) / 864e5 * 0.3, 1.5);  // stale facts drift back in
   if (trivial(f)) w *= 0.3;
+  const last = s && s.recent[s.recent.length - 1];
+  if (last && last.ok && last.ms < FAST && last.t && isToday(last.t)) w *= 0.4;  // quick today: let it rest
   return w;
 }
 
-// Weighted sample of 10 distinct facts; never both 3+5 and 5+3 in one batch.
+// Build a round of 10 distinct facts (never both 3+5 and 5+3) in this order of priority:
+//   1. facts that need work, so a miss always comes back next round
+//   2. a few brand-new facts
+//   3. facts already seen, so most of the round feels doable
+//   4. easy new facts (0s and 1s), then anything left, if the round is still short
 function pickBatch(op, range) {
-  const pool = allFacts(op, range).map(f => ({f, w: weight(f)}));
+  const all = allFacts(op, range).map(f => ({f, w: weight(f), st: status(S.facts[f.k])}));
   const out = [], fams = new Set();
-  while (out.length < BATCH && pool.length) {
-    let r = Math.random() * pool.reduce((t, p) => t + p.w, 0), i = 0;
-    for (; i < pool.length - 1; i++) { r -= pool[i].w; if (r <= 0) break; }
-    const [p] = pool.splice(i, 1);
-    if (fams.has(p.f.fam)) continue;
-    fams.add(p.f.fam);
-    out.push(p.f);
+  const draw = (pool, n) => {
+    pool = pool.slice();
+    const stop = Math.min(BATCH, out.length + n);
+    while (out.length < stop && pool.length) {
+      let r = Math.random() * pool.reduce((t, p) => t + p.w, 0), i = 0;
+      for (; i < pool.length - 1; i++) { r -= pool[i].w; if (r <= 0) break; }
+      const [p] = pool.splice(i, 1);
+      if (fams.has(p.f.fam)) continue;
+      fams.add(p.f.fam);
+      out.push(p.f);
+    }
+  };
+  const trouble = all.filter(p => p.st === 'trouble');
+  draw(trouble, TROUBLE_MAX);
+  // with a big pile of facts to fix, slow down on new ones
+  draw(all.filter(p => p.st === 'unseen' && !trivial(p.f)), trouble.length >= 6 ? 1 : NEW_MAX);
+  draw(all.filter(p => p.st === 'learning' || p.st === 'mastered'), BATCH);
+  draw(all.filter(p => p.st === 'unseen' && trivial(p.f)), BATCH);
+  draw(all, BATCH);
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [out[i], out[j]] = [out[j], out[i]];
   }
   return out;
 }
 
+// First answers only: comeback cards are not recorded, since the answer was just shown.
 function recordFact(k, ms, ok) {
   const s = S.facts[k] || (S.facts[k] = {n: 0, ok: 0, sumOk: 0, recent: [], last: 0});
   ms = Math.round(ms);
   s.n++;
   if (ok) { s.ok++; s.sumOk += ms; }
-  s.recent.push({ms, ok});
+  s.recent.push({ms, ok, t: Date.now()});
   if (s.recent.length > 6) s.recent.shift();
   s.last = Date.now();
 }
@@ -583,7 +612,7 @@ function startBatch() {
 function next() {
   if (!G.queue.length) return finish();
   const c = G.cur = G.queue.shift();
-  Object.assign(G, {input: '', phase: 'ask', cardStart: now(), paused: 0, hiddenAt: document.hidden ? now() : null, firstMs: 0});
+  Object.assign(G, {input: '', phase: 'ask', cardStart: now(), paused: 0, hiddenAt: document.hidden ? now() : null, firstMs: 0, keyAt: 0});
   const f = c.f;
   $('#pA').textContent = f.a;
   $('#pOp').textContent = f.op === '+' ? '+' : '−';
@@ -622,7 +651,10 @@ function press(k) {
   if (!G || G.phase === 'wait') return;
   if (k === 'del') G.input = G.input.slice(0, -1);
   else if (k === 'ok') return submit();
-  else if (G.input.length < 2) G.input = (G.input === '0' ? '' : G.input) + k;
+  else if (G.input.length < 2) {
+    if (!G.input) G.keyAt = elapsed();  // when he started typing this answer
+    G.input = (G.input === '0' ? '' : G.input) + k;
+  }
   $('#card').classList.remove('oops');
   renderAns();
 }
@@ -631,9 +663,9 @@ function submit() {
   if (!G.input) return;
   const v = +G.input, c = G.cur, f = c.f, card = $('#card');
   if (G.phase === 'ask') {
-    const ms = elapsed(), ok = v === f.ans;
-    recordFact(f.k, ms, ok);
-    save();
+    // Thinking time: up to the first digit, as long as the rest was typed promptly.
+    const ms = Math.min(MAX_MS, Math.max(G.keyAt, elapsed() - TYPING)), ok = v === f.ans;
+    if (!c.retry) { recordFact(f.k, ms, ok); save(); }
     if (ok) {
       const stars = c.retry ? 1 : ms < FAST ? 3 : ms < SLOW ? 2 : 1;
       return complete(ms, true, stars);

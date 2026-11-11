@@ -1,10 +1,10 @@
 # Prompts
 
-- **Model:** claude-opus-5-5
-- **Effort:** high
-- **Session(s):** 7fed538a-66d8-4213-8d85-43dd474e6b3a
-- **Tokens:** input 120, output 75766, cache read 8317305, cache write 484540
-- **Cost (tokscale estimate):** $5.6
+- **Model:** claude-fable-5-2, claude-opus-5-5
+- **Effort:** high, medium
+- **Session(s):** 7fed538a-66d8-4213-8d85-43dd474e6b3a eac6e170-3645-4413-892c-d3d7b7f71ea2
+- **Tokens:** input 158, output 94872, cache read 10804702, cache write 571298
+- **Cost (tokscale estimate):** $9.61
 
 ## You
 
@@ -74,6 +74,22 @@ Pushed `master` to `danwatt/ai-experiments`, and local now matches the remote.
 
 ## You
 
+lets add tx-lege and math-garden, and push those as well. Lets also add a recursive ignore for .DS_Store
+
+## Claude
+
+Clean. No secrets; tx-lege already ignores cache/venv/output. Adding root `.gitignore`, committing, pushing.
+
+Pushed `d59cc34` to `master` on `danwatt/ai-experiments`. Local and remote match.
+
+- **math-garden:** `README.md` and `index.html`.
+- **tx-lege:** source code, tests, `pyproject.toml`, `uv.lock`, README and its own `.gitignore`. That `.gitignore` keeps out the 78 MB of `.cache/`, `.venv/` and `output/`, so only source went up. I checked the source for anything like API keys or passwords before committing and found none.
+- **Root `.gitignore`:** `**/.DS_Store` ignores it in every folder, including the one in `tx-lege/`.
+
+Still untracked: `3dtd-opus-5.5-uiltra/` and `voicebox-samples/`.
+
+## You
+
 Looking good so far. I would like for it to randomly switch between horizontal "x + y = " and the vertical version.
 
 ## Claude
@@ -111,10 +127,6 @@ The change is in [fact-rocket/index.html](fact-rocket/index.html) and isn't comm
 ## You
 
 Lets make the horizontal and vertical white boxes take up the same amount of space, so that the keyboard always stays in the same spot
-
-*(sent while Claude was working on the above)*
-
-Also, when doing 10+10, or even 10+9, the numbers overflow the white box.
 
 ## Claude
 
@@ -185,3 +197,94 @@ Pushed `ef1d403` to `master`, and local matches the remote. It has the random si
 Some files weren't in this commit:
 - **`.claude/launch.json`:** it has new edits I didn't make, so I left it uncommitted.
 - **Untracked folders:** `3dtd-opus-5.5-uiltra/`, `overhead/` (new since last push) and `voicebox-samples/`.
+
+## You
+
+Lets run the scripts/prompt-md on this conversation
+
+## Claude
+
+Output good, two fixes needed: drop unrelated tx-lege/math-garden push section, and restore your mid-turn "10+10 overflows" message (script missed it).
+
+I generated [fact-rocket/prompt.md](fact-rocket/prompt.md) from this session, and its 14 screenshots are saved in `fact-rocket/prompt-assets/`.
+
+- **Header:** claude-opus-5-5 at high effort, $5.60 estimated cost. That cost and the token counts cover the whole session, including the tx-lege/math-garden push.
+- **Removed:** the tx-lege/math-garden push and this "run prompt-md" request, since neither is part of the demo.
+- **Added back:** your "10+10 overflows the white box" message. You sent it while I was working, and the script didn't capture it, which left the overflow fix with no prompt above it. It now appears under the matching prompt with a note that it was sent mid-turn.
+- **Screenshot 13:** it shows test content I put on the card for sizing ("10 + 10 = 18" with a subtraction tip), not a real card.
+
+Not committed yet.
+
+## You
+
+Lets take a look at fact-rocket. How can we make this better, covering the features we have today (just addition and subtraction).
+
+## Claude
+
+Read [index.html](index.html) end to end. Not played in browser this pass. Visuals and feel solid. Weak spot is learning engine: what gets asked, and what counts as "known".
+
+## Learning engine (biggest wins)
+
+1. **Missed facts barely come back.** `weight()` gives trouble 6, unseen 3. Fresh addition pool: 81 non-trivial unseen × 3 + 40 trivial × 0.9 ≈ 279 total weight. One trouble fact = ~2% per draw, ~20% chance per round. Kid misses 8 + 7, sees it once more same round, then maybe not for 5 rounds. Fix: guarantee slots. Every round takes up to 3–4 trouble facts first, then fills rest.
+
+2. **Too many new facts at once.** Same math: first dozen rounds are ~9 of 10 brand-new facts. Bad for struggling kid. Fix: cap new facts at 2–3 per round, rest from known/learning (incremental rehearsal). Builds confidence, still moves forward.
+
+3. **Mastery earned too cheap.**
+   - Comeback card answer counts in `recent`. Kid copies ghost answer, sees card again 3 cards later, answers in 2s. That counts as one of three "mastered" answers.
+   - All three fast answers can land same day. Short-term memory, not recall.
+   - Fix: comeback answers don't count toward mastery; require fast-correct on 2+ different days.
+
+4. **3-second clock measures fingers, not memory.** Time runs until ✓ pressed. Answer 17 needs three taps. Fix: record time to first digit as recall time (keep total time too). Also cap at ~20s so one walk-away doesn't wreck averages.
+
+5. **No strategy order.** "Up to 10 / Up to 20" is coarse. Better ladder: +0/+1, doubles, make-10 pairs, near doubles, +9/+8 bridging, then matching subtraction families. Tips already speak this language; selection doesn't. Unlock next group when current mostly mastered.
+
+## Motivation
+
+6. **Stars buy nothing.** `S.stars` just counts up. Add unlocks: rocket colors, planet badges.
+7. **Speed record fights adaptivity.** Rounds get harder as engine targets weak facts, so "fastest flight" gets harder to beat. Swap for "facts mastered: 34 of 121" as kid-facing progress, plus day streak.
+8. **Kid can't see own progress.** Fact map hidden in grown-ups page. Kid-friendly version (stars lighting up) would motivate.
+
+## Device (phone + iPad mini)
+
+9. **No sync, no import.** Export exists, import doesn't. Phone and iPad hold separate progress. Add Import JSON at minimum.
+10. **Home-screen app.** Add manifest + apple-touch-icon so it runs fullscreen, no Safari bars. Swap `100vh` for `100dvh`.
+11. **Keypad uses `click`.** `pointerdown` responds faster, timing more accurate.
+12. **iPad mini portrait** leaves empty space under keypad (noted last session, never fixed). Scale card and keys up there.
+
+## Grown-ups page
+
+13. Trend chart over days (average recall time, mastered count). Now only "first 5 vs last 5".
+14. Horizontal vs vertical comparison. Data already saved per answer, never shown.
+
+Recommend 1–4 first: small code change, biggest effect on actual learning. Item 5 next, bigger design. Rest polish.
+
+## You
+
+Lets address the learning engine 1-4
+
+## Claude
+
+Edits in. Testing rounds in browser now.
+
+All four in [index.html](games/fact-rocket/index.html). Played three rounds in browser, no console errors, test data cleared. Not committed.
+
+**1. Missed facts come back.** Each round now takes up to 4 "needs work" facts first. Test with 8 trouble facts seeded: round had 4 of them.
+
+**2. New facts capped.** Max 3 brand-new facts per round, dropping to 1 when 6+ facts need work. Rest of round comes from facts already seen. Fresh start with nothing seen: round 1 was 3 new + 7 easy ones (0s, 1s, x − x); round 2 was 7 seen + 3 new.
+
+**3. Mastery harder to fake.**
+- Comeback cards no longer recorded in fact history (still listed in round log).
+- Three quick right answers must span 2+ days. Test: three on same day stays "Learning"; spread over two days shows "Mastered".
+- Fact answered quick today gets lower weight for rest of day.
+
+**4. Thinking time, not typing time.** Clock stops at first digit of answer, with 2s allowance for typing rest. Slower typing than that counts as thinking. Test: first digit at 1.3s, ✓ at 4.2s, recorded 2.2s. Recorded time capped at 20s.
+
+Things to know:
+- **Existing progress:** old answers have no date, so all count as one "old" day. Facts now "Mastered" drop to "Learning" until one more quick right answer on new day.
+- **Averages shift:** new times are shorter than old ones (typing excluded), so grown-ups "Avg answer" will look like sudden jump in speed.
+- **Flight time unchanged:** still full time on cards, uncapped.
+- **Knobs:** `TROUBLE_MAX`, `NEW_MAX`, `TYPING`, `MAX_MS` at top of script.
+
+## You
+
+Commit the working tree changes with a sensible message.
