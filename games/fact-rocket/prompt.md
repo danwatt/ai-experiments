@@ -3,8 +3,8 @@
 - **Model:** claude-fable-5-2, claude-opus-5-5
 - **Effort:** high, medium
 - **Session(s):** 7fed538a-66d8-4213-8d85-43dd474e6b3a eac6e170-3645-4413-892c-d3d7b7f71ea2
-- **Tokens:** input 158, output 94872, cache read 10804702, cache write 571298
-- **Cost (tokscale estimate):** $9.61
+- **Tokens:** input 180, output 112694, cache read 12308682, cache write 595884
+- **Cost (tokscale estimate):** $11.01
 
 ## You
 
@@ -284,6 +284,53 @@ Things to know:
 - **Averages shift:** new times are shorter than old ones (typing excluded), so grown-ups "Avg answer" will look like sudden jump in speed.
 - **Flight time unchanged:** still full time on cards, uncapped.
 - **Knobs:** `TROUBLE_MAX`, `NEW_MAX`, `TYPING`, `MAX_MS` at top of script.
+
+## You
+
+Commit the working tree changes with a sensible message.
+
+## Claude
+
+Committed `20244ed` on `master`: "Fact Rocket: fix fact selection, mastery and timing". Not pushed.
+
+- **In commit:** [index.html](games/fact-rocket/index.html) and regenerated [prompt.md](games/fact-rocket/prompt.md) (both sessions; cost shows $9.61).
+- **Left out:** edits not from this session — `politics/texas-isd-statewide-opus-5.5-high/`, `route-planner-opus-5.5-extra/`, untracked `watt-logo-variations/`. Say so if those should go in too.
+- **prompt.md stale by one turn:** generated before this commit request, so this last exchange not in it.
+
+## You
+
+Lets work on the motification points
+
+## Claude
+
+Code in. Testing skins, streak, star map in browser.
+
+![screenshot 15](prompt-assets/015.webp)
+
+![screenshot 16](prompt-assets/016.webp)
+
+![screenshot 17](prompt-assets/017.webp)
+
+![screenshot 18](prompt-assets/018.webp)
+
+Good. Clearing test data, resetting viewport.
+
+Motivation points 6–8 done in [index.html](games/fact-rocket/index.html). Played round at phone size (375×812): no console errors, no sideways scroll. Test data cleared. Not committed.
+
+**6. Stars unlock rockets.** New "My rockets" row on home: 8 paint jobs (Classic, Comet, Lime, Sunset, Grape, Midnight, Bubblegum, Gold) at 0 / 30 / 75 / 150 / 250 / 400 / 600 / 900 stars. Stars never spent, only counted. Chosen rocket shows everywhere (home, fuel bar, launch). Row caption shows stars left to next one. Results screen announces unlock. Test: 24 stars + round took it past 30, "New rocket unlocked: Comet!" shown, Comet selectable.
+
+**7. Speed record gone, mastery + streak in.**
+- Home: "Fastest flight" line replaced by bar — gold for mastered, blue for learning — with counts for chosen mission.
+- Home: "🔥 3 days in a row" beside Today dots, shown from 2 days up.
+- Results: record line now names newly mastered facts, or counts quick answers ("Quick again on another day = mastered"). Flight time tile stays, with no comparison.
+
+**8. Kid star map.** Tap bar on home. Grid of every fact, Adding / Taking away tabs: gold star mastered, blue star learning, dim dot not met. Tap star to see its fact. "Needs work" facts show as plain learning here; no red for kid.
+
+Things to know:
+- **Day one stays at 0 mastered** (two-day rule). Blue part of bar grows instead.
+- **Best times still saved** in data, just not shown.
+- **Existing stars count** toward unlocks right away.
+- **Not tested:** iPad mini size, and unlock thresholds are my guess (~15–25 stars per round, so first unlock after round 2, last after ~45 rounds). Costs sit in `SKINS` at top of script.
 
 ## You
 

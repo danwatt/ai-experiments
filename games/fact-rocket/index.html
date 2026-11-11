@@ -39,6 +39,8 @@ button:focus-visible{outline:4px solid var(--gold);outline-offset:3px}
 .warn{margin:10px auto 0;max-width:420px;text-align:center;font-size:13px;color:#ffd0c9;background:rgba(255,107,107,.15);border-radius:12px;padding:8px 12px}
 
 /* ---------- rocket + planets ---------- */
+:root{--rb:#f4f6ff;--rn:#ff5d73;--rw:#3b4bd8}
+.rocket .rb{fill:var(--rb)} .rocket .rn{fill:var(--rn)} .rocket .rw{fill:var(--rw)}
 .rocket .flame{transform-origin:32px 92px;animation:flicker .12s infinite alternate}
 .planet{position:relative;border-radius:50%;flex:none;background:radial-gradient(circle at 34% 30%,var(--l),var(--d) 80%);box-shadow:inset -6px -8px 14px rgba(0,0,0,.28)}
 .planet.band{background:repeating-linear-gradient(168deg,transparent 0 13%,rgba(80,30,0,.14) 13% 21%),radial-gradient(circle at 34% 30%,var(--l),var(--d) 80%)}
@@ -58,7 +60,21 @@ button:focus-visible{outline:4px solid var(--gold);outline-offset:3px}
 .seg button small{display:block;font-size:12px;font-weight:700;color:var(--muted);margin-top:3px}
 .seg button.sel{background:var(--accent);border-color:#b3baff;box-shadow:0 5px 0 #3a45b8}
 .seg button.sel small{color:#e3e6ff}
-.best{text-align:center;color:var(--soft);font-size:14px;font-weight:700;min-height:20px}
+.prog{display:block;width:min(100%,420px);margin:10px auto 0;padding:6px 4px;text-align:center;color:var(--soft);font-size:14px;font-weight:700}
+.prog b{color:#fff}
+.prog u{color:var(--muted);text-underline-offset:3px}
+.bar{display:flex;height:14px;border-radius:999px;background:rgba(255,255,255,.1);overflow:hidden;margin-bottom:8px;border:1px solid var(--glass-line)}
+.bar i{display:block;height:100%;transition:width .4s}
+.bar .m{background:linear-gradient(#ffe27f,#ffb21f)}
+.bar .l{background:linear-gradient(#c4e6ff,#6aa8ff)}
+.skins{display:flex;gap:8px;overflow-x:auto;padding:10px 2px 4px;scrollbar-width:none}
+.skin{flex:none;width:66px;padding:8px 2px 6px;border-radius:14px;background:rgba(255,255,255,.06);border:2px solid transparent;font-size:11px;font-weight:800;color:var(--soft);line-height:1.2}
+.skin svg{width:26px;display:block;margin:0 auto 4px}
+.skin .flame{animation:none}
+.skin.sel{border-color:var(--gold);background:rgba(255,200,61,.15);color:#fff}
+.skin.locked svg{opacity:.3;filter:grayscale(1)}
+.k-learning{background:#6aa8ff;color:#fff!important}
+.k-mastered{background:#ffc83d}
 .journey{margin-top:22px;background:var(--glass);border:1px solid var(--glass-line);border-radius:20px;padding:14px 16px}
 .journey .row{display:flex;align-items:center;gap:12px;overflow:hidden}
 .journey .trail{flex:1;height:0;border-top:2px dotted rgba(255,255,255,.3);min-width:12px}
@@ -144,7 +160,7 @@ button:focus-visible{outline:4px solid var(--gold);outline-offset:3px}
 
 /* ---------- grown-ups ---------- */
 #stats{user-select:text;-webkit-user-select:text}
-#stats h1{font-size:26px;margin:0}
+#stats h1,#map h1{font-size:26px;margin:0}
 .panel{background:var(--glass);border:1px solid var(--glass-line);border-radius:20px;padding:16px;margin-top:14px}
 .panel h2{font-size:16px;margin:0 0 4px}
 .panel .note{font-size:13px;color:var(--soft);margin:0 0 12px;line-height:1.45}
@@ -222,11 +238,19 @@ td.num,th.num{text-align:right}
     </div>
 
     <button class="big" id="launchBtn">🚀 Launch!</button>
-    <div class="best" id="bestLine"></div>
+    <button class="prog" id="progBtn" aria-label="Open my star map">
+      <div class="bar"><i class="m" id="barM"></i><i class="l" id="barL"></i></div>
+      <span id="progCap"></span>
+    </button>
 
     <div class="journey">
       <div class="row" id="journeyRow"></div>
       <div class="cap" id="journeyCap"></div>
+    </div>
+
+    <div class="journey">
+      <div class="cap" style="margin-top:0" id="skinCap"></div>
+      <div class="skins" id="skins"></div>
     </div>
 
     <div class="warn" id="warn" hidden>Progress can’t be saved in this browser (private window?). It will reset when the page closes.</div>
@@ -271,6 +295,28 @@ td.num,th.num{text-align:right}
     <div class="btnrow">
       <button class="big" id="againBtn">🚀 Fly again</button>
       <button class="big blue" id="homeBtn">Home</button>
+    </div>
+  </section>
+
+  <!-- STAR MAP (kid's view of progress) -->
+  <section id="map" class="screen" aria-label="My star map">
+    <div class="top">
+      <h1>My star map</h1>
+      <button class="iconbtn" id="mapBack" aria-label="Back">✕</button>
+    </div>
+    <div class="panel">
+      <p class="note" id="mapNote"></p>
+      <div class="tabs" id="mapTabs">
+        <button data-g="add">Adding</button>
+        <button data-g="sub">Taking away</button>
+      </div>
+      <div class="fgrid" id="mgrid"></div>
+      <div class="legend">
+        <span><i class="k-mastered"></i>Mastered</span>
+        <span><i class="k-learning"></i>Learning</span>
+        <span><i class="s-unseen"></i>Not met yet</span>
+      </div>
+      <div class="detail" id="mdetail"></div>
     </div>
   </section>
 
@@ -339,11 +385,22 @@ const MAX_MS = 20000;                     // cap on a recorded answer time (walk
 const ROCKET = `<svg class="rocket" viewBox="0 0 64 124" aria-hidden="true">
   <path class="flame" d="M23 92 Q32 126 41 92Z" fill="#ffad3b"/>
   <path class="flame" d="M27 92 Q32 112 37 92Z" fill="#fff27a"/>
-  <path d="M32 4C48 20 50 50 46 92H18C14 50 16 20 32 4Z" fill="#f4f6ff"/>
-  <path d="M32 4C40 12 44 22 45.6 30H18.4C20 22 24 12 32 4Z" fill="#ff5d73"/>
-  <circle cx="32" cy="50" r="9" fill="#3b4bd8" stroke="#c9d0ff" stroke-width="3"/>
-  <path d="M18 64L5 92 18 88Z M46 64L59 92 46 88Z" fill="#ff5d73"/>
-  <rect x="29" y="70" width="6" height="22" rx="3" fill="#ff5d73"/></svg>`;
+  <path class="rb" d="M32 4C48 20 50 50 46 92H18C14 50 16 20 32 4Z"/>
+  <path class="rn" d="M32 4C40 12 44 22 45.6 30H18.4C20 22 24 12 32 4Z"/>
+  <circle class="rw" cx="32" cy="50" r="9" stroke="#c9d0ff" stroke-width="3"/>
+  <path class="rn" d="M18 64L5 92 18 88Z M46 64L59 92 46 88Z"/>
+  <rect class="rn" x="29" y="70" width="6" height="22" rx="3"/></svg>`;
+// Rocket paint jobs: [name, body, nose + fins, window, stars needed]. Stars are never spent.
+const SKINS = [
+  ['Classic', '#f4f6ff', '#ff5d73', '#3b4bd8', 0],
+  ['Comet', '#dff6ff', '#2aa8ff', '#0b3a8a', 30],
+  ['Lime', '#f2ffe0', '#46c93a', '#1c6b2a', 75],
+  ['Sunset', '#fff0d6', '#ff8a3d', '#a8320f', 150],
+  ['Grape', '#f1e4ff', '#9a4dff', '#3d1a8a', 250],
+  ['Midnight', '#2b2f55', '#ffc83d', '#9bd0ff', 400],
+  ['Bubblegum', '#ffe3f3', '#ff5db1', '#7a2bd1', 600],
+  ['Gold', '#ffd95a', '#ff7a1f', '#ffffff', 900],
+];
 const PLANETS = [
   ['the Moon', '#f4f4f8', '#8d8fa8'],
   ['Mars', '#ffa27a', '#b63b1c'],
@@ -364,7 +421,7 @@ const $ = s => document.querySelector(s);
 const now = () => performance.now();
 
 /* ================= storage ================= */
-const DEFAULT = {v: 1, settings: {op: 'add', range: 20, muted: false}, facts: {}, batches: [], stars: 0, launches: 0, best: {}};
+const DEFAULT = {v: 1, settings: {op: 'add', range: 20, muted: false, skin: 0}, facts: {}, batches: [], stars: 0, launches: 0, best: {}};
 let S, storageOk = true;
 
 function load() {
@@ -537,18 +594,51 @@ document.querySelectorAll('.rocket-slot').forEach(el => {
   if (el.classList.contains('small')) el.querySelector('svg').style.width = '20px';
 });
 
+/* ================= progress the pilot can see ================= */
+const skinVars = i => `--rb:${SKINS[i][1]};--rn:${SKINS[i][2]};--rw:${SKINS[i][3]}`;
+function applySkin() {
+  if (!SKINS[S.settings.skin] || SKINS[S.settings.skin][4] > S.stars) S.settings.skin = 0;
+  document.documentElement.style.cssText = skinVars(S.settings.skin);
+}
+// Days in a row with at least one rocket, counting today (or up to yesterday if not flown yet today).
+function dayStreak() {
+  const days = new Set(S.batches.map(b => new Date(b.t).toDateString()));
+  const d = new Date();
+  let n = 0;
+  if (!days.has(d.toDateString())) d.setDate(d.getDate() - 1);
+  while (days.has(d.toDateString())) { n++; d.setDate(d.getDate() - 1); }
+  return n;
+}
+function tally(op, range) {
+  const st = allFacts(op, range).map(f => status(S.facts[f.k]));
+  const mastered = st.filter(s => s === 'mastered').length;
+  return {total: st.length, mastered, learning: st.filter(s => s === 'learning' || s === 'trouble').length};
+}
+
 /* ================= home ================= */
 function renderHome() {
   const {op, range} = S.settings;
+  applySkin();
   $('#starTotal').textContent = `⭐ ${S.stars}`;
   document.querySelectorAll('#opSeg button').forEach(b => b.classList.toggle('sel', b.dataset.op === op));
   document.querySelectorAll('#rangeSeg button').forEach(b => b.classList.toggle('sel', +b.dataset.range === range));
 
-  const best = S.best[`${op}-${range}`];
-  $('#bestLine').textContent = best ? `Fastest flight on this mission: ${fmtTime(best)}` : 'New mission — set your first record!';
+  const t = tally(op, range);
+  $('#barM').style.width = t.mastered / t.total * 100 + '%';
+  $('#barL').style.width = t.learning / t.total * 100 + '%';
+  $('#progCap').innerHTML = `<b>${t.mastered}</b> mastered · <b>${t.learning}</b> learning · of ${t.total} facts<br><u>My star map ›</u>`;
 
-  const today = S.batches.filter(b => isToday(b.t)).length, goal = Math.max(3, today);
-  $('#today').innerHTML = `Today:&nbsp;${Array.from({length: goal}, (_, i) => `<i class="${i < today ? 'on' : ''}"></i>`).join('')}`;
+  const today = S.batches.filter(b => isToday(b.t)).length, goal = Math.max(3, today), streak = dayStreak();
+  $('#today').innerHTML = `Today:&nbsp;${Array.from({length: goal}, (_, i) => `<i class="${i < today ? 'on' : ''}"></i>`).join('')}` +
+    (streak >= 2 ? `&nbsp;· 🔥 ${streak} days in a row` : '');
+
+  const next = SKINS.find(s => s[4] > S.stars);
+  $('#skinCap').innerHTML = next ? `My rockets · <b>${next[4] - S.stars}</b> more ⭐ for <b>${next[0]}</b>` : 'My rockets · all unlocked!';
+  $('#skins').innerHTML = SKINS.map((s, i) => {
+    const locked = s[4] > S.stars;
+    return `<button class="skin${locked ? ' locked' : ''}${i === S.settings.skin ? ' sel' : ''}" data-skin="${i}" style="${skinVars(i)}"${locked ? ' disabled' : ''}>` +
+      `${ROCKET}${locked ? `⭐ ${s[4]}` : s[0]}</button>`;
+  }).join('');
 
   const n = S.launches, from = Math.max(0, n - 4);
   let row = '';
@@ -567,6 +657,15 @@ $('#opSeg').addEventListener('click', e => {
 $('#rangeSeg').addEventListener('click', e => {
   const b = e.target.closest('button'); if (!b) return;
   S.settings.range = +b.dataset.range; save(); renderHome();
+});
+$('#skins').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b || b.disabled) return;
+  S.settings.skin = +b.dataset.skin; save(); renderHome();
+  tone([523, 784], {gap: 0.08});
+});
+$('#progBtn').addEventListener('click', () => {
+  mapOp = S.settings.op === 'sub' ? 'sub' : 'add'; mapKey = null;
+  renderMap(); show('map');
 });
 $('#launchBtn').addEventListener('click', startBatch);
 $('#parentBtn').addEventListener('click', () => { renderStats(); show('stats'); });
@@ -604,6 +703,7 @@ function startBatch() {
   const {op, range} = S.settings;
   G = {op, range, queue: pickBatch(op, range).map(f => ({f, retry: false})), cells: Array(BATCH).fill(''),
        done: 0, firstTry: 0, stars: 0, streak: 0, bestStreak: 0, ms: 0, items: [], missed: []};
+  G.wasMastered = new Set(G.queue.filter(c => status(S.facts[c.f.k]) === 'mastered').map(c => c.f.k));
   tone([392, 523], {gap: 0.1});
   show('play');
   next();
@@ -786,7 +886,7 @@ function renderMute() { $('#muteBtn').textContent = S.settings.muted ? '🔇' : 
 function finish() {
   const g = G; G = null;
   const key = `${g.op}-${g.range}`, prevBest = S.best[key], ms = Math.round(g.ms);
-  const dest = S.launches;
+  const dest = S.launches, starsBefore = S.stars;
   S.launches++;
   S.stars += g.stars;
   if (!prevBest || ms < prevBest) S.best[key] = ms;
@@ -801,11 +901,18 @@ function finish() {
   $('#resTime').textContent = fmtTime(ms);
   $('#resStars').textContent = `+${g.stars}`;
 
+  // Celebrate learning, not the clock: newly mastered facts, quick answers, new rockets.
+  const firsts = g.items.filter(x => !x.retry);
+  const newly = firsts.filter(x => !g.wasMastered.has(x.k) && status(S.facts[x.k]) === 'mastered').map(x => showFact(parseKey(x.k)));
+  const quick = firsts.filter(x => x.ok && x.ms < FAST).length;
+  const lines = [];
+  if (newly.length) lines.push(`🏆 Mastered: ${newly.slice(0, 4).join(', ')}${newly.length > 4 ? ` and ${newly.length - 4} more` : ''}!`);
+  else if (quick) lines.push(`⚡ ${quick} quick answer${quick === 1 ? '' : 's'}! Quick again on another day = mastered.`);
+  else lines.push('Every flight makes the facts stick. Keep flying!');
+  SKINS.filter(s => s[4] > starsBefore && s[4] <= S.stars).forEach(s => lines.push(`🚀 New rocket unlocked: ${s[0]}!`));
   const rec = $('#resRecord');
-  rec.classList.remove('calm');
-  if (!prevBest) { rec.textContent = 'First flight on this mission — that’s your time to beat!'; rec.classList.add('calm'); }
-  else if (ms < prevBest) rec.textContent = `🏆 New record! ${fmtTime(prevBest - ms)} faster than before.`;
-  else { rec.textContent = `Your record: ${fmtTime(prevBest)}. Keep flying!`; rec.classList.add('calm'); }
+  rec.classList.toggle('calm', !newly.length && lines.length === 1);
+  rec.innerHTML = lines.join('<br>');
 
   const missed = g.missed.map(parseKey);
   $('#resPractice').innerHTML = missed.length
@@ -873,27 +980,53 @@ function cellHtml(k) {
   const text = st === 'unseen' ? '·' : avg === null ? '✕' : secs(avg);
   return `<div class="f s-${st}${k === selKey ? ' sel' : ''}" data-k="${k}" title="${showFact(parseKey(k))}">${text}</div>`;
 }
-function renderGrid() {
-  document.querySelectorAll('#gridTabs button').forEach(b => b.classList.toggle('sel', b.dataset.g === gridOp));
-  let html = '';
-  if (gridOp === 'add') {
-    html += '<div class="h corner">+</div>';
-    for (let b = 0; b <= 10; b++) html += `<div class="h">${b}</div>`;
-    for (let a = 0; a <= 10; a++) {
-      html += `<div class="h">${a}</div>`;
-      for (let b = 0; b <= 10; b++) html += cellHtml(`${a}+${b}`);
-    }
-  } else {
-    html += '<div class="h corner">−</div>';
-    for (let b = 0; b <= 10; b++) html += `<div class="h">${b}</div>`;
-    for (let c = 0; c <= 20; c++) {
-      html += `<div class="h">${c}</div>`;
-      for (let b = 0; b <= 10; b++) html += (b <= c && c - b <= 10) ? cellHtml(`${c}-${b}`) : '<div></div>';
+// Grid of every fact for one operation; `cell` renders one square from its key.
+function gridHtml(op, cell) {
+  let html = `<div class="h corner">${op === 'add' ? '+' : '−'}</div>`;
+  for (let b = 0; b <= 10; b++) html += `<div class="h">${b}</div>`;
+  for (let r = 0; r <= (op === 'add' ? 10 : 20); r++) {
+    html += `<div class="h">${r}</div>`;
+    for (let b = 0; b <= 10; b++) {
+      if (op === 'add') html += cell(`${r}+${b}`);
+      else html += (b <= r && r - b <= 10) ? cell(`${r}-${b}`) : '<div></div>';
     }
   }
-  $('#fgrid').innerHTML = html;
+  return html;
+}
+function renderGrid() {
+  document.querySelectorAll('#gridTabs button').forEach(b => b.classList.toggle('sel', b.dataset.g === gridOp));
+  $('#fgrid').innerHTML = gridHtml(gridOp, cellHtml);
   renderDetail();
 }
+
+/* ================= star map ================= */
+let mapOp = 'add', mapKey = null;
+const kidStatus = k => ({unseen: 'unseen', mastered: 'mastered'})[status(S.facts[k])] || 'learning';
+function renderMap() {
+  document.querySelectorAll('#mapTabs button').forEach(b => b.classList.toggle('sel', b.dataset.g === mapOp));
+  const t = tally(mapOp, 20);
+  $('#mapNote').textContent = `${t.mastered} of ${t.total} stars are gold. Answer a fact quickly on two different days to turn its star gold. Tap a star to see its fact.`;
+  $('#mgrid').innerHTML = gridHtml(mapOp, k => {
+    const st = kidStatus(k);
+    return `<div class="f ${st === 'unseen' ? 's-unseen' : 'k-' + st}${k === mapKey ? ' sel' : ''}" data-k="${k}">${st === 'unseen' ? '·' : '★'}</div>`;
+  });
+  let text = mapOp === 'add' ? 'Rows: first number. Columns: second number.' : 'Rows: starting number. Columns: number taken away.';
+  if (mapKey) {
+    const f = parseKey(mapKey), st = kidStatus(mapKey);
+    text = st === 'unseen' ? `${showFact(f)}: not met yet.`
+      : `${showFact(f)} = ${f.ans} · ${st === 'mastered' ? '⭐ Mastered!' : 'Learning. Keep answering it quickly!'}`;
+  }
+  $('#mdetail').textContent = text;
+}
+$('#mapTabs').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  mapOp = b.dataset.g; mapKey = null; renderMap();
+});
+$('#mgrid').addEventListener('click', e => {
+  const c = e.target.closest('.f'); if (!c) return;
+  mapKey = c.dataset.k; renderMap();
+});
+$('#mapBack').addEventListener('click', () => { renderHome(); show('home'); });
 function renderDetail() {
   if (!selKey) { $('#detail').textContent = gridOp === 'add' ? 'Rows: first number. Columns: second number.' : 'Rows: starting number. Columns: number taken away.'; return; }
   const f = parseKey(selKey), s = S.facts[selKey];
