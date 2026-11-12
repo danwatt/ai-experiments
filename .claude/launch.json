@@ -246,6 +246,19 @@
         "politics"
       ],
       "port": 8827
+    },
+    {
+      "name": "texas-public-hospitals",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8791",
+        "-d",
+        "."
+      ],
+      "port": 8791,
+      "url": "http://localhost:8791"
     }
   ]
 }

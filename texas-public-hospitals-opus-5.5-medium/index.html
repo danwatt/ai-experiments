@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Texas Public Hospitals</title>
+  <meta name="description" content="Ten years of revenue, expenses and net income for Texas' county and hospital-district hospitals, from Medicare cost reports.">
+  <link rel="stylesheet" href="../bluebonnet-design-system/dist/bluebonnet.css">
+  <script>
+    (function () {
+      var t = 'auto';
+      try { t = localStorage.getItem('txhosp-theme') || 'auto'; } catch (e) {}
+      if (t !== 'auto') document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+  <style>
+    /* Chart series, validated with the dataviz palette checker against surface-raised in each theme:
+       patient revenue = bluebonnet, expenses = paintbrush, property tax = winecup; --c-n is a neutral
+       for "everything else" (other income, districts with no hospital), never a fourth identity hue. */
+    :root { --c-1: #3149a3; --c-2: #c93f24; --c-3: #8e2a6b; --c-n: #a3a9c4;
+      /* map ramps: sequential = one hue light to dark; diverging = paintbrush, gray midpoint, bluebonnet */
+      --sq-0: #e3e7fb; --sq-1: #bfc7e9; --sq-2: #9ca8d8; --sq-3: #7888c6; --sq-4: #5569b5; --sq-5: #3149a3;
+      --dv-0: #c93f24; --dv-1: #e08a75; --dv-2: #f2c6ba; --dv-3: #e4e5ec; --dv-4: #bfc7e9; --dv-5: #7888c6; --dv-6: #3149a3; }
+    @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --c-1: #6d82e0; --c-2: #e0694b; --c-3: #b8569a; --c-n: #555c85;
+      --sq-0: #232a5c; --sq-1: #39427d; --sq-2: #4e5b9d; --sq-3: #6473be; --sq-4: #798cde; --sq-5: #8fa4ff;
+      --dv-0: #e0694b; --dv-1: #a5503d; --dv-2: #5e3632; --dv-3: #30344f; --dv-4: #39427d; --dv-5: #5569b5; --dv-6: #8fa4ff; } }
+    [data-theme="dark"] { --c-1: #6d82e0; --c-2: #e0694b; --c-3: #b8569a; --c-n: #555c85;
+      --sq-0: #232a5c; --sq-1: #39427d; --sq-2: #4e5b9d; --sq-3: #6473be; --sq-4: #798cde; --sq-5: #8fa4ff;
+      --dv-0: #e0694b; --dv-1: #a5503d; --dv-2: #5e3632; --dv-3: #30344f; --dv-4: #39427d; --dv-5: #5569b5; --dv-6: #8fa4ff; }
+
+    body { background: var(--surface); color: var(--ink); margin: 0; }
+    .wrap { max-width: 1180px; margin: 0 auto; padding: var(--space-6) var(--space-6) var(--space-12); }
+    @media (max-width: 600px) { .wrap { padding: var(--space-4) var(--space-4) var(--space-12); } }
+    header.top { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-4); }
+    .eyebrow { color: var(--ink-muted); margin: 0 0 var(--space-2); }
+    h1.text-h1 { margin: 0 0 var(--space-3); }
+    .lede { max-width: 68ch; color: var(--ink-muted); margin: 0; }
+    section { margin-top: var(--space-12); }
+    section > h2 { margin: 0 0 var(--space-2); }
+    section > p.sub { color: var(--ink-muted); max-width: 70ch; margin: 0 0 var(--space-6); }
+
+    .tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-4); margin-top: var(--space-8); }
+    @media (max-width: 860px) { .tiles { grid-template-columns: repeat(2, 1fr); } }
+    .tile, .panel { background: var(--surface-raised); border: 1px solid var(--line); border-radius: var(--radius-md); }
+    .tile { padding: var(--space-4); }
+    .tile .v { font: 700 28px/34px var(--font-display); letter-spacing: -0.01em; margin: var(--space-1) 0; }
+    .tile .d { color: var(--ink-muted); font-size: 14px; line-height: 20px; }
+
+    .panel { padding: var(--space-4); }
+    .panel h3 { margin: 0; }
+    .panel .meta { color: var(--ink-muted); font-size: 14px; line-height: 20px; margin: 2px 0 var(--space-3); }
+    .grid6 { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-4); }
+    @media (max-width: 960px) { .grid6 { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 600px) { .grid6 { grid-template-columns: 1fr; } }
+    .mini { position: relative; height: 180px; }
+    .mini-stats { display: flex; gap: var(--space-4); margin-top: var(--space-3); font-size: 14px; line-height: 20px; color: var(--ink-muted); flex-wrap: wrap; }
+    .mini-stats b { color: var(--ink); font-weight: 600; }
+    .panel button.linkish { all: unset; cursor: pointer; color: var(--bluebonnet); font-size: 14px; font-weight: 600; }
+    .panel button.linkish:hover { text-decoration: underline; }
+    .panel button.linkish:focus-visible { outline: 2px solid var(--bluebonnet); outline-offset: 2px; border-radius: 2px; }
+
+    .legend { display: flex; flex-wrap: wrap; gap: var(--space-4); font-size: 14px; line-height: 20px; color: var(--ink-muted); margin-bottom: var(--space-4); }
+    .legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .sw { width: 14px; height: 10px; border-radius: 2px; display: inline-block; }
+    .sw.line { height: 2px; border-radius: 0; }
+
+    .controls { display: flex; gap: var(--space-4); flex-wrap: wrap; align-items: flex-end; margin-bottom: var(--space-6); }
+    .controls .bb-field { min-width: 260px; flex: 1 1 320px; max-width: 480px; }
+    .detail-head { display: flex; justify-content: space-between; gap: var(--space-4); flex-wrap: wrap; align-items: baseline; margin-bottom: var(--space-4); }
+    .detail-head h3 { margin: 0; }
+    .two { display: grid; grid-template-columns: 3fr 2fr; gap: var(--space-4); }
+    @media (max-width: 900px) { .two { grid-template-columns: 1fr; } }
+    .chart { position: relative; height: 340px; }
+    .chart.short { height: 260px; }
+    .stack { display: grid; gap: var(--space-4); }
+    .note { font-size: 14px; line-height: 22px; color: var(--ink-muted); margin: var(--space-3) 0 0; }
+    .flag { margin-bottom: var(--space-4); }
+    .map-grid { display: grid; grid-template-columns: minmax(0, 3fr) minmax(240px, 1fr); gap: var(--space-6); align-items: start; }
+    @media (max-width: 860px) { .map-grid { grid-template-columns: 1fr; } }
+    #txmap { display: block; width: 100%; height: auto; }
+    #txmap path { stroke: var(--surface-raised); stroke-width: 0.6; transition: opacity 120ms; }
+    #txmap path.nodata { fill: var(--surface-raised); stroke: var(--line-strong); stroke-width: 0.4; }
+    #txmap path.has { cursor: pointer; }
+    #txmap path.has:hover, #txmap path.sel { stroke: var(--ink); stroke-width: 1.6; }
+    @media (prefers-reduced-motion: reduce) { #txmap path { transition: none; } }
+    .map-legend { display: flex; flex-wrap: wrap; gap: 2px; margin: var(--space-2) 0 var(--space-4); font-size: 12px; color: var(--ink-muted); }
+    .map-legend .k { display: flex; flex-direction: column; gap: 4px; min-width: 56px; flex: 1 1 0; }
+    .map-legend .k i { height: 12px; border-radius: 2px; display: block; }
+    .map-legend .k.none { flex: 0 0 auto; margin-left: var(--space-3); }
+    .map-legend .k.none i { background: var(--surface-raised); border: 1px solid var(--line-strong); }
+    .map-side h3 { margin: 0 0 var(--space-1); }
+    .map-side .meta { margin-bottom: var(--space-3); }
+    .map-side ul { list-style: none; padding: 0; margin: 0; display: grid; gap: var(--space-2); }
+    .map-side li { display: flex; justify-content: space-between; gap: var(--space-3); font-size: 14px; line-height: 20px; border-bottom: 1px solid var(--line); padding-bottom: var(--space-2); }
+    .map-side li > span:last-child { white-space: nowrap; font-weight: 600; }
+    .map-side li .hn { display: block; color: var(--ink-muted); font-size: 13px; }
+    .map-tip { position: fixed; pointer-events: none; z-index: 10; background: var(--surface-raised); border: 1px solid var(--line-strong); border-radius: var(--radius-md); box-shadow: var(--shadow-1); padding: var(--space-2) var(--space-3); font-size: 13px; line-height: 18px; max-width: 280px; }
+    .map-tip b { display: block; font-size: 14px; }
+    .sankey-head { display: flex; justify-content: space-between; align-items: flex-end; gap: var(--space-4); flex-wrap: wrap; margin-top: var(--space-8); border-top: 1px solid var(--line); padding-top: var(--space-6); }
+    .sankey-head h3 { margin: 0; }
+    .sankey-year { flex: 0 0 160px; }
+    .sankey-wrap { overflow-x: auto; margin-top: var(--space-4); }
+    #sankey { display: block; width: 100%; min-width: 680px; height: auto; font-family: var(--font-body); }
+    #sankey .lbl { fill: var(--ink); font-size: 13px; font-weight: 600; }
+    #sankey .amt { fill: var(--ink-muted); font-size: 12px; }
+    #sankey .ctr { fill: var(--ink); font: 700 15px var(--font-display); }
+    #sankey path.flow { fill-opacity: .42; transition: fill-opacity 120ms; }
+    #sankey path.flow:hover { fill-opacity: .7; }
+    @media (prefers-reduced-motion: reduce) { #sankey path.flow { transition: none; } }
+
+    .tbl-tools { display: flex; gap: var(--space-4); flex-wrap: wrap; align-items: flex-end; margin-bottom: var(--space-4); }
+    .tbl-tools .bb-field { flex: 1 1 260px; max-width: 360px; }
+    .bb-table-wrap { overflow-x: auto; }
+    .bb-table td.n, .bb-table th.n { text-align: right; white-space: nowrap; }
+    .bb-table th button { all: unset; cursor: pointer; font: inherit; }
+    .bb-table th button:focus-visible { outline: 2px solid var(--bluebonnet); outline-offset: 2px; }
+    .bb-table th[aria-sort] button::after { content: " \2195"; color: var(--line-strong); }
+    .bb-table th[aria-sort="ascending"] button::after { content: " \2191"; color: var(--ink); }
+    .bb-table th[aria-sort="descending"] button::after { content: " \2193"; color: var(--ink); }
+    .bb-table tbody tr { cursor: pointer; }
+    .bb-table tbody tr:hover td { background: var(--bluebonnet-soft); }
+    .bb-table td .sub { display: block; color: var(--ink-muted); font-size: 13px; }
+    .neg { color: var(--danger); }
+    .spark { display: block; }
+    details.methods { margin-top: var(--space-4); }
+    details.methods summary { cursor: pointer; font-weight: 600; }
+    .methods ul { padding-left: 20px; max-width: 80ch; }
+    .methods li { margin-bottom: var(--space-2); }
+    .theme-btn { white-space: nowrap; }
+    footer { margin-top: var(--space-12); color: var(--ink-muted); font-size: 14px; border-top: 1px solid var(--line); padding-top: var(--space-4); }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <p class="eyebrow text-label">Texas public hospitals · FY2015–FY2024</p>
+      <h1 class="text-h1">Where the money goes at Texas' public hospitals</h1>
+      <p class="lede">Texas has about 100 hospitals owned by a county, a city or a hospital district. Six big urban systems take in most of the money: Parkland, Harris Health, University Health, JPS, UMC Lubbock and UMC El Paso. These charts show ten years of their revenue and expenses as filed with Medicare, and how much of it the local property tax pays for.</p>
+    </div>
+    <button class="bb-btn bb-btn--secondary bb-btn--sm theme-btn" id="themeBtn" type="button">Theme: auto</button>
+  </header>
+
+  <div class="tiles" id="tiles"></div>
+
+  <section id="big">
+    <h2 class="text-h2">The big six</h2>
+    <p class="sub">Total revenue (patient revenue plus other income such as property taxes, grants and supplemental Medicaid payments) against total expenses each fiscal year, with the district's property tax levy for comparison. Each panel has its own scale. A dashed stretch skips a short transition year (Harris Health's 7-month FY2022).</p>
+    <div class="legend" aria-hidden="true">
+      <span><i class="sw line" style="background:var(--c-1)"></i>Total revenue</span>
+      <span><i class="sw line" style="background:var(--c-2)"></i>Total expenses</span>
+      <span><i class="sw line" style="background:var(--c-3)"></i>Property tax levy</span>
+    </div>
+    <div class="grid6" id="grid6"></div>
+  </section>
+
+  <section id="map">
+    <h2 class="text-h2">County by county</h2>
+    <p class="sub">Each county with a public hospital, shaded by the measure you pick, from the Medicare cost reports. Counties with more than one public hospital are added together. Hover or tap a county for its hospitals; select it to open the largest one below.</p>
+    <div class="controls" style="margin-bottom:var(--space-3)">
+      <div class="bb-field" style="flex:1 1 280px;max-width:360px">
+        <label class="bb-field__label" for="mapMetric">Shade by</label>
+        <select class="bb-field__control" id="mapMetric">
+          <option value="margin">Margin (net income ÷ revenue)</option>
+          <option value="net">Net income</option>
+          <option value="rev">Total revenue</option>
+          <option value="tax">Property tax levy</option>
+          <option value="taxShare">Property tax share of revenue</option>
+          <option value="uncomp">Cost of uncompensated care</option>
+          <option value="uncompShare">Uncompensated care share of expenses</option>
+        </select>
+      </div>
+      <div class="bb-field" style="flex:0 0 160px">
+        <label class="bb-field__label" for="mapYear">Fiscal year</label>
+        <select class="bb-field__control" id="mapYear"></select>
+      </div>
+    </div>
+    <div class="panel map-grid">
+      <div>
+        <div class="map-legend" id="mapLegend"></div>
+        <svg id="txmap" role="img" aria-labelledby="mapTitle"><title id="mapTitle">Texas counties shaded by the selected measure</title></svg>
+      </div>
+      <div class="map-side">
+        <h3 class="text-h3" id="mapSideTitle"></h3>
+        <div class="meta" id="mapSideMeta"></div>
+        <ul id="mapSideList"></ul>
+      </div>
+    </div>
+    <p class="note" id="mapNote"></p>
+  </section>
+
+  <section id="audited">
+    <h2 class="text-h2">What the audits say</h2>
+    <p class="sub">The Medicare cost reports above cover the hospital. Each district's audited financial statements cover the whole district and split the year into two parts: running the hospitals (operating result) and everything else, mostly property tax and investment income. Five of the big six lose money running their hospitals every year. At Parkland, Harris Health, University Health and JPS, property tax more than covers that loss, and investment income adds to the surplus. UMC El Paso's tax roughly covers it. UMC Lubbock is different: its hospitals mostly break even or make money, and it levies very little tax. Select a row to see that system year by year.</p>
+    <div class="panel">
+      <div class="bb-table-wrap" id="auditSummary" style="border:0"></div>
+      <p class="note">FY<span class="auditLast"></span> figures, plus totals over every audited year we have (FY2015–FY<span class="auditLast"></span>; UMC Lubbock from FY2019). A change in net position is the audited equivalent of net income. Capital spending is cash spent on buildings and equipment; only depreciation shows up as an expense, so a district saving up for or paying for construction shows a surplus.</p>
+    </div>
+  </section>
+
+  <section id="detail">
+    <h2 class="text-h2">One hospital, year by year</h2>
+    <p class="sub">Pick any of the public hospitals. Patient revenue is what insurers, Medicare, Medicaid and patients actually paid. Property tax is the hospital district's levy from the Texas Comptroller. Other income is the rest of the non-patient money on the cost report: grants, investment income and some state and federal programs.</p>
+    <div class="controls">
+      <div class="bb-field">
+        <label class="bb-field__label" for="pick">Hospital</label>
+        <select class="bb-field__control" id="pick"></select>
+      </div>
+    </div>
+    <div class="detail-head">
+      <div>
+        <h3 class="text-h3" id="dName"></h3>
+        <div class="meta" id="dMeta"></div>
+      </div>
+    </div>
+    <div id="dFlag"></div>
+    <div class="two">
+      <div class="panel">
+        <h3 class="text-h3">Revenue and expenses</h3>
+        <div class="meta">Stacked bars: where revenue came from. Line: total expenses.</div>
+        <div class="legend" aria-hidden="true">
+          <span><i class="sw" style="background:var(--c-1)"></i>Patient revenue</span>
+          <span><i class="sw" style="background:var(--c-3)"></i>Property tax levy</span>
+          <span><i class="sw" style="background:var(--c-n)"></i>Other income</span>
+          <span><i class="sw line" style="background:var(--c-2)"></i>Total expenses</span>
+        </div>
+        <div class="chart"><canvas id="cMain" role="img" aria-label="Revenue by source and total expenses by year"></canvas></div>
+      </div>
+      <div class="stack">
+        <div class="panel">
+          <h3 class="text-h3">Net income</h3>
+          <div class="meta">Revenue minus expenses. Bars below zero are losses.</div>
+          <div class="chart short"><canvas id="cNet" role="img" aria-label="Net income by year"></canvas></div>
+        </div>
+        <div class="panel">
+          <h3 class="text-h3">Cost of uncompensated care</h3>
+          <div class="meta">Charity care plus bad debt, at cost.</div>
+          <div class="chart short"><canvas id="cUnc" role="img" aria-label="Cost of uncompensated care by year"></canvas></div>
+        </div>
+      </div>
+    </div>
+    <div id="auditPanel" class="panel" style="margin-top:var(--space-4)" hidden>
+      <h3 class="text-h3">Audited results</h3>
+      <div class="meta" id="auditMeta"></div>
+      <div class="legend" aria-hidden="true">
+        <span><i class="sw" style="background:var(--c-2)"></i>Operating result</span>
+        <span><i class="sw" style="background:var(--c-3)"></i>Property tax</span>
+        <span><i class="sw" style="background:var(--c-1)"></i>Investment return</span>
+        <span><i class="sw" style="background:var(--c-n)"></i>Everything else</span>
+        <span><i class="sw line" style="background:var(--ink)"></i>Change in net position</span>
+      </div>
+      <div class="chart"><canvas id="cAudit" role="img" aria-label="Audited operating result, property tax, investment return and change in net position by year"></canvas></div>
+      <div class="sankey-head">
+        <h3 class="text-h3">Where the money came from and where it went</h3>
+        <div class="bb-field sankey-year">
+          <label class="bb-field__label" for="sankeyYear">Fiscal year</label>
+          <select class="bb-field__control" id="sankeyYear"></select>
+        </div>
+      </div>
+      <div class="sankey-wrap"><svg id="sankey" role="img" aria-labelledby="sankeyTitle"><title id="sankeyTitle"></title></svg></div>
+      <p class="note" id="sankeyNote"></p>
+      <div class="bb-table-wrap" id="auditTable" style="border:0;margin-top:var(--space-4)"></div>
+      <p class="note" id="auditNote"></p>
+    </div>
+    <div class="panel" style="margin-top:var(--space-4)">
+      <h3 class="text-h3">The numbers, from the Medicare cost report</h3>
+      <div class="meta">Dollars in millions, hospital only. Wages and benefits are reported on separate lines; the audited "salaries and benefits" in the Sankey above also covers the district's own physician group and clinics where it has them, so it runs higher. FTE is employees on payroll.</div>
+      <div class="bb-table-wrap" id="dTable" style="border:0"></div>
+    </div>
+  </section>
+
+  <section id="all">
+    <h2 class="text-h2">All public hospitals</h2>
+    <p class="sub">Every Texas hospital that Medicare lists as owned by a county, city or hospital district. Figures are for the latest year each filed, usually FY2024. Select a row to open it above.</p>
+    <div class="tbl-tools">
+      <div class="bb-field">
+        <label class="bb-field__label" for="q">Search by name, city or county</label>
+        <input class="bb-field__control" id="q" type="search" placeholder="Lubbock, Uvalde, Hunt…">
+      </div>
+      <label class="bb-choice"><input type="checkbox" id="onlyNow" checked><span class="bb-choice__text">Still filing in FY2024</span></label>
+    </div>
+    <div class="bb-table-wrap"><table class="bb-table" id="allTable"></table></div>
+    <p class="note" id="allNote"></p>
+  </section>
+
+  <section id="districts">
+    <h2 class="text-h2">Hospital districts by property tax</h2>
+    <p class="sub">The 15 largest hospital district levies for tax year <span id="tyLabel"></span>. Blue districts run one of the hospitals above. Gray ones don't appear in the cost reports as a hospital owner.</p>
+    <div class="panel">
+      <div class="legend" aria-hidden="true">
+        <span><i class="sw" style="background:var(--c-1)"></i>Runs a hospital in this list</span>
+        <span><i class="sw" style="background:var(--c-n)"></i>No hospital of its own in the cost reports</span>
+      </div>
+      <div class="chart" style="height:460px"><canvas id="cDist" role="img" aria-label="Largest hospital district property tax levies"></canvas></div>
+      <p class="note" id="distNote"></p>
+    </div>
+  </section>
+
+  <section id="notes">
+    <h2 class="text-h2">About the data</h2>
+    <p class="sub">Every number here comes from the Medicare cost report each hospital files every year, as published by CMS in its Hospital Provider Cost Report files.</p>
+    <details class="methods" open>
+      <summary>How to read it</summary>
+      <ul>
+        <li><b>Cost reports cover the hospital, not the whole district.</b> Audited district statements can differ. They may count clinics, health plans (Parkland Community Health Plan, JPS's and Harris Health's Medicaid HMOs) and tax collections that the hospital's cost report leaves out or books differently.</li>
+        <li><b>Fiscal years.</b> Each report is labeled with the year its midpoint falls in, so an October–September year ending September 2024 is FY2024. Harris Health ran March–February until 2022, then filed a 7-month report (March–September 2022) to move to an October year. Its FY2022 is short, and the charts mark it.</li>
+        <li><b>Property tax</b> comes from the Texas Comptroller's yearly Special District Rates and Levies reports (tax years 2013 to 2025; the years before 2021 are no longer linked from the Comptroller's site and come from the Internet Archive). It is the levy, taxable value times the adopted rate. Hospitals actually collect slightly less, usually 97 to 99%. Tax year Y is billed in October and due January 31 of Y+1, so it is matched to the fiscal year that contains that date: tax year 2023 pays for FY2024. Harris Health's 7-month FY2022 contains no January 31, so it shows no levy. A few years where a district's reported rate is off by a factor of 3 or more from its usual rate, almost always a keying error, are left blank.</li>
+        <li><b>Other income</b> is everything outside patient care: property taxes, grants, investment income, and for some hospitals supplemental Medicaid money. In the detail chart, the levy is taken out of other income and shown on its own. Where the levy is larger than the reported other income (Midland in some years), the hospital books part of its tax elsewhere and the bars add up to more than reported revenue. The tooltip says so. Hospitals book supplemental payments inconsistently. Some count them as patient revenue, so the split between the two varies from place to place.</li>
+        <li><b>Rural districts with nursing homes.</b> Many small hospital districts own or lease nursing homes to qualify them for Texas Medicaid's nursing facility supplemental programs (QIPP and earlier MPAP). That money moves through the hospital's books, so a 25-bed hospital can show hundreds of millions in revenue and expenses. Uvalde, Coryell and Limestone are examples. Pages for those hospitals carry a flag.</li>
+        <li><b>Not included:</b> state-owned hospitals (UT Southwestern, UTMB, MD Anderson, UT Tyler, the state psychiatric hospitals) and hospital districts that run no hospital of their own, such as Central Health in Travis County (which funds care at Dell Seton) and the Nueces County Hospital District (which funds CHRISTUS Spohn). <span id="exList"></span></li>
+        <li>Dollars are nominal, not adjusted for inflation.</li>
+      </ul>
+    </details>
+  </section>
+
+  <footer>Sources: CMS Hospital Provider Cost Report, 2011–2024 releases (data.cms.gov); Texas Comptroller, Special District Rates and Levies, tax years 2013–2025. Built with <code>build_data.py</code>. Styled with the Bluebonnet design system.</footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="data.js"></script>
+<script src="counties.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
