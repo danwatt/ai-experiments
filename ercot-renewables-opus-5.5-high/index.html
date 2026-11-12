@@ -38,7 +38,8 @@
       --s-other: #c694b5;
       --seq-0: #e3e7fb; --seq-1: #bfc7e9; --seq-2: #9ca8d8; --seq-3: #7888c6;
       --seq-4: #5569b5; --seq-5: #3149a3; --seq-6: #283c8b; --seq-7: #1f2f73;
-      --yr-0: var(--seq-3); --yr-1: var(--seq-4); --yr-2: var(--seq-5); --yr-3: var(--seq-6); --yr-4: var(--seq-7);
+      /* one distinct hue per year on the time-of-day charts, newest first in Bluebonnet's series order */
+      --yr-4: var(--bluebonnet); --yr-3: var(--paintbrush); --yr-2: var(--winecup); --yr-1: var(--firewheel); --yr-0: var(--ink-muted);
     }
     [data-theme="dark"] {
       --s-hydro: #54619c;
@@ -89,6 +90,12 @@
     .shape-table { font-size: 14px; }
     .shape-table td, .shape-table th { white-space: nowrap; text-align: right; }
     .shape-table th:first-child, .shape-table td:first-child { text-align: left; }
+    .shape-table thead th { white-space: normal; vertical-align: bottom; }
+    .shape-table > :not(caption) > * > * { padding-left: 6px; padding-right: 6px; }
+    .price-notes { list-style: none; padding: 0; margin: var(--space-4) 0 0; max-width: none; display: grid; gap: var(--space-2) var(--space-6); grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); color: var(--ink-muted); }
+    .price-notes li { display: grid; grid-template-columns: 18px 1fr; gap: var(--space-2); align-items: start; }
+    .price-notes strong { color: var(--ink); font-weight: 600; }
+    .note-n { width: 18px; height: 18px; margin-top: 2px; border-radius: var(--radius-pill); background: var(--ink); color: var(--surface-raised); font: 700 11px/18px var(--font-body); text-align: center; }
     .shape-table .sub { color: var(--ink-muted); font-size: 12px; }
   </style>
 </head>
@@ -241,7 +248,8 @@
         <p class="small text-ink-2 mb-2" id="price-sub"></p>
         <div class="legend mb-2" id="legend-price"></div>
         <p class="small text-muted-ink mb-0" id="price-empty" hidden>ERCOT's day-ahead price history starts in December 2010. Widen the year range to see it.</p>
-        <div class="chart-box short"><canvas id="price" role="img" aria-label="Line chart of monthly average and median wholesale electricity price"></canvas></div>
+        <div class="chart-box short"><canvas id="price" role="img" aria-label="Line chart of monthly average and median wholesale electricity price, with numbered notes on the largest spikes"></canvas></div>
+        <ol class="price-notes small" id="price-notes" aria-label="Notes on price spikes"></ol>
       </div>
     </div>
 
@@ -323,6 +331,7 @@
           <li>Hydro and biomass are combined because each is under 0.5% of generation.</li>
           <li>The time-of-day charts average ERCOT's 15-minute intervals (interval ending, Central prevailing time) over every day in the period, from 2022 on. Demand is total settled generation minus battery charging. Batteries are ERCOT's "Other" (mostly battery discharge) plus <code>WSL</code> charging. Seasons are calendar-year months: winter is Jan, Feb and Dec of the same year. A year is shown only when every month of the period has data.</li>
           <li>Prices are ERCOT's <a href="https://www.ercot.com/mp/data-products/data-product-details?id=NP4-180-ER" rel="noopener">day-ahead settlement point prices</a> at the hub average (<code>HB_HUBAVG</code>), hourly, in dollars per megawatt-hour. Monthly figures weight every hour equally. These are wholesale prices, not retail bills, and they move with natural gas prices as well as with the grid mix: 2022 was a year of expensive gas.</li>
+          <li>Price spike notes draw on the market monitor's <a href="https://www.potomaceconomics.com/wp-content/uploads/2020/07/2011_ERCOT-SOM_REPORT.pdf" rel="noopener">2011 State of the Market Report</a>, the FERC–NERC <a href="https://www.nerc.com/pa/rrm/ea/Documents/February_2021_Cold_Weather_Report.pdf" rel="noopener">report on the February 2021 cold weather outages</a>, and EIA's Today in Energy articles from <a href="https://www.eia.gov/todayinenergy/detail.php?id=42456" rel="noopener">January 2020</a>, <a href="https://www.eia.gov/todayinenergy/detail.php?id=55139" rel="noopener">January 2023</a> and <a href="https://www.eia.gov/todayinenergy/detail.php?id=60602" rel="noopener">October 2023</a>.</li>
           <li>Rebuild the data with <code>python3 build_data.py</code>.</li>
         </ul>
       </div>

@@ -574,24 +574,40 @@
     timeChart('batt', batt, { plugins: [zeroLine] });
 
     // peak, low and steepest 3-hour rise of the plotted curve, per year
+    const steepest = v => {
+      let ramp = -Infinity, at = 0;
+      for (let j = 0; j + 12 < v.length; j++) if (v[j + 12] - v[j] > ramp) { ramp = v[j + 12] - v[j]; at = j; }
+      return { ramp, at };
+    };
+    // the same rise once net battery output is taken off the plotted curve (already netted in the resid view)
+    const withBatt = state.duck !== 'resid';
+    const netted = withBatt ? duckSeries((i, j) => METRIC[state.duck](i, j) - S.storage[i][j]) : [];
     const rows = series.map(s => {
       const v = s.data;
-      let hi = 0, lo = 0, ramp = -Infinity, rampAt = 0;
+      let hi = 0, lo = 0;
       v.forEach((x, j) => { if (x > v[hi]) hi = j; if (x < v[lo]) lo = j; });
-      for (let j = 0; j + 12 < v.length; j++) if (v[j + 12] - v[j] > ramp) { ramp = v[j + 12] - v[j]; rampAt = j; }
-      return { year: s.year, hi, lo, v, ramp, rampAt };
+      const r = steepest(v);
+      const nb = netted.find(n => n.year === s.year);
+      return { year: s.year, hi, lo, v, ramp: r.ramp, rampAt: r.at, nb: nb ? steepest(nb.data) : null };
     });
     const at = j => `<div class="sub">${clock(HOURS[j])}</div>`;
     document.getElementById('shape-sub').textContent =
-      `${DUCK[state.duck].label} · ${periodLabel()}. The steepest 3-hour rise is the ramp other plants must climb.`;
+      `${DUCK[state.duck].label} · ${periodLabel()}. The steepest 3-hour rise is the ramp other plants must climb.` +
+      (withBatt ? ' "Net of batteries" is the same rise after battery charging and discharging.' : ' Batteries are already netted out of this view.');
+    // "4:15–7:15 am" when both ends share am/pm, to keep the columns narrow
+    const span = r => {
+      const a = clock(HOURS[r.at]), b = clock(HOURS[r.at + 12]);
+      return a.slice(-2) === b.slice(-2) ? `${a.slice(0, -3)}–${b}` : `${a} – ${b}`;
+    };
     document.getElementById('shape').innerHTML = `
-      <thead><tr><th>Year</th><th>Low</th><th>Peak</th><th>Peak − low</th><th>Steepest 3-hr rise</th></tr></thead>
+      <thead><tr><th>Year</th><th>Low</th><th>Peak</th><th>Peak − low</th><th>Steepest 3-hr rise</th>${withBatt ? '<th>Net of batteries</th>' : ''}</tr></thead>
       <tbody>${rows.slice().reverse().map(r => `<tr>
         <td><span class="legend"><span><i style="background:${yrColor(r.year)}"></i>${r.year}</span></span></td>
         <td>${gw(r.v[r.lo])}${at(r.lo)}</td>
         <td>${gw(r.v[r.hi])}${at(r.hi)}</td>
         <td>${gw(r.v[r.hi] - r.v[r.lo])}</td>
-        <td>${gw(r.ramp)}<div class="sub">${clock(HOURS[r.rampAt])} – ${clock(HOURS[r.rampAt + 12])}</div></td>
+        <td>${gw(r.ramp)}<div class="sub">${span({ at: r.rampAt })}</div></td>
+        ${withBatt ? `<td>${r.nb ? `${gw(r.nb.ramp)}<div class="sub">${span(r.nb)}</div>` : '–'}</td>` : ''}
       </tr>`).join('')}</tbody>`;
   }
 
@@ -617,6 +633,86 @@
   const prLabel = m => MON[+m.slice(5, 7) - 1] + ' ' + m.slice(0, 4);
 
   // months off the top of a capped axis get a marker and their value at the top edge
+  // annotated price events, numbered in date order; `from`/`to` shade a stretch, `m` places the marker
+  const PRICE_EVENTS = [
+    { m: '2011-08', title: 'Drought and record heat',
+      text: 'The hottest, driest summer on record in ERCOT. Demand peaked at a then-record 68,379 MW on Aug 3, and 17 of the year\'s 28.5 hours at the $3,000 offer cap fell in August.',
+      src: 'Potomac Economics, 2011 State of the Market Report',
+      url: 'https://www.potomaceconomics.com/wp-content/uploads/2020/07/2011_ERCOT-SOM_REPORT.pdf' },
+    { m: '2019-08', title: 'Record demand and emergency alerts',
+      text: 'Demand peaked at a record 74,666 MW on Aug 12. ERCOT declared energy emergency alerts on Aug 13 and 15, and real-time prices sat at the $9,000 cap for several hours.',
+      src: 'EIA, Today in Energy, Jan 10, 2020',
+      url: 'https://www.eia.gov/todayinenergy/detail.php?id=42456' },
+    { m: '2021-02', title: 'Winter Storm Uri',
+      text: 'Frozen generators and gas supply forced rolling outages for nearly three days, peaking at 20,000 MW of load shed on Feb 15. Day-ahead hub prices reached $8,995/MWh.',
+      src: 'FERC, NERC and Regional Entity staff report, Nov 2021',
+      url: 'https://www.nerc.com/pa/rrm/ea/Documents/February_2021_Cold_Weather_Report.pdf' },
+    { m: '2022-07', from: '2022-05', to: '2022-09', title: 'Expensive natural gas',
+      text: 'Gas rose from about $3.70 to almost $10 per MMBtu by late August, lifting the typical hour, not just the peaks. A July heat wave set record demand.',
+      src: 'EIA, Today in Energy, Jan 10, 2023',
+      url: 'https://www.eia.gov/todayinenergy/detail.php?id=55139' },
+    { m: '2023-08', title: 'Record heat',
+      text: 'ERCOT broke its all-time demand record and asked customers to conserve on several days. Hourly wholesale prices topped $4,000/MWh.',
+      src: 'EIA, Today in Energy, Oct 5, 2023',
+      url: 'https://www.eia.gov/todayinenergy/detail.php?id=60602' }
+  ];
+  PRICE_EVENTS.forEach((e, k) => { e.n = k + 1; });
+  const eventAt = m => PRICE_EVENTS.find(e => e.m === m);
+
+  // shaded stretches behind the lines, numbered badges above the average line
+  const priceEvents = {
+    id: 'priceEvents',
+    beforeDatasetsDraw(chart, _, opts) {
+      const { ctx, chartArea: a } = chart;
+      const x = chart.scales.x;
+      ctx.save();
+      ctx.fillStyle = alpha(css('--firewheel'), isDark() ? 0.26 : 0.22);
+      opts.events.forEach(e => {
+        if (!e.from) return;
+        const lo = opts.months.findIndex(m => m >= e.from);
+        let hi = -1;
+        opts.months.forEach((m, i) => { if (m <= e.to) hi = i; });
+        if (lo < 0 || hi < lo) return;
+        const half = opts.months.length > 1 ? (x.getPixelForValue(1) - x.getPixelForValue(0)) / 2 : 4;
+        const l = Math.max(a.left, x.getPixelForValue(lo) - half), r = Math.min(a.right, x.getPixelForValue(hi) + half);
+        ctx.fillRect(l, a.top, r - l, a.bottom - a.top);
+      });
+      ctx.restore();
+    },
+    afterDatasetsDraw(chart, _, opts) {
+      const { ctx, chartArea: a } = chart;
+      const pts = chart.getDatasetMeta(0).data;
+      ctx.save();
+      ctx.font = '700 11px "Public Sans", system-ui, sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      opts.events.forEach(e => {
+        const i = opts.months.indexOf(e.m);
+        if (i < 0 || !pts[i]) return;
+        const p = pts[i];
+        const off = opts.cap && chart.data.datasets[0].data[i] > opts.cap;
+        // off-scale months already carry a label at the top edge; sit the badge just under it
+        const by = off ? a.top + 36 : Math.max(a.top + 10, p.y - 16);
+        ctx.fillStyle = css('--ink');
+        ctx.beginPath(); ctx.arc(p.x, by, 9, 0, 2 * Math.PI); ctx.fill();
+        ctx.strokeStyle = css('--surface-raised'); ctx.lineWidth = 2; ctx.stroke();
+        ctx.fillStyle = css('--surface-raised');
+        ctx.fillText(String(e.n), p.x, by + 0.5);
+      });
+      ctx.restore();
+    }
+  };
+
+  function renderPriceNotes(months) {
+    const shown = PRICE_EVENTS.filter(e => months.includes(e.m));
+    const el = document.getElementById('price-notes');
+    el.hidden = !shown.length;
+    el.innerHTML = shown.map(e => `
+      <li><span class="note-n" aria-hidden="true">${e.n}</span><div>
+        <strong>${prLabel(e.from || e.m)}${e.from ? ' – ' + prLabel(e.to) : ''}: ${e.title}.</strong>
+        ${e.text} <a href="${e.url}" rel="noopener">${e.src}</a>
+      </div></li>`).join('');
+  }
+
   const offScale = {
     id: 'offScale',
     afterDatasetsDraw(chart, _, opts) {
@@ -649,7 +745,7 @@
     const empty = !idx.length;
     document.getElementById('price-empty').hidden = !empty;
     document.getElementById('price').parentElement.hidden = empty;
-    if (empty) { document.getElementById('price-sub').textContent = ''; return; }
+    if (empty) { document.getElementById('price-sub').textContent = ''; document.getElementById('price-notes').hidden = true; return; }
     const labels = idx.map(i => prLabel(PR.months[i]));
     const series = [
       { label: 'Average', data: idx.map(i => PR.mean[i]), color: css('--bluebonnet') },
@@ -691,22 +787,31 @@
           legend: { display: false },
           crosshair: {},
           offScale: { cap, labels },
+          priceEvents: { cap, events: PRICE_EVENTS, months: idx.map(i => PR.months[i]) },
           tooltip: Object.assign(tooltipStyle(), {
             callbacks: {
               label: t => `${t.dataset.label}: ${usd(t.parsed.y, 2)}/MWh`,
-              footer: t => `Highest hour: ${usd(PR.max[idx[t[0].dataIndex]])}/MWh`
+              footer: t => {
+                const m = PR.months[idx[t[0].dataIndex]];
+                const ev = eventAt(m);
+                const band = PRICE_EVENTS.find(e => e.from && m >= e.from && m <= e.to);
+                const note = ev || band;
+                return [`Highest hour: ${usd(PR.max[idx[t[0].dataIndex]])}/MWh`].concat(note ? [`Note ${note.n}: ${note.title}`] : []);
+              }
             }
           })
         }
       },
-      plugins: [crosshair, yearLabels, offScale]
+      plugins: [crosshair, yearLabels, offScale, priceEvents]
     });
+    renderPriceNotes(idx.map(i => PR.months[i]));
     legend('legend-price', series.map(s => ({ label: s.label, color: s.color })));
     document.querySelectorAll('#legend-price i').forEach(i => i.classList.add('line'));
     document.getElementById('price-sub').textContent =
       `Day-ahead price at ERCOT's hub average, ${prLabel(PR.months[idx[0]])} – ${prLabel(PR.months[idx[idx.length - 1]])}, in dollars per megawatt-hour. ` +
       'The average includes rare scarcity hours; the median is a typical hour.' +
-      (cap ? ' The scale is capped so one extreme month does not flatten the rest.' : '');
+      (cap ? ' The scale is capped so one extreme month does not flatten the rest.' : '') +
+      ' Numbered markers explain the biggest spikes; the shaded stretch is 2022\'s expensive gas.';
   }
 
   const pricePeriod = () => ({ type: state.priceType, season: state.priceSeason, month: state.priceMonth });
