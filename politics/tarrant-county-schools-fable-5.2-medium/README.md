@@ -2,7 +2,7 @@
 
 One page for the 16 independent school districts in Tarrant County, Texas, FY2011–FY2025, with school-meal claims through 2025-26. It merges three earlier pages and extends the school-level data from four districts to all 16.
 
-`index.html` holds all the data (about 1.4 MB). The map loads [Leaflet](https://leafletjs.com/) from cdnjs and base-map tiles from Esri, so it needs an internet connection. Everything else works offline.
+`index.html` holds all the data (about 1.4 MB). It is styled with the [Bluebonnet design system](../../bluebonnet-design-system/), linked from `../../bluebonnet-design-system/dist/bluebonnet.css`, so serve it from the repo root rather than from this folder. The map loads [Leaflet](https://leafletjs.com/) from cdnjs and base-map tiles from Esri, and the fonts come from Google Fonts. Offline, the map is missing and the text falls back to system fonts; the charts still work.
 
 ## Three views, one state
 
@@ -44,6 +44,16 @@ The build is one `fetch.sh` and one `build_data.py` instead of three of each. On
 - **Federal share:** 8.1% countywide, down from a 16.5% peak in FY2022.
 - **School meals, 2025-26:** Fort Worth's CEP claiming rate fell from 93.6% to 79.9%, and its school-year USDA reimbursement fell 15% ($38.7M to $32.7M, months claimed in both years). Across all schools in the program, reimbursement fell 2.5%.
 - **Carroll ISD** isn't in the National School Lunch Program, so it has no meal claims.
+
+## Design
+
+The page uses Bluebonnet's tokens, type and base layer. Its own CSS only adds layout and chart rules.
+
+- **Controls:** the selected view, year and option are filled `bluebonnet`. Callouts are tinted blocks, as Bluebonnet's alerts are.
+- **Revenue colors:** local is `bluebonnet`, state is `firewheel`, federal grants are `paintbrush` and USDA meals are `winecup`.
+- **Longer series:** charts with more than five series (federal programs, school funding sources) add half-strength tints of bluebonnet, paintbrush and winecup. Bluebonnet defines five series colors, so the tints are this page's addition.
+- **District boundaries:** the 16 outline colors on the map are still generated, because Bluebonnet has no 16-color set.
+- **Themes:** light and dark follow the system setting, and the Auto / Light / Dark switch sets `data-theme`.
 
 ## Rebuilding
 

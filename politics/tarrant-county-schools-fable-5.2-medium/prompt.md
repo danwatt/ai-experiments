@@ -3,8 +3,8 @@
 - **Model:** claude-fable-5-2
 - **Effort:** medium
 - **Session(s):** e71f64b1-16d9-447f-a62b-ec100217afa3
-- **Tokens:** input 74, output 85653, cache read 7867681, cache write 312958
-- **Cost (tokscale estimate):** $10.01
+- **Tokens:** input 158, output 123224, cache read 15227422, cache write 450326
+- **Cost (tokscale estimate):** $15.18
 
 ## You
 
@@ -137,3 +137,146 @@ scripts/prompt-md.sh politics/tarrant-county-schools-fable-5.2-medium e71f64b1-1
 ## You
 
 Commit the working tree changes with a sensible message.
+
+## Claude
+
+Committed: `e560102` "Add combined Tarrant County schools page (Fable 5.2 medium)".
+
+- **Branch:** was on `master`, so commit went on new branch `tarrant-county-schools`. Not pushed.
+- **In commit:** new demo directory (page, build scripts, README, `prompt.md`, prompt screenshots), landing screenshot, `demos.js`, `.claude/launch.json`, pointer line in three original READMEs.
+- **prompt.md:** regenerated first, so it includes previous reply. This turn not in it.
+- **Left uncommitted:** statewide page changes, route-planner changes, `watt-logo-variations/`. All predate this work and belong to other tasks, so kept out of this commit.
+
+## You
+
+Merge to master
+
+## Claude
+
+Merged. `master` fast-forwarded to `e560102`; branch `tarrant-county-schools` deleted.
+
+- Not pushed, so Pages site unchanged until push.
+- Statewide, route-planner and `watt-logo-variations/` changes still uncommitted, untouched.
+
+## You
+
+Push
+
+## Claude
+
+Pushed. `origin/master` now at `e560102`, in sync with local.
+
+- Pages workflow should trigger from push; build result not checked.
+- Statewide, route-planner and `watt-logo-variations/` changes still local and uncommitted.
+
+## You
+
+Lets update these pages now to use the Bluebonnet design system that I just created.
+
+## Claude
+
+Tokens renamed to Bluebonnet names. Now restyling components (type, radii, controls, tables, callouts), then browser check.
+
+![screenshot 10](prompt-assets/010.webp)
+
+![screenshot 11](prompt-assets/011.webp)
+
+![screenshot 12](prompt-assets/012.webp)
+
+![screenshot 13](prompt-assets/013.webp)
+
+![screenshot 14](prompt-assets/014.webp)
+
+![screenshot 15](prompt-assets/015.webp)
+
+![screenshot 16](prompt-assets/016.webp)
+
+![screenshot 17](prompt-assets/017.webp)
+
+![screenshot 18](prompt-assets/018.webp)
+
+![screenshot 19](prompt-assets/019.webp)
+
+![screenshot 20](prompt-assets/020.webp)
+
+![screenshot 21](prompt-assets/021.webp)
+
+![screenshot 22](prompt-assets/022.webp)
+
+Restyle works in light and dark, no console errors. Checking map view, then docs.
+
+![screenshot 23](prompt-assets/023.webp)
+
+![screenshot 24](prompt-assets/024.webp)
+
+![screenshot 25](prompt-assets/025.webp)
+
+![screenshot 26](prompt-assets/026.webp)
+
+Now README, then `prompt.md`.
+
+Combined Tarrant page now on Bluebonnet. Nothing committed.
+
+**Scope taken:** only [index.html](politics/tarrant-county-schools-fable-5.2-medium/index.html). "These pages" read as three merged views. Statewide, GPT 6.1 and three originals untouched, per earlier instruction.
+
+**Changed**
+- Page links `../../bluebonnet-design-system/dist/bluebonnet.css`. Own palette deleted; all colors now Bluebonnet tokens.
+- Type: Bricolage Grotesque headings and tile numbers, Public Sans body, uppercase label style on control labels and table headers.
+- Controls: selected view/year/option filled `bluebonnet`, `line-strong` borders, 2px focus ring, 120ms color transitions only.
+- Callouts: tinted blocks, side stripe removed (Alert rule).
+- Radii and spacing on Bluebonnet scale.
+- Chart colors: local `bluebonnet`, state `firewheel`, federal `paintbrush`, USDA meals `winecup`.
+- Landing thumbnail regenerated; [README.md](politics/tarrant-county-schools-fable-5.2-medium/README.md) gained Design section; `prompt.md` rerun ($13.61 so far).
+
+**Deviations from Bluebonnet, know these**
+- Charts with 6–7 series use half-strength tints of bluebonnet, paintbrush, winecup. System defines only five series colors.
+- 16 district boundary colors on map still generated hsl. No 16-color set in system.
+- `firewheel` documented as fill only; used here for state bars and some legend swatches, never text.
+- Chart subheads 16px, not `text-h3` 19px; tables 14px. Kept dense for data.
+
+**Behavior change**
+- Page no longer standalone: must be served from repo root (Pages fine; `politics` preview server alone loses styling). Fonts need Google Fonts; offline falls back to system fonts.
+
+**Verified:** county, district, schools views in light and dark; phone width without horizontal scroll; no console errors. Not checked: district view in dark, tablet width.
+
+## You
+
+Yes, statewide too
+
+## Claude
+
+Statewide CSS converted. Browser check now.
+
+![screenshot 27](prompt-assets/027.webp)
+
+![screenshot 28](prompt-assets/028.webp)
+
+![screenshot 29](prompt-assets/029.webp)
+
+![screenshot 30](prompt-assets/030.webp)
+
+![screenshot 31](prompt-assets/031.webp)
+
+![screenshot 32](prompt-assets/032.webp)
+
+![screenshot 33](prompt-assets/033.webp)
+
+Statewide page now on Bluebonnet. Nothing committed.
+
+**Changed in [index.html](politics/texas-isd-statewide-opus-5.5-high/index.html)**
+- Same treatment as Tarrant page: linked `bluebonnet.css`, own palette removed, Bluebonnet type, controls, callouts, tables, radii.
+- Same chart mapping: local `bluebonnet`, state `firewheel`, federal `paintbrush`, USDA meals `winecup`; half tints for 6–7 series charts.
+- County map ramp: `bluebonnet-soft` to `bluebonnet`; diverging measures paintbrush to bluebonnet.
+- Thumbnail regenerated; [README.md](politics/texas-isd-statewide-opus-5.5-high/README.md) intro updated.
+
+**Verified:** top, revenue, county map, federal programs, recapture sections; light and dark; 646px and 1100px widths without horizontal scroll; no console errors. Not checked: phone width, meals and enrollment sections, district search flow.
+
+**Know before commit**
+- Statewide `index.html` and `README.md` already had your uncommitted edits (plus `build_data.py`, `fetch.sh`). Restyle sits on top, same files. Splitting into separate commits needs hunk-level staging.
+- Statewide page no longer opens standalone from file in styled form: needs repo-root serving, like Tarrant page.
+- Statewide `prompt.md` left alone (Opus session record). Restyle recorded in Tarrant `prompt.md`, rerun now ($14.93); README points there. Rerun again after final prompt.
+- Three original Opus pages and GPT 6.1 page still old style.
+
+## You
+
+lets commit what is here and push

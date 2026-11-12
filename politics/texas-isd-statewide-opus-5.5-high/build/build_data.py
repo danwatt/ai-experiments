@@ -226,6 +226,23 @@ def main():
         vals = [round((r[ycol[y]] or 0) / 1000) if isinstance(r[ycol[y]], (int, float)) else 0 for y in RY]
         if any(vals): rcp[d] = vals
 
+    # TEA property wealth: wealth per ADA (taxable value / average daily attendance) FY2005-FY2025,
+    # and wealth per WADA (the weighted-student measure recapture is based on) for the latest year
+    ws = openpyxl.load_workbook(f"{RAW}/zip/wealth-per-ada.xlsx", read_only=True).worksheets[0]
+    wr = list(ws.iter_rows(values_only=True))
+    wcol = {int(re.match(r"\d{4}-(\d{4})", c).group(1)): j for j, c in enumerate(wr[0]) if isinstance(c, str) and re.match(r"\d{4}-\d{4}", c)}
+    wealth = {}
+    for r in wr[1:]:
+        if not r or not r[0]: continue
+        d = str(r[0]).strip("'").zfill(6)
+        if d in names:
+            wealth[d] = [round(r[wcol[y]] / 1000) if y in wcol and isinstance(r[wcol[y]], (int, float)) and r[wcol[y]] > 0 else None for y in YEARS]
+    ws = openpyxl.load_workbook(f"{RAW}/zip/wealth-per-wada.xlsx", read_only=True).worksheets[0]
+    vr = list(ws.iter_rows(values_only=True))
+    wada_year = int(re.search(r"(\d{4})-(\d{4})", vr[0][4]).group(2))
+    wada = {str(r[0]).strip("'").zfill(6): [round(r[2]), round(r[3] / 1000), round(r[4] / 1000)]
+            for r in vr[1:] if r and r[0] and isinstance(r[4], (int, float))}
+
     CPI = {2011: 221.09, 2012: 227.56, 2013: 231.35, 2014: 234.97, 2015: 236.68, 2016: 238.27, 2017: 242.66,
            2018: 248.13, 2019: 253.27, 2020: 257.23, 2021: 263.15, 2022: 282.03, 2023: 299.69, 2024: 309.57,
            2025: 317.73, 2026: 327.67}
@@ -237,6 +254,7 @@ def main():
         "fin": fin, "meals": mealout,
         "counties": counties,
         "rcp": rcp, "rcpYears": RY,
+        "wealth": wealth, "wada": wada, "wadaYear": wada_year,
     }
     blob = "window.TX=" + json.dumps(data, separators=(",", ":")) + ";"
     page = open(OUT).read()

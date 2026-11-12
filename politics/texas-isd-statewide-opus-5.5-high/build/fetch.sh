@@ -32,6 +32,9 @@ for line in $ACT; do
   [ -s "$z" ] || curl -sSL -A "$UA" -o "$z" "${line#*|}" &
 done
 [ -s "$RAW/zip/summarized.xlsx" ] || curl -sSL -A "$UA" -o "$RAW/zip/summarized.xlsx" "$T/media/423296" &
+# TEA property wealth: wealth per ADA history and wealth per WADA for the latest school year
+curl -sSL -A "$UA" -o "$RAW/zip/wealth-per-ada.xlsx" "$T/about-tea/state-funding/state-funding-reports-and-data/wealth-per-ada-2005-2025.xlsx" &
+curl -sSL -A "$UA" -o "$RAW/zip/wealth-per-wada.xlsx" "$T/data-reports/financial-reports/school-finance-reports-and-data/wealth-per-wada-2025.xlsx" &
 # TEA recapture paid by district, FY1994-FY2027 (FY2026 near-final, FY2027 preliminary)
 curl -sSL -A "$UA" -o "$RAW/zip/recapture-paid.xlsx" "$T/about-tea/state-funding/state-funding-reports-and-data/recapture-paid-by-district.xlsx" &
 # County outlines (Census, via plotly's sample GeoJSON); build_data.py keeps Texas (FIPS 48) only

@@ -1,13 +1,13 @@
 # Texas school district finances
 
-`index.html` is one self-contained page (no external scripts, about 1.9 MB with the data inlined). Open it directly. Add `#<TEA district number>` to the URL to open on a district, for example `#101912` for Houston ISD.
+`index.html` is one page with the data inlined and no external scripts (about 1.9 MB). It is styled with the [Bluebonnet design system](../../bluebonnet-design-system/), linked from `../../bluebonnet-design-system/dist/bluebonnet.css`, so serve it from the repo root; the fonts come from Google Fonts and fall back to system fonts offline. The Bluebonnet restyle was done later with Fable 5.2 and is recorded in the [Tarrant County page's prompt](../tarrant-county-schools-fable-5.2-medium/prompt.md); chart colors follow the same mapping as that page (local `bluebonnet`, state `firewheel`, federal `paintbrush`, USDA meals `winecup`). Add `#<TEA district number>` to the URL to open on a district, for example `#101912` for Houston ISD.
 
 It covers every Texas independent school district on the same measures, and with the same fund and program categories, as the [Fort Worth ISD](../fwisd-budget-opus-5.5-high/) and [Tarrant County](../tarrant-isd-compare-opus-5.5-high/) explorers.
 
 ## What's in it
 
 - **Revenue over time:** revenue by level of government and federal money by program, FY2011–FY2025. You can show it for Texas, for the peer group or for the chosen district.
-- **County map:** nine measures. Federal share, revenue per student, USDA meals per student, COVID relief per student, free-rate meal share, the change in free-rate share for 2025-26, enrollment change, recapture paid per student, and the estimated net recapture flow per student.
+- **County map:** ten measures, including property value per student. Also: federal share, revenue per student, USDA meals per student, COVID relief per student, free-rate meal share, the change in free-rate share for 2025-26, enrollment change, recapture paid per student, and the estimated net recapture flow per student.
 - **Peer comparisons:** pick a district and compare it with its county, its education service region, districts of similar size, or all of Texas. The comparisons cover:
   - revenue by level;
   - federal share over time;
@@ -23,6 +23,7 @@ It covers every Texas independent school district on the same measures, and with
   - trends since 2015-16.
 - **Recapture ("Robin Hood"):**
   - statewide recapture paid, FY2011–FY2027;
+  - a scatter of every district's property value per student against recapture paid per student;
   - the selected district's and county's payments, estimated share and net;
   - the districts or counties that pay the most and that gain the most, as totals or per student.
 - **A table of all districts** that you can sort and filter.
@@ -47,6 +48,7 @@ It covers every Texas independent school district on the same measures, and with
 - **Net recapture flow by county:** most counties come out ahead under the estimate. The sending counties are the oil-rich Permian Basin and Eagle Ford counties, plus Travis, Midland and Collin.
   - Tarrant County gains about $98M (+$300 per student), even though 16 of its districts include payers such as Carroll and Fort Worth.
   - Fort Worth ISD itself paid $5.2M (on its enrichment tax pennies) and gets back an estimated $38M.
+- **Recapture follows property value per student, not household income.** Cypress-Fairbanks ISD has never paid recapture. Its $78.7B tax base is spread over about 150,000 weighted students: $526K each in 2024-25, less than Fort Worth's $555K. Austin has $2.0M per weighted student and Highland Park $3.3M. Nine in ten FY2025 payers had more than $861K of property per student in attendance; the state median is $717K.
 
 ## Rebuilding
 
@@ -58,7 +60,7 @@ python3 build/build_data.py /tmp/tx-raw index.html
 `fetch.sh` downloads:
 - about 400 MB of statewide TEA zips (reusing any already in `RAW/zip`);
 - the TEA enrollment summary;
-- TEA's recapture-paid-by-district file;
+- TEA's recapture-paid-by-district file and its wealth per ADA and wealth per WADA files;
 - county outlines;
 - TDA meal claims, summarized on data.texas.gov as October site rows plus monthly totals per entity, about 20 MB in all.
 
@@ -74,6 +76,7 @@ python3 build/build_data.py /tmp/tx-raw index.html
 - Meal claims are matched to districts by county-district number, or by name before 2018-19.
   - About 20 districts have no claims of their own: they aren't in the National School Lunch Program (Carroll, Highland Park) or they claim through a cooperative.
   - 2020-21 and 2021-22 are left out because of the universal free-meal waivers.
+- **Property value per student** is TEA's wealth per ADA: taxable value for school funding ÷ average daily attendance, FY2011–FY2025. County values weight each district by enrollment. Wealth per WADA (weighted students, the basis for recapture) is shown for the latest year only, because TEA publishes it one year at a time. The military districts (Randolph Field, Lackland, Fort Sam Houston) and a few special districts have no taxable property.
 - **Recapture paid** comes from TEA's [recapture paid by district](https://tea.texas.gov/about-tea/state-funding/state-funding-reports-and-data/recapture-paid-by-district.xlsx) file. It agrees with the Chapter 49 payments in district books (General Fund, function 91, mostly object 6224) to within about 1% a year.
 - **What a district gets back from recapture is an estimate.** Each year's statewide recapture total is shared out in proportion to each district's Foundation School Program state aid (objects 5811 and 5812). The statewide net is zero by construction.
   - In practice the Legislature sets total state aid. Recapture lowers how much general revenue it has to put in, so no district's aid moves dollar for dollar with recapture.

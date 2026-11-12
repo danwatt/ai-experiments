@@ -6,165 +6,158 @@
 <title>Tarrant County Schools</title>
 <meta name="description" content="The 16 school districts of Tarrant County, Texas, FY2011–FY2025: districts side by side, one district's money flow from source to spending, and spending, federal grants and USDA meals at every school. Built from TEA PEIMS actuals, NCES school data and Texas Department of Agriculture meal claims.">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="stylesheet" href="../../bluebonnet-design-system/dist/bluebonnet.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <style>
+/* Page-level aliases onto Bluebonnet tokens (../../bluebonnet-design-system). Chart series follow the
+   system order: bluebonnet, paintbrush, winecup, firewheel, ink-muted; charts with more series add half tints. */
 :root {
-  color-scheme: light;
-  --bg: #f6f5f2; --surface: #fcfcfb; --surface-2: #f0efeb; --border: #dedcd5; --grid: #e6e4de;
-  --text: #0b0b0b; --text-2: #52514e; --text-3: #7a7974; --accent: #2a78d6;
-  --local: #2a78d6; --state: #1baf7a; --federal: #eb6834; --cn: #6250d6;
-  --neutral: #b9b7b0; --heat: #2a78d6;
-  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100; --s5: #e87ba4; --s6: #008300; --s7: #6250d6; --s8: #e34948;
-  --down: #c2410c; --up: #1c5cab;
-}
-@media (prefers-color-scheme: dark) {
-  :root:where(:not([data-theme="light"])) {
-    color-scheme: dark;
-    --bg: #121211; --surface: #1a1a19; --surface-2: #232321; --border: #34342f; --grid: #2b2b28;
-    --text: #f0efec; --text-2: #c3c2b7; --text-3: #8f8e86; --accent: #3987e5;
-    --local: #3987e5; --state: #199e70; --federal: #d95926; --cn: #9085e9;
-    --neutral: #55544f; --heat: #3987e5;
-    --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181; --s6: #008300; --s7: #9085e9; --s8: #e66767;
-    --down: #f08a5d; --up: #86b6ef;
-  }
-}
-:root[data-theme="dark"] {
-  color-scheme: dark;
-  --bg: #121211; --surface: #1a1a19; --surface-2: #232321; --border: #34342f; --grid: #2b2b28;
-  --text: #f0efec; --text-2: #c3c2b7; --text-3: #8f8e86; --accent: #3987e5;
-  --local: #3987e5; --state: #199e70; --federal: #d95926; --cn: #9085e9;
-  --neutral: #55544f; --heat: #3987e5;
-  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181; --s6: #008300; --s7: #9085e9; --s8: #e66767;
-  --down: #f08a5d; --up: #86b6ef;
+  --grid: var(--line);
+  --local: var(--bluebonnet); --state: var(--firewheel); --federal: var(--paintbrush); --cn: var(--winecup);
+  --neutral: color-mix(in srgb, var(--line-strong) 55%, var(--surface-raised)); --neutral-link: var(--line);
+  --heat: var(--bluebonnet); --heat-0: var(--bluebonnet-soft); --mid: var(--surface-sunken);
+  --s1: var(--bluebonnet); --s2: var(--paintbrush);
+  --s3: color-mix(in srgb, var(--bluebonnet) 50%, var(--surface-raised));
+  --s4: var(--firewheel); --s5: var(--ink-muted);
+  --s6: color-mix(in srgb, var(--paintbrush) 50%, var(--surface-raised));
+  --s7: var(--winecup);
+  --s8: color-mix(in srgb, var(--winecup) 50%, var(--surface-raised));
+  --down: var(--paintbrush); --up: var(--bluebonnet);
 }
 * { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; }
-body {
-  margin: 0; background: var(--bg); color: var(--text);
-  font: 15px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-}
-.wrap { max-width: 1240px; margin: 0 auto; padding: 0 16px 64px; }
-header { padding: 36px 0 12px; }
-h1 { font-size: clamp(26px, 4vw, 38px); line-height: 1.15; margin: 0 0 10px; letter-spacing: -0.01em; }
-h2 { font-size: 21px; margin: 0 0 4px; }
-h3 { font-size: 15px; margin: 0 0 6px; }
-p { margin: 0 0 10px; }
-.lede { color: var(--text-2); max-width: 840px; font-size: 16px; }
-a { color: var(--accent); }
-.muted { color: var(--text-3); }
-.small { font-size: 13px; }
-.card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin: 18px 0; }
-.card > .sub { color: var(--text-2); margin-bottom: 12px; max-width: 880px; }
-.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin: 18px 0 6px; }
-.tile { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; }
-.tile .k { font-size: 12px; color: var(--text-2); text-transform: uppercase; letter-spacing: .04em; }
-.tile .v { font-size: 28px; font-weight: 650; line-height: 1.2; margin: 4px 0 2px; font-variant-numeric: tabular-nums; }
-.tile .d { font-size: 13px; color: var(--text-2); }
+/* body, headings, links, focus ring and selection come from Bluebonnet's classless base layer */
+.wrap { max-width: 1240px; margin: 0 auto; padding: 0 var(--space-4) var(--space-12); }
+@media (min-width: 768px) { .wrap { padding: 0 var(--space-6) var(--space-12); } }
+header { padding: var(--space-8) 0 var(--space-3); }
+h1 { margin: 0 0 var(--space-3); }
+h2 { margin: 0 0 var(--space-1); }
+h3 { font-size: 16px; line-height: 22px; margin: 0 0 var(--space-2); }
+p { margin: 0 0 var(--space-3); }
+.lede { color: var(--ink-muted); max-width: 75ch; }
+.muted { color: var(--ink-muted); }
+.small { font-size: 14px; line-height: 22px; }
+.card { background: var(--surface-raised); border: 1px solid var(--line); border-radius: var(--radius-md); padding: var(--space-6); margin: var(--space-4) 0; }
+.card > .sub { color: var(--ink-muted); margin-bottom: var(--space-3); max-width: 75ch; font-size: 15px; line-height: 24px; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: var(--space-3); margin: var(--space-4) 0 var(--space-2); }
+.tile { background: var(--surface-raised); border: 1px solid var(--line); border-radius: var(--radius-md); padding: var(--space-3) var(--space-4); }
+.tile .k { font: 600 12px/16px var(--font-body); color: var(--ink-muted); text-transform: uppercase; letter-spacing: .06em; }
+.tile .v { font: 700 28px/34px var(--font-display); letter-spacing: -0.01em; margin: var(--space-1) 0 2px; }
+.tile .d { font-size: 14px; line-height: 20px; color: var(--ink-muted); }
 .controls {
-  position: sticky; top: 0; z-index: 1000; background: color-mix(in srgb, var(--bg) 92%, transparent);
-  backdrop-filter: blur(6px); padding: 10px 0; border-bottom: 1px solid var(--border);
-  display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center;
+  position: sticky; top: 0; z-index: 1000; background: color-mix(in srgb, var(--surface) 92%, transparent);
+  backdrop-filter: blur(6px); padding: var(--space-3) 0; border-bottom: 1px solid var(--line);
+  display: flex; flex-wrap: wrap; gap: var(--space-3) var(--space-4); align-items: center;
 }
 .controls > .row.yrs { min-width: 0; flex: 1 1 100%; flex-wrap: nowrap; }
-.row { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
-.seg { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: var(--surface); }
-.seg button { border: 0; background: none; color: var(--text-2); padding: 6px 11px; font: inherit; font-size: 13px; cursor: pointer; }
-.seg button + button { border-left: 1px solid var(--border); }
-.seg button[aria-pressed="true"] { background: var(--text); color: var(--surface); }
+.row { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-3); align-items: center; }
+.seg { display: inline-flex; border: 1px solid var(--line-strong); border-radius: var(--radius-md); overflow: hidden; background: var(--surface-raised); }
+.seg button { border: 0; background: none; color: var(--ink); min-height: 32px; padding: 0 var(--space-3); font: 600 14px/20px var(--font-body); cursor: pointer; transition: background-color .12s ease, color .12s ease; }
+.seg button:hover:not([aria-pressed="true"]) { background: var(--bluebonnet-soft); color: var(--bluebonnet); }
+.seg button + button { border-left: 1px solid var(--line-strong); }
+.seg button[aria-pressed="true"] { background: var(--bluebonnet); color: var(--on-bluebonnet); }
 select {
-  font: inherit; font-size: 13.5px; color: var(--text); background: var(--surface); border: 1px solid var(--border);
-  border-radius: 8px; padding: 5px 8px; max-width: 100%;
+  font: 400 15px/20px var(--font-body); color: var(--ink); background: var(--surface-raised); border: 1px solid var(--line-strong);
+  border-radius: var(--radius-md); min-height: 34px; padding: 0 var(--space-2); max-width: 100%;
 }
-.ctl-label { font-size: 12px; color: var(--text-3); margin-right: 2px; text-transform: uppercase; letter-spacing: .04em; }
+select:hover, input[type=search]:hover { border-color: var(--ink-muted); }
+.ctl-label { font: 600 12px/16px var(--font-body); color: var(--ink-muted); margin-right: 2px; text-transform: uppercase; letter-spacing: .06em; }
 .years { display: flex; flex-wrap: nowrap; gap: 4px; overflow-x: auto; max-width: 100%; padding-bottom: 2px; scrollbar-width: thin; }
 .years button {
-  border: 1px solid var(--border); background: var(--surface); color: var(--text-2); border-radius: 6px;
-  padding: 4px 7px; font: inherit; font-size: 12.5px; cursor: pointer; font-variant-numeric: tabular-nums; min-width: 48px;
+  border: 1px solid var(--line-strong); background: var(--surface-raised); color: var(--ink); border-radius: var(--radius-md);
+  min-height: 32px; padding: 0 6px; font: 600 13px/20px var(--font-body); cursor: pointer; min-width: 54px;
+  transition: background-color .12s ease, border-color .12s ease, color .12s ease;
 }
-.years button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
-.years button:focus-visible, .seg button:focus-visible, .hb-l:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
-.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--text-2); margin: 6px 0 10px; }
+.years button:hover:not([aria-pressed="true"]) { border-color: var(--bluebonnet); color: var(--bluebonnet); }
+@media (prefers-reduced-motion: reduce) { .seg button, .years button { transition: none; } }
+.years button[aria-pressed="true"] { background: var(--bluebonnet); border-color: var(--bluebonnet); color: var(--on-bluebonnet); }
+.years button:focus-visible, .hb-l:focus-visible { outline: 2px solid var(--bluebonnet); outline-offset: 2px; }
+.seg button:focus-visible { outline: 2px solid var(--bluebonnet); outline-offset: -2px; }
+.years { padding: 4px; margin: -4px; }
+.legend { display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-4); font-size: 14px; line-height: 22px; color: var(--ink-muted); margin: var(--space-2) 0 var(--space-3); }
 .legend span { display: inline-flex; align-items: center; gap: 6px; }
-.legend i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+.legend i { width: 12px; height: 12px; border-radius: var(--radius-sm); display: inline-block; }
 .legend i.ln { height: 3px; border-radius: 2px; width: 16px; }
-.legend i.dash { height: 0; width: 16px; border-top: 2px dashed var(--text-2); border-radius: 0; }
+.legend i.dash { height: 0; width: 16px; border-top: 2px dashed var(--ink-muted); border-radius: 0; }
 .legend i.dot { border-radius: 50%; }
-.legend i.ring { border-radius: 50%; background: var(--surface) !important; border: 2px solid var(--text-3); }
+.legend i.ring { border-radius: 50%; background: var(--surface-raised) !important; border: 2px solid var(--ink-muted); }
 .chart { width: 100%; overflow: hidden; }
 .chart svg { display: block; width: 100%; height: auto; }
 .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(380px, 100%), 1fr)); gap: 22px; }
 .grid2 > div { min-width: 0; }
-.callout { border-left: 3px solid var(--accent); padding: 8px 14px; background: var(--surface-2); border-radius: 0 8px 8px 0; margin: 14px 0 4px; max-width: 920px; }
-.callout.fed { border-color: var(--federal); }
-.callout.cn { border-color: var(--cn); }
-.note { font-size: 13px; color: var(--text-2); margin-top: 6px; }
+/* Alert pattern: the whole block is tinted, no side stripe */
+.callout { padding: var(--space-3) var(--space-4); background: var(--bluebonnet-soft); border-radius: var(--radius-md); margin: var(--space-4) 0 var(--space-1); max-width: 75ch; font-size: 15px; line-height: 24px; }
+.callout.fed { background: var(--paintbrush-soft); }
+.callout.cn { background: var(--surface-sunken); }
+.callout p:last-child { margin-bottom: 0; }
+.note { font-size: 14px; line-height: 22px; color: var(--ink-muted); margin-top: var(--space-2); }
 .dn { color: var(--down); } .upc { color: var(--up); }
 
 /* horizontal bar rows (HTML so labels stay crisp at any width) */
 .hb { --lw: 172px; --vw: 72px; font-size: 13px; }
 .hb-row, .hb-axis { display: grid; grid-template-columns: var(--lw) 1fr var(--vw); align-items: center; gap: 0 10px; }
-.hb-row { padding: 2px 0; border-radius: 6px; }
-.hb-row:hover { background: var(--surface-2); }
-.hb-row.all { border-bottom: 1px solid var(--border); margin-bottom: 4px; padding-bottom: 6px; border-radius: 6px 6px 0 0; }
+.hb-row { padding: 2px 0; border-radius: var(--radius-sm); }
+.hb-row:hover { background: var(--bluebonnet-soft); }
+.hb-row.all { border-bottom: 1px solid var(--line); margin-bottom: 4px; padding-bottom: 6px; border-radius: 6px 6px 0 0; }
 .hb-l {
-  all: unset; cursor: pointer; text-align: right; color: var(--text-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  all: unset; cursor: pointer; text-align: right; color: var(--ink-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   padding: 2px 0;
 }
-.hb-row.focus .hb-l { color: var(--text); font-weight: 650; }
-.hb-row.all .hb-l { color: var(--text); font-style: italic; cursor: default; }
-.hb-row.focus .hb-l::before { content: "▸ "; color: var(--accent); }
+.hb-row.focus .hb-l { color: var(--ink); font-weight: 700; }
+.hb-row.all .hb-l { color: var(--ink); font-style: italic; cursor: default; }
+.hb-row.focus .hb-l::before { content: "▸ "; color: var(--bluebonnet); }
 .hb-track { position: relative; height: 18px; }
 .hb-track .gl { position: absolute; top: -2px; bottom: -2px; width: 1px; background: var(--grid); }
 .hb-bar { position: absolute; left: 0; top: 2px; height: 14px; display: flex; }
-.hb-bar span { height: 100%; border-right: 2px solid var(--surface); }
-.hb-bar span:last-child { border-right: 0; border-radius: 0 4px 4px 0; }
-.hb-row:hover .hb-bar span { border-right-color: var(--surface-2); }
-.hb-row.focus .hb-track::after { content: ""; position: absolute; inset: -3px -4px; border: 1.5px solid var(--accent); border-radius: 6px; pointer-events: none; }
-.hb-v { font-variant-numeric: tabular-nums; color: var(--text-2); white-space: nowrap; }
-.hb-row.focus .hb-v { color: var(--text); font-weight: 600; }
-.hb-axis { font-size: 11px; color: var(--text-3); margin-bottom: 2px; }
+.hb-bar span { height: 100%; border-right: 2px solid var(--surface-raised); }
+.hb-bar span:last-child { border-right: 0; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+.hb-row:hover .hb-bar span { border-right-color: var(--bluebonnet-soft); }
+.hb-row.focus .hb-track::after { content: ""; position: absolute; inset: -3px -4px; border: 1.5px solid var(--bluebonnet); border-radius: var(--radius-sm); pointer-events: none; }
+.hb-v { font-variant-numeric: tabular-nums; color: var(--ink-muted); white-space: nowrap; }
+.hb-row.focus .hb-v { color: var(--ink); font-weight: 600; }
+.hb-axis { font-size: 11px; color: var(--ink-muted); margin-bottom: 2px; }
 .hb-axis .ax { position: relative; height: 14px; }
 .hb-axis .ax span { position: absolute; transform: translateX(-50%); white-space: nowrap; }
 .hb-axis .ax span:first-child { transform: none; }
 .hb-axis .ax span:last-child { transform: translateX(-100%); }
 /* dumbbell */
-.db .hb-track .seg-line { position: absolute; top: 8px; height: 2px; background: var(--text-3); }
+.db .hb-track .seg-line { position: absolute; top: 8px; height: 2px; background: var(--ink-muted); }
 .db .dot { position: absolute; top: 3px; width: 12px; height: 12px; margin-left: -6px; border-radius: 50%; }
-.db .dot.a { background: var(--surface); border: 2px solid var(--text-3); }
-.db .dot.b { background: var(--cn); box-shadow: 0 0 0 2px var(--surface); }
-.db .na { color: var(--text-3); font-style: italic; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; line-height: 18px; }
-.tag { display: inline-block; font-size: 10.5px; line-height: 1; padding: 2px 4px; border: 1px solid var(--border); border-radius: 4px; color: var(--text-3); margin-left: 4px; vertical-align: 1px; font-weight: 400; font-style: normal; }
+.db .dot.a { background: var(--surface-raised); border: 2px solid var(--ink-muted); }
+.db .dot.b { background: var(--cn); box-shadow: 0 0 0 2px var(--surface-raised); }
+.db .na { color: var(--ink-muted); font-style: italic; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; line-height: 18px; }
+.tag { display: inline-block; font-size: 10.5px; line-height: 1; padding: 2px 4px; background: var(--surface-sunken); border-radius: var(--radius-sm); color: var(--ink-muted); margin-left: 4px; vertical-align: 1px; font-weight: 400; font-style: normal; }
 
 #tip {
-  position: fixed; pointer-events: none; z-index: 2000; background: var(--text); color: var(--surface);
-  border-radius: 8px; padding: 8px 10px; font-size: 12.5px; line-height: 1.4; max-width: 320px;
-  box-shadow: 0 4px 18px rgba(0,0,0,.18); opacity: 0; transition: opacity .08s;
+  position: fixed; pointer-events: none; z-index: 2000; background: var(--ink); color: var(--surface-raised);
+  border-radius: var(--radius-md); padding: var(--space-2) var(--space-3); font-size: 13px; line-height: 18px; max-width: 320px;
+  box-shadow: var(--shadow-1); opacity: 0;
 }
-#tip .tt { font-weight: 650; margin-bottom: 2px; }
+#tip .tt { font-weight: 700; margin-bottom: 2px; }
 #tip .tr { display: flex; justify-content: space-between; gap: 14px; font-variant-numeric: tabular-nums; }
-#tip .tr.sep { border-top: 1px solid color-mix(in srgb, var(--surface) 30%, transparent); margin-top: 3px; padding-top: 3px; }
+#tip .tr.sep { border-top: 1px solid color-mix(in srgb, var(--surface-raised) 30%, transparent); margin-top: 3px; padding-top: 3px; }
 #tip i { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 6px; }
-table { border-collapse: collapse; width: 100%; font-size: 13px; font-variant-numeric: tabular-nums; }
-th, td { padding: 5px 8px; border-bottom: 1px solid var(--grid); text-align: right; white-space: nowrap; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; line-height: 20px; }
+th, td { padding: 6px var(--space-2); border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; }
 th:first-child, td:first-child { text-align: left; }
-thead th { color: var(--text-2); font-weight: 600; position: sticky; top: 0; background: var(--surface); vertical-align: bottom; }
-tr.focus td { font-weight: 650; }
-tr.focus td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
-tr.all td { font-style: italic; border-bottom: 1px solid var(--border); }
-.tablewrap { overflow-x: auto; }
-.heat td.h { color: var(--text); }
-.heat td.h.inv { color: #fff; }
-.heat { font-size: 12.5px; }
-.heat th { white-space: normal; min-width: 58px; font-size: 12px; }
+thead th { color: var(--ink-muted); font: 600 12px/16px var(--font-body); letter-spacing: .04em; text-transform: uppercase; position: sticky; top: 0; background: var(--surface-sunken); vertical-align: bottom; }
+tr.focus td { font-weight: 700; }
+tr.focus td:first-child { box-shadow: inset 3px 0 0 var(--bluebonnet); }
+tr.all td { font-style: italic; border-bottom: 1px solid var(--line); }
+.tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius-md); }
+.tablewrap tbody tr:last-child td { border-bottom: 0; }
+.heat td.h { color: var(--ink); }
+.heat td.h.inv { color: var(--on-bluebonnet); }
+.heat { font-size: 13px; }
+.heat th { white-space: normal; min-width: 58px; font-size: 11px; line-height: 14px; letter-spacing: .02em; }
 .heat td, .heat th { padding: 5px 4px; }
 .heat th:first-child { min-width: 0; }
-.axis text { font-size: 11px; fill: var(--text-3); }
-.end-label { font-size: 12px; font-weight: 600; paint-order: stroke; stroke: var(--surface); stroke-width: 3px; }
+.axis text { font-size: 11px; fill: var(--ink-muted); }
+.end-label { font-size: 12px; font-weight: 600; paint-order: stroke; stroke: var(--surface-raised); stroke-width: 3px; }
 .sources li { margin-bottom: 6px; }
 .theme-toggle { float: right; margin: 0 0 8px 12px; }
 @media (max-width: 640px) {
   .controls { position: static; }
-  .card { padding: 14px; }
+  .card { padding: var(--space-4); }
   .hb { --lw: 104px; --vw: 58px; font-size: 12px; }
   .hb-row, .hb-axis { gap: 0 6px; }
   .tag { display: none; }
@@ -172,70 +165,68 @@ tr.all td { font-style: italic; border-bottom: 1px solid var(--border); }
 }
 
 /* ---- added for the combined page */
-:root { --neutral-link: #c9c7c0; --heat-0: #e8eef7; --mid: #ecebe7; }
-@media (prefers-color-scheme: dark) {
-  :root:where(:not([data-theme="light"])) { --neutral-link: #46453f; --heat-0: #24303e; --mid: #3a3a36; }
-}
-:root[data-theme="dark"] { --neutral-link: #46453f; --heat-0: #24303e; --mid: #3a3a36; }
 [hidden] { display: none !important; }
-.viewbar { margin: 14px 0 0; gap: 8px 18px; }
-.linkbtn { all: unset; cursor: pointer; color: var(--accent); font-size: 13.5px; }
-.linkbtn:hover { text-decoration: underline; }
-.linkbtn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+.viewbar { margin: var(--space-3) 0 0; gap: var(--space-2) var(--space-4); }
+/* quiet button */
+.linkbtn { all: unset; cursor: pointer; color: var(--bluebonnet); font: 600 14px/20px var(--font-body); padding: 6px var(--space-2); border-radius: var(--radius-md); transition: background-color .12s ease; }
+.linkbtn:hover { background: var(--bluebonnet-soft); }
+.linkbtn:focus-visible { outline: 2px solid var(--bluebonnet); outline-offset: 2px; }
 .seg { flex-wrap: wrap; }
 .seg button { white-space: nowrap; }
-input[type=search] { font: inherit; font-size: 13.5px; color: var(--text); background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 5px 9px; max-width: 100%; }
+input[type=search] { font: 400 15px/20px var(--font-body); color: var(--ink); background: var(--surface-raised); border: 1px solid var(--line-strong); border-radius: var(--radius-md); min-height: 34px; padding: 0 var(--space-3); max-width: 100%; }
+input[type=search]::placeholder { color: var(--ink-muted); }
 
 /* district view: Sankey, small multiples, year-over-year changes */
 .chart.wide { overflow-x: auto; }
 .chart.wide svg { min-width: 720px; }
 .multiples { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
-.mini { border: 1px solid var(--border); border-radius: 10px; padding: 10px 10px 4px; background: var(--surface); }
-.mini .t { font-size: 13px; font-weight: 600; }
-.mini .n { font-size: 12.5px; color: var(--text-2); font-variant-numeric: tabular-nums; }
-.changes { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 6px 28px; font-size: 13.5px; margin-top: 10px; }
+.mini { border: 1px solid var(--line); border-radius: var(--radius-md); padding: var(--space-3) var(--space-3) var(--space-1); background: var(--surface-raised); }
+.mini .t { font-size: 14px; line-height: 20px; font-weight: 600; }
+.mini .n { font-size: 13px; line-height: 18px; color: var(--ink-muted); }
+.changes { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--space-2) var(--space-8); font-size: 14px; line-height: 22px; margin-top: var(--space-3); }
 .changes h3 { margin-top: 6px; }
-.chg { display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--grid); padding: 3px 0; }
+.chg { display: flex; justify-content: space-between; gap: var(--space-3); border-bottom: 1px solid var(--line); padding: 3px 0; }
 .chg b { font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.sankey-node-label { font-size: 12.5px; fill: var(--text); paint-order: stroke; stroke: var(--surface); stroke-width: 3px; stroke-linejoin: round; }
-.sankey-node-val { font-size: 11px; fill: var(--text-2); }
+.sankey-node-label { font-size: 12.5px; fill: var(--ink); paint-order: stroke; stroke: var(--surface-raised); stroke-width: 3px; stroke-linejoin: round; }
+.sankey-node-val { font-size: 11px; fill: var(--ink-muted); }
 #view-district .tablewrap { max-height: 520px; }
 
 /* schools view: map, side panel, ranking, sortable tables */
 .mapgrid { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 18px; align-items: start; }
-#s-map { height: 620px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface-2); z-index: 1; }
-.leaflet-container { font: inherit; }
+#s-map { height: 620px; border-radius: var(--radius-md); border: 1px solid var(--line); background: var(--surface-sunken); z-index: 1; }
+.leaflet-container { font: 400 14px/20px var(--font-body); }
+.leaflet-container a { color: var(--bluebonnet); }
 .leaflet-control-attribution { font-size: 10.5px; }
-.maplegend { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; font-size: 12.5px; color: var(--text-2); margin-top: 8px; }
-.ramp { display: inline-block; width: 160px; height: 10px; border-radius: 3px; vertical-align: middle; margin: 0 6px; }
+.maplegend { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-4); font-size: 13px; line-height: 18px; color: var(--ink-muted); margin-top: 8px; }
+.ramp { display: inline-block; width: 160px; height: 10px; border-radius: var(--radius-sm); vertical-align: middle; margin: 0 6px; }
 .sizekey { display: inline-flex; align-items: center; gap: 6px; }
-.sizekey i { display: inline-block; border-radius: 50%; border: 1.5px solid var(--text-3); }
-.panel { border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; background: var(--surface); max-height: 620px; overflow-y: auto; }
-.panel h3 { font-size: 17px; margin: 0 0 2px; }
-.panel .meta { font-size: 12.5px; color: var(--text-2); margin-bottom: 10px; }
-.kv { display: grid; grid-template-columns: 1fr auto; gap: 3px 12px; font-size: 13px; margin: 6px 0 12px; }
-.kv span:nth-child(odd) { color: var(--text-2); }
-.kv span:nth-child(even) { font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; }
-.panel h4 { font-size: 13px; margin: 12px 0 2px; color: var(--text-2); font-weight: 600; }
-.panel .x { float: right; border: 0; background: none; color: var(--text-3); font-size: 18px; cursor: pointer; line-height: 1; padding: 0 2px; }
+.sizekey i { display: inline-block; border-radius: 50%; border: 1.5px solid var(--ink-muted); }
+.panel { border: 1px solid var(--line); border-radius: var(--radius-md); padding: var(--space-4); background: var(--surface-raised); max-height: 620px; overflow-y: auto; }
+.panel h3 { font-size: 19px; line-height: 26px; margin: 0 0 2px; }
+.panel .meta { font-size: 13px; line-height: 18px; color: var(--ink-muted); margin-bottom: var(--space-3); }
+.kv { display: grid; grid-template-columns: 1fr auto; gap: 2px var(--space-3); font-size: 14px; line-height: 22px; margin: var(--space-2) 0 var(--space-3); }
+.kv span:nth-child(odd) { color: var(--ink-muted); }
+.kv span:nth-child(even) { font-weight: 600; text-align: right; }
+.panel h4 { font: 600 12px/16px var(--font-body); letter-spacing: .06em; text-transform: uppercase; margin: var(--space-3) 0 var(--space-1); color: var(--ink-muted); }
+.panel .x { float: right; border: 0; background: none; color: var(--ink-muted); font-size: 18px; cursor: pointer; line-height: 1; padding: 0 2px; }
 .dist-dot { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: 0; }
 #view-schools .hb { --lw: 230px; --vw: 76px; }
 #view-schools .hb-row.focus .hb-l::before { content: none; }
 .hb-l .dist-dot { width: 8px; height: 8px; margin-right: 5px; }
 .hb-bar.over { -webkit-mask: linear-gradient(90deg, #000 calc(100% - 18px), transparent); mask: linear-gradient(90deg, #000 calc(100% - 18px), transparent); }
 .scrollbox { max-height: 640px; overflow-y: auto; padding-right: 4px; }
-.scrollbox .hb-axis { position: sticky; top: 0; background: var(--surface); z-index: 1; padding: 2px 0; }
+.scrollbox .hb-axis { position: sticky; top: 0; background: var(--surface-raised); z-index: 1; padding: 2px 0; }
 #tip .hint { opacity: .7; margin-top: 3px; }
 th.txt { text-align: left; }
 thead th { z-index: 1; }
 th.sortable { cursor: pointer; user-select: none; }
-th.sortable:hover { color: var(--text); }
+th.sortable:hover { color: var(--ink); }
 th.sorted::after { content: " ▾"; }
 th.sorted.asc::after { content: " ▴"; }
 tbody tr.click { cursor: pointer; }
-tbody tr.click:hover td { background: var(--surface-2); }
+tbody tr.click:hover td { background: var(--bluebonnet-soft); }
 .tablewrap.tall { max-height: 560px; overflow-y: auto; }
-.nomap { padding: 40px 20px; color: var(--text-2); text-align: center; }
+.nomap { padding: 40px 20px; color: var(--ink-muted); text-align: center; }
 @media (max-width: 900px) {
   .mapgrid { grid-template-columns: 1fr; }
   #s-map { height: 460px; }
@@ -764,7 +755,7 @@ function lineMany(box, { xs, series, ref, label = String, yFmt, valFmt, yMin, yM
   xs.forEach((x, i) => { if ((xs.length - 1 - i) % every === 0) el("text", { x: xS(i), y: H - 8, "text-anchor": "middle" }, g).textContent = label(x); });
   if (sel != null && xs.includes(sel)) {
     const i = xs.indexOf(sel), bw = iw / Math.max(1, xs.length - 1);
-    el("rect", { x: xS(i) - bw / 2, y: m.t, width: bw, height: ih, fill: css("--surface-2"), rx: 3 }, s).parentNode.insertBefore(s.lastChild, g);
+    el("rect", { x: xS(i) - bw / 2, y: m.t, width: bw, height: ih, fill: css("--surface-sunken"), rx: 3 }, s).parentNode.insertBefore(s.lastChild, g);
   }
   const pathD = sr => { let d = "", pen = false; xs.forEach((x, i) => { const v = sr.values[x]; if (v == null || !isFinite(v)) { pen = false; return; } d += (pen ? "L" : "M") + xS(i).toFixed(1) + "," + yS(v).toFixed(1); pen = true; }); return d; };
   const lastPt = sr => { for (let i = xs.length - 1; i >= 0; i--) { const v = sr.values[xs[i]]; if (v != null && isFinite(v)) return [i, v]; } return null; };
@@ -774,14 +765,14 @@ function lineMany(box, { xs, series, ref, label = String, yFmt, valFmt, yMin, yM
   });
   const labels = [];
   if (ref) {
-    el("path", { d: pathD(ref), fill: "none", stroke: css("--text-2"), "stroke-width": 2, "stroke-dasharray": "5 4", "stroke-linejoin": "round" }, s);
-    const lp = lastPt(ref); if (lp) labels.push({ y: yS(lp[1]), x: xS(lp[0]), text: "County", color: css("--text-2") });
+    el("path", { d: pathD(ref), fill: "none", stroke: css("--ink-muted"), "stroke-width": 2, "stroke-dasharray": "5 4", "stroke-linejoin": "round" }, s);
+    const lp = lastPt(ref); if (lp) labels.push({ y: yS(lp[1]), x: xS(lp[0]), text: "County", color: css("--ink-muted") });
   }
   const f = series.find(sr => sr.id === S.focus);
   if (f) {
-    el("path", { d: pathD(f), fill: "none", stroke: css("--accent"), "stroke-width": 2.5, "stroke-linejoin": "round" }, s);
-    xs.forEach((x, i) => { const v = f.values[x]; if (v != null && isFinite(v)) el("circle", { cx: xS(i), cy: yS(v), r: 3.5, fill: css("--accent"), stroke: css("--surface"), "stroke-width": 2 }, s); });
-    const lp = lastPt(f); if (lp) labels.push({ y: yS(lp[1]), x: xS(lp[0]), text: NAME[f.id], color: css("--accent") });
+    el("path", { d: pathD(f), fill: "none", stroke: css("--bluebonnet"), "stroke-width": 2.5, "stroke-linejoin": "round" }, s);
+    xs.forEach((x, i) => { const v = f.values[x]; if (v != null && isFinite(v)) el("circle", { cx: xS(i), cy: yS(v), r: 3.5, fill: css("--bluebonnet"), stroke: css("--surface-raised"), "stroke-width": 2 }, s); });
+    const lp = lastPt(f); if (lp) labels.push({ y: yS(lp[1]), x: xS(lp[0]), text: NAME[f.id], color: css("--bluebonnet") });
   }
   if (labels.length === 2 && Math.abs(labels[0].y - labels[1].y) < 14) {
     const [a, b] = labels[0].y < labels[1].y ? labels : [labels[1], labels[0]], mid = (a.y + b.y) / 2;
@@ -791,8 +782,8 @@ function lineMany(box, { xs, series, ref, label = String, yFmt, valFmt, yMin, yM
     const tx = el("text", { x: m.l + iw + 8, y: l.y + 4, class: "end-label", fill: l.color }, s);
     tx.textContent = l.text.length > 14 && narrow ? l.text.slice(0, 12) + "…" : l.text;
   });
-  const hl = el("path", { fill: "none", stroke: css("--text"), "stroke-width": 2, opacity: 0, "pointer-events": "none" }, s);
-  const cross = el("line", { y1: m.t, y2: m.t + ih, stroke: css("--text-3"), "stroke-width": 1, opacity: 0 }, s);
+  const hl = el("path", { fill: "none", stroke: css("--ink"), "stroke-width": 2, opacity: 0, "pointer-events": "none" }, s);
+  const cross = el("line", { y1: m.t, y2: m.t + ih, stroke: css("--ink-muted"), "stroke-width": 1, opacity: 0 }, s);
   const ov = el("rect", { x: m.l - 10, y: m.t, width: iw + 20, height: ih, fill: "transparent", style: "cursor:pointer" }, s);
   let near = null;
   const locate = ev => {
@@ -808,9 +799,9 @@ function lineMany(box, { xs, series, ref, label = String, yFmt, valFmt, yMin, yM
     if (best && best.id !== S.focus) { hl.setAttribute("d", pathD(best)); hl.setAttribute("opacity", 1); } else hl.setAttribute("opacity", 0);
     const x = xs[i], fv = v => v == null || !isFinite(v) ? "—" : valFmt(v);
     let rows = "";
-    if (best && best.id !== S.focus) rows += trow(NAME[best.id], fv(best.values[x]), css("--text"));
-    if (f) rows += trow(NAME[f.id], fv(f.values[x]), css("--accent"));
-    if (ref) rows += trow("All 16 districts", fv(ref.values[x]), css("--text-2"));
+    if (best && best.id !== S.focus) rows += trow(NAME[best.id], fv(best.values[x]), css("--ink"));
+    if (f) rows += trow(NAME[f.id], fv(f.values[x]), css("--bluebonnet"));
+    if (ref) rows += trow("All 16 districts", fv(ref.values[x]), css("--ink-muted"));
     const vals = series.map(sr => [sr, sr.values[x]]).filter(([, v]) => v != null && isFinite(v)).sort((a, b) => b[1] - a[1]);
     if (vals.length > 2) rows += trow("Highest: " + NAME[vals[0][0].id], fv(vals[0][1]), null, "sep") + trow("Lowest: " + NAME[vals[vals.length - 1][0].id], fv(vals[vals.length - 1][1]));
     showTip(ev, `<div class="tt">${label(x)}</div>${rows}${best && best.id !== S.focus ? '<div class="muted" style="color:inherit;opacity:.7;margin-top:3px">Click to follow ' + NAME[best.id] + "</div>" : ""}`);
@@ -818,7 +809,7 @@ function lineMany(box, { xs, series, ref, label = String, yFmt, valFmt, yMin, yM
   ov.addEventListener("mouseleave", () => { cross.setAttribute("opacity", 0); hl.setAttribute("opacity", 0); hideTip(); });
   ov.addEventListener("click", () => { if (near && near.id !== S.focus) setFocus(near.id); });
 }
-const lineLegend = box => legend(box, [{ label: NAME[S.focus], color: css("--accent"), cls: "ln" }, { label: "All 16 districts", cls: "dash" }, { label: "Other districts", color: css("--neutral"), cls: "ln" }]);
+const lineLegend = box => legend(box, [{ label: NAME[S.focus], color: css("--bluebonnet"), cls: "ln" }, { label: "All 16 districts", cls: "dash" }, { label: "Other districts", color: css("--neutral"), cls: "ln" }]);
 
 // ---- tiles
 function drawTiles() {
@@ -1005,7 +996,7 @@ function drawSpend() {
   const shade = (v, [lo, hi], isAll) => {
     if (isAll || hi <= lo) return "";
     const f = (v - lo) / (hi - lo), mix = Math.round(8 + f * 72);
-    return ` class="h${mix > 52 ? " inv" : ""}" style="background:color-mix(in srgb, var(--heat) ${mix}%, var(--surface))"`;
+    return ` class="h${mix > 52 ? " inv" : ""}" style="background:color-mix(in srgb, var(--heat) ${mix}%, var(--surface-raised))"`;
   };
   const fmt = v => money(v);
   const tr = r => `<tr class="${r.id === S.focus ? "focus" : ""}${r.id === "ALL" ? " all" : ""}" data-id="${r.id}"><td>${NAME[r.id]}</td>` +
@@ -1111,7 +1102,7 @@ function stackedBars(container, { yrs, series, selected, onSelect, height = 300,
   yrs.forEach((y, i) => {
     const cx = m.l + bw * i + bw / 2;
     const col = el("g", { style: "cursor:pointer" }, s);
-    if (y === selected) el("rect", { x: m.l + bw * i + 1, y: m.t, width: bw - 2, height: ih, fill: css("--surface-2"), rx: 4 }, col);
+    if (y === selected) el("rect", { x: m.l + bw * i + 1, y: m.t, width: bw - 2, height: ih, fill: css("--surface-sunken"), rx: 4 }, col);
     let acc = 0;
     const segs = series.map(sr => ({ sr, v: Math.max(0, sr.values[y] || 0) })).filter(d => d.v > 0);
     segs.forEach((d, j) => {
@@ -1123,7 +1114,7 @@ function stackedBars(container, { yrs, series, selected, onSelect, height = 300,
         el("path", { d: `M${x},${y0}V${yy + r}Q${x},${yy} ${x + r},${yy}H${x + barW - r}Q${x + barW},${yy} ${x + barW},${yy + r}V${y0}Z`, fill: d.sr.color }, col);
       } else el("rect", { x: cx - barW / 2, y: y0 - h, width: barW, height: Math.max(h, 0.5), fill: d.sr.color }, col);
     });
-    el("text", { x: cx, y: H - 8, "text-anchor": "middle", class: "axis", style: `font-size:${W < 600 && yrs.length > 8 ? 9.5 : yrs.length > 12 ? 10 : 11}px;fill:${y === selected ? css("--text") : css("--text-3")};font-weight:${y === selected ? 650 : 400}` }, s).textContent = label(y).replace(/^FY20/, "’").replace(/^20(\d\d)-/, "$1-");
+    el("text", { x: cx, y: H - 8, "text-anchor": "middle", class: "axis", style: `font-size:${W < 600 && yrs.length > 8 ? 9.5 : yrs.length > 12 ? 10 : 11}px;fill:${y === selected ? css("--ink") : css("--ink-muted")};font-weight:${y === selected ? 650 : 400}` }, s).textContent = label(y).replace(/^FY20/, "’").replace(/^20(\d\d)-/, "$1-");
     const hit = el("rect", { x: m.l + bw * i, y: m.t, width: bw, height: ih + m.b, fill: "transparent" }, col);
     hit.addEventListener("mousemove", ev => {
       const rows = series.slice().reverse().map(sr => trow(sr.label, fmt(sr.values[y] || 0), sr.color)).join("");
@@ -1157,9 +1148,9 @@ function lineChart(container, { xs, series, height = 240, label = String, yFmt =
     let d = "", pen = false;
     xs.forEach((x, i) => { const v = sr.values[x]; if (v == null) { pen = false; return; } d += (pen ? "L" : "M") + xS(i) + "," + yS(v); pen = true; });
     el("path", { d, fill: "none", stroke: sr.color, "stroke-width": 2, "stroke-dasharray": sr.dash || "none", "stroke-linejoin": "round" }, s);
-    pts.forEach(([i, v]) => el("circle", { cx: xS(i), cy: yS(v), r: sr.dash ? 2.5 : 3.5, fill: sr.color, stroke: css("--surface"), "stroke-width": 2 }, s));
+    pts.forEach(([i, v]) => el("circle", { cx: xS(i), cy: yS(v), r: sr.dash ? 2.5 : 3.5, fill: sr.color, stroke: css("--surface-raised"), "stroke-width": 2 }, s));
   });
-  const cross = el("line", { y1: m.t, y2: m.t + ih, stroke: css("--text-3"), "stroke-width": 1, opacity: 0 }, s);
+  const cross = el("line", { y1: m.t, y2: m.t + ih, stroke: css("--ink-muted"), "stroke-width": 1, opacity: 0 }, s);
   const ov = el("rect", { x: m.l - 10, y: m.t, width: iw + 20, height: ih, fill: "transparent" }, s);
   ov.addEventListener("mousemove", ev => {
     const r = s.getBoundingClientRect(), px = (ev.clientX - r.left) / r.width * W;
@@ -1264,7 +1255,7 @@ function drawSankey() {
   });
   const total = colTot[0];
   Object.values(nodes).forEach(n => {
-    const fill = n.group === "use" || n.group === "fund" ? css("--text-3") : groupColor(n.group);
+    const fill = n.group === "use" || n.group === "fund" ? css("--ink-muted") : groupColor(n.group);
     const dim = S.fedOnly && !["federal", "cn"].includes(n.group);
     const rect = el("rect", { x: n.x, y: n.y, width: nodeW, height: n.h, fill, rx: 2, opacity: dim ? 0.35 : 1 }, s);
     rect.addEventListener("mousemove", ev => showTip(ev, `<div class="tt">${n.label}</div>${trow(fyLabel(y), money(n.v))}${trow("Share of column", (n.v / colTot[n.col] * 100).toFixed(1) + "%")}`));
@@ -1376,8 +1367,8 @@ function drawMultiples() {
     const mx = Math.max(...vals) || 1;
     const xS = j => m + j / (ys.length - 1) * (W - 2 * m), yS = v => H - m - v / mx * (H - 2 * m - 6);
     el("line", { x1: m, x2: W - m, y1: H - m, y2: H - m, stroke: css("--grid") }, s);
-    el("path", { d: vals.map((v, j) => (j ? "L" : "M") + xS(j) + "," + yS(v)).join(""), fill: "none", stroke: k === "food" ? css("--cn") : css("--accent"), "stroke-width": 2 }, s);
-    el("circle", { cx: xS(i), cy: yS(vals[i]), r: 4, fill: k === "food" ? css("--cn") : css("--accent"), stroke: css("--surface"), "stroke-width": 2 }, s);
+    el("path", { d: vals.map((v, j) => (j ? "L" : "M") + xS(j) + "," + yS(v)).join(""), fill: "none", stroke: k === "food" ? css("--cn") : css("--bluebonnet"), "stroke-width": 2 }, s);
+    el("circle", { cx: xS(i), cy: yS(vals[i]), r: 4, fill: k === "food" ? css("--cn") : css("--bluebonnet"), stroke: css("--surface-raised"), "stroke-width": 2 }, s);
     const ov = el("rect", { x: 0, y: 0, width: W, height: H, fill: "transparent", style: "cursor:pointer" }, s);
     const pick = ev => { const r = s.getBoundingClientRect(); return Math.max(0, Math.min(ys.length - 1, Math.round(((ev.clientX - r.left) / r.width * W - m) / (W - 2 * m) * (ys.length - 1)))); };
     ov.addEventListener("mousemove", ev => { const j = pick(ev); showTip(ev, `<div class="tt">${label}</div>${trow(fyLabel(ys[j]), money(vals[j]))}`); });
@@ -1444,14 +1435,14 @@ function drawMeals() {
   MY.forEach(y => { const m = M(y); if (m.enroll && y !== 2021 && y !== 2022) { freeVals[y] = m.free / m.enroll; if (m.cepEnroll / m.enroll > 0.95) ispVals[y] = freeVals[y] / 1.6; } });
   lineChart($("#freeChart"), {
     xs: MY, label: y => syLabel(y).slice(2), xLabelEvery: 2, yMax: 1, yFmt: v => Math.round(v * 100) + "%", valFmt: v => (v * 100).toFixed(1) + "%", height: 250, width: 460,
-    series: [{ label: "Claimed at free rate", color: css("--cn"), values: freeVals }, { label: "Implied ISP (all schools on CEP)", color: css("--text-2"), dash: "5 4", values: ispVals }],
+    series: [{ label: "Claimed at free rate", color: css("--cn"), values: freeVals }, { label: "Implied ISP (all schools on CEP)", color: css("--ink-muted"), dash: "5 4", values: ispVals }],
   });
 
   // monthly
   const months = ["08", "09", "10", "11", "12", "01", "02", "03", "04", "05"];
   const mn = ["Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar", "Apr", "May"];
   const mon = y => Object.fromEntries(months.map((mm, i) => { const yr = i < 5 ? y - 1 : y; return [i, (M(y).monthly || {})[`${yr}-${mm}`] ?? null]; }));
-  const monSeries = [{ label: "2024-25", color: css("--text-3"), values: mon(2025) }, { label: "2025-26", color: css("--cn"), values: mon(2026) }];
+  const monSeries = [{ label: "2024-25", color: css("--ink-muted"), values: mon(2025) }, { label: "2025-26", color: css("--cn"), values: mon(2026) }];
   legend($("#monLegend"), monSeries);
   const mmax = Math.max(...monSeries.flatMap(s => Object.values(s.values).filter(v => v != null)));
   lineChart($("#monthChart"), { xs: months.map((_, i) => i), label: i => mn[i], series: monSeries, height: 250, width: 460, valFmt: v => "$" + (v / 1e6).toFixed(2) + "M", yFmt: v => v ? "$" + (v / 1e6).toFixed(mmax >= 4e6 ? 0 : 1) + "M" : "$0" });
@@ -1617,7 +1608,7 @@ function stackedBars(box, { series, values, height = 220, width = 560, fmt, axis
   const bw = iw / NY, barW = Math.min(28, bw * 0.7), every = W < 420 ? 3 : 2;
   Y.forEach((y, i) => {
     const cx = m.l + bw * i + bw / 2, col = el("g", { style: onSelect ? "cursor:pointer" : "" }, s);
-    if (y === sel) el("rect", { x: m.l + bw * i + 1, y: m.t, width: bw - 2, height: ih, fill: css("--surface-2"), rx: 3 }, col);
+    if (y === sel) el("rect", { x: m.l + bw * i + 1, y: m.t, width: bw - 2, height: ih, fill: css("--surface-sunken"), rx: 3 }, col);
     let acc = 0;
     const segs = series.map(sr => ({ sr, v: Math.max(0, values[sr.key][i] || 0) })).filter(d => d.v > 0);
     segs.forEach((d, j) => {
@@ -1626,7 +1617,7 @@ function stackedBars(box, { series, values, height = 220, width = 560, fmt, axis
       if (j === segs.length - 1 && h > 4) { const r = 3, yy = y0 - h; el("path", { d: `M${x},${y0}V${yy + r}Q${x},${yy} ${x + r},${yy}H${x + barW - r}Q${x + barW},${yy} ${x + barW},${yy + r}V${y0}Z`, fill: d.sr.color }, col); }
       else el("rect", { x, y: y0 - h, width: barW, height: Math.max(h, 0.5), fill: d.sr.color }, col);
     });
-    if ((NY - 1 - i) % every === 0) el("text", { x: cx, y: H - 6, "text-anchor": "middle", class: "axis", style: `fill:${y === sel ? css("--text") : css("--text-3")};font-weight:${y === sel ? 650 : 400}` }, s).textContent = "’" + String(y).slice(2);
+    if ((NY - 1 - i) % every === 0) el("text", { x: cx, y: H - 6, "text-anchor": "middle", class: "axis", style: `fill:${y === sel ? css("--ink") : css("--ink-muted")};font-weight:${y === sel ? 650 : 400}` }, s).textContent = "’" + String(y).slice(2);
     const hit = el("rect", { x: m.l + bw * i, y: m.t, width: bw, height: ih + m.b, fill: "transparent" }, col);
     hit.addEventListener("mousemove", ev => showTip(ev, `<div class="tt">${fyLabel(y)}</div>${series.slice().reverse().map(sr => trow(sr.label, fmt(values[sr.key][i] || 0), sr.color)).join("")}${totals[i] ? trow("Total", fmt(totals[i]), null, "sep") : trow("No data", "")}`));
     hit.addEventListener("mouseleave", hideTip);
@@ -1641,8 +1632,8 @@ function sparkline(box, { values, fmt, height = 70, width = 320, color }) {
   const xS = i => m.l + i / (values.length - 1) * iw, yS = x => m.t + ih - (x - mn) / (mx - mn || 1) * ih;
   el("line", { x1: m.l, x2: W - m.r, y1: yS(0), y2: yS(0), stroke: css("--grid") }, s);
   let d = "", pen = false; values.forEach((x, i) => { if (x == null) { pen = false; return; } d += (pen ? "L" : "M") + xS(i) + "," + yS(x); pen = true; });
-  el("path", { d, fill: "none", stroke: color || css("--accent"), "stroke-width": 2 }, s);
-  const i = yi(); if (values[i] != null) el("circle", { cx: xS(i), cy: yS(values[i]), r: 3.5, fill: color || css("--accent"), stroke: css("--surface"), "stroke-width": 1.5 }, s);
+  el("path", { d, fill: "none", stroke: color || css("--bluebonnet"), "stroke-width": 2 }, s);
+  const i = yi(); if (values[i] != null) el("circle", { cx: xS(i), cy: yS(values[i]), r: 3.5, fill: color || css("--bluebonnet"), stroke: css("--surface-raised"), "stroke-width": 1.5 }, s);
   [0, values.length - 1].forEach(k => el("text", { x: xS(k), y: H - 2, "text-anchor": k ? "end" : "start", class: "axis", style: "font-size:10px" }, s).textContent = "’" + String(Y[k]).slice(2));
   const ov = el("rect", { x: 0, y: 0, width: W, height: H, fill: "transparent" }, s);
   ov.addEventListener("mousemove", ev => { const r = s.getBoundingClientRect(), k = Math.max(0, Math.min(values.length - 1, Math.round(((ev.clientX - r.left) / r.width * W - m.l) / iw * (values.length - 1)))); showTip(ev, trow(fyLabel(Y[k]), values[k] == null ? "—" : fmt(values[k]))); });
@@ -1711,7 +1702,7 @@ function drawMap(refit) {
   layerS.clearLayers(); markers = {};
   list.slice().sort((a, b2) => (enr(b2, i) || 0) - (enr(a, i) || 0)).forEach((s, k) => {
     const v = M.f(s, i), selected = s.id === S.sel;
-    const mk = L.circleMarker([s.lat, s.lon], { radius: rad(enr(s, i) || meal(s, "e", MY.indexOf(Y[i]))), fillColor: sc.fn(v), fillOpacity: 0.9, color: selected ? css("--text") : css("--text-3"), weight: selected ? 3 : 0.8 }).addTo(layerS);
+    const mk = L.circleMarker([s.lat, s.lon], { radius: rad(enr(s, i) || meal(s, "e", MY.indexOf(Y[i]))), fillColor: sc.fn(v), fillOpacity: 0.9, color: selected ? css("--ink") : css("--ink-muted"), weight: selected ? 3 : 0.8 }).addTo(layerS);
     mk.on("mouseover", e => showTip(e.originalEvent, `<div class="tt">${s.n}</div>${trow(DSHORT[s.d], s.lvl + (s.gr ? " · " + s.gr : ""))}${trow(M.label, v == null ? "—" : M.fmt(v))}${trow("Enrollment", enr(s, i) ? enr(s, i).toLocaleString() : "—")}${trow("Spending per student", money(METRICS.sppp.f(s, i)))}<div class="hint">Click for details</div>`));
     mk.on("mousemove", e => showTip(e.originalEvent, tip.innerHTML));
     mk.on("mouseout", hideTip);
