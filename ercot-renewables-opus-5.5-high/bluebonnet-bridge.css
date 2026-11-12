@@ -1,0 +1,133 @@
+/* Bootstrap 5.3 on Bluebonnet (../bluebonnet-design-system). Bootstrap stays for the grid, utilities and
+   collapse; its variables and the few components the pages use are mapped onto Bluebonnet tokens.
+   Load after bootstrap.min.css and bluebonnet.css. The pages set data-theme and data-bs-theme together. */
+
+:root, [data-bs-theme] {
+  --bs-font-sans-serif: var(--font-body);
+  --bs-font-monospace: var(--font-mono);
+  --bs-body-font-family: var(--font-body);
+  --bs-body-font-size: 16px;
+  --bs-body-line-height: 1.625;
+  --bs-body-bg: var(--surface);
+  --bs-body-color: var(--ink);
+  --bs-emphasis-color: var(--ink);
+  --bs-heading-color: var(--ink);
+  --bs-secondary-color: var(--ink-muted);
+  --bs-secondary-bg: var(--surface-sunken);
+  --bs-tertiary-bg: var(--surface-sunken);
+  --bs-border-color: var(--line);
+  --bs-border-color-translucent: var(--line);
+  --bs-code-color: var(--ink);
+  --bs-highlight-bg: var(--firewheel);
+  --bs-border-radius: var(--radius-md);
+  --bs-border-radius-sm: var(--radius-sm);
+  --bs-border-radius-lg: var(--radius-md);
+}
+
+body { font-variant-numeric: tabular-nums; }
+a { color: var(--bluebonnet); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+a:hover { color: var(--bluebonnet-deep); text-decoration-thickness: 2px; }
+a:visited { color: var(--link-visited); }
+:focus-visible { outline: 2px solid var(--bluebonnet); outline-offset: 2px; }
+code { background: var(--surface-sunken); padding: 1px var(--space-1); border-radius: var(--radius-sm); font-size: 13px; }
+
+h1, h2, h3, h4, h5, .h1, .h2, .h3, .h4, .h5 { font-family: var(--font-display); color: var(--ink); text-wrap: balance; }
+h1 { font-size: 32px; line-height: 38px; font-weight: 700; letter-spacing: -0.01em; }
+.h5 { font-size: 19px; line-height: 26px; font-weight: 600; }
+.small, small { font-size: 14px; line-height: 22px; }
+.text-ink-2 { color: var(--ink-muted) !important; }
+.text-muted-ink { color: var(--ink-muted) !important; }
+
+/* top bar */
+.bb-bar { background: var(--surface-raised); border-bottom: 1px solid var(--line); }
+.bb-bar .navbar-brand { font: 700 17px/24px var(--font-display); color: var(--ink); }
+.bb-bar a.navbar-brand { text-decoration: none; }
+.bb-bar a.navbar-brand:hover { color: var(--bluebonnet); }
+@media (min-width: 768px) { .container-xl.px-3 { padding-left: var(--space-6) !important; padding-right: var(--space-6) !important; } }
+
+/* cards: panels on surface-raised, a line border, never rounder than radius-md */
+.card {
+  --bs-card-bg: var(--surface-raised);
+  --bs-card-border-color: var(--line);
+  --bs-card-border-radius: var(--radius-md);
+  --bs-card-inner-border-radius: var(--radius-md);
+  --bs-card-spacer-x: var(--space-4);
+  --bs-card-spacer-y: var(--space-4);
+}
+@media (min-width: 768px) { .card { --bs-card-spacer-x: var(--space-6); --bs-card-spacer-y: var(--space-6); } }
+
+/* buttons: outline-secondary is Bluebonnet's secondary button; checked / btn-secondary is primary */
+.btn {
+  --bs-btn-font-family: var(--font-body);
+  --bs-btn-font-weight: 600;
+  --bs-btn-font-size: 15px;
+  --bs-btn-line-height: 20px;
+  --bs-btn-border-radius: var(--radius-md);
+  --bs-btn-focus-box-shadow: none;
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2);
+  min-height: 40px;
+  transition: background-color .12s ease, border-color .12s ease, color .12s ease;
+}
+.btn-sm, .btn-group-sm > .btn {
+  --bs-btn-padding-y: 0;
+  --bs-btn-padding-x: var(--space-3);
+  --bs-btn-font-size: 14px;
+  --bs-btn-border-radius: var(--radius-md);
+  min-height: 32px;
+}
+.btn-outline-secondary {
+  --bs-btn-color: var(--ink);
+  --bs-btn-bg: var(--surface-raised);
+  --bs-btn-border-color: var(--line-strong);
+  --bs-btn-hover-color: var(--bluebonnet);
+  --bs-btn-hover-bg: var(--bluebonnet-soft);
+  --bs-btn-hover-border-color: var(--line-strong);
+  --bs-btn-active-color: var(--on-bluebonnet);
+  --bs-btn-active-bg: var(--bluebonnet);
+  --bs-btn-active-border-color: var(--bluebonnet);
+  --bs-btn-disabled-color: var(--ink);
+  --bs-btn-disabled-bg: var(--surface-raised);
+  --bs-btn-disabled-border-color: var(--line-strong);
+}
+.btn-secondary {
+  --bs-btn-color: var(--on-bluebonnet);
+  --bs-btn-bg: var(--bluebonnet);
+  --bs-btn-border-color: var(--bluebonnet);
+  --bs-btn-hover-color: var(--on-bluebonnet);
+  --bs-btn-hover-bg: var(--bluebonnet-deep);
+  --bs-btn-hover-border-color: var(--bluebonnet-deep);
+  --bs-btn-active-color: var(--on-bluebonnet);
+  --bs-btn-active-bg: var(--bluebonnet-deep);
+  --bs-btn-active-border-color: var(--bluebonnet-deep);
+}
+.btn:disabled, .btn.disabled { opacity: .5; cursor: not-allowed; }
+.btn:focus-visible, .btn-check:focus-visible + .btn { box-shadow: none; outline: 2px solid var(--bluebonnet); outline-offset: 2px; z-index: 3; }
+
+/* selects follow Bluebonnet's field control */
+.form-select {
+  background-color: var(--surface-raised);
+  color: var(--ink);
+  border-color: var(--line-strong);
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+}
+.form-select-sm { min-height: 32px; font-size: 14px; border-radius: var(--radius-md); }
+.form-select:hover { border-color: var(--ink-muted); }
+.form-select:focus { border-color: var(--bluebonnet); box-shadow: none; outline: 2px solid var(--bluebonnet); outline-offset: 1px; }
+
+/* tables follow Bluebonnet's table: sunken label-style header row, line dividers, bluebonnet-soft hover */
+.table {
+  --bs-table-bg: var(--surface-raised);
+  --bs-table-color: var(--ink);
+  --bs-table-border-color: var(--line);
+  --bs-table-hover-bg: var(--bluebonnet-soft);
+  --bs-table-hover-color: var(--ink);
+  --bs-table-striped-bg: var(--surface-sunken);
+}
+.table > thead th {
+  background: var(--surface-sunken);
+  font: 600 12px/16px var(--font-body); letter-spacing: .06em; text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
+@media (prefers-reduced-motion: reduce) { .btn { transition: none; } }

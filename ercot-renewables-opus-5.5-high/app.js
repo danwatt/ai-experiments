@@ -50,7 +50,7 @@
   const alpha = (hex, a) => `rgba(${rgb(hex).join(', ')}, ${a})`;
   // opaque mix of a color over the surface, so overlapping area edges never darken
   const tint = (hex, a) => {
-    const c = rgb(hex), s = rgb(css('--surface'));
+    const c = rgb(hex), s = rgb(css('--surface-raised'));
     return `rgb(${c.map((v, k) => Math.round(v * a + s[k] * (1 - a))).join(', ')})`;
   };
   const isDark = () => document.documentElement.getAttribute('data-bs-theme') === 'dark';
@@ -126,7 +126,7 @@
   }
 
   const tooltipStyle = () => ({
-    backgroundColor: css('--surface'),
+    backgroundColor: css('--surface-raised'),
     titleColor: css('--ink'),
     bodyColor: css('--ink-2'),
     footerColor: css('--ink'),
@@ -153,7 +153,7 @@
         const px = x.getPixelForValue(opts.focusIndex);
         line(px, css('--ink'), 1.5);
         ctx.save();
-        ctx.fillStyle = css('--ink'); ctx.font = '600 11px system-ui, sans-serif';
+        ctx.fillStyle = css('--ink'); ctx.font = '600 11px "Public Sans", system-ui, sans-serif';
         ctx.textAlign = px > a.right - 60 ? 'right' : 'left';
         ctx.fillText(opts.focusLabel, px + (ctx.textAlign === 'right' ? -4 : 4), a.top + 12);
         ctx.restore();
@@ -168,7 +168,7 @@
   function renderMix() {
     const idx = rangeIdx();
     const asShare = state.unit === 'share';
-    const surface = css('--surface');
+    const surface = css('--surface-raised');
     const datasets = SOURCES.map((s, k) => ({
       label: s.label,
       key: s.key,
@@ -281,7 +281,7 @@
         const meta = chart.getDatasetMeta(chart.data.datasets.length - 1);
         const { ctx } = chart;
         ctx.save();
-        ctx.fillStyle = css('--ink'); ctx.font = '600 11px system-ui, sans-serif'; ctx.textBaseline = 'middle';
+        ctx.fillStyle = css('--ink'); ctx.font = '600 11px "Public Sans", system-ui, sans-serif'; ctx.textBaseline = 'middle';
         meta.data.forEach((bar, k) => ctx.fillText(fmt(meta._dataset.data[k]), bar.x + 6, bar.y));
         ctx.restore();
       }
@@ -357,7 +357,7 @@
         }).sort((a, b) => a.y - b.y);
         for (let k = 1; k < pts.length; k++) if (pts[k].y - pts[k - 1].y < 14) pts[k].y = pts[k - 1].y + 14;
         ctx.save();
-        ctx.font = '600 11px system-ui, sans-serif'; ctx.textBaseline = 'middle';
+        ctx.font = '600 11px "Public Sans", system-ui, sans-serif'; ctx.textBaseline = 'middle';
         pts.forEach(p => {
           ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x + 10, p.y, 3.5, 0, Math.PI * 2); ctx.fill();
           ctx.fillStyle = css('--ink-2'); ctx.fillText(p.text, p.x + 18, p.y);
@@ -380,7 +380,7 @@
           label: s.label, data: s.data,
           borderColor: s.color, backgroundColor: s.color,
           borderWidth: 2, pointRadius: years.length > 12 ? 0 : 3, pointHoverRadius: 5,
-          pointBorderColor: css('--surface'), pointBorderWidth: 2, pointStyle: 'circle', tension: 0
+          pointBorderColor: css('--surface-raised'), pointBorderWidth: 2, pointStyle: 'circle', tension: 0
         }))
       },
       options: {
@@ -492,7 +492,7 @@
       }).filter(Boolean).sort((a, b) => a.y - b.y);
       for (let k = 1; k < pts.length; k++) if (pts[k].y - pts[k - 1].y < 13) pts[k].y = pts[k - 1].y + 13;
       ctx.save();
-      ctx.font = '600 11px system-ui, sans-serif'; ctx.textBaseline = 'middle';
+      ctx.font = '600 11px "Public Sans", system-ui, sans-serif'; ctx.textBaseline = 'middle';
       pts.forEach(p => {
         ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x + 8, p.y, 3.5, 0, Math.PI * 2); ctx.fill();
         ctx.fillStyle = css('--ink-2'); ctx.fillText(p.text, p.x + 15, p.y);
@@ -520,7 +520,7 @@
           return {
             label: String(s.year), data: s.data.map((v, j) => ({ x: xs[j], y: v })),
             borderColor: c, backgroundColor: c, borderWidth: s.year === series[series.length - 1].year ? 3 : 2,
-            pointRadius: 0, pointHoverRadius: 4, pointHoverBorderColor: css('--surface'), pointHoverBorderWidth: 2,
+            pointRadius: 0, pointHoverRadius: 4, pointHoverBorderColor: css('--surface-raised'), pointHoverBorderWidth: 2,
             pointStyle: 'circle', tension: 0.2
           };
         })
@@ -621,7 +621,7 @@
       if (!opts.cap) return;
       const { ctx, chartArea: a } = chart;
       ctx.save();
-      ctx.font = '600 11px system-ui, sans-serif'; ctx.textBaseline = 'top';
+      ctx.font = '600 11px "Public Sans", system-ui, sans-serif'; ctx.textBaseline = 'top';
       chart.data.datasets.forEach((ds, k) => {
         if (chart.getDatasetMeta(k).hidden) return;
         ds.data.forEach((v, i) => {
@@ -650,7 +650,7 @@
     if (empty) { document.getElementById('price-sub').textContent = ''; return; }
     const labels = idx.map(i => prLabel(PR.months[i]));
     const series = [
-      { label: 'Average', data: idx.map(i => PR.mean[i]), color: css('--s-other') },
+      { label: 'Average', data: idx.map(i => PR.mean[i]), color: css('--bluebonnet') },
       { label: 'Median', data: idx.map(i => PR.median[i]), color: css('--ink-2') }
     ];
     // one scarcity month (Winter Storm Uri) would flatten everything else, so cap the axis above it
@@ -676,7 +676,7 @@
         labels,
         datasets: series.map(s => ({
           label: s.label, data: s.data, borderColor: s.color, backgroundColor: s.color,
-          borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, pointHoverBorderColor: css('--surface'),
+          borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, pointHoverBorderColor: css('--surface-raised'),
           pointHoverBorderWidth: 2, pointStyle: 'circle', tension: 0
         }))
       },
@@ -742,7 +742,7 @@
     const bin = v => Math.min(STEPS - 1, Math.floor(v / top * STEPS));
     const ramp = Array.from({ length: STEPS }, (_, k) => css('--seq-' + k));
     const dark = isDark();
-    const ink = b => dark ? (b >= 6 ? '#0b0b0b' : css('--ink')) : (b >= 4 ? '#ffffff' : css('--ink'));
+    const ink = b => (b >= (dark ? 3 : 4)) ? css('--on-bluebonnet') : css('--ink');
 
     let html = '<thead><tr><th class="yr"></th>' + MON.map(n => `<th scope="col">${n}</th>`).join('') + '</tr></thead><tbody>';
     for (let y = state.from; y <= state.to; y++) {
@@ -819,7 +819,7 @@
   }
 
   function renderAll() {
-    Chart.defaults.font.family = 'system-ui, -apple-system, "Segoe UI", sans-serif';
+    Chart.defaults.font.family = '"Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif';
     Chart.defaults.color = css('--ink-2');
     renderMix();
     renderFocus();
@@ -903,6 +903,7 @@
     const applyTheme = () => {
       const dark = theme === 'dark' || (theme === 'auto' && mq.matches);
       document.documentElement.setAttribute('data-bs-theme', dark ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
       renderAll();
     };
     document.getElementById('th-' + theme).checked = true;
@@ -916,6 +917,8 @@
     renderStats();
     syncRange();
     renderAll();
+    // canvas text needs Public Sans loaded; redraw once the web fonts arrive
+    if (document.fonts) document.fonts.ready.then(renderAll);
   }
 
   init();

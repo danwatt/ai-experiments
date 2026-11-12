@@ -306,7 +306,7 @@
       point(j, v, lines, pos) {
         const px = x(HOURS[j]), py = y(v);
         g.append('circle').attr('cx', px).attr('cy', py).attr('r', 4.5)
-          .attr('fill', css('--ink')).attr('stroke', css('--surface')).attr('stroke-width', 2);
+          .attr('fill', css('--ink')).attr('stroke', css('--surface-raised')).attr('stroke-width', 2);
         const gap = 14;
         const ty = pos === 'above' ? py - gap : py + gap + fs;
         g.append('line').attr('x1', px).attr('x2', px).attr('y1', pos === 'above' ? py - 6 : py + 6)
@@ -572,6 +572,7 @@
   const applyTheme = () => {
     const dark = theme === 'dark' || (theme === 'auto' && mq.matches);
     document.documentElement.setAttribute('data-bs-theme', dark ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
     if (D) redraw();
   };
   document.getElementById('th-' + theme).checked = true;

@@ -1,94 +1,73 @@
 <!doctype html>
-<html lang="en" data-bs-theme="light">
+<html lang="en" data-bs-theme="light" data-theme="light">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Flattening the Duck</title>
   <meta name="description" content="Animated, annotated walk through ERCOT's average daily demand curve: how solar created the duck curve and batteries are flattening it.">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../bluebonnet-design-system/dist/bluebonnet.css">
+  <link rel="stylesheet" href="bluebonnet-bridge.css">
   <script>
     // apply the saved or OS theme before first paint
     (function () {
       var t = 'auto';
       try { t = localStorage.getItem('ercot-theme') || 'auto'; } catch (e) {}
       var dark = t === 'dark' || (t === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-      document.documentElement.setAttribute('data-bs-theme', dark ? 'dark' : 'light');
+      var h = document.documentElement, v = dark ? 'dark' : 'light';
+      h.setAttribute('data-bs-theme', v); h.setAttribute('data-theme', v);
     })();
   </script>
   <style>
+    /* Page aliases onto Bluebonnet tokens; same series colors as the explorer (index.html). */
     :root {
-      --surface: #fcfcfb;
-      --plane: #f9f9f7;
-      --ink: #0b0b0b;
-      --ink-2: #52514e;
-      --muted: #898781;
-      --grid: #e1e0d9;
-      --axis: #c3c2b7;
-      --hairline: rgba(11, 11, 11, 0.10);
-      --left: rgba(11, 11, 11, 0.06);
-      --s-wind: #1baf7a;
-      --s-solar: #eda100;
-      --s-batt: #2a78d6;
+      --ink-2: var(--ink-muted);
+      --muted: var(--ink-muted);
+      --grid: var(--line);
+      --axis: var(--line-strong);
+      --hairline: var(--line);
+      --left: var(--surface-sunken);
+      --s-wind: var(--bluebonnet);
+      --s-solar: var(--firewheel);
+      --s-batt: var(--winecup);
     }
-    [data-bs-theme="dark"] {
-      --surface: #1a1a19;
-      --plane: #0d0d0d;
-      --ink: #f0efec;
-      --ink-2: #c3c2b7;
-      --muted: #898781;
-      --grid: #2c2c2a;
-      --axis: #383835;
-      --hairline: rgba(255, 255, 255, 0.10);
-      --left: rgba(255, 255, 255, 0.07);
-      --s-wind: #199e70;
-      --s-solar: #c98500;
-      --s-batt: #3987e5;
-    }
-    body {
-      background: var(--plane);
-      color: var(--ink);
-      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
-    }
-    .card { background: var(--surface); border-color: var(--hairline); }
-    .text-ink-2 { color: var(--ink-2) !important; }
-    a { color: var(--s-batt); }
-    .lede { max-width: 66ch; color: var(--ink-2); }
+    .lede { max-width: 65ch; color: var(--ink-muted); }
 
-    .caption { min-height: 7.5rem; max-width: 72ch; font-size: 1.02rem; line-height: 1.5; }
-    .caption .kicker { font-size: .75rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 600; }
-    .caption h2 { font-size: 1.25rem; font-weight: 600; margin: .15rem 0 .35rem; }
-    .caption p { margin: 0; color: var(--ink-2); }
+    .caption { min-height: 7.5rem; max-width: 72ch; font-size: 16px; line-height: 26px; }
+    .caption .kicker { font: 600 12px/16px var(--font-body); text-transform: uppercase; letter-spacing: .06em; color: var(--ink-muted); }
+    .caption h2 { font-size: 19px; line-height: 26px; font-weight: 600; margin: var(--space-1) 0 6px; }
+    .caption p { margin: 0; color: var(--ink-muted); max-width: none; }
     .caption strong { color: var(--ink); font-weight: 600; }
-    @media (max-width: 575.98px) { .caption { min-height: 10.5rem; font-size: .95rem; } }
+    @media (max-width: 575.98px) { .caption { min-height: 10.5rem; font-size: 15px; line-height: 24px; } }
 
     .stage { position: relative; height: 480px; }
     @media (max-width: 767.98px) { .stage { height: 380px; } }
-    .stage svg { display: block; width: 100%; height: 100%; overflow: visible; }
+    .stage svg { display: block; width: 100%; height: 100%; overflow: visible; font-family: var(--font-body); }
 
-    .legend { display: flex; flex-wrap: wrap; gap: .25rem 1rem; font-size: .85rem; color: var(--ink-2); }
-    .legend span { display: inline-flex; align-items: center; gap: .4rem; }
-    .legend i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+    .legend { display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-4); font-size: 14px; line-height: 20px; color: var(--ink-muted); }
+    .legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .legend i { width: 12px; height: 12px; border-radius: var(--radius-sm); display: inline-block; }
     .legend i.line { height: 3px; width: 18px; border-radius: 2px; }
-    .legend i.dash { height: 0; width: 18px; border-top: 2px dashed var(--muted); border-radius: 0; }
+    .legend i.dash { height: 0; width: 18px; border-top: 2px dashed var(--ink-muted); border-radius: 0; }
 
-    .steps .btn { font-size: .8rem; }
-    .progress { height: 3px; background: var(--grid); }
-    .progress-bar { background: var(--ink-2); transition: none; }
+    .steps .btn { font-size: 13px; }
+    .progress { height: 3px; background: var(--line); border-radius: var(--radius-pill); }
+    .progress-bar { background: var(--bluebonnet); transition: none; }
 
     /* chart annotations fade in once a scene settles */
     .note { opacity: 0; transition: opacity .45s ease; }
     .note.on { opacity: 1; }
-    .note text { font-size: 12px; fill: var(--ink-2); paint-order: stroke; stroke: var(--surface); stroke-width: 4px; stroke-linejoin: round; }
+    .note text { font-size: 12px; fill: var(--ink-muted); paint-order: stroke; stroke: var(--surface-raised); stroke-width: 4px; stroke-linejoin: round; }
     .note .strong { fill: var(--ink); font-weight: 600; }
-    .note line, .note path { stroke: var(--ink-2); fill: none; stroke-width: 1.25; }
+    .note line, .note path { stroke: var(--ink-muted); fill: none; stroke-width: 1.25; }
     .ghost { transition: opacity .45s ease; }
     @media (prefers-reduced-motion: reduce) { .note, .ghost { transition: none; } }
   </style>
 </head>
 <body>
-  <nav class="navbar border-bottom" style="background: var(--surface); border-color: var(--hairline) !important;">
+  <nav class="navbar bb-bar">
     <div class="container-xl px-3">
-      <a class="navbar-brand mb-0 h1 fs-6 fw-semibold text-decoration-none" href="./" style="color: var(--ink);">← ERCOT fuel mix</a>
+      <a class="navbar-brand mb-0" href="./">← ERCOT fuel mix</a>
       <div class="btn-group btn-group-sm" role="group" aria-label="Color theme">
         <input type="radio" class="btn-check" name="theme" id="th-auto" value="auto" autocomplete="off">
         <label class="btn btn-outline-secondary" for="th-auto">Auto</label>
@@ -101,7 +80,7 @@
   </nav>
 
   <header class="container-xl px-3 pt-4 pb-3">
-    <h1 class="h2 fw-semibold mb-2">How Texas grew a duck, and how batteries are flattening it</h1>
+    <h1 class="mb-2">How Texas grew a duck, and how batteries are flattening it</h1>
     <p class="lede mb-0">A step-by-step walk through the average day on the ERCOT grid, built from ERCOT's 15-minute fuel mix data. Let it play, or step through at your own pace.</p>
   </header>
 
