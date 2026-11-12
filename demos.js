@@ -56,6 +56,9 @@ window.DEMOS = [
   { s: "tools", t: "Road trip planner", href: "route-planner-opus-5.5-extra/README.html", img: "screenshots/projects/route-planner-opus-5.5-extra.webp", d: "Plans multi-day drives the way Streets & Trips did: a break every N minutes or M miles at real rest areas, exits and towns, plus meals, fuel, overnights and zones drawn on the map. Python, Valhalla and Leaflet in Docker; runs locally, so this page shows screenshots. Planned in one session, built phase by phase by six more.", model: "Opus 5.5 + Sonnet 5.5", effort: "xhigh / high", links: [["prompt", "route-planner-opus-5.5-extra/prompt.html"], ["README", "route-planner-opus-5.5-extra/README.html"], ["design mockups", "route-planner-opus-5.5-extra/design/"]] },
 
 
+  // Design systems
+  { s: "design", t: "Bluebonnet Design System", href: "bluebonnet-design-system/", img: "screenshots/projects/bluebonnet-design-system.webp", d: "Texas wildflower colors as design tokens: bluebonnet blue for the brand, with Indian paintbrush, firewheel gold and winecup as accents, in light and dark. A Pico-style classless base layer, seven React components, and a build script that compiles tokens.json to CSS. Also published as a Claude design system.", model: "Opus 5.5", effort: "medium", links: [["prompt", "bluebonnet-design-system/prompt.html"], ["README", "bluebonnet-design-system/README.html"], ["component guide", "bluebonnet-design-system/components/README.html"]] },
+
   // Video & vision
   { s: "vision", t: "Garden Map", href: "garden-map/", img: "screenshots/projects/garden-map.webp", d: "Plants identified from a walking video of a 50 ft back yard bed, placed on a top-down map.", model: null, effort: null, links: [["prompt", "garden-map/prompt.html"]] },
 ];
@@ -69,5 +72,6 @@ window.SECTIONS = {
   schools: { name: "Texas schools", blurb: "School district finances from TEA audited actuals and TDA meal claims, from Fort Worth ISD out to all 1,019 districts." },
   data: { name: "Data & analysis" },
   tools: { name: "Tools", blurb: "Python projects; the README says how to run them." },
+  design: { name: "Design systems" },
   vision: { name: "Video & vision" },
 };

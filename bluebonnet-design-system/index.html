@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bluebonnet Design System</title>
+<meta name="description" content="Texas wildflower design tokens, a classless base layer and seven React components.">
+<link rel="stylesheet" href="dist/bluebonnet.css">
+<style>
+  /* Page layout only. Every color, size and font comes from Bluebonnet tokens. */
+  .wrap { max-width: 1080px; margin: 0 auto; padding-block: var(--space-6) var(--space-12); padding-left: max(var(--space-4), env(safe-area-inset-left, 0px)); padding-right: max(var(--space-4), env(safe-area-inset-right, 0px)); }
+  .topbar { display: flex; justify-content: space-between; align-items: center; gap: var(--space-4); flex-wrap: wrap; }
+  .topbar a { font-weight: 600; }
+  .seg { display: inline-flex; border: 1px solid var(--line-strong); border-radius: var(--radius-md); overflow: hidden; }
+  .seg button { appearance: none; border: 0; background: var(--surface-raised); color: var(--ink-muted); font: 600 14px/20px var(--font-body); padding: 6px var(--space-3); cursor: pointer; }
+  .seg button + button { border-left: 1px solid var(--line); }
+  .seg button[aria-pressed="true"] { background: var(--bluebonnet); color: var(--on-bluebonnet); }
+
+  .hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 480px); gap: var(--space-6); align-items: end; margin-top: var(--space-8); }
+  .hero h1 { font-size: clamp(48px, 9vw, 88px); line-height: .92; letter-spacing: -.02em; margin: 0; }
+  .hero p { color: var(--ink-muted); margin: var(--space-3) 0 0; }
+  .hero svg { width: 100%; height: auto; display: block; }
+  .brand { fill: var(--bluebonnet); } .deep { fill: var(--bluebonnet-deep); } .warm { fill: var(--paintbrush); } .gold { fill: var(--firewheel); } .tip { fill: var(--surface-raised); }
+  @media (max-width: 720px) { .hero { grid-template-columns: 1fr; } .hero .art { order: -1; } }
+
+  section { margin-top: var(--space-12); }
+  section > h2 { margin-top: 0; }
+  .eyebrow { color: var(--ink-muted); margin: 0 0 var(--space-2); }
+
+  .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: var(--space-4); }
+  .sw { border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface-raised); overflow: hidden; min-width: 0; }
+  .sw__chip { height: 64px; border-bottom: 1px solid var(--line); }
+  .sw__body { padding: var(--space-3); display: grid; gap: var(--space-1); }
+  .sw__name { font: 600 14px/20px var(--font-mono); color: var(--ink); }
+  .sw__val { font: 400 12px/16px var(--font-mono); color: var(--ink-muted); }
+  .sw__use { font-size: 13px; line-height: 19px; color: var(--ink-muted); }
+  .flowers { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--space-4); margin-bottom: var(--space-6); }
+  .flower { padding: var(--space-4); border-radius: var(--radius-md); min-height: 120px; display: flex; flex-direction: column; justify-content: flex-end; }
+  .flower b { font-family: var(--font-display); font-size: 19px; line-height: 24px; }
+  .flower span { font-size: 13px; line-height: 18px; opacity: .9; }
+
+  .type-row { display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: var(--space-4); padding: var(--space-3) 0; border-bottom: 1px solid var(--line); align-items: baseline; }
+  .type-row code { background: none; padding: 0; color: var(--ink-muted); font-size: 12px; }
+  .type-row div { min-width: 0; overflow-wrap: anywhere; }
+  @media (max-width: 560px) { .type-row { grid-template-columns: 1fr; gap: var(--space-1); } }
+
+  .scale { display: grid; gap: var(--space-2); }
+  .scale__row { display: grid; grid-template-columns: 90px 48px minmax(0, 1fr); gap: var(--space-3); align-items: center; font-size: 14px; }
+  .scale__bar { height: 12px; background: var(--bluebonnet); border-radius: 2px; }
+  .radii { display: flex; flex-wrap: wrap; gap: var(--space-4); margin-top: var(--space-6); }
+  .radii div { width: 88px; height: 64px; border: 2px solid var(--bluebonnet); background: var(--bluebonnet-soft); display: grid; place-items: center; font: 500 12px/16px var(--font-mono); color: var(--bluebonnet); }
+
+  .demo-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: var(--space-6); }
+  .panel { border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface-raised); padding: var(--space-6); min-width: 0; }
+  .panel > h3 { margin-top: 0; }
+  .row { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: center; }
+  .stack { display: flex; flex-direction: column; gap: var(--space-4); }
+  .classless { max-width: 65ch; }
+  footer { margin-top: var(--space-12); padding-top: var(--space-6); border-top: 1px solid var(--line); color: var(--ink-muted); font-size: 14px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <a href="../">← All experiments</a>
+    <div class="seg" role="group" aria-label="Theme">
+      <button type="button" data-theme-choice="system" aria-pressed="true">System</button>
+      <button type="button" data-theme-choice="light" aria-pressed="false">Light</button>
+      <button type="button" data-theme-choice="dark" aria-pressed="false">Dark</button>
+    </div>
+  </div>
+
+  <header class="hero">
+    <div>
+      <p class="text-label eyebrow">Design system · v1</p>
+      <h1>Bluebonnet</h1>
+      <p>Texas wildflower colors for calm, legible interfaces. Bluebonnet blue for everything that matters; paintbrush, firewheel and winecup scattered through it the way they grow along a roadside in April.</p>
+      <p class="row" style="margin-top: var(--space-4)">
+        <a class="bb-btn bb-btn--primary" href="README.html" style="text-decoration:none">Read the guide</a>
+        <a class="bb-btn bb-btn--secondary" href="tokens.json" style="text-decoration:none">tokens.json</a>
+      </p>
+    </div>
+    <div class="art" aria-hidden="true">
+      <svg viewBox="0 0 480 288">
+        <rect class="gold" x="0" y="152" width="96" height="112" rx="8"/>
+        <rect class="brand" x="112" y="-16" width="160" height="280" rx="8"/>
+        <rect class="warm" x="288" y="64" width="96" height="200" rx="8"/>
+        <rect class="deep" x="400" y="120" width="80" height="144" rx="8"/>
+        <g id="raceme"></g>
+      </svg>
+    </div>
+  </header>
+
+  <section aria-labelledby="h-color">
+    <p class="text-label eyebrow">Color</p>
+    <h2 id="h-color">The field</h2>
+    <p>Blue does the work. The other flowers are accents: on any one screen, bluebonnet should outweigh every other hue combined.</p>
+    <div class="flowers">
+      <div class="flower" style="background:var(--bluebonnet);color:var(--on-bluebonnet)"><b>Bluebonnet</b><span>Lupinus texensis · brand, links, focus</span></div>
+      <div class="flower" style="background:var(--paintbrush);color:var(--on-paintbrush)"><b>Paintbrush</b><span>Castilleja indivisa · one accent per screen</span></div>
+      <div class="flower" style="background:var(--firewheel);color:var(--on-firewheel)"><b>Firewheel</b><span>Gaillardia pulchella · fills and selection</span></div>
+      <div class="flower" style="background:var(--winecup);color:var(--surface-raised)"><b>Winecup</b><span>Callirhoe involucrata · visited links</span></div>
+    </div>
+    <div class="swatches" id="swatches"><p>Loading tokens…</p></div>
+  </section>
+
+  <section aria-labelledby="h-type">
+    <p class="text-label eyebrow">Typography</p>
+    <h2 id="h-type">Type scale</h2>
+    <p>Bricolage Grotesque for headings, Public Sans for reading, IBM Plex Mono for code and coordinates.</p>
+    <div id="type"></div>
+  </section>
+
+  <section aria-labelledby="h-space">
+    <p class="text-label eyebrow">Space and shape</p>
+    <h2 id="h-space">Spacing and radii</h2>
+    <div class="scale" id="spacing"></div>
+    <div class="radii" id="radii"></div>
+  </section>
+
+  <section aria-labelledby="h-comp">
+    <p class="text-label eyebrow">Components</p>
+    <h2 id="h-comp">Live components</h2>
+    <p>Rendered by React from <code>dist/bluebonnet.js</code>. Guidelines are in <a href="components/README.html">the component guide</a>.</p>
+    <div class="demo-grid" id="components"><p>Loading React…</p></div>
+  </section>
+
+  <section aria-labelledby="h-classless">
+    <p class="text-label eyebrow">Base layer</p>
+    <h2 id="h-classless">Plain HTML, no classes</h2>
+    <div class="panel classless">
+      <h3>Ennis Bluebonnet Trails</h3>
+      <p>The Ennis Garden Club maps more than 40 miles of roadside trails each April. Peak bloom usually lands in the second or third week; <a href="#h-classless">check the field report</a> before you drive, and <a href="#">visited links</a> turn winecup once you have read them.</p>
+      <p>Coordinates for the downtown trailhead: <code>32.3293° N, 96.6253° W</code>.</p>
+      <pre><code>&lt;link rel="stylesheet" href="dist/bluebonnet.css"&gt;</code></pre>
+      <hr>
+      <small>Select any text on this page to see firewheel gold.</small>
+    </div>
+  </section>
+
+  <footer>
+    Bluebonnet is free to use in any project. Source: <code>tokens.json</code>, <code>src/components.css</code>, <code>dist/bluebonnet.js</code>. Rebuild with <code>python3 build.py</code>.
+  </footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+<script src="dist/bluebonnet.js"></script>
+<script>
+(function () {
+  // Theme switch: system (no attribute), light or dark.
+  var KEY = "bluebonnet-theme";
+  function apply(choice) {
+    if (choice === "system") document.documentElement.removeAttribute("data-theme");
+    else document.documentElement.setAttribute("data-theme", choice);
+    document.querySelectorAll("[data-theme-choice]").forEach(function (b) {
+      b.setAttribute("aria-pressed", b.dataset.themeChoice === choice ? "true" : "false");
+    });
+  }
+  var saved = "system";
+  try { saved = localStorage.getItem(KEY) || "system"; } catch (e) {}
+  apply(saved);
+  document.querySelectorAll("[data-theme-choice]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      apply(b.dataset.themeChoice);
+      try { localStorage.setItem(KEY, b.dataset.themeChoice); } catch (e) {}
+    });
+  });
+
+  // Cover raceme: discs stacked up the bluebonnet slab, white at the tip.
+  var rows = [[240,[168,192,216]],[216,[168,192,216]],[192,[168,192,216]],[168,[180,204]],[144,[180,204]],[120,[180,204]],[96,[180,204]],[72,[192]],[48,[192]]];
+  var g = document.getElementById("raceme"), NS = "http://www.w3.org/2000/svg";
+  rows.forEach(function (r) {
+    r[1].forEach(function (x) {
+      var c = document.createElementNS(NS, "circle");
+      c.setAttribute("cx", x); c.setAttribute("cy", r[0]); c.setAttribute("r", 8);
+      c.setAttribute("class", r[0] <= 96 ? "tip" : "deep");
+      g.appendChild(c);
+    });
+  });
+
+  function el(tag, attrs, kids) {
+    var n = document.createElement(tag);
+    for (var k in attrs || {}) { if (k === "text") n.textContent = attrs[k]; else if (k === "style") n.style.cssText = attrs[k]; else n.setAttribute(k, attrs[k]); }
+    (kids || []).forEach(function (c) { n.appendChild(c); });
+    return n;
+  }
+  function md(s) { // `code` spans in usage notes
+    var span = document.createElement("span");
+    s.split(/(`[^`]+`)/).forEach(function (part) {
+      if (/^`.*`$/.test(part)) span.appendChild(el("code", { text: part.slice(1, -1) }));
+      else span.appendChild(document.createTextNode(part));
+    });
+    return span;
+  }
+
+  fetch("tokens.json").then(function (r) { return r.json(); }).then(function (t) {
+    var theme0 = t.color.themes[0].id;
+    var box = document.getElementById("swatches"); box.textContent = "";
+    t.color.tokens.forEach(function (tok) {
+      var v = tok.value, light = typeof v === "string" ? v : v[theme0], dark = typeof v === "string" ? v : (v.dark || light);
+      var val = light === dark ? light : light + " · " + dark;
+      var use = el("div", { class: "sw__use" }); use.appendChild(md(tok.usage || ""));
+      box.appendChild(el("div", { class: "sw" }, [
+        el("div", { class: "sw__chip", style: "background:var(--" + tok.name + ")" }),
+        el("div", { class: "sw__body" }, [el("div", { class: "sw__name", text: tok.name }), el("div", { class: "sw__val", text: val }), use])
+      ]));
+    });
+
+    var type = document.getElementById("type");
+    t.type.groups.forEach(function (gr) {
+      gr.styles.forEach(function (s) {
+        type.appendChild(el("div", { class: "type-row" }, [
+          el("code", { text: s.name + " · " + s.fontSize + "/" + s.lineHeight }),
+          el("div", { class: s.name, text: s.sample || s.name })
+        ]));
+      });
+    });
+
+    var sp = document.getElementById("spacing");
+    t.spacing.tokens.forEach(function (s) {
+      sp.appendChild(el("div", { class: "scale__row" }, [
+        el("code", { text: s.name }), el("span", { text: s.value }),
+        el("div", { class: "scale__bar", style: "width:" + s.value })
+      ]));
+    });
+    var rd = document.getElementById("radii");
+    t.radius.tokens.forEach(function (r) {
+      rd.appendChild(el("div", { style: "border-radius:" + (r.name === "radius-pill" ? "32px" : r.value), text: r.name }));
+    });
+  }).catch(function () {
+    document.getElementById("swatches").textContent = "Couldn't load tokens.json. Open this page through a web server, not as a file.";
+  });
+
+  // Components
+  if (!window.React || !window.Bluebonnet) {
+    document.getElementById("components").textContent = "React didn't load, so the live components can't render. Check your connection to cdnjs.cloudflare.com.";
+    return;
+  }
+  var B = window.Bluebonnet, h = React.createElement;
+  var rows2 = [
+    { id: 1, county: "Llano", stage: "Peak", n: 14, miles: "38.2" },
+    { id: 2, county: "Burnet", stage: "Budding", n: 9, miles: "21.0" },
+    { id: 3, county: "Washington", stage: "Peak", n: 12, miles: "44.7" },
+    { id: 4, county: "Ellis", stage: "Gone to seed", n: 7, miles: "12.5" }
+  ];
+  var tone = { Peak: "success", Budding: "bluebonnet", "Gone to seed": "neutral" };
+
+  function Demo() {
+    var s = React.useState(""), acres = s[0], setAcres = s[1];
+    var bad = acres !== "" && !(parseFloat(acres) > 0);
+    return h(React.Fragment, null,
+      h("div", { className: "panel" }, h("h3", null, "Buttons"),
+        h("div", { className: "stack" },
+          h("div", { className: "row" }, h(B.Button, null, "Save report"), h(B.Button, { variant: "accent" }, "Plan a drive")),
+          h("div", { className: "row" }, h(B.Button, { variant: "secondary" }, "Export CSV"), h(B.Button, { variant: "quiet" }, "Cancel"), h(B.Button, { variant: "danger" }, "Delete")),
+          h("div", { className: "row" }, h(B.Button, { size: "sm" }, "Small"), h(B.Button, { disabled: true }, "Disabled")))),
+      h("div", { className: "panel" }, h("h3", null, "Badges and alerts"),
+        h("div", { className: "stack" },
+          h("div", { className: "row" }, h(B.Badge, { tone: "success", dot: true }, "Peak bloom"), h(B.Badge, { tone: "warning", dot: true }, "Dry week"), h(B.Badge, { tone: "danger", dot: true }, "Road closed"), h(B.Badge, { tone: "firewheel" }, "New"), h(B.Badge, { tone: "paintbrush" }, "Featured")),
+          h(B.Alert, { tone: "info", title: "Peak bloom is about 10 days out" }, "Reports from Burnet and Llano counties show mostly budding plants."),
+          h(B.Alert, { tone: "danger", title: "Upload failed" }, "The photo is larger than 20 MB. Choose a smaller file and try again."))),
+      h("div", { className: "panel" }, h("h3", null, "Report a sighting"),
+        h("form", { className: "stack", onSubmit: function (e) { e.preventDefault(); } },
+          h(B.Field, { label: "County", defaultValue: "Llano", hint: "Where you saw the bloom." }),
+          h(B.Field, { label: "Patch size (acres)", value: acres, onChange: function (e) { setAcres(e.target.value); }, inputMode: "decimal", placeholder: "2.5", error: bad ? "Enter a number above 0." : undefined }),
+          h(B.Choice, { label: "Email me when peak bloom is reported", defaultChecked: true }),
+          h("div", { className: "row", role: "radiogroup", "aria-label": "Bloom stage" },
+            h(B.Choice, { type: "radio", name: "stage", label: "Budding" }),
+            h(B.Choice, { type: "radio", name: "stage", label: "Peak", defaultChecked: true })),
+          h("div", { className: "row" }, h(B.Button, { type: "submit" }, "Save sighting")))),
+      h("div", { className: "panel" }, h("h3", null, "Tabs and table"),
+        h(B.Tabs, { label: "Report sections", items: [
+          { id: "list", label: "Sightings", content: h(B.Table, { caption: "Week of Mar 30, 2026", rows: rows2, columns: [
+            { key: "county", label: "County" },
+            { key: "stage", label: "Stage", render: function (r) { return h(B.Badge, { tone: tone[r.stage] }, r.stage); } },
+            { key: "n", label: "Reports", numeric: true },
+            { key: "miles", label: "Route mi", numeric: true }] }) },
+          { id: "season", label: "Season", content: h("p", null, "Bluebonnets usually peak from late March to mid April, a week or two later in North Texas than in the Hill Country.") }
+        ] }))
+    );
+  }
+  ReactDOM.createRoot(document.getElementById("components")).render(h(Demo));
+})();
+</script>
+</body>
+</html>
