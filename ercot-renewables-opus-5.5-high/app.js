@@ -16,6 +16,8 @@
     { key: 'other', label: 'Other / storage', css: '--s-other', get: i => F.other[i] },
     { key: 'coal', label: 'Coal', css: '--s-coal', get: i => F.coal[i] }
   ];
+  // stacking order for the monthly mix chart, bottom first
+  const MIX = ['nuclear', 'solar', 'wind', 'hydro', 'gas', 'other', 'coal'].map(k => SOURCES.find(s => s.key === k));
   const GROUPS = [
     { label: 'Renewables', css: '--s-wind', keys: ['wind', 'solar', 'hydro'] },
     { label: 'Natural gas', css: '--s-gas', keys: ['gas'] },
@@ -169,7 +171,7 @@
     const idx = rangeIdx();
     const asShare = state.unit === 'share';
     const surface = css('--surface-raised');
-    const datasets = SOURCES.map((s, k) => ({
+    const datasets = MIX.map((s, k) => ({
       label: s.label,
       key: s.key,
       data: idx.map(i => asShare ? 100 * V[s.key][i] / TOTAL[i] : V[s.key][i] / 1000),
@@ -236,7 +238,7 @@
       plugins: [crosshair]
     };
     replace('mix', cfg);
-    legend('legend-mix', SOURCES.slice().reverse().map(s => ({ label: s.label, color: css(s.css) })));
+    legend('legend-mix', MIX.slice().reverse().map(s => ({ label: s.label, color: css(s.css) })));
     document.getElementById('mix-sub').textContent = (asShare
       ? 'Share of each month\'s generation, '
       : 'Generation per month in terawatt-hours, ') + `${state.from}–${state.to}. Click a month to focus it below.`;
