@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """Build counties.js: Texas county outlines as SVG path strings.
 
-Usage: python3 build_counties.py <us-atlas counties-10m.json>
+Usage: python3 -I build_counties.py   (reads .sources/geo/counties-10m.json from fetch_sources.py)
 Source: https://cdn.jsdelivr.net/npm/us-atlas@3.0.1/counties-10m.json (Census cartographic
 boundaries, TopoJSON). Projects with an Albers equal-area conic fitted to Texas, simplifies
 lightly (Douglas-Peucker, 0.6 px) and writes window.TX_COUNTIES = {viewBox, counties: {fips: {name, d}}}.
 """
 import json, math, os, sys
 
-topo = json.load(open(sys.argv[1]))
+topo = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".sources", "geo", "counties-10m.json")))
 sx, sy = topo["transform"]["scale"]
 tx, ty = topo["transform"]["translate"]
 

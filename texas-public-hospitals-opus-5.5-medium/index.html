@@ -121,6 +121,17 @@
     .bb-table tbody tr:hover td { background: var(--bluebonnet-soft); }
     .bb-table td .sub { display: block; color: var(--ink-muted); font-size: 13px; }
     .neg { color: var(--danger); }
+    .bb-table td.has-src { cursor: help; }
+    .bb-table td.has-src:hover, .bb-table td.has-src:focus-visible { text-decoration: underline dotted var(--line-strong); text-underline-offset: 3px; }
+    .bb-table td.has-src:focus-visible { outline: 2px solid var(--bluebonnet); outline-offset: -2px; }
+    .src-pop { position: absolute; z-index: 50; max-width: min(380px, calc(100vw - 16px)); padding: var(--space-3) var(--space-4);
+      background: var(--surface-raised); color: var(--ink); border: 1px solid var(--line-strong); border-radius: 8px;
+      box-shadow: 0 6px 24px rgb(0 0 0 / .18); font-size: 13px; line-height: 1.45; }
+    .src-pop__title { font-weight: 700; margin-bottom: 4px; }
+    .src-pop p { margin: 0 0 4px; color: var(--ink-muted); }
+    .src-pop ul { margin: 6px 0 0; padding-left: 18px; }
+    .src-pop li { margin-bottom: 2px; }
+    .src-pop a { color: var(--bluebonnet); overflow-wrap: anywhere; }
     .spark { display: block; }
     details.methods { margin-top: var(--space-4); }
     details.methods summary { cursor: pointer; font-weight: 600; }
@@ -191,7 +202,7 @@
 
   <section id="audited">
     <h2 class="text-h2">What the audits say</h2>
-    <p class="sub">The Medicare cost reports above cover the hospital. Each district's audited financial statements cover the whole district and split the year into two parts: running the hospitals (operating result) and everything else, mostly property tax and investment income. Five of the big six lose money running their hospitals every year. At Parkland, Harris Health, University Health and JPS, property tax more than covers that loss, and investment income adds to the surplus. UMC El Paso's tax roughly covers it. UMC Lubbock is different: its hospitals mostly break even or make money, and it levies very little tax. Select a row to see that system year by year.</p>
+    <p class="sub">The Medicare cost reports above cover the hospital. Each district's audited financial statements cover the whole district and split the year into two parts: running the hospitals (operating result) and everything else, mostly property tax and investment income. Five of the big six lose money running their hospitals every year. At Parkland, Harris Health, University Health and JPS, property tax more than covers that loss, and investment income adds to the surplus. UMC El Paso's tax roughly covers it. UMC Lubbock is different: its hospitals mostly break even or make money, and it levies very little tax. Select a row to see that system year by year. Hover a number to see the page of the audit it comes from, with a link.</p>
     <div class="panel">
       <div class="bb-table-wrap" id="auditSummary" style="border:0"></div>
       <p class="note">FY<span class="auditLast"></span> figures, plus totals over every audited year we have (FY2015–FY<span class="auditLast"></span>; UMC Lubbock from FY2019). A change in net position is the audited equivalent of net income. Capital spending is cash spent on buildings and equipment; only depreciation shows up as an expense, so a district saving up for or paying for construction shows a surplus.</p>
@@ -264,7 +275,7 @@
     </div>
     <div class="panel" style="margin-top:var(--space-4)">
       <h3 class="text-h3">The numbers, from the Medicare cost report</h3>
-      <div class="meta">Dollars in millions, hospital only. Wages and benefits are reported on separate lines; the audited "salaries and benefits" in the Sankey above also covers the district's own physician group and clinics where it has them, so it runs higher. FTE is employees on payroll.</div>
+      <div class="meta">Dollars in millions, hospital only. Wages and benefits are reported on separate lines; the audited "salaries and benefits" in the Sankey above also covers the district's own physician group and clinics where it has them, so it runs higher. FTE is employees on payroll. Hover a number for the CMS report row (or Comptroller spreadsheet cell) it comes from.</div>
       <div class="bb-table-wrap" id="dTable" style="border:0"></div>
     </div>
   </section>

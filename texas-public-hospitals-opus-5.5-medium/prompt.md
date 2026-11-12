@@ -3,8 +3,8 @@
 - **Model:** claude-opus-5-5
 - **Effort:** medium
 - **Session(s):** 63f745a2-f8f4-4cff-ac4f-16758b9e8a75
-- **Tokens:** input 374, output 174387, cache read 51226683, cache write 405254
-- **Cost (tokscale estimate):** $16.98
+- **Tokens:** input 508, output 225997, cache read 63837613, cache write 542910
+- **Cost (tokscale estimate):** $21.63
 
 ## You
 
@@ -432,3 +432,186 @@ Map works. Two fixes: "about 0" gray looks like "no hospital", and the side list
 ![screenshot 27](prompt-assets/027.webp)
 
 ![screenshot 28](prompt-assets/028.webp)
+
+The county map is in, as a new "County by county" section right after the big six. It shades counties by margin by default. I checked it on desktop and phone, in light and dark modes, with no errors.
+
+**What it does:**
+- **Shade by:**
+  - margin (the default)
+  - net income
+  - total revenue
+  - property tax levy
+  - tax as a share of revenue
+  - cost of uncompensated care
+  - uncompensated care as a share of expenses
+- **Year picker** for FY2015–FY2024.
+- **Margin and net income use a red-to-blue scale with gray at zero.** Red means losing money, blue means making money, gray means about even. The other measures shade from light to dark blue for small to large.
+- **Counties with no public hospital** are outlined in white.
+- **Hovering a county** shows each of its public hospitals with its revenue and margin.
+- **Selecting a county** lists its hospitals in the side panel; selecting one opens it in the one-hospital view below. "Back to the county ranking" returns the side panel to its default.
+- **By default the side panel ranks the top 10 counties** for the chosen measure. For margin and net income it shows the 10 lowest.
+- **When a county has more than one public hospital, their figures are added together.**
+
+**FY2024 margin:** 93 counties have a public hospital. The deepest losses are all small rural hospitals, led by Concho (−28.6%), Lamb (−18.7%) and Chambers (−18.5%). The big urban counties are all in the black; Tarrant is +20.9%.
+
+**Things to know:**
+- **Margins come from the Medicare reports, not the audits**, because those cover every hospital. For Tarrant that's 20.9%, versus about 26% from the audited figures (a $336M gain on roughly $1.29B of operating revenue).
+- **The tax measures only cover districts that run a hospital in this data.** Districts that only fund care at other hospitals, like Travis, Nueces and Montgomery, show as blank; they still appear in the districts chart further down.
+- **Small hospitals that run nursing homes through Medicaid programs, and short reporting years, can swing a county's color a lot from year to year.** The note under the map says so.
+
+**Files added:**
+- [counties.js](texas-public-hospitals-opus-5.5-medium/counties.js) holds the county shapes (50 KB), built by [build_counties.py](texas-public-hospitals-opus-5.5-medium/build_counties.py) from the US Census county outlines.
+- Two hospitals had no county on their Medicare report; I set them by hand: Martin County Hospital (Martin County) and Coon Memorial in Dalhart (Dallam County).
+
+`prompt.md` is regenerated. Nothing is committed.
+
+## You
+
+Lets commit this and push it
+
+## Claude
+
+The hospitals demo is committed and pushed to master as `640f715`, "Add Texas public hospitals explorer." I pushed straight to master because that's how the recent commits in this repo were made, and it's the branch the site deploys from. The GitHub Pages build should pick it up from there; I didn't check that it went live.
+
+The commit has 45 files:
+- the whole `texas-public-hospitals-opus-5.5-medium/` folder: the page, data, build scripts, county shapes, audited figures, `prompt.md` and its screenshots
+- the landing-page card in `demos.js` and its screenshot
+- the local preview setting in `.claude/launch.json`
+
+I left out everything else that was uncommitted in the repo: the route planner changes, the Fact Rocket edits, the Hexahedron cinematic folder and `watt-logo-variations/`.
+
+The landing-page screenshot is from before the property tax, audited results, Sankey and map were added, so the card shows an older view of the page.
+
+## You
+
+Can we update the tables to point to where the numbers come from? Specifically I would like to be able to mouse over a table cell and for every cell that it is possible for have it linked to where that number exists on a file government website or other official source.
+
+## Claude
+
+Working out source links now: CMS API rows per report, audit PDF pages, Comptroller files.
+
+Matching audited figures to PDF pages.
+
+Data rebuilt with source refs; checking spreadsheet row numbers, then wiring hover popovers.
+
+Now the JS source layer.
+
+Code in place; testing in browser.
+
+![screenshot 29](prompt-assets/029.webp)
+
+![screenshot 30](prompt-assets/030.webp)
+
+Popover not showing on hover; debugging.
+
+![screenshot 31](prompt-assets/031.webp)
+
+Works. Spot-checking page numbers against the PDFs and the CMS/levy links.
+
+Page refs check out. Checking levy tooltip and dark mode.
+
+![screenshot 32](prompt-assets/032.webp)
+
+Row/column pointers verified. Regenerating prompt.md.
+
+Every number in the four tables now has its source on hover: the audit summary, the audit year-by-year table, the cost report table and the all-hospitals table. That's about 1,000 cells. Hovering shows a small box with the source, where the number sits in it, the exact value, and links. The popover stays open while you move into it, so you can click the links. Tab and Enter work from the keyboard too.
+
+What each source links to:
+- **Cost report numbers:** the exact report row on data.cms.gov, trimmed to the columns that number uses. For example, a JPS net income cell opens a short JSON record showing only the CCN, hospital, period and "Net Income". Cells that add up columns, like total revenue, margin or benefits, say which columns they combine.
+- **Audited numbers:** the PDF page plus the line label, e.g. "PDF page 14, line 'Ad valorem tax support'". The link ends in `#page=14`, which works for the JPS PDFs. The Federal Audit Clearinghouse ones (the other five systems) download instead of opening, so the box tells you which page to go to.
+- **Property tax:** the Comptroller spreadsheet, with sheet, row, column and cell, e.g. "Sheet DETAIL, row 2138, column Q, Calculated Levy". Spreadsheets can't link to a single cell, so the box tells you which one. The Comptroller no longer posts years before 2021, so those link to the Internet Archive copy.
+
+Some audited figures don't appear as one printed number, about 80 of roughly 770. Those are sums or zeros, like supplemental Medicaid at some systems or "other nonoperating". They point to the statement page and say the figure is the sum of several lines on it.
+
+How I checked it:
+- Spot-checked page numbers against the PDF text and row numbers against the spreadsheets, including old `.xls` years.
+- Tested the CMS links live.
+- Confirmed the rebuilt data is identical to before apart from the new source fields.
+- Looked at the popover in the browser in light and dark mode.
+
+I did not click through to every link.
+
+New script: `audited/locate_pages.py` finds the page numbers from the saved audit text files. The data build now also records the CMS report IDs and spreadsheet rows. I also regenerated `prompt.md`.
+
+Nothing is committed yet. Commit and push to master like last time?
+
+## You
+
+Is all of this repeatable or am I going to have to rely on using an LLM to do this in the future? That is is the extra extraction of cross-links purely done within the script.
+
+## Claude
+
+The link-finding itself is all done by scripts, with no LLM involved. The inputs those scripts read are only partly repeatable.
+
+**Fully scripted:**
+- `build_data.py` saves the CMS report ID for each year (from the CSV's `rpt_rec_num` column) and the Comptroller spreadsheet row and column for each levy. It reads them straight from the files and doesn't guess.
+- `audited/locate_pages.py` finds the PDF page and line for each audited figure by matching numbers in the PDF text. The matching follows fixed rules: thousands, or dollars rounded to thousands, on the page that also has that year's bottom line.
+- `app.js` builds the URLs and popovers from that data when the page loads.
+
+Run them on the same inputs and you get the same links every time.
+
+**Not repeatable yet:**
+1. **Audited figures are hand-entered.** The values in `audited/*.json` were read out of the PDFs during this session, with `check.py` checking that they add up. Adding FY2025 means someone has to read the new statements and type the numbers in, whether that's you or an LLM. Different systems lay out their statements too differently for one parser. Once the numbers are in, `locate_pages.py` finds their pages on its own.
+2. **No download script.** The cost report CSVs, levy spreadsheets and audit PDFs were downloaded by hand into this session's temporary folder, which gets cleared. The text versions of the PDFs that `locate_pages.py` reads live there too. That folder isn't in the repo, so these files will be gone.
+3. **Two hard-coded lookup tables.**
+   - The CMS dataset IDs are listed in `build_data.py`. A new year's ID has to be added by hand, though it's in CMS's public `data.json`.
+   - A small rename table in `locate_pages.py` matches two JPS PDF file names to their source URLs.
+
+A `fetch_sources.sh` script would fix items 2 and 3:
+- download the CSVs and look up the dataset IDs from CMS's `data.json`
+- download the Comptroller files, using the Internet Archive for years before 2021
+- download each audit PDF from the URLs already in the JSON files and convert it to text
+- then run both build scripts
+
+After that, the only manual step would be typing in the audited figures for a new fiscal year.
+
+The source-links change is still not committed.
+
+## You
+
+Yeah, let's script as much as we can
+
+## Claude
+
+Full pipeline ran from fresh downloads. Comparing output to before.
+
+Byte-identical apart from the new levy URL field. Writing README with the update steps.
+
+Quick browser check that the levy links still work after the URL change.
+
+The demo now rebuilds from the official sources with one command, and a fresh run produced the same data as before.
+
+```bash
+texas-public-hospitals-opus-5.5-medium/build.sh
+```
+
+What `build.sh` runs, in order:
+1. **`fetch_sources.py`** (new) downloads everything into `.sources/`, which git ignores:
+   - **CMS cost report CSVs.** It reads CMS's public catalog (`data.json`) to find them, and saves each year's dataset ID there too. The ID is no longer typed into `build_data.py`.
+   - **Comptroller levy spreadsheets.** It finds 2021–2025 on the Comptroller's rates page. For 2013–2020 it tries each old file-name spelling on the Internet Archive.
+   - **Audit PDFs.** It downloads every URL listed in `audited/*.json` and converts each to text.
+   - **County outlines.**
+   - It then writes `.sources/manifest.json`, which records where each file came from.
+   - Files already downloaded are skipped; `--refresh` downloads everything again.
+2. **`build_counties.py`** builds the map shapes.
+3. **`audited/check.py`** checks that each audited year adds up.
+4. **`audited/locate_pages.py`** finds the PDF page for each audited figure.
+5. **`build_data.py`** builds `data.js`.
+
+The build scripts now read `.sources/` and the manifest, so they no longer need folder arguments. The hard-coded CMS IDs and the JPS file-name table are gone. The levy links come from the URL each file was actually downloaded from.
+
+How I checked it:
+- I ran the whole thing on an empty `.sources/`. All 14 cost report years, 13 levy files and 30 audit PDFs downloaded.
+- `counties.js` came out byte-identical.
+- `data.js` matches the previous build except for the new levy URLs.
+- In the browser, an old levy cell and a new one both link to the right place.
+
+**Still manual:**
+- **Audited figures.** Typing in a new year's audited numbers is the one regular step left. `README.md` (new, and linked from the landing-page card) explains how to add a year.
+- **Hospital lists in `build_data.py`.** Which hospitals count as public, who owns which hospital, and the year range are hand-kept lists there. They only change when a hospital or tax district is added.
+
+`prompt.md` is regenerated. Nothing is committed yet. Should I commit and push all of this (source links, build scripts, README) to master, or hold off?
+
+## You
+
+Commit and push

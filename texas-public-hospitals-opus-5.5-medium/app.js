@@ -40,6 +40,121 @@
     return !h.major && mx > 1.5 && (y.beds || 0) < 150;
   };
 
+  // ---------- sources: every table cell that can be traced gets data-src, and hovering it shows where the number is ----------
+  const SRC = [];
+  const srcOf = spec => spec ? ` data-src="${SRC.push(spec) - 1}" tabindex="0"` : "";
+  const td = (html, spec, extra) => `<td class="n${spec ? " has-src" : ""}"${extra || ""}${srcOf(spec)}>${html}</td>`;
+  const fmtDate = s => new Date(s + "T12:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  const dollars = v => v == null ? "–" : (v < 0 ? "−$" : "$") + Math.abs(Math.round(v)).toLocaleString("en-US");
+  const CMS_PAGE = "https://data.cms.gov/provider-compliance/cost-reports/hospital-provider-cost-report";
+  // cost report columns behind each figure (names as published on data.cms.gov)
+  const CMS_COLS = {
+    npr: ["Net Patient Revenue"], oinc: ["Total Other Income"], opex: ["Less Total Operating Expense"],
+    oexp: ["Total Other Expenses"], net: ["Net Income"], gross: ["Total Patient Revenue"],
+    medicaid: ["Net Revenue from Medicaid"], uncomp: ["Cost of Uncompensated Care"],
+    salaries: ["Total Salaries From Worksheet A"],
+    benefits: ["Wage-Related Costs (Core)", "Wage-Related Costs (RHC/FQHC)", "Wage Related Costs for Part - A Teaching Physicians", "Wage Related Costs for Interns and Residents"],
+    beds: ["Number of Beds"], fte: ["FTE - Employees on Payroll"], dis: ["Total Discharges (V + XVIII + XIX + Unknown)"],
+  };
+  CMS_COLS.rev = [...CMS_COLS.npr, ...CMS_COLS.oinc];
+  CMS_COLS.exp = [...CMS_COLS.opex, ...CMS_COLS.oexp];
+  CMS_COLS.wb = [...CMS_COLS.salaries, ...CMS_COLS.benefits];
+  const CMS_HOW = {
+    rev: "Net Patient Revenue + Total Other Income", exp: "Less Total Operating Expense + Total Other Expenses",
+    benefits: "sum of the four wage-related cost columns", wb: "wages + the four wage-related cost columns",
+    margin: "Net Income ÷ (Net Patient Revenue + Total Other Income)",
+  };
+  function cmsSrc(h, y, k) {
+    if (!y || !y.src) return null;
+    const cols = k === "margin" ? ["Net Income", ...CMS_COLS.rev] : CMS_COLS[k];
+    const show = ["Provider CCN", "Hospital Name", "Fiscal Year Begin Date", "Fiscal Year End Date", ...cols];
+    const links = y.src.map(([file, rpt]) => ({
+      href: `https://data.cms.gov/data-api/v1/dataset/${D.cmsApi[file]}/data?filter[rpt_rec_num]=${rpt}&column=${encodeURIComponent(show.join(","))}`,
+      label: `Report ${rpt} in the ${file} cost report file (data.cms.gov)`,
+    }));
+    links.push({ href: CMS_PAGE, label: "Hospital Provider Cost Report dataset" });
+    const lines = [`${h.cmsName}, CCN ${h.id}, period ${fmtDate(y.start)} – ${fmtDate(y.end)}.`,
+      (CMS_HOW[k] ? "Computed: " + CMS_HOW[k] + "." : "Column: " + cols.join(", ") + ".")];
+    if (k !== "margin" && y[k] != null && cols.length === 1) lines.push("Value: " + (["beds", "fte", "dis"].includes(k) ? y[k].toLocaleString() : dollars(y[k])));
+    if (y.src.length > 1) lines.push("Two partial reports in this year, added together.");
+    return { title: "CMS Medicare cost report", lines, links };
+  }
+  function levySrc(h, y) {
+    if (!y || y.tax == null || !h.tu) return null;
+    const ty = taxYearOf(h, y), dist = D.districts.find(d => d.tu === h.tu), s = dist && dist.src[ty];
+    if (!s) return null;
+    const colL = i => (i >= 26 ? String.fromCharCode(64 + Math.floor(i / 26)) : "") + String.fromCharCode(65 + i % 26);
+    const href = s.url, archived = href.includes("web.archive.org");
+    return {
+      title: "Texas Comptroller, Special District Rates and Levies",
+      lines: [`${dist.name}, tax year ${ty}.`,
+        `Sheet “${s.sheet}”, ${s.rows.length > 1 ? "rows " + s.rows.join(", ") + " (added)" : "row " + s.rows[0]}, column ${colL(s.ci)} “${s.col}” (cell ${colL(s.ci)}${s.rows[0]}).`,
+        "Value: " + dollars(y.tax),
+        archived ? "The Comptroller no longer posts this year; the link is the Internet Archive copy." : "Spreadsheet download; open it and go to that cell."],
+      links: [{ href, label: s.file }, { href: "https://comptroller.texas.gov/taxes/property-tax/rates/", label: "Comptroller tax rates and levies page" }],
+    };
+  }
+  const AUDIT_LBL = {
+    npsr: "Net patient revenue", supp: "Supplemental Medicaid", oopOther: "Other operating revenue", opRev: "Operating revenue",
+    opExp: "Operating expenses", opInc: "Operating result", tax: "Property tax", invest: "Investment return", interest: "Interest expense",
+    relief: "COVID relief", otherNonop: "Other nonoperating", cap: "Capital grants and gifts", transfer: "Transfers", chg: "Change in net position",
+    capex: "Capital spending",
+  };
+  function auditRef(h, fy, k) {
+    const p = h.audit && h.audit.pages[String(fy)] && h.audit.pages[String(fy)][k];
+    if (!p) return null;
+    const [key, page, label, derived] = p, url = h.audit.sources[key], fac = url.includes("app.fac.gov");
+    return { key, page, label, derived, url, href: url + "#page=" + page, fac };
+  }
+  // ks: one field, or several that the cell adds up; fys: one year, or several for multi-year totals
+  function auditSrc(h, fys, ks) {
+    fys = [].concat(fys); ks = [].concat(ks);
+    const refs = [];
+    fys.forEach(fy => ks.forEach(k => { const r = auditRef(h, fy, k), a = auditYear(h, fy); if (r && a && a[k]) refs.push({ fy, k, a: a[k], ...r }); }));
+    if (!refs.length) return null;
+    const lines = [h.audit.entity + "."];
+    const many = fys.length > 1 || ks.length > 1;
+    refs.slice(0, 12).forEach(r => lines.push((many ? `FY${r.fy}${ks.length > 1 ? " " + AUDIT_LBL[r.k].toLowerCase() : ""}: ${dollars(r.a)}, ` : "") +
+      `PDF page ${r.page}` + (r.derived ? ", the sum of several lines on that statement" : r.label ? `, line “${r.label}”` : "") + "."));
+    if (refs.length > 12) lines.push(`…and ${refs.length - 12} more.`);
+    if (!many) lines.push("Value: " + dollars(refs[0].a) + " (statements are in thousands).");
+    if (refs.some(r => r.fac)) lines.push("Federal Audit Clearinghouse PDFs download instead of opening; go to the page shown.");
+    const seen = new Set(), links = [];
+    refs.forEach(r => { const id = r.key + r.page; if (seen.has(id) || links.length >= 6) return; seen.add(id); links.push({ href: r.href, label: `Audited statements ${r.key}, page ${r.page}` }); });
+    return { title: "Audited financial statements", lines, links };
+  }
+
+  const pop = document.createElement("div");
+  pop.className = "src-pop"; pop.hidden = true; pop.setAttribute("role", "tooltip"); pop.id = "srcPop";
+  document.body.appendChild(pop);
+  let popFor = null, hideT = null;
+  function showSrc(el) {
+    const s = SRC[el.dataset.src];
+    if (!s) return;
+    clearTimeout(hideT);
+    popFor = el;
+    pop.innerHTML = `<div class="src-pop__title">${esc(s.title)}</div>${s.lines.map(l => `<p>${esc(l)}</p>`).join("")}<ul>${s.links.map(l => `<li><a href="${esc(l.href)}" target="_blank" rel="noopener">${esc(l.label)}</a></li>`).join("")}</ul>`;
+    pop.hidden = false;
+    el.setAttribute("aria-describedby", "srcPop");
+    const r = el.getBoundingClientRect(), w = pop.offsetWidth, ht = pop.offsetHeight;
+    let x = Math.min(Math.max(8, r.left + r.width / 2 - w / 2), innerWidth - w - 8), yy = r.bottom + 6;
+    if (yy + ht > innerHeight - 8 && r.top - ht - 6 > 8) yy = r.top - ht - 6;
+    pop.style.left = x + scrollX + "px"; pop.style.top = yy + scrollY + "px";
+  }
+  function hideSrc(now) {
+    clearTimeout(hideT);
+    hideT = setTimeout(() => { pop.hidden = true; if (popFor) popFor.removeAttribute("aria-describedby"); popFor = null; }, now ? 0 : 250);
+  }
+  document.addEventListener("mouseover", e => { const el = e.target.closest("[data-src]"); if (el) showSrc(el); else if (pop.contains(e.target)) clearTimeout(hideT); });
+  document.addEventListener("mouseout", e => { if (e.target.closest("[data-src]") || pop.contains(e.target)) hideSrc(); });
+  document.addEventListener("focusin", e => { const el = e.target.closest("[data-src]"); if (el) showSrc(el); else if (!pop.contains(e.target)) hideSrc(true); });
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape") hideSrc(true);
+    // Enter on a sourced cell opens its first link, and does not open the row's detail view
+    const el = e.target.closest && e.target.closest("[data-src]");
+    if (e.key === "Enter" && el) { e.stopPropagation(); window.open(SRC[el.dataset.src].links[0].href, "_blank", "noopener"); }
+  }, true);
+
   // ---------- theme ----------
   const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
   let C = {};
@@ -272,30 +387,31 @@
     });
   }
   function detailTable(h) {
+    const c = k => y => cmsSrc(h, y, k);
     const rows = [
-      ["Patient revenue", y => mil(y.npr)],
-      ["Other income", y => mil(y.oinc)],
-      ["  of which property tax levy", y => mil(y.tax)],
-      ["  tax year of that levy", y => y.tax != null ? taxYearOf(h, y) : "–"],
-      ["Total revenue", y => "<b>" + mil(y.rev) + "</b>"],
-      ["Operating expenses", y => mil(y.opex)],
-      ["Other expenses", y => mil(y.oexp)],
-      ["Total expenses", y => "<b>" + mil(y.exp) + "</b>"],
-      ["Net income", y => `<b class="${y.net < 0 ? "neg" : ""}">${mil(y.net)}</b>`],
-      ["Margin", y => `<span class="${y.net < 0 ? "neg" : ""}">${pct(margin(y))}</span>`],
-      ["Gross charges", y => mil(y.gross)],
-      ["Medicaid net revenue", y => mil(y.medicaid)],
-      ["Uncompensated care (cost)", y => mil(y.uncomp)],
-      ["Wages (cost report)", y => mil(y.salaries)],
-      ["Benefits (cost report)", y => mil(y.benefits)],
-      ["Wages and benefits", y => y.salaries == null ? "–" : "<b>" + mil((y.salaries || 0) + (y.benefits || 0)) + "</b>"],
-      ["Beds", y => y.beds ?? "–"],
-      ["FTE", y => y.fte != null ? Math.round(y.fte).toLocaleString() : "–"],
-      ["Discharges", y => y.dis != null ? y.dis.toLocaleString() : "–"],
+      ["Patient revenue", y => mil(y.npr), c("npr")],
+      ["Other income", y => mil(y.oinc), c("oinc")],
+      ["  of which property tax levy", y => mil(y.tax), y => levySrc(h, y)],
+      ["  tax year of that levy", y => y.tax != null ? taxYearOf(h, y) : "–", y => levySrc(h, y)],
+      ["Total revenue", y => "<b>" + mil(y.rev) + "</b>", c("rev")],
+      ["Operating expenses", y => mil(y.opex), c("opex")],
+      ["Other expenses", y => mil(y.oexp), c("oexp")],
+      ["Total expenses", y => "<b>" + mil(y.exp) + "</b>", c("exp")],
+      ["Net income", y => `<b class="${y.net < 0 ? "neg" : ""}">${mil(y.net)}</b>`, c("net")],
+      ["Margin", y => `<span class="${y.net < 0 ? "neg" : ""}">${pct(margin(y))}</span>`, c("margin")],
+      ["Gross charges", y => mil(y.gross), c("gross")],
+      ["Medicaid net revenue", y => mil(y.medicaid), c("medicaid")],
+      ["Uncompensated care (cost)", y => mil(y.uncomp), c("uncomp")],
+      ["Wages (cost report)", y => mil(y.salaries), c("salaries")],
+      ["Benefits (cost report)", y => mil(y.benefits), c("benefits")],
+      ["Wages and benefits", y => y.salaries == null ? "–" : "<b>" + mil((y.salaries || 0) + (y.benefits || 0)) + "</b>", c("wb")],
+      ["Beds", y => y.beds ?? "–", c("beds")],
+      ["FTE", y => y.fte != null ? Math.round(y.fte).toLocaleString() : "–", c("fte")],
+      ["Discharges", y => y.dis != null ? y.dis.toLocaleString() : "–", c("dis")],
     ];
     const ys = YEARS.map(fy => yearOf(h, fy));
     const head = `<tr><th scope="col">$ millions</th>${YEARS.map((fy, i) => `<th scope="col" class="n">FY${fy}${partial(ys[i]) ? "*" : ""}</th>`).join("")}</tr>`;
-    const body = rows.filter(([l]) => !l.startsWith("  ") || ys.some(y => y && y.tax != null)).map(([l, f]) => `<tr><th scope="row" style="white-space:nowrap;${l.startsWith("  ") ? "padding-left:28px;font-weight:400;color:var(--ink-muted)" : ""}">${l.trim()}</th>${ys.map(y => `<td class="n">${y ? f(y) : "–"}</td>`).join("")}</tr>`).join("");
+    const body = rows.filter(([l]) => !l.startsWith("  ") || ys.some(y => y && y.tax != null)).map(([l, f, sf]) => `<tr><th scope="row" style="white-space:nowrap;${l.startsWith("  ") ? "padding-left:28px;font-weight:400;color:var(--ink-muted)" : ""}">${l.trim()}</th>${ys.map(y => y ? td(f(y), sf(y)) : td("–")).join("")}</tr>`).join("");
     document.getElementById("dTable").innerHTML = `<table class="bb-table"><thead>${head}</thead><tbody>${body}</tbody></table>` +
       (ys.some(partial) ? `<p class="note">* Short reporting period, see the note above.</p>` : "");
     document.querySelectorAll("#dTable tbody tr").forEach(tr => tr.style.cursor = "default");
@@ -311,23 +427,23 @@
     const ys = YEARS.map(fy => auditYear(h, fy));
     const cr = YEARS.map(fy => yearOf(h, fy));
     const rows = [
-      ["Net patient revenue", a => mil(a.npsr)],
-      ["Supplemental Medicaid", a => a.supp == null ? "in patient rev." : mil(a.supp)],
-      ["Other operating revenue", a => mil(a.oopOther)],
-      ["Operating revenue", a => "<b>" + mil(a.opRev) + "</b>"],
-      ["Operating expenses", a => "<b>" + mil(a.opExp) + "</b>"],
-      ["Operating result", a => `<b class="${a.opInc < 0 ? "neg" : ""}">${mil(a.opInc)}</b>`],
-      ["Property tax", a => mil(a.tax)],
-      ["Investment return", a => mil(a.invest)],
-      ["Interest expense", a => mil(a.interest)],
-      ["COVID relief", a => mil(a.relief)],
-      ["Other nonoperating, capital gifts, transfers", a => mil((a.otherNonop || 0) + (a.cap || 0) + (a.transfer || 0))],
-      ["Change in net position", a => `<b class="${a.chg < 0 ? "neg" : ""}">${mil(a.chg)}</b>`],
-      ["Capital spending (cash)", a => mil(a.capex)],
+      ["Net patient revenue", a => mil(a.npsr), "npsr"],
+      ["Supplemental Medicaid", a => a.supp == null ? "in patient rev." : mil(a.supp), "supp"],
+      ["Other operating revenue", a => mil(a.oopOther), "oopOther"],
+      ["Operating revenue", a => "<b>" + mil(a.opRev) + "</b>", "opRev"],
+      ["Operating expenses", a => "<b>" + mil(a.opExp) + "</b>", "opExp"],
+      ["Operating result", a => `<b class="${a.opInc < 0 ? "neg" : ""}">${mil(a.opInc)}</b>`, "opInc"],
+      ["Property tax", a => mil(a.tax), "tax"],
+      ["Investment return", a => mil(a.invest), "invest"],
+      ["Interest expense", a => mil(a.interest), "interest"],
+      ["COVID relief", a => mil(a.relief), "relief"],
+      ["Other nonoperating, capital gifts, transfers", a => mil((a.otherNonop || 0) + (a.cap || 0) + (a.transfer || 0)), ["otherNonop", "cap", "transfer"]],
+      ["Change in net position", a => `<b class="${a.chg < 0 ? "neg" : ""}">${mil(a.chg)}</b>`, "chg"],
+      ["Capital spending (cash)", a => mil(a.capex), "capex"],
     ];
     const head = `<tr><th scope="col">$ millions</th>${YEARS.map((fy, i) => `<th scope="col" class="n">FY${fy}${ys[i] && ys[i].months ? "*" : ""}</th>`).join("")}</tr>`;
-    const body = rows.map(([l, f]) => `<tr><th scope="row" style="white-space:nowrap">${l}</th>${ys.map(a => `<td class="n">${a ? f(a) : "–"}</td>`).join("")}</tr>`).join("") +
-      `<tr><th scope="row" style="white-space:nowrap;font-weight:400;color:var(--ink-muted)">Cost report net income, for comparison</th>${cr.map(y => `<td class="n" style="color:var(--ink-muted)">${y ? mil(y.net) : "–"}</td>`).join("")}</tr>`;
+    const body = rows.map(([l, f, k]) => `<tr><th scope="row" style="white-space:nowrap">${l}</th>${ys.map((a, i) => a ? td(f(a), auditSrc(h, YEARS[i], k)) : td("–")).join("")}</tr>`).join("") +
+      `<tr><th scope="row" style="white-space:nowrap;font-weight:400;color:var(--ink-muted)">Cost report net income, for comparison</th>${cr.map(y => y ? td(mil(y.net), cmsSrc(h, y, "net"), ' style="color:var(--ink-muted)"') : td("–")).join("")}</tr>`;
     document.getElementById("auditTable").innerHTML = `<table class="bb-table"><thead>${head}</thead><tbody>${body}</tbody></table>`;
     const src = Object.entries(A.sources).map(([k, u]) => `<a href="${esc(u)}">${esc(k)}</a>`).join(", ");
     document.getElementById("auditNote").innerHTML = esc(A.notes) + (ys.some(a => a && a.months) ? " * Short period." : "") + " Audited statements: " + src + ".";
@@ -463,11 +579,11 @@
     const sys = BIG6.map(id => byId[id]).filter(h => h.audit);
     const sum = (h, k) => Object.values(h.audit.years).reduce((t, a) => t + (a[k] || 0), 0);
     const yrs = h => Object.keys(h.audit.years).sort();
-    const cell = v => `<td class="n"><span class="${v < 0 ? "neg" : ""}">${money(v)}</span></td>`;
+    const cell = (v, spec) => td(`<span class="${v < 0 ? "neg" : ""}">${money(v)}</span>`, spec);
     const head = `<tr><th scope="col">System</th><th scope="col" class="n">Operating result</th><th scope="col" class="n">Property tax</th><th scope="col" class="n">Investment return</th><th scope="col" class="n">Change in net position</th><th scope="col" class="n">Capital spending</th><th scope="col" class="n">Years</th><th scope="col" class="n">Total operating result</th><th scope="col" class="n">Total property tax</th><th scope="col" class="n">Total change in net position</th></tr>`;
     const body = sys.map(h => {
       const a = auditYear(h, D.last) || {}, y = yrs(h);
-      return `<tr data-id="${h.id}" tabindex="0"><td><b>${esc(h.name)}</b><span class="sub">${esc(h.audit.entity.split(" d/b/a")[0])}</span></td>${cell(a.opInc)}${cell(a.tax)}${cell(a.invest)}${cell(a.chg)}${cell(a.capex)}<td class="n">FY${y[0].slice(2)}–${y[y.length - 1].slice(2)}</td>${cell(sum(h, "opInc"))}${cell(sum(h, "tax"))}${cell(sum(h, "chg"))}</tr>`;
+      return `<tr data-id="${h.id}" tabindex="0"><td><b>${esc(h.name)}</b><span class="sub">${esc(h.audit.entity.split(" d/b/a")[0])}</span></td>${["opInc", "tax", "invest", "chg", "capex"].map(k => cell(a[k], auditSrc(h, D.last, k))).join("")}<td class="n">FY${y[0].slice(2)}–${y[y.length - 1].slice(2)}</td>${["opInc", "tax", "chg"].map(k => cell(sum(h, k), auditSrc(h, y, k))).join("")}</tr>`;
     }).join("");
     const el = document.getElementById("auditSummary");
     el.innerHTML = `<table class="bb-table"><thead><tr><th></th><th colspan="5" scope="colgroup" class="n">FY${D.last}</th><th colspan="4" scope="colgroup" class="n">All audited years</th></tr>${head}</thead><tbody>${body}</tbody></table>`;
@@ -482,15 +598,21 @@
   // ---------- all hospitals table ----------
   const COLS = [
     { k: "name", l: "Hospital", s: h => h.name.toLowerCase() },
-    { k: "beds", l: "Beds", n: 1, s: h => latest(h).beds || 0, f: h => latest(h).beds ?? "–" },
-    { k: "rev", l: "Revenue", n: 1, s: h => latest(h).rev, f: h => money(latest(h).rev) },
-    { k: "exp", l: "Expenses", n: 1, s: h => latest(h).exp, f: h => money(latest(h).exp) },
-    { k: "net", l: "Net income", n: 1, s: h => latest(h).net, f: h => `<span class="${latest(h).net < 0 ? "neg" : ""}">${money(latest(h).net)}</span>` },
-    { k: "mar", l: "Margin", n: 1, s: h => margin(latest(h)) ?? -9, f: h => `<span class="${latest(h).net < 0 ? "neg" : ""}">${pct(margin(latest(h)))}</span>` },
-    { k: "tax", l: "Property tax", n: 1, s: h => latest(h).tax ?? -1, f: h => money(latest(h).tax) },
-    { k: "tsh", l: "Tax share", n: 1, s: h => taxShare(latest(h)) ?? -1, f: h => pct(taxShare(latest(h))) },
+    { k: "beds", l: "Beds", n: 1, s: h => latest(h).beds || 0, f: h => latest(h).beds ?? "–", src: h => cmsSrc(h, latest(h), "beds") },
+    { k: "rev", l: "Revenue", n: 1, s: h => latest(h).rev, f: h => money(latest(h).rev), src: h => cmsSrc(h, latest(h), "rev") },
+    { k: "exp", l: "Expenses", n: 1, s: h => latest(h).exp, f: h => money(latest(h).exp), src: h => cmsSrc(h, latest(h), "exp") },
+    { k: "net", l: "Net income", n: 1, s: h => latest(h).net, f: h => `<span class="${latest(h).net < 0 ? "neg" : ""}">${money(latest(h).net)}</span>`, src: h => cmsSrc(h, latest(h), "net") },
+    { k: "mar", l: "Margin", n: 1, s: h => margin(latest(h)) ?? -9, f: h => `<span class="${latest(h).net < 0 ? "neg" : ""}">${pct(margin(latest(h)))}</span>`, src: h => cmsSrc(h, latest(h), "margin") },
+    { k: "tax", l: "Property tax", n: 1, s: h => latest(h).tax ?? -1, f: h => money(latest(h).tax), src: h => levySrc(h, latest(h)) },
+    { k: "tsh", l: "Tax share", n: 1, s: h => taxShare(latest(h)) ?? -1, f: h => pct(taxShare(latest(h))), src: h => taxShareSrc(h) },
     { k: "trend", l: "Revenue, FY" + D.first + "–" + D.last, n: 1, s: h => { const a = h.years[0], b = latest(h); return a.rev ? b.rev / a.rev : 0; }, f: h => spark(h) },
   ];
+  // tax share: the levy over cost report revenue, so both sources
+  function taxShareSrc(h) {
+    const a = levySrc(h, latest(h)), b = cmsSrc(h, latest(h), "rev");
+    if (!a || !b) return null;
+    return { title: "Property tax levy ÷ cost report revenue", lines: [...a.lines.slice(0, 3), ...b.lines.slice(0, 2)], links: [a.links[0], ...b.links] };
+  }
   let sortK = "rev", sortDir = -1;
   function spark(h) {
     const vals = YEARS.map(fy => { const y = yearOf(h, fy); return y && !partial(y) ? y.rev : null; }), w = 96, ht = 24;
@@ -512,7 +634,7 @@
     const tb = rows.map(h => {
       const y = latest(h);
       const sub = [h.city, h.county ? h.county + " County" : "", y.fy !== D.last ? "last filed FY" + y.fy : "", nursingFlag(h) ? "nursing home programs" : ""].filter(Boolean).join(" · ");
-      return `<tr data-id="${h.id}" tabindex="0"><td><b>${esc(h.name)}</b><span class="sub">${esc(sub)}</span></td>${COLS.slice(1).map(c => `<td class="n">${c.f(h)}</td>`).join("")}</tr>`;
+      return `<tr data-id="${h.id}" tabindex="0"><td><b>${esc(h.name)}</b><span class="sub">${esc(sub)}</span></td>${COLS.slice(1).map(c => td(c.f(h), c.src && c.src(h))).join("")}</tr>`;
     }).join("");
     const t = document.getElementById("allTable");
     t.innerHTML = `<thead><tr>${th}</tr></thead><tbody>${tb}</tbody>`;
@@ -524,7 +646,7 @@
       tr.addEventListener("click", () => openDetail(tr.dataset.id, true));
       tr.addEventListener("keydown", e => { if (e.key === "Enter") openDetail(tr.dataset.id, true); });
     });
-    document.getElementById("allNote").textContent = rows.length + " hospitals shown. Property tax is the district's levy for the tax year due during that fiscal year. A dash means no hospital district levies a tax for it: county- and city-owned hospitals are funded from the county or city budget instead.";
+    document.getElementById("allNote").textContent = rows.length + " hospitals shown. Hover a number to see the cost report row or levy spreadsheet cell it comes from. Property tax is the district's levy for the tax year due during that fiscal year. A dash means no hospital district levies a tax for it: county- and city-owned hospitals are funded from the county or city budget instead.";
   }
   document.getElementById("q").addEventListener("input", table);
   document.getElementById("onlyNow").addEventListener("change", table);
