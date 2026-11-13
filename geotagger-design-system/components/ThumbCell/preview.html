@@ -1,0 +1,47 @@
+<!-- @dsCard group="Media" height=330 subtitle="Selection, badges, suggestion chips and dimmed states" -->
+<!DOCTYPE html>
+<html>
+<body>
+<div class="gt-surface" id="root" style="padding:16px;background:var(--pane)">
+<style>
+  .lbl { font-size:11px; color:var(--ink-dim); margin:0 0 6px; }
+  .row { display:grid; grid-template-columns:repeat(4,120px); gap:8px; margin-bottom:14px; }
+</style>
+
+  <p class="lbl">Selection, geotagged, excluded, ambiguous</p>
+  <div class="row">
+    <div class="thumb-cell selected"><img alt=""><span class="face-score">0.91</span></div>
+    <div class="thumb-cell tagged"><img alt=""></div>
+    <div class="thumb-cell geo-ignored"><img alt=""></div>
+    <div class="thumb-cell ambiguous"><img alt=""><span class="face-score">0.63</span></div>
+  </div>
+
+  <p class="lbl">Settled name, suggestion with accept/reject, suggestion plus amber alternative, camera strip</p>
+  <div class="row">
+    <div class="thumb-cell"><img alt=""><span class="face-label">Marion</span></div>
+    <div class="thumb-cell"><img alt="">
+      <span class="face-suggest"><span class="sug-check">✓</span><span class="sug-name">Elias</span><span class="sug-reject">✕</span></span>
+    </div>
+    <div class="thumb-cell"><img alt="">
+      <span class="face-chips">
+        <span class="face-suggest"><span class="sug-check">✓</span><span class="sug-name">Elias</span><span class="sug-reject">✕</span></span>
+        <span class="face-alt"><span class="alt-arrow">→</span><span class="sug-name">Jonas?</span><span class="sug-reject">✕</span></span>
+      </span>
+    </div>
+    <div class="thumb-cell"><img alt=""><span class="cam-strip" style="background:#5cb85c"></span><span class="thumb-name" style="opacity:1">IMG_4821.CR2</span></div>
+  </div>
+
+  <p class="lbl">Ignored (grayscale) and come back later (sepia) — deferred reads brighter than dismissed</p>
+  <div class="row">
+    <div class="thumb-cell ignored"><img alt=""><span class="face-label ignored-label">ignored</span></div>
+    <div class="thumb-cell come-back"><img alt=""><span class="face-label come-back-label">come back</span></div>
+  </div>
+</div>
+<script>
+  // Placeholder tiles stand in for photographs; the app supplies real thumbnails.
+  const TILES = ['%23394a5a','%235a4a3a','%233a5a4a','%234a3a5a','%235a5a3a','%233a4a5a','%23524040','%23405248'];
+  const tile = i => "data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Crect width='120' height='120' fill='" + TILES[i % TILES.length] + "'/%3E%3Cpath d='M0 86 L32 56 L62 80 L88 60 L120 92 L120 120 L0 120 Z' fill='rgba(0,0,0,.28)'/%3E%3Ccircle cx='94' cy='26' r='10' fill='rgba(255,255,255,.14)'/%3E%3C/svg%3E";
+  document.querySelectorAll('.thumb-cell img').forEach((img, i) => { img.src = tile(i); });
+</script>
+</body>
+</html>

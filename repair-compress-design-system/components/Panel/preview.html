@@ -1,0 +1,20 @@
+<!-- @dsCard group="Layout" height=220 subtitle="panel ground, hairline, 2px radius" -->
+<div id="root"></div>
+<script>
+  var h = React.createElement;
+  var Panel = window.CodecLab.Panel;
+  var root = ReactDOM.createRoot(document.getElementById("root"));
+  root.render(
+    h("div", { style: { display: "grid", gap: "var(--space-8)", fontFamily: "var(--font-mono)", fontSize: "12px", color: "var(--ink)" } },
+      h(Panel, null,
+        h("div", { style: { fontFamily: "var(--font-pixel)", fontSize: "12px", color: "var(--dmg-4)", marginBottom: "var(--space-5)" } }, "RPR1"),
+        h("div", { style: { color: "var(--ink-soft)", maxWidth: "66ch" } },
+          "The default panel: 14px of padding, one hairline in ", h("code", { style: { color: "var(--hot)" } }, "rule"), ", a 2px corner.")
+      ),
+      h(Panel, { flush: true },
+        h("div", { style: { padding: "var(--space-4) var(--space-5)", borderBottom: "1px solid var(--rule)", color: "var(--ink-soft)", fontSize: "11px" } }, "flush — for a table well or a chart that bleeds"),
+        h("div", { style: { padding: "var(--space-4) var(--space-5)", fontVariantNumeric: "tabular-nums" } }, "31,102 verses · 4.5 MB · 1.2 MB encoded")
+      )
+    )
+  );
+</script>

@@ -1,0 +1,1110 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GeoTagger design system</title>
+<meta name="description" content="A photo library, put in its place. Near-black surfaces so the only saturated colour on screen is the photograph, one blue accent, status colours that always carry a word, and emoji for icons.">
+
+<link rel="stylesheet" href="dist/tokens.css">
+<link rel="stylesheet" href="components/bundle.css">
+<style>
+  /* Page chrome only. Colors, type and spacing come from this system's own tokens. */
+  *, *::before, *::after { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--canvas); color: var(--ink); font-family: var(--font-ui); font-size: 14px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+  a { color: var(--accent-text); }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .92em; color: var(--accent-text); }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 24px max(16px, env(safe-area-inset-right, 0px)) 96px max(16px, env(safe-area-inset-left, 0px)); }
+  .topbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .topbar a { font-weight: 600; text-decoration: none; }
+  .seg { display: inline-flex; border: 1px solid var(--hairline); border-radius: 4px; overflow: hidden; }
+  .seg button { appearance: none; border: 0; background: var(--pane); color: var(--ink-muted); font: inherit; font-size: 12px; padding: 5px 12px; cursor: pointer; }
+  .seg button + button { border-left: 1px solid var(--hairline); }
+  .seg button[aria-pressed="true"] { background: var(--accent-fill); color: var(--on-accent); }
+  .hero { margin-top: 40px; }
+  .eyebrow { margin: 0 0 8px; color: var(--ink-muted); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; font-family: var(--font-ui); }
+  h1 { margin: 0; font-family: var(--font-ui); font-size: clamp(30px, 6vw, 52px); line-height: 1.1; font-weight: 700; }
+  .lead { max-width: 70ch; color: var(--ink-muted); font-size: 15px; margin: 16px 0 0; }
+  .links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+  .links a { border: 1px solid var(--hairline); border-radius: 4px; padding: 6px 12px; text-decoration: none; background: var(--pane); font-weight: 600; font-size: 13px; }
+  .cover { position: relative; margin-top: 32px; border: 1px solid var(--hairline); border-radius: 6px; overflow: hidden; }
+  .cover iframe { border: 0; display: block; transform-origin: 0 0; }
+  nav.sections { position: sticky; top: 0; z-index: 5; display: flex; gap: 4px; flex-wrap: wrap; margin: 32px -16px 0; padding: 10px 16px; background: var(--canvas); border-bottom: 1px solid var(--hairline); }
+  nav.sections a { padding: 4px 10px; border-radius: 4px; text-decoration: none; color: var(--ink-muted); font-weight: 600; font-size: 13px; }
+  nav.sections a:hover { background: var(--pane); color: var(--ink); }
+  section { margin-top: 56px; scroll-margin-top: 60px; }
+  .sechead { display: flex; justify-content: space-between; align-items: end; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
+  h2 { margin: 0; font-family: var(--font-ui); font-size: 22px; font-weight: 700; }
+  h3 { margin: 32px 0 12px; font-size: 15px; font-weight: 700; }
+  h3 small { color: var(--ink-muted); font-weight: 400; margin-left: 6px; }
+  h4 { margin: 0; font-size: 14px; }
+  .note { color: var(--ink-muted); max-width: 80ch; margin: 0 0 12px; }
+  #filter { font: inherit; font-size: 13px; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--hairline); background: var(--pane); color: var(--ink); width: 240px; max-width: 100%; }
+
+  .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+  .sw { border: 1px solid var(--hairline); border-radius: 6px; background: var(--pane); overflow: hidden; min-width: 0; }
+  .sw[hidden] { display: none; }
+  .sw__chip { height: 56px; border-bottom: 1px solid var(--hairline); }
+  .sw__body { padding: 10px 12px 12px; display: grid; gap: 2px; }
+  .sw__name { font-weight: 600; color: var(--ink); }
+  .sw__hex { font-family: ui-monospace, Menlo, monospace; font-size: 11px; color: var(--ink-muted); overflow-wrap: anywhere; }
+  .sw__use { font-size: 12px; color: var(--ink-muted); margin-top: 4px; }
+
+  .specimens { display: grid; gap: 1px; background: var(--hairline); border: 1px solid var(--hairline); border-radius: 6px; overflow: hidden; }
+  .spec { background: var(--pane); padding: 14px 16px; display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 4px 20px; align-items: baseline; }
+  .spec__meta { display: grid; gap: 2px; font-size: 12px; color: var(--ink-muted); }
+  .spec__sample { color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+  .spec__use { grid-column: 2; font-size: 12px; color: var(--ink-muted); }
+  @media (max-width: 640px) { .spec { grid-template-columns: 1fr; } .spec__use { grid-column: 1; } }
+
+  .tablewrap { overflow-x: auto; border: 1px solid var(--hairline); border-radius: 6px; background: var(--pane); }
+  table.scale { width: 100%; border-collapse: collapse; }
+  table.scale td { padding: 10px 14px; border-top: 1px solid var(--hairline); vertical-align: middle; }
+  table.scale tr:first-child td { border-top: 0; }
+  td.num { font-family: ui-monospace, Menlo, monospace; font-size: 12px; color: var(--ink-muted); white-space: nowrap; max-width: 280px; overflow-wrap: anywhere; white-space: normal; }
+  td.use { font-size: 12px; color: var(--ink-muted); min-width: 220px; }
+  td.viz { min-width: 90px; }
+  .bar { display: block; height: 10px; border-radius: 2px; background: var(--accent-text); }
+  .bar--thin { height: 6px; }
+  .box { display: inline-block; width: 44px; height: 44px; border: 1px solid var(--accent-text); background: color-mix(in srgb, var(--accent-text) 18%, transparent); }
+  .box--shadow { background: var(--hairline); border-color: transparent; border-radius: 6px; }
+
+  .cards { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .card { border: 1px solid var(--hairline); border-radius: 6px; background: var(--pane); overflow: hidden; min-width: 0; }
+  .card header { padding: 12px 14px 10px; display: flex; flex-direction: column; gap: 2px; }
+  .card header span { font-size: 12px; color: var(--ink-muted); }
+  .card iframe { display: block; width: 100%; border: 0; border-top: 1px solid var(--hairline); border-bottom: 1px solid var(--hairline); background: var(--canvas); }
+  .guide { padding: 10px 14px; font-size: 13px; color: var(--ink-muted); }
+  .guide summary { cursor: pointer; font-weight: 600; color: var(--ink); }
+  .guide h4 { margin: 14px 0 4px; color: var(--ink); }
+  .guide p { margin: 8px 0; }
+  .guide ul { padding-left: 20px; margin: 8px 0; }
+  footer { margin-top: 72px; color: var(--ink-muted); font-size: 12px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <a href="../">← All experiments</a>
+    
+  </div>
+
+  <header class="hero">
+    <p class="eyebrow">Design system · from danwatt/geo-tagger</p>
+    <h1>GeoTagger</h1>
+    <div class="lead"><p style="margin:0">A photo library, put in its place. Near-black surfaces so the only saturated colour on screen is the photograph, one blue accent, status colours that always carry a word, and emoji for icons.</p></div>
+    <div class="links">
+      <a href="README.html">Read the guide</a>
+      <a href="tokens.json">tokens.json</a>
+      <a href="dist/tokens.css">tokens.css</a>
+      <a href="components/bundle.css">bundle.css</a>
+    </div>
+  </header>
+  <div class="cover" id="cover"><iframe title="Cover" tabindex="-1" style="width:960px;height:288px" srcdoc="
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;dist/tokens.css&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;components/bundle.css&quot;&gt;&lt;style&gt;html,body{margin:0}body{background:var(--canvas);color:var(--ink);font-family:var(--font-ui);padding:0}body{padding:0!important;overflow:hidden}&lt;/style&gt;&lt;/head&gt;
+&lt;body&gt;
+&lt;div id=&quot;root&quot;&gt;
+&lt;style&gt;
+  #root { width: 960px; height: 288px; position: relative; background: var(--canvas); overflow: hidden; }
+  #root svg { display: block; width: 960px; height: 288px; }
+  .brand      { fill: var(--accent); }
+  .brand-deep { fill: var(--accent-fill); }
+  .pin        { fill: var(--marker); }
+  .named      { fill: var(--success); }
+  .tile       { fill: var(--accent); rx: 3px; }
+  .tile-pin   { fill: var(--marker); rx: 3px; }
+  .tile-named { fill: var(--success); rx: 3px; }
+  .block      { rx: 4px; }
+  #name {
+    position: absolute; left: 48px; bottom: 84px;
+    font-family: var(--font-ui); font-weight: 800; font-size: 72px; line-height: 0.92;
+    letter-spacing: -0.015em; color: var(--ink); margin: 0; max-width: 440px;
+  }
+  #tagline {
+    position: absolute; left: 48px; bottom: 52px;
+    font-family: var(--font-ui); font-weight: 400; font-size: 13px; line-height: 18px;
+    color: var(--ink-muted); margin: 0; max-width: 440px;
+  }
+&lt;/style&gt;
+
+&lt;!--
+  blocks:      accent 192x208 · accent-fill 144x208 (bleeds off the right edge) · marker 96x96 · success 96x96; corners radius-4
+  arrangement: one tall brand slab at x=496 with two stacked status satellites, the deep slab carrying the pattern off the right edge; everything right of x=480, the name alone on the ground
+  pattern:     geometric, modular, dense UI — tiles cut by the radius tokens, two merged two-wide. GeoTagger is a grid of square 120px tiles in which a handful are pinned, so the cover is that grid: 40-odd radius-3 tiles at a 24px pitch over the deep block, one in marker amber (geotagged) and one in success green (named).
+  scales:      pitch 24px = space-16 + space-8, gap space-4, tile 20px, blocks on multiples of space-16, radius-4 on blocks and radius-3 on tiles
+--&gt;
+&lt;svg viewBox=&quot;0 0 960 288&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot; role=&quot;img&quot; aria-label=&quot;GeoTagger&quot;&gt;
+  &lt;rect class=&quot;brand block&quot;      x=&quot;496&quot; y=&quot;40&quot;  width=&quot;192&quot; height=&quot;208&quot;/&gt;
+  &lt;rect class=&quot;pin block&quot;        x=&quot;704&quot; y=&quot;40&quot;  width=&quot;96&quot;  height=&quot;96&quot;/&gt;
+  &lt;rect class=&quot;named block&quot;      x=&quot;704&quot; y=&quot;152&quot; width=&quot;96&quot;  height=&quot;96&quot;/&gt;
+  &lt;rect class=&quot;brand-deep block&quot; x=&quot;816&quot; y=&quot;40&quot;  width=&quot;144&quot; height=&quot;208&quot;/&gt;
+
+  &lt;g id=&quot;grid&quot;&gt;&lt;/g&gt;
+&lt;/svg&gt;
+
+&lt;p id=&quot;name&quot;&gt;GeoTagger&lt;/p&gt;
+&lt;p id=&quot;tagline&quot;&gt;A photo library, put in its place.&lt;/p&gt;
+&lt;/div&gt;
+&lt;script&gt;
+  // The pattern: the app&#x27;s own photo grid, drawn at a 24px pitch over the deep block.
+  // Two tiles are merged two-wide, one is pinned (marker) and one named (success).
+  const NS = &#x27;http://www.w3.org/2000/svg&#x27;;
+  const g = document.getElementById(&#x27;grid&#x27;);
+  const wide = new Set([&#x27;1,2&#x27;, &#x27;4,5&#x27;]);          // row,col of a merged two-wide tile
+  const skip = new Set([&#x27;1,3&#x27;, &#x27;4,6&#x27;]);          // the column each merge swallows
+  const pinned = &#x27;2,4&#x27;, named = &#x27;6,2&#x27;;
+  for (let row = 0; row &lt; 8; row++) {
+    for (let col = 0; col &lt; 6; col++) {
+      const key = row + &#x27;,&#x27; + (col + 1);
+      if (skip.has(key)) continue;
+      const r = document.createElementNS(NS, &#x27;rect&#x27;);
+      r.setAttribute(&#x27;x&#x27;, 824 + col * 24);
+      r.setAttribute(&#x27;y&#x27;, 48 + row * 24);
+      r.setAttribute(&#x27;width&#x27;, wide.has(key) ? 44 : 20);
+      r.setAttribute(&#x27;height&#x27;, 20);
+      r.setAttribute(&#x27;class&#x27;, key === pinned ? &#x27;tile-pin&#x27; : key === named ? &#x27;tile-named&#x27; : &#x27;tile&#x27;);
+      g.appendChild(r);
+    }
+  }
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+"></iframe></div>
+
+  <nav class="sections" aria-label="Sections"><a href="#colors">Colors</a><a href="#type">Type</a><a href="#spacing">Spacing</a><a href="#radius">Radius</a><a href="#shadow">Shadow</a><a href="#layout">Layout</a><a href="#opacity">Opacity</a><a href="#zindex">Z-index</a><a href="#components">Components</a></nav>
+  <section id="colors"><div class="sechead"><h2>Colors</h2><input id="filter" type="search" placeholder="Filter 87 colors" aria-label="Filter colors"></div><div class="swatches" id="swatches"><div class="sw" data-name="canvas"><div class="sw__chip" style="background:var(--canvas)"></div><div class="sw__body"><code class="sw__name">canvas</code><span class="sw__hex">dark #1a1a1a</span><span class="sw__use">The application background, set on <code>body</code> by every page. Grounds <code>ink</code>, <code>ink-secondary</code>, <code>ink-muted</code>, <code>ink-soft</code>, <code>accent-text</code>.</span></div></div><div class="sw" data-name="canvas-deep"><div class="sw__chip" style="background:var(--canvas-deep)"></div><div class="sw__body"><code class="sw__name">canvas-deep</code><span class="sw__hex">dark #0d0d0d</span><span class="sw__use">The full-photo review pane on Crowd Review, darker than <code>canvas</code> so a photo carries its own edge.</span></div></div><div class="sw" data-name="media-well"><div class="sw__chip" style="background:var(--media-well)"></div><div class="sw__body"><code class="sw__name">media-well</code><span class="sw__hex">dark #111111</span><span class="sw__use">Behind a thumbnail or face crop while its image loads, so a slow tile is a dark hole rather than a flash of pane.</span></div></div><div class="sw" data-name="pane"><div class="sw__chip" style="background:var(--pane)"></div><div class="sw__body"><code class="sw__name">pane</code><span class="sw__hex">dark #1e1e1e</span><span class="sw__use">Scrolling content panes: the photo grid, the detail pane, the people list. One step up from <code>canvas</code>.</span></div></div><div class="sw" data-name="rail"><div class="sw__chip" style="background:var(--rail)"></div><div class="sw__body"><code class="sw__name">rail</code><span class="sw__hex">dark #1d1d1d</span><span class="sw__use">The status bar and the timeline histogram strip — furniture that sits below the content, not above it.</span></div></div><div class="sw" data-name="form-bar"><div class="sw__chip" style="background:var(--form-bar)"></div><div class="sw__body"><code class="sw__name">form-bar</code><span class="sw__hex">dark #202020</span><span class="sw__use">The Search page filter form, a band of controls above the results.</span></div></div><div class="sw" data-name="bar"><div class="sw__chip" style="background:var(--bar)"></div><div class="sw__body"><code class="sw__name">bar</code><span class="sw__hex">dark #222222</span><span class="sw__use">Top and bottom bars on the touch pages (Quick Tag, Quick Geocode), and the section panels on People Manager.</span></div></div><div class="sw" data-name="card"><div class="sw__chip" style="background:var(--card)"></div><div class="sw__body"><code class="sw__name">card</code><span class="sw__hex">dark #232323</span><span class="sw__use">Dashboard and settings cards. Grounds <code>ink</code>, <code>accent-text</code>, <code>success</code>, <code>danger-text</code>.</span></div></div><div class="sw" data-name="chrome"><div class="sw__chip" style="background:var(--chrome)"></div><div class="sw__body"><code class="sw__name">chrome</code><span class="sw__hex">dark #252525</span><span class="sw__use">Toolbars, sticky grid headers, the camera legend, and grouped control panels. Grounds <code>ink</code> and <code>ink-muted</code>.</span></div></div><div class="sw" data-name="chrome-alt"><div class="sw__chip" style="background:var(--chrome-alt)"></div><div class="sw__body"><code class="sw__name">chrome-alt</code><span class="sw__hex">dark #2d2d2d</span><span class="sw__use">Toolbar and status bar on the map-first pages (Places DB, Contexts, Representatives), which run one step lighter than <code>chrome</code>.</span></div></div><div class="sw" data-name="overlay"><div class="sw__chip" style="background:var(--overlay)"></div><div class="sw__body"><code class="sw__name">overlay</code><span class="sw__hex">dark #2a2a2a</span><span class="sw__use">Anything floating over the page: modals, the quick-action popup, the person picker, typeahead lists. Grounds <code>ink-strong</code> and <code>on-accent</code>.</span></div></div><div class="sw" data-name="field"><div class="sw__chip" style="background:var(--field)"></div><div class="sw__body"><code class="sw__name">field</code><span class="sw__hex">dark #333333</span><span class="sw__use">The fill of text inputs, selects, and the imprecise-drop control group. Grounds <code>ink-strong</code>.</span></div></div><div class="sw" data-name="control"><div class="sw__chip" style="background:var(--control)"></div><div class="sw__body"><code class="sw__name">control</code><span class="sw__hex">dark #383838</span><span class="sw__use">Default button fill, count badges, <code>kbd</code> keys, and the toast background. Grounds <code>ink</code>.</span></div></div><div class="sw" data-name="control-hover"><div class="sw__chip" style="background:var(--control-hover)"></div><div class="sw__body"><code class="sw__name">control-hover</code><span class="sw__hex">dark #4a4a4a</span><span class="sw__use">Button fill on hover, and the grey 'no faces detected' segment of the coverage bar.</span></div></div><div class="sw" data-name="hairline"><div class="sw__chip" style="background:var(--hairline)"></div><div class="sw__body"><code class="sw__name">hairline</code><span class="sw__hex">dark #333333</span><span class="sw__use">The 1px rule under every toolbar and above every status bar, and between panes.</span></div></div><div class="sw" data-name="rule"><div class="sw__chip" style="background:var(--rule)"></div><div class="sw__body"><code class="sw__name">rule</code><span class="sw__hex">dark #2e2e2e</span><span class="sw__use">The lighter 1px rule between rows of a metadata table and under a month divider.</span></div></div><div class="sw" data-name="field-border"><div class="sw__chip" style="background:var(--field-border)"></div><div class="sw__body"><code class="sw__name">field-border</code><span class="sw__hex">dark #444444</span><span class="sw__use">Border on inputs, selects, popovers and map controls. Carries meaning, so it holds 3:1 against <code>canvas</code> and <code>field</code>.</span></div></div><div class="sw" data-name="control-border"><div class="sw__chip" style="background:var(--control-border)"></div><div class="sw__body"><code class="sw__name">control-border</code><span class="sw__hex">dark #555555</span><span class="sw__use">Border on default buttons and on the <code>kbd</code> key caps.</span></div></div><div class="sw" data-name="panel-border"><div class="sw__chip" style="background:var(--panel-border)"></div><div class="sw__body"><code class="sw__name">panel-border</code><span class="sw__hex">dark #383838</span><span class="sw__use">Border on grouped inline panels — the guess bar, the face assign bar, picker rows.</span></div></div><div class="sw" data-name="ink"><div class="sw__chip" style="background:var(--ink)"></div><div class="sw__body"><code class="sw__name">ink</code><span class="sw__hex">dark #dddddd</span><span class="sw__use">Body copy. Reads on <code>canvas</code>, <code>pane</code>, <code>card</code>, <code>chrome</code>, <code>control</code> and <code>overlay</code>.</span></div></div><div class="sw" data-name="ink-strong"><div class="sw__chip" style="background:var(--ink-strong)"></div><div class="sw__body"><code class="sw__name">ink-strong</code><span class="sw__hex">dark #eeeeee</span><span class="sw__use">Text inside inputs and selects, modal headings, and emphasised values. Reads on <code>field</code>, <code>overlay</code>, <code>control</code> and <code>canvas</code>.</span></div></div><div class="sw" data-name="ink-page"><div class="sw__chip" style="background:var(--ink-page)"></div><div class="sw__body"><code class="sw__name">ink-page</code><span class="sw__hex">dark #e0e0e0</span><span class="sw__use">Body copy on the map-first pages (Places DB, Contexts, Representatives), which set their own slightly brighter body colour. Reads on <code>canvas</code> and <code>chrome-alt</code>.</span></div></div><div class="sw" data-name="ink-secondary"><div class="sw__chip" style="background:var(--ink-secondary)"></div><div class="sw__body"><code class="sw__name">ink-secondary</code><span class="sw__hex">dark #cccccc</span><span class="sw__use">Supporting copy: stat lines, legend labels, basemap buttons. Reads on <code>canvas</code>, <code>card</code> and <code>chrome</code>.</span></div></div><div class="sw" data-name="ink-muted"><div class="sw__chip" style="background:var(--ink-muted)"></div><div class="sw__body"><code class="sw__name">ink-muted</code><span class="sw__hex">dark #aaaaaa</span><span class="sw__use">De-emphasised copy: guess summaries, progress labels, close buttons. Reads on <code>canvas</code>, <code>card</code>, <code>chrome</code> and <code>overlay</code>.</span></div></div><div class="sw" data-name="ink-soft"><div class="sw__chip" style="background:var(--ink-soft)"></div><div class="sw__body"><code class="sw__name">ink-soft</code><span class="sw__hex">dark #999999</span><span class="sw__use">Field labels, status-bar text on the map pages, settings help. Reads on <code>canvas</code>, <code>card</code> and <code>chrome-alt</code>.</span></div></div><div class="sw" data-name="ink-dim"><div class="sw__chip" style="background:var(--ink-dim)"></div><div class="sw__body"><code class="sw__name">ink-dim</code><span class="sw__hex">dark #888888</span><span class="sw__use">Metadata keys, counts and month dividers. Reads on <code>canvas</code> and <code>card</code> at about 4.9:1 — keep it to 11px+ labels, not running copy.</span></div></div><div class="sw" data-name="ink-faint"><div class="sw__chip" style="background:var(--ink-faint)"></div><div class="sw__body"><code class="sw__name">ink-faint</code><span class="sw__hex">dark #777777</span><span class="sw__use">Histogram axis labels and birth-date annotations. Below 4.5:1 on <code>canvas</code> (about 3.9:1): decoration and non-essential annotation only, never the only carrier of a fact.</span></div></div><div class="sw" data-name="ink-ghost"><div class="sw__chip" style="background:var(--ink-ghost)"></div><div class="sw__body"><code class="sw__name">ink-ghost</code><span class="sw__hex">dark #666666</span><span class="sw__use">Empty-state hints and the resting colour of a table delete button. About 3:1 on <code>canvas</code> — use at 12px+ and pair with a hover state that brightens it.</span></div></div><div class="sw" data-name="ink-placeholder"><div class="sw__chip" style="background:var(--ink-placeholder)"></div><div class="sw__body"><code class="sw__name">ink-placeholder</code><span class="sw__hex">dark #555555</span><span class="sw__use">The detail-pane placeholder and the day divider. About 2.3:1 on <code>canvas</code> — purely decorative; never put a fact here.</span></div></div><div class="sw" data-name="accent"><div class="sw__chip" style="background:var(--accent)"></div><div class="sw__body"><code class="sw__name">accent</code><span class="sw__hex">dark #4a90d9</span><span class="sw__use">The product's one accent: focus ring on inputs, border of an active button, selected thumbnail ring, drop target outline. 4.6:1 on <code>canvas</code>, so it clears the 3:1 floor for a meaningful mark.</span></div></div><div class="sw" data-name="accent-text"><div class="sw__chip" style="background:var(--accent-text)"></div><div class="sw__body"><code class="sw__name">accent-text</code><span class="sw__hex">dark #7ab8f5</span><span class="sw__use">Accent text: card headings, year dividers, links, the label of an active button. 8.3:1 on <code>canvas</code> and <code>card</code>.</span></div></div><div class="sw" data-name="accent-fill"><div class="sw__chip" style="background:var(--accent-fill)"></div><div class="sw__body"><code class="sw__name">accent-fill</code><span class="sw__hex">dark #2a4a6e</span><span class="sw__use">Fill of an active or primary button, a selected list row, and a person chip. Grounds <code>on-accent</code>.</span></div></div><div class="sw" data-name="accent-fill-deep"><div class="sw__chip" style="background:var(--accent-fill-deep)"></div><div class="sw__body"><code class="sw__name">accent-fill-deep</code><span class="sw__hex">dark #1e3a5e</span><span class="sw__use">Primary button hover, and the count badge inside an already-active person row.</span></div></div><div class="sw" data-name="accent-fill-strong"><div class="sw__chip" style="background:var(--accent-fill-strong)"></div><div class="sw__body"><code class="sw__name">accent-fill-strong</code><span class="sw__hex">dark #3a5f8a</span><span class="sw__use">The selected segment of a mode toggle, where the label is plain white rather than <code>accent-text</code>.</span></div></div><div class="sw" data-name="on-accent"><div class="sw__chip" style="background:var(--on-accent)"></div><div class="sw__body"><code class="sw__name">on-accent</code><span class="sw__hex">dark #cfe6ff</span><span class="sw__use">Text and icons on <code>accent-fill</code> — 7:1. Use this, not <code>accent-text</code>, whenever the type is under 14px on a filled accent.</span></div></div><div class="sw" data-name="on-accent-bright"><div class="sw__chip" style="background:var(--on-accent-bright)"></div><div class="sw__body"><code class="sw__name">on-accent-bright</code><span class="sw__hex">dark #eaf4ff</span><span class="sw__use">Text on the 'create a new person' row of a picker, the one accent row that must outrank the others.</span></div></div><div class="sw" data-name="accent-quiet"><div class="sw__chip" style="background:var(--accent-quiet)"></div><div class="sw__body"><code class="sw__name">accent-quiet</code><span class="sw__hex">dark #9ab8d8</span><span class="sw__use">The label of a face-group header. 7:1 on <code>accent-header</code>.</span></div></div><div class="sw" data-name="accent-header"><div class="sw__chip" style="background:var(--accent-header)"></div><div class="sw__body"><code class="sw__name">accent-header</code><span class="sw__hex">dark #1e2a3a</span><span class="sw__use">Fill of the default face-group header — the band that titles a day, event or cluster of faces.</span></div></div><div class="sw" data-name="accent-header-border"><div class="sw__chip" style="background:var(--accent-header-border)"></div><div class="sw__body"><code class="sw__name">accent-header-border</code><span class="sw__hex">dark #3a5a7a</span><span class="sw__use">The rule under a face-group header and under a year divider.</span></div></div><div class="sw" data-name="accent-card"><div class="sw__chip" style="background:var(--accent-card)"></div><div class="sw__body"><code class="sw__name">accent-card</code><span class="sw__hex">dark #1a2230</span><span class="sw__use">Fill of a cluster, suggested-group or representative-group card — a blue-cast surface that sets a proposal apart from settled content.</span></div></div><div class="sw" data-name="accent-card-border"><div class="sw__chip" style="background:var(--accent-card-border)"></div><div class="sw__body"><code class="sw__name">accent-card-border</code><span class="sw__hex">dark #2a3d54</span><span class="sw__use">Border of a cluster or suggested-group card, and the rule between its header and its faces.</span></div></div><div class="sw" data-name="accent-card-deep"><div class="sw__chip" style="background:var(--accent-card-deep)"></div><div class="sw__body"><code class="sw__name">accent-card-deep</code><span class="sw__hex">dark #141c28</span><span class="sw__use">The face strip inside a suggested group, one step darker than <code>accent-card</code>.</span></div></div><div class="sw" data-name="success"><div class="sw__chip" style="background:var(--success)"></div><div class="sw__body"><code class="sw__name">success</code><span class="sw__hex">dark #5cb85c</span><span class="sw__use">Green for 'done': geotagged counts, the fully-labeled coverage segment, the saved flash. 6.3:1 on <code>card</code>. Always paired with a word ('geotagged', 'Saved'), never hue alone.</span></div></div><div class="sw" data-name="success-quiet"><div class="sw__chip" style="background:var(--success-quiet)"></div><div class="sw__body"><code class="sw__name">success-quiet</code><span class="sw__hex">dark #8ec88e</span><span class="sw__use">The label of a green face-group header and of an assigned-name chip. 7.4:1 on <code>success-surface</code>.</span></div></div><div class="sw" data-name="success-surface"><div class="sw__chip" style="background:var(--success-surface)"></div><div class="sw__body"><code class="sw__name">success-surface</code><span class="sw__hex">dark #1c2d1c</span><span class="sw__use">Fill of the green face-group header — the 'already labeled' section.</span></div></div><div class="sw" data-name="success-border"><div class="sw__chip" style="background:var(--success-border)"></div><div class="sw__body"><code class="sw__name">success-border</code><span class="sw__hex">dark #2a5a2a</span><span class="sw__use">The rule under a green group header and the border of a labeled face card.</span></div></div><div class="sw" data-name="success-chip"><div class="sw__chip" style="background:var(--success-chip)"></div><div class="sw__body"><code class="sw__name">success-chip</code><span class="sw__hex">dark #1d3d1d</span><span class="sw__use">Fill of the name chip under a labeled face on Crowd Review.</span></div></div><div class="sw" data-name="success-action"><div class="sw__chip" style="background:var(--success-action)"></div><div class="sw__body"><code class="sw__name">success-action</code><span class="sw__hex">dark #2a6e3a</span><span class="sw__use">Fill of the primary confirm button on the touch pages ('Tag', 'Apply'). Grounds <code>on-success-action</code>.</span></div></div><div class="sw" data-name="success-action-border"><div class="sw__chip" style="background:var(--success-action-border)"></div><div class="sw__body"><code class="sw__name">success-action-border</code><span class="sw__hex">dark #3a9d52</span><span class="sw__use">Border of the primary confirm button on the touch pages.</span></div></div><div class="sw" data-name="on-success-action"><div class="sw__chip" style="background:var(--on-success-action)"></div><div class="sw__body"><code class="sw__name">on-success-action</code><span class="sw__hex">dark #eaffea</span><span class="sw__use">Label on <code>success-action</code>.</span></div></div><div class="sw" data-name="place"><div class="sw__chip" style="background:var(--place)"></div><div class="sw__body"><code class="sw__name">place</code><span class="sw__hex">dark #8ec6a0</span><span class="sw__use">A resolved place name from the offline geocoder, and the meta line of a Quick Geocode group. Reads on <code>canvas</code>.</span></div></div><div class="sw" data-name="warn"><div class="sw__chip" style="background:var(--warn)"></div><div class="sw__body"><code class="sw__name">warn</code><span class="sw__hex">dark #d9a441</span><span class="sw__use">Amber for 'partly done': the partially-labeled coverage segment.</span></div></div><div class="sw" data-name="warn-text"><div class="sw__chip" style="background:var(--warn-text)"></div><div class="sw__body"><code class="sw__name">warn-text</code><span class="sw__hex">dark #e0b878</span><span class="sw__use">The 'new person' state of the Quick Tag hint, and the label above ambiguous alternatives. Reads on <code>canvas</code> and <code>bar</code>.</span></div></div><div class="sw" data-name="warn-quiet"><div class="sw__chip" style="background:var(--warn-quiet)"></div><div class="sw__body"><code class="sw__name">warn-quiet</code><span class="sw__hex">dark #d8b88a</span><span class="sw__use">The label of an amber face-group header and of a 'come back to this' chip. 8.2:1 on <code>warn-surface</code>.</span></div></div><div class="sw" data-name="warn-surface"><div class="sw__chip" style="background:var(--warn-surface)"></div><div class="sw__body"><code class="sw__name">warn-surface</code><span class="sw__hex">dark #2a2218</span><span class="sw__use">Fill of the amber face-group header — the crowd and come-back queues, a deliberate 'not yet'.</span></div></div><div class="sw" data-name="warn-border"><div class="sw__chip" style="background:var(--warn-border)"></div><div class="sw__body"><code class="sw__name">warn-border</code><span class="sw__hex">dark #4a3a28</span><span class="sw__use">The rule under an amber group header and the border of a crowd card.</span></div></div><div class="sw" data-name="warn-ring"><div class="sw__chip" style="background:var(--warn-ring)"></div><div class="sw__body"><code class="sw__name">warn-ring</code><span class="sw__hex">dark #d39a2e</span><span class="sw__use">The 2px inset ring on an ambiguous face — a face the matcher could not choose between two people. 3:1 against <code>pane</code>, so it stands as a meaningful mark.</span></div></div><div class="sw" data-name="warn-fill"><div class="sw__chip" style="background:var(--warn-fill)"></div><div class="sw__body"><code class="sw__name">warn-fill</code><span class="sw__hex">dark #6b4716</span><span class="sw__use">Fill of an 'or is it this person instead?' alternative button. Grounds <code>on-warn-fill</code>.</span></div></div><div class="sw" data-name="warn-fill-border"><div class="sw__chip" style="background:var(--warn-fill-border)"></div><div class="sw__body"><code class="sw__name">warn-fill-border</code><span class="sw__hex">dark #c8901f</span><span class="sw__use">Border of an alternative-suggestion button.</span></div></div><div class="sw" data-name="on-warn-fill"><div class="sw__chip" style="background:var(--on-warn-fill)"></div><div class="sw__body"><code class="sw__name">on-warn-fill</code><span class="sw__hex">dark #ffe2b8</span><span class="sw__use">Label on <code>warn-fill</code>, and on the amber alternative chip over a face.</span></div></div><div class="sw" data-name="danger"><div class="sw__chip" style="background:var(--danger)"></div><div class="sw__body"><code class="sw__name">danger</code><span class="sw__hex">dark #d9534f</span><span class="sw__use">Red for 'missing': the not-geotagged count, the none-labeled coverage segment, backfill hints. 3.9:1 on <code>card</code> — it misses the 4.5:1 floor at the 11–12px it is used at in the source; kept exact, and always accompanied by its own word ('not geotagged') so the colour is never the only signal.</span></div></div><div class="sw" data-name="danger-text"><div class="sw__chip" style="background:var(--danger-text)"></div><div class="sw__body"><code class="sw__name">danger-text</code><span class="sw__hex">dark #f88888</span><span class="sw__use">Error lines and the label of a danger button. 6.8:1 on <code>card</code> and <code>canvas</code> — prefer this over <code>danger</code> for anything a person has to read.</span></div></div><div class="sw" data-name="danger-border"><div class="sw__chip" style="background:var(--danger-border)"></div><div class="sw__body"><code class="sw__name">danger-border</code><span class="sw__hex">dark #aa3333</span><span class="sw__use">Border of a danger button and of a table row's delete affordance.</span></div></div><div class="sw" data-name="danger-surface"><div class="sw__chip" style="background:var(--danger-surface)"></div><div class="sw__body"><code class="sw__name">danger-surface</code><span class="sw__hex">dark #550000</span><span class="sw__use">Danger button fill on hover.</span></div></div><div class="sw" data-name="danger-action"><div class="sw__chip" style="background:var(--danger-action)"></div><div class="sw__body"><code class="sw__name">danger-action</code><span class="sw__hex">dark #6e2a2a</span><span class="sw__use">Fill of the destructive button on the touch action bar ('Not a face'). Grounds <code>on-danger-action</code>.</span></div></div><div class="sw" data-name="danger-action-border"><div class="sw__chip" style="background:var(--danger-action-border)"></div><div class="sw__body"><code class="sw__name">danger-action-border</code><span class="sw__hex">dark #9d3a3a</span><span class="sw__use">Border of the destructive touch button.</span></div></div><div class="sw" data-name="on-danger-action"><div class="sw__chip" style="background:var(--on-danger-action)"></div><div class="sw__body"><code class="sw__name">on-danger-action</code><span class="sw__hex">dark #ffeaea</span><span class="sw__use">Label on <code>danger-action</code>.</span></div></div><div class="sw" data-name="danger-quiet"><div class="sw__chip" style="background:var(--danger-quiet)"></div><div class="sw__body"><code class="sw__name">danger-quiet</code><span class="sw__hex">dark #f0a3a3</span><span class="sw__use">The resting colour of a reject affordance — the '✕' on a suggestion chip that means 'not this person'.</span></div></div><div class="sw" data-name="danger-hot"><div class="sw__chip" style="background:var(--danger-hot)"></div><div class="sw__body"><code class="sw__name">danger-hot</code><span class="sw__hex">dark #ff6b6b</span><span class="sw__use">A reject affordance on hover, brightening <code>danger-quiet</code> so the target is unmistakable before the click.</span></div></div><div class="sw" data-name="toast-error"><div class="sw__chip" style="background:var(--toast-error)"></div><div class="sw__body"><code class="sw__name">toast-error</code><span class="sw__hex">dark #7a2a2a</span><span class="sw__use">Fill of a toast reporting a failure, replacing <code>control</code>. Grounds <code>ink-strong</code>.</span></div></div><div class="sw" data-name="marker"><div class="sw__chip" style="background:var(--marker)"></div><div class="sw__body"><code class="sw__name">marker</code><span class="sw__hex">dark #e0a040</span><span class="sw__use">The place dot on the Places DB map, and the glow on a photo whose clock was shifted.</span></div></div><div class="sw" data-name="badge-gold"><div class="sw__chip" style="background:var(--badge-gold)"></div><div class="sw__body"><code class="sw__name">badge-gold</code><span class="sw__hex">dark #e0a020</span><span class="sw__use">The border and badge on the representative face — the one crop kept out of a run of near-duplicates. Its badge sets <code>canvas</code> as the text colour.</span></div></div><div class="sw" data-name="highlight"><div class="sw__chip" style="background:var(--highlight)"></div><div class="sw__body"><code class="sw__name">highlight</code><span class="sw__hex">dark #ffdd00</span><span class="sw__use">The cross-highlight tying a face card to its bounding box on the photo. Transient and paired with a border-width change, so it never carries state on its own.</span></div></div><div class="sw" data-name="context-accent"><div class="sw__chip" style="background:var(--context-accent)"></div><div class="sw__body"><code class="sw__name">context-accent</code><span class="sw__hex">dark #44aa88</span><span class="sw__use">The Contexts page's own green: the add and save buttons, and the border of a selected context. That page predates the blue accent and is the one screen that does not use <code>accent</code>.</span></div></div><div class="sw" data-name="context-accent-hover"><div class="sw__chip" style="background:var(--context-accent-hover)"></div><div class="sw__body"><code class="sw__name">context-accent-hover</code><span class="sw__hex">dark #33aa77</span><span class="sw__use">Hover fill for the Contexts add and save buttons.</span></div></div><div class="sw" data-name="context-selected"><div class="sw__chip" style="background:var(--context-selected)"></div><div class="sw__body"><code class="sw__name">context-selected</code><span class="sw__hex">dark #1e3a2e</span><span class="sw__use">Fill of the selected context row.</span></div></div><div class="sw" data-name="tint-blue"><div class="sw__chip" style="background:var(--tint-blue)"></div><div class="sw__body"><code class="sw__name">tint-blue</code><span class="sw__hex">dark rgba(60, 100, 170, 0.09)</span><span class="sw__use">First of six group tints cycled across adjacent day/event sections so neighbouring groups read apart without a hard border.</span></div></div><div class="sw" data-name="tint-rust"><div class="sw__chip" style="background:var(--tint-rust)"></div><div class="sw__body"><code class="sw__name">tint-rust</code><span class="sw__hex">dark rgba(170, 80, 60, 0.09)</span><span class="sw__use">Second group tint.</span></div></div><div class="sw" data-name="tint-green"><div class="sw__chip" style="background:var(--tint-green)"></div><div class="sw__body"><code class="sw__name">tint-green</code><span class="sw__hex">dark rgba(60, 160, 80, 0.09)</span><span class="sw__use">Third group tint.</span></div></div><div class="sw" data-name="tint-amber"><div class="sw__chip" style="background:var(--tint-amber)"></div><div class="sw__body"><code class="sw__name">tint-amber</code><span class="sw__hex">dark rgba(170, 140, 50, 0.09)</span><span class="sw__use">Fourth group tint.</span></div></div><div class="sw" data-name="tint-violet"><div class="sw__chip" style="background:var(--tint-violet)"></div><div class="sw__body"><code class="sw__name">tint-violet</code><span class="sw__hex">dark rgba(130, 60, 170, 0.09)</span><span class="sw__use">Fifth group tint.</span></div></div><div class="sw" data-name="tint-teal"><div class="sw__chip" style="background:var(--tint-teal)"></div><div class="sw__body"><code class="sw__name">tint-teal</code><span class="sw__hex">dark rgba(40, 150, 160, 0.09)</span><span class="sw__use">Sixth group tint.</span></div></div><div class="sw" data-name="tint-border"><div class="sw__chip" style="background:var(--tint-border)"></div><div class="sw__body"><code class="sw__name">tint-border</code><span class="sw__hex">dark rgba(80, 110, 160, 0.18)</span><span class="sw__use">The border around a tinted group section — barely there, enough to close the shape.</span></div></div><div class="sw" data-name="scrim"><div class="sw__chip" style="background:var(--scrim)"></div><div class="sw__body"><code class="sw__name">scrim</code><span class="sw__hex">dark rgba(0, 0, 0, 0.55)</span><span class="sw__use">Backdrop behind the shortcuts help and the person picker.</span></div></div><div class="sw" data-name="scrim-heavy"><div class="sw__chip" style="background:var(--scrim-heavy)"></div><div class="sw__body"><code class="sw__name">scrim-heavy</code><span class="sw__hex">dark rgba(0, 0, 0, 0.7)</span><span class="sw__use">Backdrop behind the month-picker modal.</span></div></div><div class="sw" data-name="scrim-photo"><div class="sw__chip" style="background:var(--scrim-photo)"></div><div class="sw__body"><code class="sw__name">scrim-photo</code><span class="sw__hex">dark rgba(0, 0, 0, 0.93)</span><span class="sw__use">Backdrop behind the full-photo overlay, where nothing should compete with the image.</span></div></div><div class="sw" data-name="caption-scrim"><div class="sw__chip" style="background:var(--caption-scrim)"></div><div class="sw__body"><code class="sw__name">caption-scrim</code><span class="sw__hex">dark rgba(0, 0, 0, 0.6)</span><span class="sw__use">The band behind a filename or name caption laid over a thumbnail. Grounds <code>ink-strong</code> over arbitrary photo content.</span></div></div></div></section><section id="type"><div class="sechead"><h2>Type</h2></div><h3>Interface <small>ui</small></h3><div class="specimens"><div class="spec"><div class="spec__meta"><code>display-number</code><span>36px / 1 · 700</span></div><div class="spec__sample" style="font-family:var(--font-ui);font-size:36px;line-height:1;font-weight:700">48,201</div><div class="spec__use">The one big number on a dashboard card — the library total.</div></div><div class="spec"><div class="spec__meta"><code>heading-modal</code><span>18px / 24px · 700</span></div><div class="spec__sample" style="font-family:var(--font-ui);font-size:18px;line-height:24px;font-weight:700">Sphinx of black quartz, judge my vow</div><div class="spec__use">The title of a modal dialog.</div></div><div class="spec"><div class="spec__meta"><code>heading-page</code><span>15px / 20px · 700</span></div><div class="spec__sample" style="font-family:var(--font-ui);font-size:15px;line-height:20px;font-weight:700">Sphinx of black quartz, judge my vow</div><div class="spec__use">A sidebar or page-manager title.</div></div><div class="spec"><div class="spec__meta"><code>heading-card</code><span>14px / 18px · 600</span></div><div class="spec__sample" style="font-family:var(--font-ui);font-size:14px;line-height:18px;font-weight:600">Sphinx of black quartz, judge my vow</div><div class="spec__use">A dashboard or settings card heading, set in <code>accent-text</code>.</div></div><div class="spec"><div class="spec__meta"><code>heading-section</code><span>13px / 18px · 700</span></div><div class="spec__sample" style="font-family:var(--font-ui);font-size:13px;line-height:18px;font-weight:700">Sphinx of black quartz, judge my vow</div><div class="spec__use">A section label inside a panel.</div></div><div class="spec"><div class="spec__meta"><code>body</code><span>13px / 18px · 400</span></div><div class="spec__sample" style="font-family:var(--font-ui);font-size:13px;line-height:18px;font-weight:400">Sphinx of black quartz, judge my vow</div><div class="spec__use">The base size of every desktop pane. Set in <code>ink</code> on <code>canvas</code> or <code>pane</code>.</div></div><div class="spec"><div class="spec__meta"><code>body-page</code><span>14px / 20px · 400</span></div><div class="spec__sample" style="font-family:var(--font-ui);font-size:14px;line-height:20px;font-weight:400">Sphinx of black quartz, judge my vow</div><div class="spec__use">Body copy on the map-first pages, which run one step larger. Set in <code>ink-page</code>.</div></div><div class="spec"><div class="spec__meta"><code>control</code><span>12px / 16px · 400</span></div><div class="spec__sample" style="font-family:var(--font-ui);font-size:12px;line-height:16px;font-weight:400">Sphinx of black quartz, judge my vow</div><div class="spec__use">Buttons, table cells, inputs and selects — most interactive text in the app.</div></div><div class="spec"><div class="spec__meta"><code>label</code><span>12px / 16px · 500</span></div><div class="spec__sample" style="font-family:var(--font-ui);font-size:12px;line-height:16px;font-weight:500">Sphinx of black quartz, judge my vow</div><div class="spec__use">A setting's name, a month name, a checkbox label.</div></div><div class="spec"><div class="spec__meta"><code>meta</code><span>11px / 15px · 400</span></div><div class="spec__sample" style="font-family:var(--font-ui);font-size:11px;line-height:15px;font-weight:400">Sphinx of black quartz, judge my vow</div><div class="spec__use">Counts, hints, help text, legend entries, status bars.</div></div><div class="spec"><div class="spec__meta"><code>micro</code><span>10px / 14px · 400</span></div><div class="spec__sample" style="font-family:var(--font-ui);font-size:10px;line-height:14px;font-weight:400">Sphinx of black quartz, judge my vow</div><div class="spec__use">Captions and chips laid over a thumbnail. Needs <code>caption-scrim</code> behind it.</div></div><div class="spec"><div class="spec__meta"><code>nano</code><span>9px / 12px · 400</span></div><div class="spec__sample" style="font-family:var(--font-ui);font-size:9px;line-height:12px;font-weight:400">Sphinx of black quartz, judge my vow</div><div class="spec__use">A match score badge or a name inside a bounding box. Decoration beside the thing it annotates — never the only place a fact appears.</div></div><div class="spec"><div class="spec__meta"><code>eyebrow</code><span>10px / 14px · 700</span></div><div class="spec__sample" style="font-family:var(--font-ui);font-size:10px;line-height:14px;font-weight:700;letter-spacing:0.07em">WATSON FAMILY</div><div class="spec__use">The uppercase family-group header in the people list. Set in <code>ink-placeholder</code> in the source; raise it to <code>ink-dim</code> if the grouping has to be read.</div></div></div><h3>Touch <small>touch</small></h3><div class="specimens"><div class="spec"><div class="spec__meta"><code>touch-title</code><span>22px / 26px · 800</span></div><div class="spec__sample" style="font-family:var(--font-touch);font-size:22px;line-height:26px;font-weight:800">Is this Marion?</div><div class="spec__use">The name being proposed on Quick Tag — the one thing a thumb is answering about.</div></div><div class="spec"><div class="spec__meta"><code>touch-body</code><span>16px / 22px · 400</span></div><div class="spec__sample" style="font-family:var(--font-touch);font-size:16px;line-height:22px;font-weight:400">Sphinx of black quartz, judge my vow</div><div class="spec__use">Picker rows and the picker search field. 16px keeps iOS from zooming on focus.</div></div><div class="spec"><div class="spec__meta"><code>touch-action</code><span>15px / 20px · 700</span></div><div class="spec__sample" style="font-family:var(--font-touch);font-size:15px;line-height:20px;font-weight:700">Sphinx of black quartz, judge my vow</div><div class="spec__use">The labels on the bottom action bar.</div></div><div class="spec"><div class="spec__meta"><code>touch-meta</code><span>14px / 20px · 400</span></div><div class="spec__sample" style="font-family:var(--font-touch);font-size:14px;line-height:20px;font-weight:400">Sphinx of black quartz, judge my vow</div><div class="spec__use">Progress counters, toasts and link buttons on the touch pages.</div></div><div class="spec"><div class="spec__meta"><code>touch-caption</code><span>13px / 18px · 400</span></div><div class="spec__sample" style="font-family:var(--font-touch);font-size:13px;line-height:18px;font-weight:400">Sphinx of black quartz, judge my vow</div><div class="spec__use">Secondary lines under the Quick Tag title: timestamp, place, control labels.</div></div></div></section><section id="spacing"><div class="sechead"><h2>Spacing</h2></div><p class="note">The source has no spacing scale; these are the even step values its stylesheets actually use, named by value.</p><div class="tablewrap"><table class="scale"><tbody><tr><td><code>space-2</code></td><td class="num">2px</td><td class="viz"><span class="bar" style="width:2.0px"></span></td><td class="use">Chip padding and the offset of a badge pinned into a thumbnail's corner.</td></tr><tr><td><code>space-4</code></td><td class="num">4px</td><td class="viz"><span class="bar" style="width:4.0px"></span></td><td class="use">The photo grid gap, and the gap between icon buttons in a toolbar group.</td></tr><tr><td><code>space-6</code></td><td class="num">6px</td><td class="viz"><span class="bar" style="width:6.0px"></span></td><td class="use">Grid padding, list-row padding, the gap between related controls.</td></tr><tr><td><code>space-8</code></td><td class="num">8px</td><td class="viz"><span class="bar" style="width:8.0px"></span></td><td class="use">The default gap — between toolbar items, card rows, and form fields.</td></tr><tr><td><code>space-10</code></td><td class="num">10px</td><td class="viz"><span class="bar" style="width:10.0px"></span></td><td class="use">Pane padding (detail pane, face review), and toolbar side padding.</td></tr><tr><td><code>space-12</code></td><td class="num">12px</td><td class="viz"><span class="bar" style="width:12.0px"></span></td><td class="use">Sidebar header padding and the padding of a floating panel.</td></tr><tr><td><code>space-14</code></td><td class="num">14px</td><td class="viz"><span class="bar" style="width:14.0px"></span></td><td class="use">Side padding of the touch bars and the Quick Tag stage.</td></tr><tr><td><code>space-16</code></td><td class="num">16px</td><td class="viz"><span class="bar" style="width:16.0px"></span></td><td class="use">Card padding and the dashboard grid gap.</td></tr><tr><td><code>space-20</code></td><td class="num">20px</td><td class="viz"><span class="bar" style="width:20.0px"></span></td><td class="use">Modal padding.</td></tr><tr><td><code>space-24</code></td><td class="num">24px</td><td class="viz"><span class="bar" style="width:24.0px"></span></td><td class="use">The gap between top-level sections on People Manager.</td></tr></tbody></table></div></section><section id="radius"><div class="sechead"><h2>Radius</h2></div><div class="tablewrap"><table class="scale"><tbody><tr><td><code>radius-2</code></td><td class="num">2px</td><td class="viz"><span class="box" style="border-radius:var(--radius-2)"></span></td><td class="use">A face bounding box drawn over a photo.</td></tr><tr><td><code>radius-3</code></td><td class="num">3px</td><td class="viz"><span class="box" style="border-radius:var(--radius-3)"></span></td><td class="use">Thumbnails, face crops and count badges — the smallest rounding that still reads.</td></tr><tr><td><code>radius-4</code></td><td class="num">4px</td><td class="viz"><span class="box" style="border-radius:var(--radius-4)"></span></td><td class="use">The workhorse: buttons, inputs, selects, list rows, detail images.</td></tr><tr><td><code>radius-5</code></td><td class="num">5px</td><td class="viz"><span class="box" style="border-radius:var(--radius-5)"></span></td><td class="use">Grouped inline panels and the quick-action popup.</td></tr><tr><td><code>radius-6</code></td><td class="num">6px</td><td class="viz"><span class="box" style="border-radius:var(--radius-6)"></span></td><td class="use">Map popups, basemap controls, context and cluster cards.</td></tr><tr><td><code>radius-8</code></td><td class="num">8px</td><td class="viz"><span class="box" style="border-radius:var(--radius-8)"></span></td><td class="use">Dashboard cards, settings groups and centred modals.</td></tr><tr><td><code>radius-10</code></td><td class="num">10px</td><td class="viz"><span class="box" style="border-radius:var(--radius-10)"></span></td><td class="use">Picker rows and the search field on the touch pages.</td></tr><tr><td><code>radius-12</code></td><td class="num">12px</td><td class="viz"><span class="box" style="border-radius:var(--radius-12)"></span></td><td class="use">The big buttons on the touch action bar.</td></tr><tr><td><code>radius-16</code></td><td class="num">16px</td><td class="viz"><span class="box" style="border-radius:var(--radius-16)"></span></td><td class="use">The top corners of a bottom sheet.</td></tr><tr><td><code>radius-pill</code></td><td class="num">20px</td><td class="viz"><span class="box" style="border-radius:var(--radius-pill)"></span></td><td class="use">Toasts, link buttons and person chips — anything that should read as a lozenge.</td></tr><tr><td><code>radius-round</code></td><td class="num">50%</td><td class="viz"><span class="box" style="border-radius:var(--radius-round)"></span></td><td class="use">Camera legend dots, map place dots and histogram slider thumbs.</td></tr></tbody></table></div></section><section id="shadow"><div class="sechead"><h2>Shadow</h2></div><div class="tablewrap"><table class="scale"><tbody><tr><td><code>shadow-control</code></td><td class="num">0 2px 8px rgba(0, 0, 0, 0.5)</td><td class="viz"><span class="box box--shadow" style="box-shadow:var(--shadow-control)"></span></td><td class="use">A control floating over the map, such as the basemap switcher.</td></tr><tr><td><code>shadow-popup</code></td><td class="num">0 3px 12px rgba(0, 0, 0, 0.6)</td><td class="viz"><span class="box box--shadow" style="box-shadow:var(--shadow-popup)"></span></td><td class="use">A Leaflet popup — a map marker's card.</td></tr><tr><td><code>shadow-panel</code></td><td class="num">0 4px 20px rgba(0, 0, 0, 0.5)</td><td class="viz"><span class="box box--shadow" style="box-shadow:var(--shadow-panel)"></span></td><td class="use">The context form panel, anchored to a corner of the map.</td></tr><tr><td><code>shadow-modal</code></td><td class="num">0 4px 20px rgba(0, 0, 0, 0.8)</td><td class="viz"><span class="box box--shadow" style="box-shadow:var(--shadow-modal)"></span></td><td class="use">A centred modal over a scrim.</td></tr><tr><td><code>shadow-float</code></td><td class="num">0 6px 20px rgba(0, 0, 0, 0.8)</td><td class="viz"><span class="box box--shadow" style="box-shadow:var(--shadow-float)"></span></td><td class="use">The quick-action popup, the person picker and typeahead lists — the layer closest to the pointer.</td></tr><tr><td><code>shadow-thumb</code></td><td class="num">0 1px 4px rgba(0, 0, 0, 0.6)</td><td class="viz"><span class="box box--shadow" style="box-shadow:var(--shadow-thumb)"></span></td><td class="use">A histogram range thumb, so a light knob keeps its edge over the bars.</td></tr><tr><td><code>shadow-bbox</code></td><td class="num">0 0 0 2px rgba(0, 0, 0, 0.5)</td><td class="viz"><span class="box box--shadow" style="box-shadow:var(--shadow-bbox)"></span></td><td class="use">A dark ring outside a face bounding box, keeping the <code>accent-text</code> border legible over any photo.</td></tr></tbody></table></div></section><section id="layout"><div class="sechead"><h2>Layout</h2></div><p class="note">Fixed dimensions the app's panes and grids are built from. <code>face-size</code> is the only one the source declares as a CSS custom property.</p><div class="tablewrap"><table class="scale"><tbody><tr><td><code>face-size</code></td><td class="num">120px</td><td class="viz"><span class="bar bar--thin" style="width:120.0px"></span></td><td class="use">The canonical face/photo tile. Declared as <code>--face-size</code> in face-grid.css and used as the <code>minmax()</code> floor of every auto-fill grid.</td></tr><tr><td><code>pane-people</code></td><td class="num">220px</td><td class="viz"><span class="bar bar--thin" style="width:220.0px"></span></td><td class="use">The people list column on the People page.</td></tr><tr><td><code>pane-sidebar</code></td><td class="num">300px</td><td class="viz"><span class="bar bar--thin" style="width:240px"></span></td><td class="use">The person picker sidebar on Representatives.</td></tr><tr><td><code>pane-contexts</code></td><td class="num">320px</td><td class="viz"><span class="bar bar--thin" style="width:240px"></span></td><td class="use">The context list sidebar on Contexts.</td></tr><tr><td><code>pane-detail</code></td><td class="num">340px</td><td class="viz"><span class="bar bar--thin" style="width:240px"></span></td><td class="use">The face detail column on the People page.</td></tr><tr><td><code>card-min</code></td><td class="num">320px</td><td class="viz"><span class="bar bar--thin" style="width:240px"></span></td><td class="use">The <code>minmax()</code> floor of the dashboard's auto-fit card grid.</td></tr><tr><td><code>measure-settings</code></td><td class="num">720px</td><td class="viz"><span class="bar bar--thin" style="width:240px"></span></td><td class="use">Max width of the settings column — a reading measure, centred.</td></tr><tr><td><code>measure-page</code></td><td class="num">960px</td><td class="viz"><span class="bar bar--thin" style="width:240px"></span></td><td class="use">Max width of the People Manager content column.</td></tr><tr><td><code>bar-status</code></td><td class="num">22px</td><td class="viz"><span class="bar bar--thin" style="width:22.0px"></span></td><td class="use">Status bar height, matched by its line-height so the text centres without padding.</td></tr><tr><td><code>bar-timeline</code></td><td class="num">72px</td><td class="viz"><span class="bar bar--thin" style="width:72.0px"></span></td><td class="use">Height of the timeline histogram strip.</td></tr></tbody></table></div></section><section id="opacity"><div class="sechead"><h2>Opacity</h2></div><div class="tablewrap"><table class="scale"><tbody><tr><td><code>opacity-dimmed</code></td><td class="num">0.35</td><td class="viz"><span class="box" style="opacity:var(--opacity-dimmed);background:var(--accent-text)"></span></td><td class="use">A camera legend entry whose photos are filtered out.</td></tr><tr><td><code>opacity-ignored</code></td><td class="num">0.4</td><td class="viz"><span class="box" style="opacity:var(--opacity-ignored);background:var(--accent-text)"></span></td><td class="use">A face marked 'not a face' or ignored, paired with a grayscale filter.</td></tr><tr><td><code>opacity-disabled</code></td><td class="num">0.45</td><td class="viz"><span class="box" style="opacity:var(--opacity-disabled);background:var(--accent-text)"></span></td><td class="use">A control that cannot act yet, such as the spatial-focus checkbox before a context is picked.</td></tr><tr><td><code>opacity-geo-ignored</code></td><td class="num">0.55</td><td class="viz"><span class="box" style="opacity:var(--opacity-geo-ignored);background:var(--accent-text)"></span></td><td class="use">A photo excluded from geotagging, badged 🚫.</td></tr><tr><td><code>opacity-come-back</code></td><td class="num">0.75</td><td class="viz"><span class="box" style="opacity:var(--opacity-come-back);background:var(--accent-text)"></span></td><td class="use">A face deferred to the come-back queue — dimmed less than ignored, because it is a 'not yet', not a dismissal.</td></tr></tbody></table></div></section><section id="zindex"><div class="sechead"><h2>Z-index</h2></div><p class="note">The layers the app actually stacks, lowest to highest.</p><div class="tablewrap"><table class="scale"><tbody><tr><td><code>z-sticky</code></td><td class="num">10</td><td class="viz"></td><td class="use">A sticky grid header inside a scrolling pane.</td></tr><tr><td><code>z-map-chrome</code></td><td class="num">500</td><td class="viz"></td><td class="use">The map navigation bar, above Leaflet's own panes.</td></tr><tr><td><code>z-sheet-backdrop</code></td><td class="num">999</td><td class="viz"></td><td class="use">The backdrop behind a bottom sheet.</td></tr><tr><td><code>z-popup</code></td><td class="num">1000</td><td class="viz"></td><td class="use">Map hints, floating form panels and the quick-action popup.</td></tr><tr><td><code>z-picker</code></td><td class="num">1100</td><td class="viz"></td><td class="use">The person picker, which may open on top of a popup.</td></tr><tr><td><code>z-help</code></td><td class="num">1200</td><td class="viz"></td><td class="use">The keyboard shortcuts overlay.</td></tr><tr><td><code>z-tooltip</code></td><td class="num">9999</td><td class="viz"></td><td class="use">The histogram tooltip, which follows the cursor over everything.</td></tr><tr><td><code>z-modal</code></td><td class="num">10000</td><td class="viz"></td><td class="use">A centred modal and its scrim — the top of the stack.</td></tr></tbody></table></div></section><section id="components"><div class="sechead"><h2>Components</h2></div><h3 class="group">Actions</h3><div class="cards"><article class="card" id="c-Button"><header><h4>Button</h4><span>Default, active, primary, danger, icon and disabled</span></header><iframe class="fit" title="Button preview" loading="lazy" style="height:180px" srcdoc="
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;dist/tokens.css&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;components/bundle.css&quot;&gt;&lt;style&gt;html,body{margin:0}body{background:var(--canvas);color:var(--ink);font-family:var(--font-ui);padding:0}&lt;/style&gt;&lt;/head&gt;
+&lt;body&gt;
+&lt;div class=&quot;gt-surface&quot; id=&quot;root&quot; style=&quot;padding:20px&quot;&gt;
+  &lt;div style=&quot;display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:16px&quot;&gt;
+    &lt;button class=&quot;button&quot;&gt;Run backfill&lt;/button&gt;
+    &lt;button class=&quot;button active&quot;&gt;📍 Geocode&lt;/button&gt;
+    &lt;button class=&quot;button primary&quot;&gt;Apply this guess&lt;/button&gt;
+    &lt;button class=&quot;button danger&quot;&gt;Stop&lt;/button&gt;
+    &lt;button class=&quot;button icon-btn&quot; title=&quot;Accept suggestion&quot;&gt;✓&lt;/button&gt;
+    &lt;button class=&quot;button icon-btn&quot; title=&quot;Ignore face&quot;&gt;🚫&lt;/button&gt;
+    &lt;button class=&quot;button&quot; disabled&gt;Recompute&lt;/button&gt;
+  &lt;/div&gt;
+  &lt;div class=&quot;gt-toolbar&quot; style=&quot;border-radius:4px;border-bottom:none&quot;&gt;
+    &lt;div class=&quot;toolbar-group&quot;&gt;
+      &lt;a class=&quot;button active&quot; href=&quot;#&quot;&gt;🏠 Home&lt;/a&gt;
+      &lt;a class=&quot;button&quot; href=&quot;#&quot;&gt;🔎 Search&lt;/a&gt;
+      &lt;a class=&quot;button&quot; href=&quot;#&quot;&gt;🙂 People&lt;/a&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;toolbar-spacer&quot;&gt;&lt;/div&gt;
+    &lt;button class=&quot;button&quot;&gt;Detecting… 3,410 left&lt;/button&gt;
+    &lt;button class=&quot;button danger&quot;&gt;Stop&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+"></iframe><details class="guide"><summary>Usage guidelines</summary><p>The app's one button, in the five variants <code>style.css</code> defines: default, active, primary, danger and icon-only.</p>
+<p>Every clickable control in GeoTagger is this button. It is deliberately small — 12px label, 4px/10px padding — because toolbars carry eight or ten of them at once and the photographs need the room.</p>
+<h4>When to use</h4>
+<ul><li><strong>Default</strong> for any ordinary action. <code>control</code> fill, <code>control-border</code>, <code>ink</code> label.</li><li><strong><code>.active</code></strong> for a toggle that is currently on, or the current page in the nav. <code>accent-fill</code> + <code>accent</code> border + <code>accent-text</code> label.</li><li><strong><code>.primary</code></strong> for the one action a panel exists to perform — "Apply this guess". Same fill as <code>.active</code>, hovering to <code>accent-fill-deep</code>. Never put two primaries in one group.</li><li><strong><code>.danger</code></strong> for a destructive or stop action. Border and label only; the fill stays neutral until hover, so a Stop button sitting beside a running job does not shout.</li><li><strong><code>.icon-btn</code></strong> for a single-glyph action (✓ ✕ 🚫) in a dense row. Always give it a <code>title</code>.</li></ul>
+<p><code>&lt;a class="button"&gt;</code> and <code>&lt;button class="button"&gt;</code> are styled identically, so a link that navigates and a button that acts look the same — pick by what the element actually does.</p>
+<h4>What the consumer provides</h4>
+<p>The label text (a verb phrase, sentence case), an optional leading emoji separated by a space, and <code>disabled</code> where it applies. For a long-running job, rewrite the label in place as the client loop progresses ("Detect faces" → "Detecting… 3,410 left") rather than adding a spinner.</p>
+<h4>Don't</h4>
+<ul><li>Don't invent a size scale. The only variation is <code>.icon-btn</code>, and <code>.face-group-header .button</code> at 11px inside a group header.</li><li>Don't use <code>.primary</code> for navigation.</li><li>Don't set a background on <code>.danger</code> at rest — the hover <code>danger-surface</code> is the whole signal.</li></ul></details></article><article class="card" id="c-TouchActionBar"><header><h4>TouchActionBar</h4><span>The Quick Tag answer bar</span></header><iframe class="fit" title="TouchActionBar preview" loading="lazy" style="height:210px" srcdoc="
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;dist/tokens.css&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;components/bundle.css&quot;&gt;&lt;style&gt;html,body{margin:0}body{background:var(--canvas);color:var(--ink);font-family:var(--font-ui);padding:0}&lt;/style&gt;&lt;/head&gt;
+&lt;body&gt;
+&lt;div class=&quot;gt-surface&quot; id=&quot;root&quot; style=&quot;padding:0&quot;&gt;
+  &lt;div style=&quot;max-width:420px;margin:0 auto;border:1px solid var(--hairline);border-radius:8px;overflow:hidden&quot;&gt;
+    &lt;div style=&quot;font-family:var(--font-touch);background:var(--bar);padding:12px 14px;border-bottom:1px solid var(--hairline);display:flex;align-items:center;gap:10px&quot;&gt;
+      &lt;span style=&quot;color:#9ab;font-size:24px;line-height:1&quot;&gt;‹&lt;/span&gt;
+      &lt;span style=&quot;font-weight:700;flex:1&quot;&gt;Quick Tag&lt;/span&gt;
+      &lt;span style=&quot;color:#9ab;font-size:14px&quot;&gt;12 / 84&lt;/span&gt;
+    &lt;/div&gt;
+    &lt;div style=&quot;padding:18px 14px;text-align:center;font-family:var(--font-touch)&quot;&gt;
+      &lt;div style=&quot;font-size:22px;line-height:26px;font-weight:800;color:var(--accent-text)&quot;&gt;Marion&lt;/div&gt;
+      &lt;div style=&quot;color:#9aa;font-size:13px;margin-top:5px&quot;&gt;14 Aug 2011 · 16:22&lt;/div&gt;
+      &lt;div style=&quot;color:var(--place);font-size:13px;margin-top:4px&quot;&gt;Skagen, Nordjylland&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;gt-actions&quot;&gt;
+      &lt;button class=&quot;act skip&quot;&gt;Skip&lt;/button&gt;
+      &lt;button class=&quot;act primary&quot;&gt;Yes, tag&lt;/button&gt;
+      &lt;button class=&quot;act&quot;&gt;Someone else&lt;/button&gt;
+      &lt;button class=&quot;act danger&quot;&gt;Not a face&lt;/button&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+"></iframe><details class="guide"><summary>Usage guidelines</summary><p>The fixed bottom bar of thumb-sized answers on the phone pages (Quick Tag, Quick Geocode).</p>
+<p>Quick Tag asks one question at a time — "is this Marion?" — and this bar is the whole answer surface. The buttons are 16px tall padding, <code>radius-12</code>, <code>touch-action</code> weight 700, and they fill the width evenly so a thumb never has to aim.</p>
+<h4>When to use</h4>
+<p>Only on a single-question touch flow. A desktop pane uses <code>Button</code> instead.</p>
+<p>Three roles, left to right:</p>
+<ul><li><strong><code>.skip</code></strong> — a fixed 80px escape hatch, lighter weight, <code>ink-secondary</code>. Always present, never primary.</li><li><strong><code>.act</code></strong> — neutral alternatives (<code>field</code> fill).</li><li><strong><code>.act.primary</code></strong> — the confirming answer, in <code>success-action</code> with <code>on-success-action</code>. Exactly one per bar.</li><li><strong><code>.act.danger</code></strong> — the destructive answer ("Not a face"), in <code>danger-action</code>.</li></ul>
+<h4>What the consumer provides</h4>
+<p>The labels, the disabled state while a request is in flight, and the safe-area padding — the bar already adds <code>env(safe-area-inset-bottom)</code> in the app, which the preview omits.</p>
+<h4>Don't</h4>
+<ul><li>Don't exceed four buttons; a thumb loses the row.</li><li>Don't put the destructive and the confirming button adjacent — the app keeps a neutral between them.</li><li>Don't shrink the 16px vertical padding to fit another control.</li></ul></details></article></div><h3 class="group">Data</h3><div class="cards"><article class="card" id="c-Chip"><header><h4>Chip</h4><span>Filter chips, family chips, list counts and summary badges</span></header><iframe class="fit" title="Chip preview" loading="lazy" style="height:220px" srcdoc="
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;dist/tokens.css&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;components/bundle.css&quot;&gt;&lt;style&gt;html,body{margin:0}body{background:var(--canvas);color:var(--ink);font-family:var(--font-ui);padding:0}&lt;/style&gt;&lt;/head&gt;
+&lt;body&gt;
+&lt;div class=&quot;gt-surface&quot; id=&quot;root&quot; style=&quot;padding:16px;display:flex;flex-direction:column;gap:18px&quot;&gt;
+  &lt;div&gt;
+    &lt;div style=&quot;font-size:11px;color:var(--ink-soft);margin-bottom:6px&quot;&gt;Applied people filters&lt;/div&gt;
+    &lt;div style=&quot;display:flex;flex-wrap:wrap;gap:4px&quot;&gt;
+      &lt;span class=&quot;person-chip&quot;&gt;Marion &lt;button title=&quot;Remove&quot;&gt;✕&lt;/button&gt;&lt;/span&gt;
+      &lt;span class=&quot;person-chip&quot;&gt;Elias &lt;button title=&quot;Remove&quot;&gt;✕&lt;/button&gt;&lt;/span&gt;
+      &lt;span class=&quot;person-chip&quot;&gt;Jonas &lt;button title=&quot;Remove&quot;&gt;✕&lt;/button&gt;&lt;/span&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;div&gt;
+    &lt;div style=&quot;font-size:11px;color:var(--ink-soft);margin-bottom:6px&quot;&gt;Families&lt;/div&gt;
+    &lt;div style=&quot;display:flex;flex-wrap:wrap;gap:8px&quot;&gt;
+      &lt;span class=&quot;family-chip&quot;&gt;&lt;span class=&quot;family-name&quot;&gt;Watson&lt;/span&gt;&lt;span class=&quot;family-count&quot;&gt;14&lt;/span&gt;&lt;/span&gt;
+      &lt;span class=&quot;family-chip&quot;&gt;&lt;span class=&quot;family-name&quot;&gt;Lindqvist&lt;/span&gt;&lt;span class=&quot;family-count&quot;&gt;6&lt;/span&gt;&lt;/span&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;div style=&quot;display:flex;gap:24px;flex-wrap:wrap&quot;&gt;
+    &lt;div style=&quot;min-width:220px&quot;&gt;
+      &lt;div style=&quot;font-size:11px;color:var(--ink-soft);margin-bottom:6px&quot;&gt;People list rows&lt;/div&gt;
+      &lt;div style=&quot;display:flex;align-items:center;justify-content:space-between;gap:6px;padding:6px 8px;border-radius:4px;border:1px solid transparent&quot;&gt;
+        &lt;span&gt;Marion&lt;/span&gt;&lt;span class=&quot;person-count&quot;&gt;212&lt;/span&gt;
+      &lt;/div&gt;
+      &lt;div style=&quot;display:flex;align-items:center;justify-content:space-between;gap:6px;padding:6px 8px;border-radius:4px;background:var(--accent-fill);border:1px solid var(--accent);color:var(--on-accent)&quot;&gt;
+        &lt;span&gt;Elias&lt;/span&gt;&lt;span class=&quot;person-count&quot; style=&quot;background:var(--accent-fill-deep);color:#bcdcff&quot;&gt;88&lt;/span&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;div&gt;
+      &lt;div style=&quot;font-size:11px;color:var(--ink-soft);margin-bottom:6px&quot;&gt;August 2011&lt;/div&gt;
+      &lt;div class=&quot;month-counts&quot;&gt;
+        &lt;span class=&quot;count-badge count-geotagged&quot;&gt;212 geotagged&lt;/span&gt;
+        &lt;span class=&quot;count-badge count-not-geotagged&quot;&gt;41 not geotagged&lt;/span&gt;
+        &lt;span class=&quot;count-badge count-total&quot;&gt;253 total&lt;/span&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+"></iframe><details class="guide"><summary>Usage guidelines</summary><p>The small lozenges that carry a selected filter, a group name, or a count.</p>
+<p>Four related shapes, all rounded past <code>radius-8</code> so they read as tokens rather than buttons:</p>
+<ul><li><strong><code>.person-chip</code></strong> — a person added to a search filter: <code>accent-fill</code>, <code>accent</code> border, <code>on-accent</code> text, 12px radius, with a <code>✕</code> that removes it. This is the only chip a person dismisses.</li><li><strong><code>.family-chip</code></strong> — a family on People Manager: a muted blue <code>#2a3a4e</code> on <code>#4a6a8e</code>, <code>radius-pill</code>, with the name (click to rename in place) and a <code>.family-count</code> bubble.</li><li><strong><code>.person-count</code></strong> — the faces-per-person bubble in a list row: <code>control</code> fill, <code>ink-muted</code>, flush right, going <code>accent-fill-deep</code> when its row is active.</li><li><strong><code>.count-badge</code></strong> — a figure in a summary row, with <code>.count-geotagged</code> (<code>success</code>), <code>.count-not-geotagged</code> (<code>danger</code>) and <code>.count-total</code> (<code>ink-muted</code>, 600) saying which figure it is.</li></ul>
+<h4>When to use</h4>
+<p>A chip means *this is currently applied* or *this is how many*. If clicking it would perform an action rather than remove a filter, it is a <code>Button</code>.</p>
+<p>Because <code>success</code> and <code>danger</code> sit close in lightness, a count chip always carries its own word — "geotagged", "not geotagged" — so the pair never depends on hue.</p>
+<h4>What the consumer provides</h4>
+<p>The text, the removal handler on <code>.person-chip</code>, and the rename handler on <code>.family-chip</code>. Chips wrap in a flex row at a 4–8px gap; the container hides itself when empty (<code>#person-chips:empty { display: none }</code>).</p>
+<h4>Don't</h4>
+<ul><li>Don't put a chip in a toolbar as a control — chips are output.</li><li>Don't colour a count chip without its label word.</li><li>Don't let a chip's text truncate silently; cap the name at 160px with an ellipsis and keep the count visible.</li></ul></details></article><article class="card" id="c-CoverageBar"><header><h4>CoverageBar</h4><span>Four-way library split, plus coverage by month</span></header><iframe class="fit" title="CoverageBar preview" loading="lazy" style="height:260px" srcdoc="
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;dist/tokens.css&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;components/bundle.css&quot;&gt;&lt;style&gt;html,body{margin:0}body{background:var(--canvas);color:var(--ink);font-family:var(--font-ui);padding:0}&lt;/style&gt;&lt;/head&gt;
+&lt;body&gt;
+&lt;div class=&quot;gt-surface&quot; id=&quot;root&quot; style=&quot;padding:16px&quot;&gt;
+  &lt;div class=&quot;card&quot;&gt;
+    &lt;div style=&quot;display:flex;align-items:center;justify-content:space-between&quot;&gt;
+      &lt;h2&gt;Face coverage&lt;/h2&gt;
+      &lt;span class=&quot;mode-toggle&quot;&gt;
+        &lt;button class=&quot;active&quot;&gt;Photos&lt;/button&gt;
+        &lt;button&gt;Faces&lt;/button&gt;
+      &lt;/span&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;coverage-bar&quot;&gt;
+      &lt;div class=&quot;cov-full&quot; style=&quot;width:46%&quot;&gt;&lt;/div&gt;
+      &lt;div class=&quot;cov-partial&quot; style=&quot;width:19%&quot;&gt;&lt;/div&gt;
+      &lt;div class=&quot;cov-none&quot; style=&quot;width:12%&quot;&gt;&lt;/div&gt;
+      &lt;div class=&quot;cov-noface&quot; style=&quot;width:23%&quot;&gt;&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;coverage-legend&quot;&gt;
+      &lt;span class=&quot;lg&quot;&gt;&lt;span class=&quot;sw cov-full&quot;&gt;&lt;/span&gt;Fully labeled · 22,172&lt;/span&gt;
+      &lt;span class=&quot;lg&quot;&gt;&lt;span class=&quot;sw cov-partial&quot;&gt;&lt;/span&gt;Some labeled · 9,158&lt;/span&gt;
+      &lt;span class=&quot;lg&quot;&gt;&lt;span class=&quot;sw cov-none&quot;&gt;&lt;/span&gt;None labeled · 5,784&lt;/span&gt;
+      &lt;span class=&quot;lg&quot;&gt;&lt;span class=&quot;sw cov-noface&quot;&gt;&lt;/span&gt;No faces detected · 11,087&lt;/span&gt;
+    &lt;/div&gt;
+
+    &lt;div style=&quot;display:flex;align-items:flex-end;gap:1px;height:80px;padding:18px 4px 0;position:relative;overflow-x:auto;margin-top:4px&quot;&gt;
+      &lt;span style=&quot;position:absolute;top:2px;left:4px;font-size:9px;color:var(--ink-faint)&quot;&gt;2009&lt;/span&gt;
+      &lt;span style=&quot;position:absolute;top:2px;left:160px;font-size:9px;color:var(--ink-faint)&quot;&gt;2011&lt;/span&gt;
+      &lt;span id=&quot;months&quot; style=&quot;display:flex;align-items:flex-end;gap:1px;height:100%&quot;&gt;&lt;/span&gt;
+    &lt;/div&gt;
+    &lt;a class=&quot;undated-link&quot; href=&quot;#&quot; style=&quot;display:block;margin-top:6px;font-size:12px;color:var(--accent-text);text-decoration:none&quot;&gt;1,204 photos have no date →&lt;/a&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;script&gt;
+  // Coverage by month: each 4px column stacks untagged over tagged.
+  const host = document.getElementById(&#x27;months&#x27;);
+  for (let i = 0; i &lt; 64; i++) {
+    const pct = Math.round(30 + 60 * Math.abs(Math.sin(i / 7)));
+    const bar = document.createElement(&#x27;span&#x27;);
+    bar.style.cssText = &#x27;flex:0 0 4px;height:100%;display:flex;flex-direction:column;cursor:pointer&#x27;;
+    bar.innerHTML = &#x27;&lt;span style=&quot;width:100%;background:var(--control-hover);height:&#x27; + (100 - pct) + &#x27;%&quot;&gt;&lt;/span&gt;&#x27; +
+                    &#x27;&lt;span style=&quot;width:100%;background:var(--success);height:&#x27; + pct + &#x27;%&quot;&gt;&lt;/span&gt;&#x27;;
+    host.appendChild(bar);
+  }
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+"></iframe><details class="guide"><summary>Usage guidelines</summary><p>The segmented bar that splits the library four ways at once, with a legend whose swatches are the segments themselves.</p>
+<p>A 14px flex track on <code>field</code>, its children sized by percentage: <code>.cov-full</code> (<code>success</code>, every face named), <code>.cov-partial</code> (<code>warn</code>, some named), <code>.cov-none</code> (<code>danger</code>, none named), <code>.cov-noface</code> (<code>control-hover</code>, no faces found). The legend reuses the same class on a 10px <code>.sw</code> square, so a segment and its key can never drift apart.</p>
+<h4>When to use</h4>
+<p>For a whole-library breakdown into mutually exclusive states, on a <code>.card-full</code> tile. The month-bar variant does the same job over time: one 4px column per month, stacking <code>bar-tagged</code> (<code>success</code>) under <code>bar-untagged</code> (<code>control-hover</code>), scrolling horizontally with a year label floated above each January.</p>
+<p><code>success</code>, <code>warn</code> and <code>danger</code> sit close in lightness, so the legend is not optional — it is what makes the bar readable. Every segment's meaning is spelled out in words beside its swatch.</p>
+<h4>What the consumer provides</h4>
+<p>The four percentages (they must total 100), the legend labels, and the counts. A segment at 0% should be omitted rather than rendered at hairline width.</p>
+<h4>Don't</h4>
+<ul><li>Don't add a fifth segment; four is already at the limit of what 14px can distinguish.</li><li>Don't ship it without the legend.</li><li>Don't reuse these colours for anything that is not this four-way split.</li></ul></details></article><article class="card" id="c-MetaTable"><header><h4>MetaTable</h4><span>Detail metadata, an editable record table, and key caps</span></header><iframe class="fit" title="MetaTable preview" loading="lazy" style="height:330px" srcdoc="
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;dist/tokens.css&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;components/bundle.css&quot;&gt;&lt;style&gt;html,body{margin:0}body{background:var(--canvas);color:var(--ink);font-family:var(--font-ui);padding:0}&lt;/style&gt;&lt;/head&gt;
+&lt;body&gt;
+&lt;div class=&quot;gt-surface&quot; id=&quot;root&quot; style=&quot;padding:16px&quot;&gt;
+  &lt;div style=&quot;display:grid;grid-template-columns:300px 1fr;gap:20px;align-items:start&quot;&gt;
+    &lt;div style=&quot;background:var(--pane);padding:10px;border-radius:6px&quot;&gt;
+      &lt;div style=&quot;font-size:11px;color:var(--ink-soft);margin-bottom:8px&quot;&gt;Detail pane&lt;/div&gt;
+      &lt;table class=&quot;gt-meta-table&quot;&gt;
+        &lt;tr&gt;&lt;td&gt;File&lt;/td&gt;&lt;td&gt;IMG_4821.CR2&lt;/td&gt;&lt;/tr&gt;
+        &lt;tr&gt;&lt;td&gt;Taken&lt;/td&gt;&lt;td&gt;2011-08-14 16:22:03&lt;/td&gt;&lt;/tr&gt;
+        &lt;tr&gt;&lt;td&gt;Camera&lt;/td&gt;&lt;td&gt;Canon EOS 40D&lt;/td&gt;&lt;/tr&gt;
+        &lt;tr&gt;&lt;td&gt;Coordinates&lt;/td&gt;&lt;td&gt;57.72091, 10.58390&lt;/td&gt;&lt;/tr&gt;
+        &lt;tr&gt;&lt;td&gt;Place&lt;/td&gt;&lt;td&gt;Skagen, Nordjylland, Denmark&lt;/td&gt;&lt;/tr&gt;
+        &lt;tr&gt;&lt;td&gt;People&lt;/td&gt;&lt;td&gt;Marion, Elias&lt;/td&gt;&lt;/tr&gt;
+        &lt;tr&gt;&lt;td&gt;Sidecar&lt;/td&gt;&lt;td&gt;IMG_4821.xmp — written&lt;/td&gt;&lt;/tr&gt;
+      &lt;/table&gt;
+    &lt;/div&gt;
+
+    &lt;div&gt;
+      &lt;div style=&quot;font-size:11px;color:var(--ink-soft);margin-bottom:8px&quot;&gt;People Manager — edits write on blur&lt;/div&gt;
+      &lt;table class=&quot;gt-data-table&quot;&gt;
+        &lt;thead&gt;&lt;tr&gt;&lt;th&gt;Name&lt;/th&gt;&lt;th&gt;Born&lt;/th&gt;&lt;th&gt;Family&lt;/th&gt;&lt;th style=&quot;text-align:right&quot;&gt;Faces&lt;/th&gt;&lt;th&gt;&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;
+        &lt;tbody&gt;
+          &lt;tr&gt;
+            &lt;td&gt;&lt;input class=&quot;edit-input&quot; value=&quot;Marion&quot; style=&quot;width:100%;background:transparent;border:1px solid transparent;border-radius:4px;color:var(--ink);font-family:inherit;font-size:12px;padding:3px 5px&quot;&gt;&lt;/td&gt;
+            &lt;td&gt;&lt;input class=&quot;edit-input&quot; value=&quot;1974-03-02&quot; style=&quot;width:130px;background:transparent;border:1px solid transparent;border-radius:4px;color:var(--ink);font-family:inherit;font-size:12px;padding:3px 5px&quot;&gt;&lt;/td&gt;
+            &lt;td&gt;&lt;select class=&quot;gt-select&quot; style=&quot;width:100%;font-size:12px;background:var(--overlay);border-color:#3a3a3a&quot;&gt;&lt;option&gt;Watson&lt;/option&gt;&lt;/select&gt;&lt;/td&gt;
+            &lt;td style=&quot;text-align:right;color:var(--ink-dim)&quot;&gt;212&lt;/td&gt;
+            &lt;td style=&quot;text-align:right&quot;&gt;&lt;button class=&quot;button&quot; style=&quot;font-size:11px;padding:2px 6px;background:none;border-color:transparent;color:var(--ink-ghost)&quot;&gt;Delete&lt;/button&gt;&lt;/td&gt;
+          &lt;/tr&gt;
+          &lt;tr&gt;
+            &lt;td&gt;&lt;input class=&quot;edit-input&quot; value=&quot;Elias&quot; style=&quot;width:100%;background:var(--canvas);border:1px solid var(--accent);border-radius:4px;color:var(--ink);font-family:inherit;font-size:12px;padding:3px 5px&quot;&gt;&lt;/td&gt;
+            &lt;td&gt;&lt;input class=&quot;edit-input&quot; value=&quot;2006-11-19&quot; style=&quot;width:130px;background:transparent;border:1px solid transparent;border-radius:4px;color:var(--ink);font-family:inherit;font-size:12px;padding:3px 5px&quot;&gt;&lt;/td&gt;
+            &lt;td&gt;&lt;select class=&quot;gt-select&quot; style=&quot;width:100%;font-size:12px;background:var(--overlay);border-color:#3a3a3a&quot;&gt;&lt;option&gt;Watson&lt;/option&gt;&lt;/select&gt;&lt;/td&gt;
+            &lt;td style=&quot;text-align:right;color:var(--ink-dim)&quot;&gt;88&lt;/td&gt;
+            &lt;td style=&quot;text-align:right&quot;&gt;&lt;button class=&quot;button&quot; style=&quot;font-size:11px;padding:2px 6px;background:none;border-color:transparent;color:var(--ink-ghost)&quot;&gt;Delete&lt;/button&gt;&lt;/td&gt;
+          &lt;/tr&gt;
+        &lt;/tbody&gt;
+      &lt;/table&gt;
+
+      &lt;div style=&quot;margin-top:14px;font-size:11px;color:var(--ink-soft)&quot;&gt;Key caps in the shortcuts table&lt;/div&gt;
+      &lt;div style=&quot;margin-top:6px;display:flex;gap:14px;font-size:12px;align-items:center&quot;&gt;
+        &lt;span&gt;&lt;span class=&quot;gt-kbd&quot;&gt;J&lt;/span&gt; / &lt;span class=&quot;gt-kbd&quot;&gt;K&lt;/span&gt; next, previous face&lt;/span&gt;
+        &lt;span&gt;&lt;span class=&quot;gt-kbd&quot;&gt;Enter&lt;/span&gt; accept suggestion&lt;/span&gt;
+        &lt;span&gt;&lt;span class=&quot;gt-kbd&quot;&gt;X&lt;/span&gt; ignore&lt;/span&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+"></iframe><details class="guide"><summary>Usage guidelines</summary><p>The two-column key/value table in a detail pane, and its wider editable sibling on People Manager.</p>
+<p><strong>Detail table</strong> (<code>.gt-meta-table</code>, <code>#detail-meta</code> in the app): full width, collapsed borders, 12px, a <code>rule</code> under each row, keys in <code>ink-dim</code> at a fixed 40% column, values in <code>ink</code> and top-aligned so a long path wraps under itself rather than pushing the key around.</p>
+<p><strong>Data table</strong> (<code>.gt-data-table</code>, <code>#persons-table</code>): a real table of rows with 600-weight <code>ink-dim</code> headers over a <code>hairline</code>, rows on a <code>#2a2a2a</code> rule that light to <code>#282828</code> on hover, and explicit column widths so the name column does not collapse when a family name is long.</p>
+<h4>When to use</h4>
+<p>The detail table for the metadata of one selected thing — filename, timestamp, camera, coordinates, place, people. The data table for a list of records a person edits in place.</p>
+<p>Inline editing uses <code>.edit-input</code>: a transparent field that looks like text until hovered (a <code>field-border</code> outline appears) and focused (<code>accent</code> border, <code>canvas</code> fill). There is no edit mode and no save button; a blur writes.</p>
+<p><code>.gt-kbd</code> renders a key cap in a shortcuts table — <code>control</code> fill, <code>control-border</code>, inheriting the UI font so it matches its row.</p>
+<h4>What the consumer provides</h4>
+<p>The rows. Format values before they arrive: coordinates to a fixed precision, timestamps in the library's own timezone, sizes already humanised.</p>
+<h4>Don't</h4>
+<ul><li>Don't put a key in <code>ink-faint</code> or below — at 12px it stops being readable.</li><li>Don't give the detail table a header row; the keys are the header.</li><li>Don't use a data table where a list of <code>ThumbCell</code>s would do.</li></ul></details></article><article class="card" id="c-ProgressBar"><header><h4>ProgressBar</h4><span>Two jobs mid-run, with a stoppable batch loop</span></header><iframe class="fit" title="ProgressBar preview" loading="lazy" style="height:220px" srcdoc="
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;dist/tokens.css&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;components/bundle.css&quot;&gt;&lt;style&gt;html,body{margin:0}body{background:var(--canvas);color:var(--ink);font-family:var(--font-ui);padding:0}&lt;/style&gt;&lt;/head&gt;
+&lt;body&gt;
+&lt;div class=&quot;gt-surface&quot; id=&quot;root&quot; style=&quot;padding:16px&quot;&gt;
+  &lt;div style=&quot;display:grid;grid-template-columns:repeat(2,1fr);gap:16px;align-items:start&quot;&gt;
+    &lt;div class=&quot;card&quot;&gt;
+      &lt;h2&gt;Geotagging&lt;/h2&gt;
+      &lt;div class=&quot;progress-bar&quot;&gt;&lt;div class=&quot;progress-fill&quot; style=&quot;width:27%&quot;&gt;&lt;/div&gt;&lt;/div&gt;
+      &lt;div class=&quot;progress-label&quot;&gt;12,880 of 48,201 · 27%&lt;/div&gt;
+      &lt;div class=&quot;stat-line highlight&quot;&gt;3,410 could be guessed from neighbours&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;card&quot;&gt;
+      &lt;h2&gt;Faces&lt;/h2&gt;
+      &lt;div class=&quot;progress-bar&quot;&gt;&lt;div class=&quot;progress-fill&quot; style=&quot;width:93%&quot;&gt;&lt;/div&gt;&lt;/div&gt;
+      &lt;div class=&quot;progress-label&quot;&gt;44,791 of 48,201 · 93%&lt;/div&gt;
+      &lt;div class=&quot;stat-line&quot;&gt;3,410 photos not yet scanned&lt;/div&gt;
+      &lt;div class=&quot;card-actions&quot;&gt;
+        &lt;button class=&quot;button&quot;&gt;Detecting… 3,410 left&lt;/button&gt;
+        &lt;button class=&quot;button danger&quot;&gt;Stop&lt;/button&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+"></iframe><details class="guide"><summary>Usage guidelines</summary><p>The 10px track that shows how far through the library a long job has got.</p>
+<p><code>field</code> track, 5px radius, an <code>accent</code> fill whose width animates over 0.3s, and an 11px <code>ink-muted</code> label beneath giving the real numbers. The fill is the app's only use of solid <code>accent</code> as a large area.</p>
+<h4>When to use</h4>
+<p>Inside a <code>Card</code>, for a ratio over the whole library: photos geotagged, photos face-scanned. Always pair it with <code>.progress-label</code> — the bar gives the shape, the label gives the count, and a person managing 48,000 photos needs the count.</p>
+<p>Long server work is driven as a client loop (POST a batch, read <code>remaining</code>, repeat), so update the width and label on each round-trip. The button that started the job rewrites its own label alongside; there is no spinner and no modal.</p>
+<h4>What the consumer provides</h4>
+<p>The percentage for the width and the formatted label ("12,880 of 48,201 · 27%"). Never show the bar without a number, and never show a percentage without its absolute counts.</p>
+<h4>Don't</h4>
+<ul><li>Don't use it for an indeterminate wait — there is no indeterminate variant, by design.</li><li>Don't colour the fill by status; that is <code>CoverageBar</code>'s job.</li><li>Don't animate anything but the width.</li></ul></details></article></div><h3 class="group">Forms</h3><div class="cards"><article class="card" id="c-Select"><header><h4>Select</h4><span>Default, width-capped, and page-scoping</span></header><iframe class="fit" title="Select preview" loading="lazy" style="height:190px" srcdoc="
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;dist/tokens.css&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;components/bundle.css&quot;&gt;&lt;style&gt;html,body{margin:0}body{background:var(--canvas);color:var(--ink);font-family:var(--font-ui);padding:0}&lt;/style&gt;&lt;/head&gt;
+&lt;body&gt;
+&lt;div class=&quot;gt-surface&quot; id=&quot;root&quot; style=&quot;padding:16px;display:flex;flex-direction:column;gap:16px&quot;&gt;
+  &lt;div class=&quot;gt-toolbar&quot; style=&quot;border-radius:4px;border-bottom:none&quot;&gt;
+    &lt;label style=&quot;font-size:12px;color:#bbb&quot;&gt;Camera&lt;/label&gt;
+    &lt;select class=&quot;gt-select&quot;&gt;
+      &lt;option&gt;All cameras&lt;/option&gt;
+      &lt;option&gt;Canon EOS 40D&lt;/option&gt;
+      &lt;option&gt;iPhone 7&lt;/option&gt;
+    &lt;/select&gt;
+    &lt;label style=&quot;font-size:12px;color:#bbb&quot;&gt;Time focus&lt;/label&gt;
+    &lt;select class=&quot;gt-select focus-active&quot; style=&quot;max-width:240px&quot;&gt;
+      &lt;option&gt;Skagen holiday · Aug 2011&lt;/option&gt;
+    &lt;/select&gt;
+    &lt;span style=&quot;color:#7fae7f;font-size:11px;font-style:italic&quot;&gt;scoped to 214 photos&lt;/span&gt;
+  &lt;/div&gt;
+
+  &lt;div class=&quot;imprecise-row&quot; style=&quot;display:flex;align-items:center;gap:6px;background:var(--field);padding:3px 8px;border-radius:4px;border:1px solid var(--field-border);width:max-content&quot;&gt;
+    &lt;label style=&quot;display:flex;align-items:center;gap:5px;color:var(--ink);font-weight:500;font-size:12px;cursor:pointer&quot;&gt;
+      &lt;input type=&quot;checkbox&quot; checked style=&quot;width:13px;height:13px;accent-color:var(--accent);margin:0&quot;&gt; Imprecise drop
+    &lt;/label&gt;
+    &lt;select class=&quot;gt-select&quot; style=&quot;padding:2px 4px;background:var(--chrome);border-color:var(--control-border);color:#fff;font-size:11px&quot;&gt;
+      &lt;option&gt;± 1 km&lt;/option&gt;&lt;option&gt;± 5 km&lt;/option&gt;
+    &lt;/select&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+"></iframe><details class="guide"><summary>Usage guidelines</summary><p>The native dropdown, styled to match <code>TextField</code> and left native everywhere else.</p>
+<p><code>field</code> fill, <code>field-border</code>, <code>radius-4</code>, 4px/6px padding, <code>ink-strong</code>. The app never replaces it with a custom listbox — a native select gets keyboard behaviour, type-ahead and the OS picker on touch for free, and this is an offline single-user tool with no reason to reinvent it.</p>
+<h4>When to use</h4>
+<p>For a closed set of options: camera, time window, family filter, an imprecise-drop radius. Cap the width where the option text can run long (<code>max-width: 240px</code> on the focus and unlabeled pickers) so one long place name cannot stretch a toolbar.</p>
+<p><code>.focus-active</code> marks a select whose choice is currently scoping the whole page — <code>accent</code> border over a <code>#24374d</code> fill. Use it only for a filter with page-wide reach, so it is obvious why the results look short.</p>
+<h4>What the consumer provides</h4>
+<p>Options, the current value, and the change handler. Where a select scopes the page, also provide the note beside it saying what is in scope.</p>
+<h4>Don't</h4>
+<ul><li>Don't build a custom dropdown to get a swatch or an icon into an option.</li><li>Don't use <code>.focus-active</code> for every filter — it stops meaning anything.</li><li>Don't leave a page-scoping select unlabelled.</li></ul></details></article><article class="card" id="c-SettingRow"><header><h4>SettingRow</h4><span>A settings group: number, checkbox, select, and a rejected value</span></header><iframe class="fit" title="SettingRow preview" loading="lazy" style="height:300px" srcdoc="
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;dist/tokens.css&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;components/bundle.css&quot;&gt;&lt;style&gt;html,body{margin:0}body{background:var(--canvas);color:var(--ink);font-family:var(--font-ui);padding:0}&lt;/style&gt;&lt;/head&gt;
+&lt;body&gt;
+&lt;div class=&quot;gt-surface&quot; id=&quot;root&quot; style=&quot;padding:16px&quot;&gt;
+  &lt;div style=&quot;max-width:560px;margin:0 auto&quot;&gt;
+    &lt;p style=&quot;font-size:12px;color:var(--ink-soft);margin:0 0 16px;line-height:1.5&quot;&gt;
+      Tuning knobs for face matching and clustering. Changes apply immediately — no restart
+      needed — and are saved to the database, overriding the env-var default shown in each hint.
+    &lt;/p&gt;
+    &lt;div class=&quot;settings-group&quot;&gt;
+      &lt;h2&gt;Face matching&lt;/h2&gt;
+
+      &lt;div class=&quot;setting-row&quot;&gt;
+        &lt;div class=&quot;setting-label&quot;&gt;
+          &lt;label for=&quot;s1&quot;&gt;Match threshold&lt;/label&gt;
+          &lt;button class=&quot;button&quot; style=&quot;font-size:11px;padding:2px 8px&quot;&gt;Reset&lt;/button&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;setting-help&quot;&gt;Cosine similarity a face must reach to be suggested for a person. GEOTAGGER_FACE_MATCH_THRESHOLD, default 0.42.&lt;/div&gt;
+        &lt;div class=&quot;setting-control&quot;&gt;
+          &lt;input id=&quot;s1&quot; type=&quot;number&quot; value=&quot;0.48&quot; step=&quot;0.01&quot;&gt;
+          &lt;span class=&quot;setting-saved-flash&quot;&gt;Saved&lt;/span&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+
+      &lt;div class=&quot;setting-row&quot;&gt;
+        &lt;div class=&quot;setting-label&quot;&gt;
+          &lt;label for=&quot;s2&quot;&gt;Suggest across families&lt;/label&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;setting-help&quot;&gt;Offer matches from people outside the subject&#x27;s family group. GEOTAGGER_CROSS_FAMILY_SUGGEST, default off.&lt;/div&gt;
+        &lt;div class=&quot;setting-control&quot;&gt;
+          &lt;input id=&quot;s2&quot; type=&quot;checkbox&quot; checked&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+
+      &lt;div class=&quot;setting-row&quot;&gt;
+        &lt;div class=&quot;setting-label&quot;&gt;
+          &lt;label for=&quot;s3&quot;&gt;Detector size&lt;/label&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;setting-help&quot;&gt;Input resolution for InsightFace. Larger finds smaller faces and runs slower. GEOTAGGER_DET_SIZE, default 640.&lt;/div&gt;
+        &lt;div class=&quot;setting-control&quot;&gt;
+          &lt;input id=&quot;s3&quot; type=&quot;number&quot; value=&quot;0&quot; style=&quot;border-color:var(--danger-border)&quot;&gt;
+        &lt;/div&gt;
+        &lt;div style=&quot;font-size:11px;color:var(--danger-text);margin-top:4px&quot;&gt;Must be a multiple of 32 between 320 and 1280.&lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+"></iframe><details class="guide"><summary>Usage guidelines</summary><p>One tunable knob on the Settings page: its name, the control, the sentence explaining it, and the env-var default it overrides.</p>
+<p>Rows stack inside a <code>.settings-group</code> — a <code>Card</code> by another name — separated by a <code>rule</code> bottom border that the last row drops. The name is <code>label</code> weight 500 in <code>ink</code>; the help is 11px <code>ink-soft</code> at 1.4 line-height; the control sits in its own flex row.</p>
+<h4>When to use</h4>
+<p>For every entry in the backend's <code>SETTINGS_SPEC</code>. These settings are persisted to the database and applied live, so the row must say so rather than implying a restart.</p>
+<p>Its parts:</p>
+<ul><li><code>.setting-label</code> — the name, with a small reset <code>Button</code> pushed to the right edge.</li><li><code>.setting-help</code> — one or two sentences, ending with the env-var default in the form the backend names it (<code>GEOTAGGER_FACE_MATCH_THRESHOLD</code>, default 0.42).</li><li><code>.setting-control</code> — a number input (110px), a checkbox (18px, <code>accent-color: accent</code>), or a select.</li><li><code>.setting-saved-flash</code> — an 11px <code>success</code> "Saved" that fades in on write and out again. It is the only save feedback; there is no save button.</li><li><code>.setting-error</code> — 11px <code>danger-text</code> under the control when a value is rejected.</li></ul>
+<h4>What the consumer provides</h4>
+<p>The spec entry: name, help sentence, control type, bounds, and the env-var default to quote. Writes go out per change; nothing is batched.</p>
+<h4>Don't</h4>
+<ul><li>Don't add a Save button — it would contradict "changes apply immediately".</li><li>Don't hide the env-var default; it is how a person reconciles the UI with their shell.</li><li>Don't let the help text exceed two sentences.</li></ul></details></article><article class="card" id="c-TextField"><header><h4>TextField</h4><span>Toolbar input, labelled form field, focus and touch sizes</span></header><iframe class="fit" title="TextField preview" loading="lazy" style="height:230px" srcdoc="
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;dist/tokens.css&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;components/bundle.css&quot;&gt;&lt;style&gt;html,body{margin:0}body{background:var(--canvas);color:var(--ink);font-family:var(--font-ui);padding:0}&lt;/style&gt;&lt;/head&gt;
+&lt;body&gt;
+&lt;div class=&quot;gt-surface&quot; id=&quot;root&quot; style=&quot;padding:16px;display:flex;flex-direction:column;gap:18px&quot;&gt;
+  &lt;div class=&quot;gt-toolbar&quot; style=&quot;border-radius:4px;border-bottom:none&quot;&gt;
+    &lt;input class=&quot;gt-input&quot; type=&quot;text&quot; style=&quot;width:280px&quot; value=&quot;D:\Photos&quot; aria-label=&quot;Library folder&quot;&gt;
+    &lt;button class=&quot;button&quot;&gt;Scan&lt;/button&gt;
+  &lt;/div&gt;
+
+  &lt;div style=&quot;display:flex;gap:14px;align-items:flex-end&quot;&gt;
+    &lt;div class=&quot;search-field&quot;&gt;
+      &lt;label for=&quot;p-loc&quot;&gt;Place&lt;/label&gt;
+      &lt;input class=&quot;gt-input&quot; id=&quot;p-loc&quot; type=&quot;text&quot; style=&quot;width:180px&quot; value=&quot;Skagen&quot;&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;search-field&quot;&gt;
+      &lt;label for=&quot;p-from&quot;&gt;Taken after&lt;/label&gt;
+      &lt;input class=&quot;gt-input&quot; id=&quot;p-from&quot; type=&quot;text&quot; style=&quot;width:130px&quot; placeholder=&quot;yyyy-mm-dd&quot;&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;search-field&quot;&gt;
+      &lt;label for=&quot;p-foc&quot;&gt;Focused&lt;/label&gt;
+      &lt;input class=&quot;gt-input&quot; id=&quot;p-foc&quot; type=&quot;text&quot; style=&quot;width:160px;border-color:var(--accent)&quot; value=&quot;Marion&quot;&gt;
+    &lt;/div&gt;
+    &lt;button class=&quot;button primary&quot;&gt;Search&lt;/button&gt;
+  &lt;/div&gt;
+
+  &lt;div style=&quot;max-width:320px&quot;&gt;
+    &lt;div style=&quot;font-size:11px;color:var(--ink-soft);margin-bottom:6px&quot;&gt;Touch size — 16px, radius-10, on canvas&lt;/div&gt;
+    &lt;input type=&quot;text&quot; placeholder=&quot;Search people…&quot;
+      style=&quot;width:100%;font-family:var(--font-touch);font-size:16px;padding:12px;border-radius:10px;border:1px solid var(--field-border);background:var(--canvas);color:var(--ink-strong)&quot;&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+"></iframe><details class="guide"><summary>Usage guidelines</summary><p>The single-line text input, and the labelled field that wraps it in a form.</p>
+<p><code>field</code> fill, <code>field-border</code>, <code>radius-4</code>, 4px/7px padding, <code>ink-strong</code> text, and <code>outline: none</code> with the border going <code>accent</code> on focus — the border *is* the focus indicator, so never remove it.</p>
+<h4>When to use</h4>
+<p>Any free text: a library folder, a place search, a person's name, a filename filter. Widths are set per use and are always explicit — <code>#dir-input</code> is 280px, <code>#location-input</code> 180px — because these sit in flex toolbars that would otherwise collapse them.</p>
+<p>In a form, wrap it in <code>.search-field</code>: a column with a 3px gap and an 11px <code>ink-soft</code> label above. In a toolbar, use the bare input with an <code>aria-label</code>.</p>
+<p>On the touch pages the field is larger — 12px padding, 16px text (<code>touch-body</code>), <code>radius-10</code>, on <code>canvas</code> rather than <code>field</code> — so iOS does not zoom on focus.</p>
+<h4>What the consumer provides</h4>
+<p>The label text, placeholder, width, and any typeahead behaviour. A typeahead list is <code>PersonPicker</code>'s markup positioned under the field.</p>
+<h4>Don't</h4>
+<ul><li>Don't rely on the placeholder as the label.</li><li>Don't restore the default focus ring on top of the border change.</li><li>Don't put a text input on <code>chrome</code> without its <code>field</code> fill — the two are close enough that the input would disappear.</li></ul></details></article></div><h3 class="group">Media</h3><div class="cards"><article class="card" id="c-FaceGroupHeader"><header><h4>FaceGroupHeader</h4><span>Five tints, each meaning a different group state</span></header><iframe class="fit" title="FaceGroupHeader preview" loading="lazy" style="height:230px" srcdoc="
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;dist/tokens.css&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;components/bundle.css&quot;&gt;&lt;style&gt;html,body{margin:0}body{background:var(--canvas);color:var(--ink);font-family:var(--font-ui);padding:0}&lt;/style&gt;&lt;/head&gt;
+&lt;body&gt;
+&lt;div class=&quot;gt-surface&quot; id=&quot;root&quot; style=&quot;padding:16px;background:var(--pane);display:flex;flex-direction:column;gap:8px&quot;&gt;
+  &lt;div class=&quot;face-group-header&quot; style=&quot;border-radius:4px&quot;&gt;
+    &lt;span class=&quot;face-group-label&quot;&gt;Cluster 14 &lt;span class=&quot;face-group-meta&quot;&gt;· 38 faces · 9 photos&lt;/span&gt;&lt;/span&gt;
+    &lt;span class=&quot;face-group-btns&quot;&gt;&lt;button class=&quot;button&quot;&gt;Name this cluster&lt;/button&gt;&lt;/span&gt;
+  &lt;/div&gt;
+  &lt;div class=&quot;face-group-header green&quot; style=&quot;border-radius:4px&quot;&gt;
+    &lt;span class=&quot;face-group-label&quot;&gt;Marion &lt;span class=&quot;face-group-meta&quot;&gt;· 212 faces labeled&lt;/span&gt;&lt;/span&gt;
+    &lt;span class=&quot;face-group-btns&quot;&gt;&lt;button class=&quot;button&quot;&gt;Find more&lt;/button&gt;&lt;/span&gt;
+  &lt;/div&gt;
+  &lt;div class=&quot;face-group-header blue&quot; style=&quot;border-radius:4px&quot;&gt;
+    &lt;span class=&quot;face-group-label&quot;&gt;Suggested: Elias &lt;span class=&quot;face-group-meta&quot;&gt;· 17 faces · 0.71–0.84&lt;/span&gt;&lt;/span&gt;
+    &lt;span class=&quot;face-group-btns&quot;&gt;
+      &lt;button class=&quot;button icon-btn&quot; title=&quot;Accept all&quot;&gt;✓&lt;/button&gt;
+      &lt;button class=&quot;button icon-btn&quot; title=&quot;Reject all&quot;&gt;✕&lt;/button&gt;
+    &lt;/span&gt;
+  &lt;/div&gt;
+  &lt;div class=&quot;face-group-header amber&quot; style=&quot;border-radius:4px&quot;&gt;
+    &lt;span class=&quot;face-group-label&quot;&gt;Crowd · 22 Jun 2014 &lt;span class=&quot;face-group-meta&quot;&gt;· 41 faces in 3 photos&lt;/span&gt;&lt;/span&gt;
+    &lt;span class=&quot;face-group-btns&quot;&gt;&lt;button class=&quot;button&quot;&gt;Come back later&lt;/button&gt;&lt;/span&gt;
+  &lt;/div&gt;
+  &lt;div class=&quot;face-group-header grey&quot; style=&quot;border-radius:4px&quot;&gt;
+    &lt;span class=&quot;face-group-label&quot;&gt;Ignored &lt;span class=&quot;face-group-meta&quot;&gt;· 96 faces&lt;/span&gt;&lt;/span&gt;
+    &lt;span class=&quot;face-group-btns&quot;&gt;&lt;button class=&quot;button&quot;&gt;Restore all&lt;/button&gt;&lt;/span&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+"></iframe><details class="guide"><summary>Usage guidelines</summary><p>The title band above a group of tiles: what the group is, how big it is, and what you can do to all of it at once.</p>
+<p>Built by <code>faceGroupHeader()</code> in <code>face-grid.js</code>. A flex row with a <code>face-group-label</code> on the left, an inline <code>face-group-meta</code> after it, and a <code>face-group-btns</code> cluster on the right, wrapping under at narrow widths.</p>
+<h4>When to use</h4>
+<p>At the top of every <code>GroupSection</code>. Pick the tint by what the group *is*, because this — not the section tint — is where colour carries meaning:</p>
+<ul><li><strong>default</strong> (<code>accent-header</code> / <code>accent-quiet</code>) — a neutral grouping: a day, an event, a cluster.</li><li><strong><code>.green</code></strong> (<code>success-surface</code> / <code>success-quiet</code>) — already labeled or already geotagged.</li><li><strong><code>.blue</code></strong> — a machine suggestion awaiting review.</li><li><strong><code>.amber</code></strong> (<code>warn-surface</code> / <code>warn-quiet</code>) — a crowd, or a come-back queue: deferred, not dismissed.</li><li><strong><code>.grey</code></strong> (<code>pane</code> / <code>ink-dim</code>) — ignored or excluded.</li></ul>
+<h4>What the consumer provides</h4>
+<p>The label, an optional meta string (count, place, time span) and the bulk actions. Buttons inside the header run at 11px; icon-only ones use <code>.icon-btn</code> and always carry a <code>title</code>.</p>
+<h4>Don't</h4>
+<ul><li>Don't put a per-item action here — these buttons act on the whole group.</li><li>Don't use a tint the section's content contradicts; a green header over unlabeled faces is a bug, not a style choice.</li><li>Don't let the meta carry a fact the label doesn't already imply.</li></ul></details></article><article class="card" id="c-ThumbCell"><header><h4>ThumbCell</h4><span>Selection, badges, suggestion chips and dimmed states</span></header><iframe class="fit" title="ThumbCell preview" loading="lazy" style="height:330px" srcdoc="
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;dist/tokens.css&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;components/bundle.css&quot;&gt;&lt;style&gt;html,body{margin:0}body{background:var(--canvas);color:var(--ink);font-family:var(--font-ui);padding:0}&lt;/style&gt;&lt;/head&gt;
+&lt;body&gt;
+&lt;div class=&quot;gt-surface&quot; id=&quot;root&quot; style=&quot;padding:16px;background:var(--pane)&quot;&gt;
+&lt;style&gt;
+  .lbl { font-size:11px; color:var(--ink-dim); margin:0 0 6px; }
+  .row { display:grid; grid-template-columns:repeat(4,120px); gap:8px; margin-bottom:14px; }
+&lt;/style&gt;
+
+  &lt;p class=&quot;lbl&quot;&gt;Selection, geotagged, excluded, ambiguous&lt;/p&gt;
+  &lt;div class=&quot;row&quot;&gt;
+    &lt;div class=&quot;thumb-cell selected&quot;&gt;&lt;img alt=&quot;&quot;&gt;&lt;span class=&quot;face-score&quot;&gt;0.91&lt;/span&gt;&lt;/div&gt;
+    &lt;div class=&quot;thumb-cell tagged&quot;&gt;&lt;img alt=&quot;&quot;&gt;&lt;/div&gt;
+    &lt;div class=&quot;thumb-cell geo-ignored&quot;&gt;&lt;img alt=&quot;&quot;&gt;&lt;/div&gt;
+    &lt;div class=&quot;thumb-cell ambiguous&quot;&gt;&lt;img alt=&quot;&quot;&gt;&lt;span class=&quot;face-score&quot;&gt;0.63&lt;/span&gt;&lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;p class=&quot;lbl&quot;&gt;Settled name, suggestion with accept/reject, suggestion plus amber alternative, camera strip&lt;/p&gt;
+  &lt;div class=&quot;row&quot;&gt;
+    &lt;div class=&quot;thumb-cell&quot;&gt;&lt;img alt=&quot;&quot;&gt;&lt;span class=&quot;face-label&quot;&gt;Marion&lt;/span&gt;&lt;/div&gt;
+    &lt;div class=&quot;thumb-cell&quot;&gt;&lt;img alt=&quot;&quot;&gt;
+      &lt;span class=&quot;face-suggest&quot;&gt;&lt;span class=&quot;sug-check&quot;&gt;✓&lt;/span&gt;&lt;span class=&quot;sug-name&quot;&gt;Elias&lt;/span&gt;&lt;span class=&quot;sug-reject&quot;&gt;✕&lt;/span&gt;&lt;/span&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;thumb-cell&quot;&gt;&lt;img alt=&quot;&quot;&gt;
+      &lt;span class=&quot;face-chips&quot;&gt;
+        &lt;span class=&quot;face-suggest&quot;&gt;&lt;span class=&quot;sug-check&quot;&gt;✓&lt;/span&gt;&lt;span class=&quot;sug-name&quot;&gt;Elias&lt;/span&gt;&lt;span class=&quot;sug-reject&quot;&gt;✕&lt;/span&gt;&lt;/span&gt;
+        &lt;span class=&quot;face-alt&quot;&gt;&lt;span class=&quot;alt-arrow&quot;&gt;→&lt;/span&gt;&lt;span class=&quot;sug-name&quot;&gt;Jonas?&lt;/span&gt;&lt;span class=&quot;sug-reject&quot;&gt;✕&lt;/span&gt;&lt;/span&gt;
+      &lt;/span&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;thumb-cell&quot;&gt;&lt;img alt=&quot;&quot;&gt;&lt;span class=&quot;cam-strip&quot; style=&quot;background:#5cb85c&quot;&gt;&lt;/span&gt;&lt;span class=&quot;thumb-name&quot; style=&quot;opacity:1&quot;&gt;IMG_4821.CR2&lt;/span&gt;&lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;p class=&quot;lbl&quot;&gt;Ignored (grayscale) and come back later (sepia) — deferred reads brighter than dismissed&lt;/p&gt;
+  &lt;div class=&quot;row&quot;&gt;
+    &lt;div class=&quot;thumb-cell ignored&quot;&gt;&lt;img alt=&quot;&quot;&gt;&lt;span class=&quot;face-label ignored-label&quot;&gt;ignored&lt;/span&gt;&lt;/div&gt;
+    &lt;div class=&quot;thumb-cell come-back&quot;&gt;&lt;img alt=&quot;&quot;&gt;&lt;span class=&quot;face-label come-back-label&quot;&gt;come back&lt;/span&gt;&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;script&gt;
+  // Placeholder tiles stand in for photographs; the app supplies real thumbnails.
+  const TILES = [&#x27;%23394a5a&#x27;,&#x27;%235a4a3a&#x27;,&#x27;%233a5a4a&#x27;,&#x27;%234a3a5a&#x27;,&#x27;%235a5a3a&#x27;,&#x27;%233a4a5a&#x27;,&#x27;%23524040&#x27;,&#x27;%23405248&#x27;];
+  const tile = i =&gt; &quot;data:image/svg+xml;utf8,%3Csvg xmlns=&#x27;http://www.w3.org/2000/svg&#x27; width=&#x27;120&#x27; height=&#x27;120&#x27;%3E%3Crect width=&#x27;120&#x27; height=&#x27;120&#x27; fill=&#x27;&quot; + TILES[i % TILES.length] + &quot;&#x27;/%3E%3Cpath d=&#x27;M0 86 L32 56 L62 80 L88 60 L120 92 L120 120 L0 120 Z&#x27; fill=&#x27;rgba(0,0,0,.28)&#x27;/%3E%3Ccircle cx=&#x27;94&#x27; cy=&#x27;26&#x27; r=&#x27;10&#x27; fill=&#x27;rgba(255,255,255,.14)&#x27;/%3E%3C/svg%3E&quot;;
+  document.querySelectorAll(&#x27;.thumb-cell img&#x27;).forEach((img, i) =&gt; { img.src = tile(i); });
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+"></iframe><details class="guide"><summary>Usage guidelines</summary><p>The square image tile — a photo thumbnail or a face crop — and the full vocabulary of badges, chips and dimming layered over it.</p>
+<p>One square (<code>aspect-ratio: 1</code>, <code>object-fit: cover</code>), <code>radius-3</code>, a 2px transparent border that becomes <code>accent</code> when selected, and <code>media-well</code> behind the image so a slow tile is a dark hole rather than a flash of pane. It is the densest thing in the app and the most heavily overloaded: every piece of state a photo or a face can be in shows here.</p>
+<h4>When to use</h4>
+<p>In any grid of media. The grid is always <code>repeat(auto-fill, minmax(var(--face-size), 1fr))</code> with a 4px gap, so photo grids, face grids and cluster strips all agree on tile size.</p>
+<p><strong>Selection and identity</strong></p>
+<ul><li><code>.selected</code> — 2px <code>accent</code> border.</li><li><code>.ambiguous</code> — a 2px inset <code>warn-ring</code>: the matcher could not choose between two people.</li></ul>
+<p><strong>Badges, pinned into corners</strong></p>
+<ul><li><code>.tagged</code> → 📍 bottom-right; <code>.geo-ignored</code> → 🚫 top-left plus <code>opacity-geo-ignored</code> on the image. Both get <code>text-shadow: 0 0 3px #000</code> to survive a light photo.</li><li><code>.face-score</code> — a 9px match score, top-right, on its own dark pad.</li><li><code>.cam-strip</code> — a 4px band across the top in the camera's legend colour.</li></ul>
+<p><strong>Captions along the bottom edge</strong>, all on a scrim so they hold over any image:</p>
+<ul><li><code>.thumb-name</code> — the filename, <code>caption-scrim</code>, revealed on hover only.</li><li><code>.face-label</code> — a settled name, always visible.</li><li><code>.face-suggest</code> — a clickable proposal on <code>rgba(42,74,110,.85)</code>: a ✓ in green, the name, and a <code>.sug-reject</code> ✕ in <code>danger-quiet</code> that brightens to <code>danger-hot</code>. Accept and reject are always both present.</li><li><code>.face-alt</code> — an amber "or is it this person?" chip, stacked under the primary suggestion inside <code>.face-chips</code>.</li></ul>
+<p><strong>Dimming states</strong>: <code>.ignored</code> (<code>opacity-ignored</code> + grayscale) for dismissed; <code>.come-back</code> (<code>opacity-come-back</code> + sepia) for deferred. The come-back state is deliberately brighter — it means "not yet", not "no".</p>
+<h4>What the consumer provides</h4>
+<p>The <code>src</code>, the state classes, and a click handler on the cell (the <code>img</code> is <code>pointer-events: none</code> so a click always lands on the cell). Every chip needs its own handler; they stop propagation.</p>
+<h4>Don't</h4>
+<ul><li>Don't stack more than two chips; beyond that the image is gone. Move the rest into the detail pane.</li><li>Don't show a suggestion without its reject affordance.</li><li>Don't put a caption on a tile without <code>caption-scrim</code> behind it.</li></ul></details></article></div><h3 class="group">Navigation</h3><div class="cards"><article class="card" id="c-AppNav"><header><h4>AppNav</h4><span>Ten peer screens, People active</span></header><iframe class="fit" title="AppNav preview" loading="lazy" style="height:140px" srcdoc="
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;dist/tokens.css&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;components/bundle.css&quot;&gt;&lt;style&gt;html,body{margin:0}body{background:var(--canvas);color:var(--ink);font-family:var(--font-ui);padding:0}&lt;/style&gt;&lt;/head&gt;
+&lt;body&gt;
+&lt;div class=&quot;gt-surface&quot; id=&quot;root&quot; style=&quot;padding:0&quot;&gt;
+  &lt;div class=&quot;gt-toolbar&quot;&gt;
+    &lt;div class=&quot;toolbar-group&quot;&gt;
+      &lt;a class=&quot;button&quot; href=&quot;#&quot;&gt;🏠 Home&lt;/a&gt;
+      &lt;a class=&quot;button&quot; href=&quot;#&quot;&gt;🔎 Search&lt;/a&gt;
+      &lt;a class=&quot;button&quot; href=&quot;#&quot;&gt;📍 Geocode&lt;/a&gt;
+      &lt;a class=&quot;button&quot; href=&quot;#&quot;&gt;⚡ Quick Geocode&lt;/a&gt;
+      &lt;a class=&quot;button&quot; href=&quot;#&quot;&gt;🌍 Places DB&lt;/a&gt;
+      &lt;a class=&quot;button&quot; href=&quot;#&quot;&gt;🕐 Time Sync&lt;/a&gt;
+      &lt;a class=&quot;button active&quot; href=&quot;#&quot;&gt;🙂 People&lt;/a&gt;
+      &lt;a class=&quot;button&quot; href=&quot;#&quot;&gt;⭐ Representatives&lt;/a&gt;
+      &lt;a class=&quot;button&quot; href=&quot;#&quot;&gt;🗺️ Contexts&lt;/a&gt;
+      &lt;a class=&quot;button&quot; href=&quot;#&quot;&gt;⚙ Settings&lt;/a&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div style=&quot;padding:14px 10px;color:var(--ink-dim);font-size:11px&quot;&gt;
+    Rendered by &lt;code style=&quot;color:var(--ink-secondary)&quot;&gt;nav.js&lt;/code&gt; from its &lt;code style=&quot;color:var(--ink-secondary)&quot;&gt;ITEMS&lt;/code&gt; array;
+    the active key comes from &lt;code style=&quot;color:var(--ink-secondary)&quot;&gt;data-active&lt;/code&gt; on the container.
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+"></iframe><details class="guide"><summary>Usage guidelines</summary><p>The top navigation strip, rendered from a single <code>ITEMS</code> array in <code>nav.js</code> into every page.</p>
+<p>Ten links, each an emoji plus a label, laid out as <code>.button</code> elements in a <code>.toolbar-group</code>. The current page carries <code>.active</code>. There is no second level and no breadcrumb: GeoTagger is ten peer screens over one library.</p>
+<h4>When to use</h4>
+<p>Once per page, as the first child of the toolbar. Adding a page means adding one <code>ITEMS</code> entry in <code>nav.js</code> and setting <code>data-active</code> on the new page's <code>&lt;div id="app-nav"&gt;</code> — the nav is data-driven, so never hand-write the markup in a page.</p>
+<h4>What the consumer provides</h4>
+<p><code>&lt;div class="toolbar-group" id="app-nav" data-active="&lt;key&gt;"&gt;&lt;/div&gt;</code> and a <code>&lt;script src="nav.js"&gt;</code>. The keys are <code>home</code>, <code>search</code>, <code>geocode</code>, <code>quick-geocode</code>, <code>map</code>, <code>timesync</code>, <code>people</code>, <code>representatives</code>, <code>contexts</code>, <code>settings</code>.</p>
+<h4>Don't</h4>
+<ul><li>Don't reorder the items per page; the order is muscle memory.</li><li>Don't drop the emoji — at 12px it is the fastest target in the row — and don't use it without the word beside it.</li><li>Don't mark more than one item active.</li></ul></details></article><article class="card" id="c-StatusBar"><header><h4>StatusBar</h4><span>Idle and error states, on both page families</span></header><iframe class="fit" title="StatusBar preview" loading="lazy" style="height:170px" srcdoc="
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;dist/tokens.css&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;components/bundle.css&quot;&gt;&lt;style&gt;html,body{margin:0}body{background:var(--canvas);color:var(--ink);font-family:var(--font-ui);padding:0}&lt;/style&gt;&lt;/head&gt;
+&lt;body&gt;
+&lt;div class=&quot;gt-surface&quot; id=&quot;root&quot; style=&quot;padding:16px;display:flex;flex-direction:column;gap:16px&quot;&gt;
+  &lt;div style=&quot;border:1px solid var(--hairline);border-radius:6px;overflow:hidden&quot;&gt;
+    &lt;div style=&quot;background:var(--pane);height:38px&quot;&gt;&lt;/div&gt;
+    &lt;div class=&quot;gt-status-bar&quot;&gt;Scanned 4,812 files · 121 new · 3 unreadable&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div style=&quot;border:1px solid var(--hairline);border-radius:6px;overflow:hidden&quot;&gt;
+    &lt;div style=&quot;background:var(--pane);height:38px&quot;&gt;&lt;/div&gt;
+    &lt;div class=&quot;gt-status-bar error&quot;&gt;ExifTool exited with code 1 — sidecar not written&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div style=&quot;border:1px solid var(--field-border);border-radius:6px;overflow:hidden&quot;&gt;
+    &lt;div style=&quot;background:var(--canvas);height:38px&quot;&gt;&lt;/div&gt;
+    &lt;div style=&quot;padding:4px 12px;font-size:12px;color:var(--ink-soft);background:var(--chrome-alt);border-top:1px solid var(--field-border);min-height:22px&quot;&gt;
+      12,880 places loaded from GeoNames
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+"></iframe><details class="guide"><summary>Usage guidelines</summary><p>The 22px rail along the bottom of a page, carrying the result of the last thing that happened.</p>
+<p>Height and line-height are both <code>bar-status</code> (22px) so the text centres with no padding. <code>rail</code> fill, <code>hairline</code> top rule, <code>meta</code> at 11px in <code>ink-dim</code>. On the map-first pages it sits on <code>chrome-alt</code> instead and runs at 12px in <code>ink-soft</code>.</p>
+<h4>When to use</h4>
+<p>One per page, last element, outside the scrolling area. It reports state — a count, a scan result, the last save — not progress; progress belongs in <code>ProgressBar</code> or in a button label.</p>
+<p><code>.error</code> switches the text to <code>danger-text</code> and nothing else. The bar never changes its own background.</p>
+<h4>What the consumer provides</h4>
+<p>A single line of text, replaced outright on each update. Keep it short enough not to wrap — the bar has no room to grow.</p>
+<h4>Don't</h4>
+<ul><li>Don't put a control in it.</li><li>Don't use it for anything the person must act on; it is too quiet to be a prompt.</li></ul></details></article><article class="card" id="c-Toolbar"><header><h4>Toolbar</h4><span>Groups, a spacer, and a sticky pane header</span></header><iframe class="fit" title="Toolbar preview" loading="lazy" style="height:200px" srcdoc="
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;dist/tokens.css&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;components/bundle.css&quot;&gt;&lt;style&gt;html,body{margin:0}body{background:var(--canvas);color:var(--ink);font-family:var(--font-ui);padding:0}&lt;/style&gt;&lt;/head&gt;
+&lt;body&gt;
+&lt;div class=&quot;gt-surface&quot; id=&quot;root&quot; style=&quot;padding:0&quot;&gt;
+  &lt;div class=&quot;gt-toolbar&quot;&gt;
+    &lt;div class=&quot;toolbar-group&quot;&gt;
+      &lt;a class=&quot;button active&quot; href=&quot;#&quot;&gt;🔎 Search&lt;/a&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;toolbar-group&quot;&gt;
+      &lt;input class=&quot;gt-input&quot; style=&quot;width:260px&quot; type=&quot;text&quot; value=&quot;D:\Photos\2011&quot; aria-label=&quot;Library folder&quot;&gt;
+      &lt;button class=&quot;button&quot;&gt;Scan&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;toolbar-spacer&quot;&gt;&lt;/div&gt;
+    &lt;div class=&quot;toolbar-group&quot;&gt;
+      &lt;label style=&quot;font-size:12px;color:#bbb;display:inline-flex;align-items:center;gap:4px&quot;&gt;
+        &lt;input type=&quot;checkbox&quot; checked style=&quot;accent-color:var(--accent);margin:0&quot;&gt; Suggested only
+      &lt;/label&gt;
+      &lt;select class=&quot;gt-select&quot;&gt;&lt;option&gt;All cameras&lt;/option&gt;&lt;/select&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;div style=&quot;background:var(--pane);height:110px&quot;&gt;
+    &lt;div class=&quot;gt-toolbar&quot; style=&quot;background:var(--chrome);padding:6px 10px&quot;&gt;
+      &lt;span style=&quot;font-size:12px;color:#bbb&quot;&gt;Sticky pane header&lt;/span&gt;
+      &lt;div class=&quot;toolbar-spacer&quot;&gt;&lt;/div&gt;
+      &lt;span style=&quot;font-size:12px;color:var(--ink-secondary)&quot;&gt;412 selected&lt;/span&gt;
+      &lt;button class=&quot;button icon-btn&quot; title=&quot;Accept&quot;&gt;✓&lt;/button&gt;
+      &lt;button class=&quot;button icon-btn&quot; title=&quot;Unassign&quot;&gt;✕&lt;/button&gt;
+      &lt;button class=&quot;button icon-btn&quot; title=&quot;Ignore&quot;&gt;🚫&lt;/button&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+"></iframe><details class="guide"><summary>Usage guidelines</summary><p>The band of controls at the top of a pane or page, and the pattern for grouping them.</p>
+<p><code>chrome</code> fill, a <code>hairline</code> bottom rule, 6px/10px padding, an 8px gap, and <code>flex-wrap</code> so a narrow window stacks rather than scrolls. It never scrolls with the content — it is <code>flex-shrink: 0</code> above a scrolling pane, or <code>position: sticky</code> at the top of one.</p>
+<h4>When to use</h4>
+<p>At the top of any page, and at the top of any pane that has its own controls (the grid pane's sticky header, the map pane's nav). Related controls go inside a <code>.toolbar-group</code> at a tighter 4px gap; a <code>.toolbar-spacer</code> pushes everything after it to the right edge.</p>
+<h4>What the consumer provides</h4>
+<p>The controls themselves — <code>Button</code>, <code>TextField</code>, <code>Select</code>, checkboxes — and their grouping. A toolbar holds no copy of its own beyond a field label.</p>
+<h4>Don't</h4>
+<ul><li>Don't nest a toolbar in a toolbar; use <code>.toolbar-group</code>.</li><li>Don't let it grow past two wrapped rows — move the overflow into a panel.</li><li>Don't put <code>chrome-alt</code> under a <code>chrome</code> toolbar. The map-first pages use <code>chrome-alt</code> throughout, the rest use <code>chrome</code> throughout.</li></ul></details></article></div><h3 class="group">Overlays</h3><div class="cards"><article class="card" id="c-MapPopup"><header><h4>MapPopup</h4><span>Place popup, source photo popup, marker dot and basemap switcher</span></header><iframe class="fit" title="MapPopup preview" loading="lazy" style="height:250px" srcdoc="
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;dist/tokens.css&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;components/bundle.css&quot;&gt;&lt;style&gt;html,body{margin:0}body{background:var(--canvas);color:var(--ink);font-family:var(--font-ui);padding:0}&lt;/style&gt;&lt;/head&gt;
+&lt;body&gt;
+&lt;div class=&quot;gt-surface&quot; id=&quot;root&quot; style=&quot;padding:16px&quot;&gt;
+  &lt;div style=&quot;background:#2b3a34;background-image:linear-gradient(0deg,rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:32px 32px;border-radius:6px;padding:18px;display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap&quot;&gt;
+    &lt;div class=&quot;gt-popup&quot;&gt;
+      &lt;div class=&quot;map-popup-name&quot;&gt;Skagen&lt;/div&gt;
+      &lt;div class=&quot;map-popup-region&quot;&gt;Nordjylland&lt;/div&gt;
+      &lt;div class=&quot;map-popup-country&quot;&gt;Denmark&lt;/div&gt;
+      &lt;div class=&quot;map-popup-meta&quot;&gt;8,181 inhabitants · 2.4 km away&lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;div class=&quot;source-popup&quot;&gt;
+      &lt;img alt=&quot;&quot; src=&quot;data:image/svg+xml;utf8,%3Csvg xmlns=&#x27;http://www.w3.org/2000/svg&#x27; width=&#x27;150&#x27; height=&#x27;150&#x27;%3E%3Crect width=&#x27;150&#x27; height=&#x27;150&#x27; fill=&#x27;%23394a5a&#x27;/%3E%3Cpath d=&#x27;M0 108 L42 70 L78 100 L110 78 L150 118 L150 150 L0 150 Z&#x27; fill=&#x27;rgba(0,0,0,.3)&#x27;/%3E%3Ccircle cx=&#x27;118&#x27; cy=&#x27;32&#x27; r=&#x27;13&#x27; fill=&#x27;rgba(255,255,255,.14)&#x27;/%3E%3C/svg%3E&quot;&gt;
+      &lt;div class=&quot;source-popup-label&quot;&gt;IMG_4820.CR2&lt;/div&gt;
+      &lt;div class=&quot;source-popup-time&quot;&gt;14 Aug 2011 · 16:19&lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;div style=&quot;display:flex;flex-direction:column;gap:14px;align-items:flex-start&quot;&gt;
+      &lt;div class=&quot;basemap-control&quot;&gt;
+        &lt;button class=&quot;basemap-btn active&quot;&gt;OSM Standard&lt;/button&gt;
+        &lt;button class=&quot;basemap-btn&quot;&gt;Humanitarian&lt;/button&gt;
+        &lt;button class=&quot;basemap-btn&quot;&gt;Topo&lt;/button&gt;
+      &lt;/div&gt;
+      &lt;div style=&quot;display:flex;align-items:center;gap:8px;font-size:11px;color:var(--ink-secondary)&quot;&gt;
+        &lt;span class=&quot;place-dot&quot;&gt;&lt;/span&gt; a place from the offline index
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+"></iframe><details class="guide"><summary>Usage guidelines</summary><p>The dark card a Leaflet marker opens, the dot that opens it, and the basemap switcher that sits beside them.</p>
+<p>Leaflet ships a light popup; the app overrides <code>.leaflet-popup-content-wrapper</code> and <code>.leaflet-popup-tip</code> to <code>chrome</code> with a <code>field-border</code>, <code>radius-6</code> and <code>shadow-popup</code> so a popup reads as part of the app rather than part of the map.</p>
+<h4>When to use</h4>
+<p>Three shapes, all over a map:</p>
+<ul><li><strong>Place popup</strong> (170px) — a place from the offline GeoNames index: name in 13px 600 <code>ink-strong</code>, region, country and a meta line stepping down through <code>#bbb</code>, <code>ink-soft</code>, <code>ink-dim</code>.</li><li><strong>Source photo popup</strong> (150px) — shown on a guess marker: a 150×150 cover thumbnail flush to the top corners, then the filename in <code>micro</code> and its timestamp in 11px 600 <code>ink-muted</code>. Its wrapper zeroes the popup's padding so the image can bleed.</li><li><strong><code>.place-dot</code></strong> — a 10px <code>marker</code> circle with a 1.5px black ring and a soft black shadow, so an amber dot survives both a satellite tile and a pale street tile.</li></ul>
+<p>The <strong>basemap switcher</strong> is a <code>rgba(30,30,30,.92)</code> control with <code>shadow-control</code>: stacked 11px buttons on a <code>hairline</code> divider, the current one filled <code>accent-fill</code> with an <code>accent-text</code> label.</p>
+<h4>What the consumer provides</h4>
+<p>The content and Leaflet's <code>className</code> on the popup options (<code>map-popup-wrap</code>, <code>source-popup-wrap</code>). Keep the width fixed — a popup that resizes to its content jumps the map.</p>
+<h4>Don't</h4>
+<ul><li>Don't let a popup inherit Leaflet's default light styling on a new map.</li><li>Don't put an action in a place popup; it is a read-out.</li><li>Don't use <code>accent</code> for a map marker — over blue water it disappears. That is why the dot is <code>marker</code> amber.</li></ul></details></article><article class="card" id="c-Modal"><header><h4>Modal</h4><span>The month picker over a dimmed page</span></header><iframe class="fit" title="Modal preview" loading="lazy" style="height:330px" srcdoc="
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;dist/tokens.css&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;components/bundle.css&quot;&gt;&lt;style&gt;html,body{margin:0}body{background:var(--canvas);color:var(--ink);font-family:var(--font-ui);padding:0}&lt;/style&gt;&lt;/head&gt;
+&lt;body&gt;
+&lt;div class=&quot;gt-surface&quot; id=&quot;root&quot; style=&quot;padding:0;position:relative;height:330px;overflow:hidden&quot;&gt;
+  &lt;div class=&quot;gt-toolbar&quot;&gt;
+    &lt;div class=&quot;toolbar-group&quot;&gt;
+      &lt;a class=&quot;button active&quot; href=&quot;#&quot;&gt;🏠 Home&lt;/a&gt;
+      &lt;a class=&quot;button&quot; href=&quot;#&quot;&gt;🔎 Search&lt;/a&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div style=&quot;background:var(--pane);height:100%&quot;&gt;&lt;/div&gt;
+
+  &lt;div class=&quot;modal&quot;&gt;
+    &lt;div class=&quot;modal-content&quot; style=&quot;width:440px&quot;&gt;
+      &lt;span class=&quot;modal-close&quot; title=&quot;Close&quot;&gt;×&lt;/span&gt;
+      &lt;h2&gt;Jump to a month&lt;/h2&gt;
+      &lt;div style=&quot;margin-bottom:16px&quot;&gt;
+        &lt;div style=&quot;font-size:16px;font-weight:600;color:var(--accent-text);margin-bottom:8px;padding:4px 0;border-bottom:1px solid var(--panel-border);display:flex;align-items:baseline;gap:10px&quot;&gt;
+          2011
+          &lt;span style=&quot;font-size:11px;font-weight:400;color:#5a8ab8;text-decoration:underline;text-underline-offset:2px&quot;&gt;browse all&lt;/span&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;month-item&quot;&gt;
+          &lt;span class=&quot;month-name&quot;&gt;August&lt;/span&gt;
+          &lt;span class=&quot;month-counts&quot;&gt;
+            &lt;span class=&quot;count-badge count-geotagged&quot;&gt;212 geotagged&lt;/span&gt;
+            &lt;span class=&quot;count-badge count-not-geotagged&quot;&gt;41 not&lt;/span&gt;
+            &lt;span class=&quot;count-badge count-total&quot;&gt;253&lt;/span&gt;
+          &lt;/span&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;month-item&quot;&gt;
+          &lt;span class=&quot;month-name&quot;&gt;July&lt;/span&gt;
+          &lt;span class=&quot;month-counts&quot;&gt;
+            &lt;span class=&quot;count-badge count-geotagged&quot;&gt;96 geotagged&lt;/span&gt;
+            &lt;span class=&quot;count-badge count-not-geotagged&quot;&gt;188 not&lt;/span&gt;
+            &lt;span class=&quot;count-badge count-total&quot;&gt;284&lt;/span&gt;
+          &lt;/span&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+"></iframe><details class="guide"><summary>Usage guidelines</summary><p>The centred dialog over a scrim — used for picking a month to jump to, and for the keyboard shortcuts sheet.</p>
+<p><code>scrim-heavy</code> backdrop at <code>z-modal</code>, an <code>overlay</code> panel with a <code>field-border</code>, <code>radius-8</code>, 20px padding, <code>shadow-modal</code>, capped at 600px wide and 80vh tall and scrolling inside. The title is <code>heading-modal</code> in <code>ink-strong</code>; the close affordance is a floated 28px <code>×</code> in <code>ink-muted</code> that goes white on hover.</p>
+<h4>When to use</h4>
+<p>Sparingly. GeoTagger runs long jobs without blocking, so a modal is only for a *choice* — jump to a month, read the shortcuts — never for progress, confirmation of a running job, or an error. An error belongs in the status bar or a <code>Toast</code>.</p>
+<p>The shortcuts variant is narrower (380px), 70vh, and takes an <code>accent</code> border instead of <code>field-border</code> because it opens over a dense page and has to announce itself.</p>
+<p>Rows inside a picker are <code>.month-item</code>: a flex row on <code>overlay</code> with a <code>panel-border</code>, going <code>field</code> + <code>accent</code> border on hover, with the name left and its <code>Chip</code> counts right.</p>
+<h4>What the consumer provides</h4>
+<p>The content, a close handler on the <code>×</code>, the backdrop and <code>Escape</code>, and focus management. The panel itself traps nothing.</p>
+<h4>Don't</h4>
+<ul><li>Don't use a modal to confirm a destructive action that a click already made explicit.</li><li>Don't stack two modals.</li><li>Don't put a long job behind one.</li></ul></details></article><article class="card" id="c-PersonPicker"><header><h4>PersonPicker</h4><span>Desktop dialog, its empty state, and the touch bottom sheet</span></header><iframe class="fit" title="PersonPicker preview" loading="lazy" style="height:330px" srcdoc="
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;dist/tokens.css&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;components/bundle.css&quot;&gt;&lt;style&gt;html,body{margin:0}body{background:var(--canvas);color:var(--ink);font-family:var(--font-ui);padding:0}&lt;/style&gt;&lt;/head&gt;
+&lt;body&gt;
+&lt;div class=&quot;gt-surface&quot; id=&quot;root&quot; style=&quot;padding:16px;display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap&quot;&gt;
+  &lt;div class=&quot;pp-modal&quot;&gt;
+    &lt;div class=&quot;pp-head&quot;&gt;Assign to… &lt;button class=&quot;pp-close&quot; title=&quot;Close&quot;&gt;✕&lt;/button&gt;&lt;/div&gt;
+    &lt;input class=&quot;pp-search&quot; type=&quot;text&quot; value=&quot;el&quot; aria-label=&quot;Search people&quot;&gt;
+    &lt;div class=&quot;pp-list&quot;&gt;
+      &lt;button class=&quot;pp-item pp-hl&quot;&gt;Elias &lt;span class=&quot;pp-count&quot;&gt;88&lt;/span&gt;&lt;/button&gt;
+      &lt;button class=&quot;pp-item&quot;&gt;Eleanor &lt;span class=&quot;pp-count&quot;&gt;31&lt;/span&gt;&lt;/button&gt;
+      &lt;button class=&quot;pp-item&quot;&gt;Michel &lt;span class=&quot;pp-count&quot;&gt;7&lt;/span&gt;&lt;/button&gt;
+      &lt;button class=&quot;pp-item pp-new&quot;&gt;＋ Create “el”&lt;/button&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;div class=&quot;pp-modal&quot;&gt;
+    &lt;div class=&quot;pp-head&quot;&gt;Assign to… &lt;button class=&quot;pp-close&quot; title=&quot;Close&quot;&gt;✕&lt;/button&gt;&lt;/div&gt;
+    &lt;input class=&quot;pp-search&quot; type=&quot;text&quot; value=&quot;zzz&quot; aria-label=&quot;Search people&quot;&gt;
+    &lt;div class=&quot;pp-list&quot;&gt;
+      &lt;div class=&quot;pp-empty&quot;&gt;No one matches&lt;/div&gt;
+      &lt;button class=&quot;pp-item pp-new&quot;&gt;＋ Create “zzz”&lt;/button&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;div style=&quot;width:260px&quot;&gt;
+    &lt;div style=&quot;font-size:11px;color:var(--ink-soft);margin-bottom:6px&quot;&gt;Touch — bottom sheet&lt;/div&gt;
+    &lt;div style=&quot;background:var(--bar);border-radius:16px 16px 0 0;padding:12px;font-family:var(--font-touch)&quot;&gt;
+      &lt;div style=&quot;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px&quot;&gt;
+        &lt;span style=&quot;font-weight:700;font-size:16px&quot;&gt;Who is this?&lt;/span&gt;
+        &lt;span style=&quot;color:var(--ink-muted);font-size:20px&quot;&gt;✕&lt;/span&gt;
+      &lt;/div&gt;
+      &lt;input type=&quot;text&quot; placeholder=&quot;Search…&quot; style=&quot;width:100%;padding:12px;font-size:16px;border-radius:10px;border:1px solid var(--field-border);background:var(--canvas);color:var(--ink-strong);margin-bottom:10px&quot;&gt;
+      &lt;div style=&quot;display:flex;flex-direction:column;gap:5px&quot;&gt;
+        &lt;button style=&quot;display:flex;align-items:center;justify-content:space-between;width:100%;text-align:left;padding:14px;font-family:inherit;font-size:16px;border:1px solid var(--panel-border);border-radius:10px;background:var(--overlay);color:var(--ink-strong)&quot;&gt;Marion &lt;span style=&quot;color:#9aa;font-size:13px&quot;&gt;212&lt;/span&gt;&lt;/button&gt;
+        &lt;button style=&quot;display:flex;align-items:center;justify-content:space-between;width:100%;text-align:left;padding:14px;font-family:inherit;font-size:16px;border:1px solid var(--accent);border-radius:10px;background:var(--accent-fill);color:var(--on-accent-bright)&quot;&gt;＋ New person&lt;/button&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+"></iframe><details class="guide"><summary>Usage guidelines</summary><p>The "assign this face to…" typeahead — a small centred dialog on desktop, a bottom sheet on touch.</p>
+<p><code>overlay</code> panel, <code>accent</code> border, <code>radius-8</code>, <code>shadow-float</code>, 260px wide and 60vh tall, opened 12vh down the viewport at <code>z-picker</code> over a <code>scrim</code> backdrop. A search field, then a scrolling list of rows, each with the person's name left and a <code>pp-count</code> of their faces right.</p>
+<h4>When to use</h4>
+<p>Anywhere a face gets a name: the People toolbar, the People detail pane, the quick-action popup on a tile. It is deliberately the same dialog in all three, so the interaction is learned once.</p>
+<p>Row states:</p>
+<ul><li>resting — <code>field</code> fill, <code>panel-border</code>.</li><li><code>.pp-hl</code> — the keyboard cursor: <code>accent-fill</code> and an <code>accent</code> border. Arrow keys move it, Enter picks it.</li><li><code>.pp-new</code> — "Create &lt;typed name&gt;", <code>accent-fill</code> with <code>on-accent-bright</code>, always last so it never steals the highlight from a real match.</li><li><code>.pp-empty</code> — <code>ink-dim</code>, centred, when nothing matches and nothing is typed.</li></ul>
+<p>On a phone the same list becomes a bottom sheet: full width, <code>radius-16</code> on the top corners only, 80dvh tall, rows at 14px padding and <code>touch-body</code> 16px, with <code>env(safe-area-inset-bottom)</code> added to the bottom padding.</p>
+<h4>What the consumer provides</h4>
+<p>The candidate list already sorted by likelihood, the face counts, the filter, and handlers for pick and create. Keep the search field focused on open.</p>
+<h4>Don't</h4>
+<ul><li>Don't use the desktop dialog's compact sizes on a touch page — use the sheet.</li><li>Don't put the create row anywhere but last.</li><li>Don't open it without a way out: the <code>×</code>, the backdrop and <code>Escape</code> all close it.</li></ul></details></article><article class="card" id="c-Toast"><header><h4>Toast</h4><span>Confirmation and failure, over the Quick Tag action bar</span></header><iframe class="fit" title="Toast preview" loading="lazy" style="height:210px" srcdoc="
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;dist/tokens.css&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;components/bundle.css&quot;&gt;&lt;style&gt;html,body{margin:0}body{background:var(--canvas);color:var(--ink);font-family:var(--font-ui);padding:0}&lt;/style&gt;&lt;/head&gt;
+&lt;body&gt;
+&lt;div class=&quot;gt-surface&quot; id=&quot;root&quot; style=&quot;padding:16px;display:flex;gap:16px;flex-wrap:wrap&quot;&gt;
+  &lt;div style=&quot;flex:1;min-width:280px;position:relative;border:1px solid var(--hairline);border-radius:8px;overflow:hidden;height:170px;background:var(--pane)&quot;&gt;
+    &lt;div style=&quot;position:absolute;left:50%;bottom:78px;transform:translateX(-50%)&quot;&gt;
+      &lt;span class=&quot;gt-toast&quot; style=&quot;font-family:var(--font-touch)&quot;&gt;Tagged as Marion&lt;/span&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;gt-actions&quot; style=&quot;position:absolute;left:0;right:0;bottom:0&quot;&gt;
+      &lt;button class=&quot;act skip&quot;&gt;Skip&lt;/button&gt;
+      &lt;button class=&quot;act primary&quot;&gt;Yes, tag&lt;/button&gt;
+      &lt;button class=&quot;act&quot;&gt;Someone else&lt;/button&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;div style=&quot;flex:1;min-width:280px;position:relative;border:1px solid var(--hairline);border-radius:8px;overflow:hidden;height:170px;background:var(--pane)&quot;&gt;
+    &lt;div style=&quot;position:absolute;left:50%;bottom:24px;transform:translateX(-50%);width:max-content&quot;&gt;
+      &lt;span class=&quot;gt-toast err&quot;&gt;Could not rename family — name already in use&lt;/span&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+"></iframe><details class="guide"><summary>Usage guidelines</summary><p>The transient lozenge that confirms a write, or reports that one failed.</p>
+<p>A <code>control</code> pill at <code>radius-pill</code>, 9px/18px padding, <code>ink-strong</code>, centred and pinned near the bottom edge — 24px up on People Manager, 92px up on Quick Tag so it clears the action bar. <code>pointer-events: none</code>, so it never intercepts the next tap. <code>.err</code> swaps the fill for <code>toast-error</code> and nothing else.</p>
+<h4>When to use</h4>
+<p>For the result of a small write that the person can already see the effect of: a face tagged, a family renamed, a person deleted. It confirms, it does not ask.</p>
+<p>For anything the person must act on, use the status bar, a <code>.hint</code> inside the relevant <code>Card</code>, or an error line beside the failing control. For a long-running job, use <code>ProgressBar</code> and the button's own label.</p>
+<h4>What the consumer provides</h4>
+<p>One short line — a sentence fragment, no punctuation at the end — and a dismiss timer. Capped at 86% of the viewport so a long filename cannot span the screen.</p>
+<h4>Don't</h4>
+<ul><li>Don't queue toasts; replace the current one.</li><li>Don't put a button or a link in it — it is <code>pointer-events: none</code>.</li><li>Don't use it for an error the person has to do something about.</li></ul></details></article></div><h3 class="group">Surfaces</h3><div class="cards"><article class="card" id="c-Card"><header><h4>Card</h4><span>Library, Geotagging and a card with a blocking hint</span></header><iframe class="fit" title="Card preview" loading="lazy" style="height:300px" srcdoc="
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;dist/tokens.css&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;components/bundle.css&quot;&gt;&lt;style&gt;html,body{margin:0}body{background:var(--canvas);color:var(--ink);font-family:var(--font-ui);padding:0}&lt;/style&gt;&lt;/head&gt;
+&lt;body&gt;
+&lt;div class=&quot;gt-surface&quot; id=&quot;root&quot; style=&quot;padding:16px&quot;&gt;
+  &lt;div style=&quot;display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:start&quot;&gt;
+    &lt;div class=&quot;card&quot;&gt;
+      &lt;h2&gt;Library&lt;/h2&gt;
+      &lt;div class=&quot;big-number&quot;&gt;48,201&lt;/div&gt;
+      &lt;div class=&quot;sub-line&quot;&gt;44,905 photos · 3,296 videos&lt;/div&gt;
+      &lt;div class=&quot;stat-line&quot;&gt;&lt;strong&gt;1,204&lt;/strong&gt; added in the last scan&lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;div class=&quot;card&quot;&gt;
+      &lt;h2&gt;Geotagging&lt;/h2&gt;
+      &lt;div class=&quot;progress-bar&quot;&gt;&lt;div class=&quot;progress-fill&quot; style=&quot;width:27%&quot;&gt;&lt;/div&gt;&lt;/div&gt;
+      &lt;div class=&quot;progress-label&quot;&gt;12,880 of 48,201 · 27%&lt;/div&gt;
+      &lt;div class=&quot;stat-line&quot;&gt;&lt;strong&gt;35,321&lt;/strong&gt; still untagged&lt;/div&gt;
+      &lt;div class=&quot;stat-line highlight&quot;&gt;3,410 could be guessed from neighbours&lt;/div&gt;
+      &lt;div class=&quot;card-actions&quot;&gt;
+        &lt;a class=&quot;button&quot; href=&quot;#&quot;&gt;⚡ Quick Geocode&lt;/a&gt;
+        &lt;a class=&quot;button&quot; href=&quot;#&quot;&gt;📍 Open Geocode view&lt;/a&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;div class=&quot;card&quot;&gt;
+      &lt;h2&gt;Reverse geocoding (place names)&lt;/h2&gt;
+      &lt;div class=&quot;stat-line&quot;&gt;9,902 of 12,880 geotagged photos have a place name&lt;/div&gt;
+      &lt;div class=&quot;hint&quot;&gt;GeoNames data not found — run setup step 4&lt;/div&gt;
+      &lt;div class=&quot;card-actions&quot;&gt;
+        &lt;button class=&quot;button&quot;&gt;Run backfill&lt;/button&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+"></iframe></article><article class="card" id="c-GroupSection"><header><h4>GroupSection</h4><span>Two consecutive day groups on cycling tints</span></header><iframe class="fit" title="GroupSection preview" loading="lazy" style="height:280px" srcdoc="
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;dist/tokens.css&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;components/bundle.css&quot;&gt;&lt;style&gt;html,body{margin:0}body{background:var(--canvas);color:var(--ink);font-family:var(--font-ui);padding:0}&lt;/style&gt;&lt;/head&gt;
+&lt;body&gt;
+&lt;div class=&quot;gt-surface&quot; id=&quot;root&quot; style=&quot;padding:16px;background:var(--pane)&quot;&gt;
+  &lt;div class=&quot;face-group-section&quot;&gt;
+    &lt;div class=&quot;face-group-header&quot;&gt;
+      &lt;span class=&quot;face-group-label&quot;&gt;14 August 2011 &lt;span class=&quot;face-group-meta&quot;&gt;· 24 photos · Skagen&lt;/span&gt;&lt;/span&gt;
+      &lt;span class=&quot;face-group-btns&quot;&gt;
+        &lt;button class=&quot;button&quot;&gt;Tag all here&lt;/button&gt;
+        &lt;button class=&quot;button icon-btn&quot; title=&quot;Ignore group&quot;&gt;🚫&lt;/button&gt;
+      &lt;/span&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;face-group-cells group-tint-0&quot;&gt;
+      &lt;div class=&quot;thumb-cell tagged&quot;&gt;&lt;img alt=&quot;&quot; src=&quot;data:image/svg+xml;utf8,%3Csvg xmlns=&#x27;http://www.w3.org/2000/svg&#x27; width=&#x27;120&#x27; height=&#x27;120&#x27;%3E%3Crect width=&#x27;120&#x27; height=&#x27;120&#x27; fill=&#x27;%23394a5a&#x27;/%3E%3Cpath d=&#x27;M0 84 L34 52 L60 78 L82 62 L120 96 L120 120 L0 120 Z&#x27; fill=&#x27;%232c3a47&#x27;/%3E%3Ccircle cx=&#x27;92&#x27; cy=&#x27;28&#x27; r=&#x27;11&#x27; fill=&#x27;%234a5a6a&#x27;/%3E%3C/svg%3E&quot;&gt;&lt;/div&gt;
+      &lt;div class=&quot;thumb-cell selected&quot;&gt;&lt;img alt=&quot;&quot; src=&quot;data:image/svg+xml;utf8,%3Csvg xmlns=&#x27;http://www.w3.org/2000/svg&#x27; width=&#x27;120&#x27; height=&#x27;120&#x27;%3E%3Crect width=&#x27;120&#x27; height=&#x27;120&#x27; fill=&#x27;%235a4a3a&#x27;/%3E%3Cpath d=&#x27;M0 92 L40 60 L70 86 L120 54 L120 120 L0 120 Z&#x27; fill=&#x27;%23473a2c&#x27;/%3E%3C/svg%3E&quot;&gt;&lt;/div&gt;
+      &lt;div class=&quot;thumb-cell&quot;&gt;&lt;img alt=&quot;&quot; src=&quot;data:image/svg+xml;utf8,%3Csvg xmlns=&#x27;http://www.w3.org/2000/svg&#x27; width=&#x27;120&#x27; height=&#x27;120&#x27;%3E%3Crect width=&#x27;120&#x27; height=&#x27;120&#x27; fill=&#x27;%233a5a4a&#x27;/%3E%3Cpath d=&#x27;M0 76 L28 58 L56 80 L96 50 L120 72 L120 120 L0 120 Z&#x27; fill=&#x27;%232c473a&#x27;/%3E%3C/svg%3E&quot;&gt;&lt;/div&gt;
+      &lt;div class=&quot;thumb-cell geo-ignored&quot;&gt;&lt;img alt=&quot;&quot; src=&quot;data:image/svg+xml;utf8,%3Csvg xmlns=&#x27;http://www.w3.org/2000/svg&#x27; width=&#x27;120&#x27; height=&#x27;120&#x27;%3E%3Crect width=&#x27;120&#x27; height=&#x27;120&#x27; fill=&#x27;%234a3a5a&#x27;/%3E%3Cpath d=&#x27;M0 88 L46 56 L84 84 L120 66 L120 120 L0 120 Z&#x27; fill=&#x27;%233a2c47&#x27;/%3E%3C/svg%3E&quot;&gt;&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;div class=&quot;face-group-section&quot; style=&quot;margin-top:8px&quot;&gt;
+    &lt;div class=&quot;face-group-header green&quot;&gt;
+      &lt;span class=&quot;face-group-label&quot;&gt;15 August 2011 &lt;span class=&quot;face-group-meta&quot;&gt;· 9 photos · all geotagged&lt;/span&gt;&lt;/span&gt;
+      &lt;span class=&quot;face-group-btns&quot;&gt;&lt;button class=&quot;button&quot;&gt;Review&lt;/button&gt;&lt;/span&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;face-group-cells group-tint-1&quot;&gt;
+      &lt;div class=&quot;thumb-cell tagged&quot;&gt;&lt;img alt=&quot;&quot; src=&quot;data:image/svg+xml;utf8,%3Csvg xmlns=&#x27;http://www.w3.org/2000/svg&#x27; width=&#x27;120&#x27; height=&#x27;120&#x27;%3E%3Crect width=&#x27;120&#x27; height=&#x27;120&#x27; fill=&#x27;%235a5a3a&#x27;/%3E%3Cpath d=&#x27;M0 80 L36 62 L64 82 L120 58 L120 120 L0 120 Z&#x27; fill=&#x27;%2347472c&#x27;/%3E%3C/svg%3E&quot;&gt;&lt;/div&gt;
+      &lt;div class=&quot;thumb-cell tagged&quot;&gt;&lt;img alt=&quot;&quot; src=&quot;data:image/svg+xml;utf8,%3Csvg xmlns=&#x27;http://www.w3.org/2000/svg&#x27; width=&#x27;120&#x27; height=&#x27;120&#x27;%3E%3Crect width=&#x27;120&#x27; height=&#x27;120&#x27; fill=&#x27;%233a4a5a&#x27;/%3E%3Cpath d=&#x27;M0 90 L30 68 L72 90 L120 62 L120 120 L0 120 Z&#x27; fill=&#x27;%232c3947&#x27;/%3E%3C/svg%3E&quot;&gt;&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+"></iframe><details class="guide"><summary>Usage guidelines</summary><p>The tinted wrapper that fences one day, event or cluster of tiles off from its neighbours.</p>
+<p>A <code>tint-border</code> outline, <code>radius-5</code>, a <code>FaceGroupHeader</code> flush at the top, and a tile grid beneath it on one of six cycling tints (<code>group-tint-0</code> … <code>group-tint-5</code>). The tints are 9% alpha — just enough that two adjacent days read as two things without a hard rule between them.</p>
+<h4>When to use</h4>
+<p>Wherever a flat grid would run two unrelated groups together: day and event groups in the photo grid, suggested-person runs in the unlabeled face queue, clusters on Discover, near-duplicate runs on Representatives.</p>
+<p>Cycle the tint by group index modulo 6 — the tint carries no meaning of its own, only difference from the group above. The header's own colour (<code>green</code>, <code>amber</code>, <code>blue</code>, <code>grey</code>) is what carries meaning.</p>
+<h4>What the consumer provides</h4>
+<p>The header (title, meta, buttons) and the tiles. In a queue where the first tile of each run must start a fresh row, tag it <code>.row-break</code> — CSS grid auto-placement cannot backfill, so the previous row's tail stays empty and becomes the visual break.</p>
+<h4>Don't</h4>
+<ul><li>Don't raise the tint opacity; at 9% it sits under a photograph without colouring it.</li><li>Don't use the tint to encode state. Two green groups can be tinted differently and still both mean "labeled".</li><li>Don't nest sections.</li></ul></details></article></div></section>
+
+  <footer>Exported from the Claude design system; page generated by <code>scripts/build-design-demo.py</code> from <code>tokens.json</code> and each component's <code>preview.html</code>.</footer>
+</div>
+<script>
+(function () {
+  var root = document.documentElement;
+  var frames = function () { return Array.prototype.slice.call(document.querySelectorAll('iframe')); };
+  function setTheme(t) {
+    root.setAttribute('data-theme', t);
+    document.querySelectorAll('[data-theme-choice]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.themeChoice === t)); });
+    frames().forEach(function (f) { try { f.contentDocument.documentElement.setAttribute('data-theme', t); } catch (e) {} });
+    try { localStorage.setItem('geotagger-design-system-theme', t); } catch (e) {}
+  }
+  document.querySelectorAll('[data-theme-choice]').forEach(function (b) { b.addEventListener('click', function () { setTheme(b.dataset.themeChoice); }); });
+  var saved = null; try { saved = localStorage.getItem('geotagger-design-system-theme'); } catch (e) {}
+  if (saved && document.querySelector('[data-theme-choice="' + saved + '"]')) setTheme(saved);
+
+  // size each preview frame to its content
+  function fit(f) {
+    try {
+      var d = f.contentDocument; if (!d || !d.body) return;
+      f.style.height = '0px';
+      var h = Math.ceil(d.documentElement.scrollHeight);
+      f.style.height = (h > 20 ? h + 2 : 160) + 'px';
+    } catch (e) {}
+  }
+  frames().forEach(function (f) {
+    if (f.closest('#cover')) return;
+    f.addEventListener('load', function () {
+      try { f.contentDocument.documentElement.setAttribute('data-theme', root.getAttribute('data-theme')); } catch (e) {}
+      fit(f); setTimeout(function () { fit(f); }, 150); setTimeout(function () { fit(f); }, 800);
+      try { new ResizeObserver(function () { fit(f); }).observe(f.contentDocument.body); } catch (e) {}
+    });
+  });
+
+  // scale the 960px cover to the column width
+  var cover = document.getElementById('cover');
+  if (cover) {
+    var cf = cover.querySelector('iframe'), ch = parseFloat(cf.style.height);
+    function scale() { var s = cover.clientWidth / 960; cf.style.transform = 'scale(' + s + ')'; cover.style.height = (ch * s) + 'px'; }
+    scale(); window.addEventListener('resize', scale);
+    cf.addEventListener('load', function () { try { cf.contentDocument.documentElement.setAttribute('data-theme', root.getAttribute('data-theme')); } catch (e) {} });
+  }
+
+  // color filter
+  var filter = document.getElementById('filter');
+  if (filter) filter.addEventListener('input', function () {
+    var q = filter.value.trim().toLowerCase();
+    document.querySelectorAll('#swatches .sw').forEach(function (el) { el.hidden = q && el.textContent.toLowerCase().indexOf(q) < 0; });
+  });
+})();
+</script>
+</body>
+</html>

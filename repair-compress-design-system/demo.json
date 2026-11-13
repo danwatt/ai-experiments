@@ -1,0 +1,27 @@
+{
+  "title": "RPR1 / YLK1 Codec Lab",
+  "eyebrow": "Design system \u00b7 from danwatt/repair-compress-demo",
+  "tagline": "An instrument panel for two text codecs from a 1993 Game Boy. Flat panels on a dark field, hairlines instead of shadows, a pixel face for structure, one blue ramp and one scarce amber accent.",
+  "artifact": "https://claude.ai/artifact/GrYXpdxiS6cfADcaaonZYt",
+  "artifactName": "RePair Compress Blue",
+  "surfaceClass": "",
+  "react": true,
+  "fonts": "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Silkscreen:wght@400;700&display=swap",
+  "page": {
+    "bg": "ground",
+    "surface": "panel",
+    "ink": "ink",
+    "muted": "ink-soft",
+    "line": "rule",
+    "accent": "hot",
+    "accentFill": "dmg-2",
+    "onAccent": "ink"
+  },
+  "themes": [
+    "dark",
+    "light"
+  ],
+  "bodyFont": "mono",
+  "headFont": "pixel",
+  "previewPad": "16px"
+}

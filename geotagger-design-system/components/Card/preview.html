@@ -1,0 +1,37 @@
+<!-- @dsCard group="Surfaces" height=300 subtitle="Library, Geotagging and a card with a blocking hint" -->
+<!DOCTYPE html>
+<html>
+<body>
+<div class="gt-surface" id="root" style="padding:16px">
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:start">
+    <div class="card">
+      <h2>Library</h2>
+      <div class="big-number">48,201</div>
+      <div class="sub-line">44,905 photos · 3,296 videos</div>
+      <div class="stat-line"><strong>1,204</strong> added in the last scan</div>
+    </div>
+
+    <div class="card">
+      <h2>Geotagging</h2>
+      <div class="progress-bar"><div class="progress-fill" style="width:27%"></div></div>
+      <div class="progress-label">12,880 of 48,201 · 27%</div>
+      <div class="stat-line"><strong>35,321</strong> still untagged</div>
+      <div class="stat-line highlight">3,410 could be guessed from neighbours</div>
+      <div class="card-actions">
+        <a class="button" href="#">⚡ Quick Geocode</a>
+        <a class="button" href="#">📍 Open Geocode view</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Reverse geocoding (place names)</h2>
+      <div class="stat-line">9,902 of 12,880 geotagged photos have a place name</div>
+      <div class="hint">GeoNames data not found — run setup step 4</div>
+      <div class="card-actions">
+        <button class="button">Run backfill</button>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

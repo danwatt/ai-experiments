@@ -1,0 +1,30 @@
+<!-- @dsCard group="Forms" height=190 subtitle="Default, width-capped, and page-scoping" -->
+<!DOCTYPE html>
+<html>
+<body>
+<div class="gt-surface" id="root" style="padding:16px;display:flex;flex-direction:column;gap:16px">
+  <div class="gt-toolbar" style="border-radius:4px;border-bottom:none">
+    <label style="font-size:12px;color:#bbb">Camera</label>
+    <select class="gt-select">
+      <option>All cameras</option>
+      <option>Canon EOS 40D</option>
+      <option>iPhone 7</option>
+    </select>
+    <label style="font-size:12px;color:#bbb">Time focus</label>
+    <select class="gt-select focus-active" style="max-width:240px">
+      <option>Skagen holiday · Aug 2011</option>
+    </select>
+    <span style="color:#7fae7f;font-size:11px;font-style:italic">scoped to 214 photos</span>
+  </div>
+
+  <div class="imprecise-row" style="display:flex;align-items:center;gap:6px;background:var(--field);padding:3px 8px;border-radius:4px;border:1px solid var(--field-border);width:max-content">
+    <label style="display:flex;align-items:center;gap:5px;color:var(--ink);font-weight:500;font-size:12px;cursor:pointer">
+      <input type="checkbox" checked style="width:13px;height:13px;accent-color:var(--accent);margin:0"> Imprecise drop
+    </label>
+    <select class="gt-select" style="padding:2px 4px;background:var(--chrome);border-color:var(--control-border);color:#fff;font-size:11px">
+      <option>± 1 km</option><option>± 5 km</option>
+    </select>
+  </div>
+</div>
+</body>
+</html>

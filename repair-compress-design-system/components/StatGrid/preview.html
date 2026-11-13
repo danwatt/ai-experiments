@@ -1,0 +1,16 @@
+<!-- @dsCard group="Data" height=200 subtitle="key / value / note readouts" -->
+<div id="root"></div>
+<script>
+  var h = React.createElement;
+  var CL = window.CodecLab;
+  ReactDOM.createRoot(document.getElementById("root")).render(
+    h(CL.Panel, null,
+      h(CL.StatGrid, { stats: [
+        { k: "Corpus", v: "4.51 MB", n: "kjv.csv, as read" },
+        { k: "Encoded", v: "1.18 MB", n: "RPR1 stream + dictionary", tone: "good" },
+        { k: "Ratio", v: "3.82x", n: "against raw text", tone: "hot" },
+        { k: "Escapes", v: "41,208", n: "literals that paid full price", tone: "warn" }
+      ] })
+    )
+  );
+</script>

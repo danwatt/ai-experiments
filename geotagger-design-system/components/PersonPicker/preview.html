@@ -1,0 +1,42 @@
+<!-- @dsCard group="Overlays" height=330 subtitle="Desktop dialog, its empty state, and the touch bottom sheet" -->
+<!DOCTYPE html>
+<html>
+<body>
+<div class="gt-surface" id="root" style="padding:16px;display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap">
+  <div class="pp-modal">
+    <div class="pp-head">Assign to… <button class="pp-close" title="Close">✕</button></div>
+    <input class="pp-search" type="text" value="el" aria-label="Search people">
+    <div class="pp-list">
+      <button class="pp-item pp-hl">Elias <span class="pp-count">88</span></button>
+      <button class="pp-item">Eleanor <span class="pp-count">31</span></button>
+      <button class="pp-item">Michel <span class="pp-count">7</span></button>
+      <button class="pp-item pp-new">＋ Create “el”</button>
+    </div>
+  </div>
+
+  <div class="pp-modal">
+    <div class="pp-head">Assign to… <button class="pp-close" title="Close">✕</button></div>
+    <input class="pp-search" type="text" value="zzz" aria-label="Search people">
+    <div class="pp-list">
+      <div class="pp-empty">No one matches</div>
+      <button class="pp-item pp-new">＋ Create “zzz”</button>
+    </div>
+  </div>
+
+  <div style="width:260px">
+    <div style="font-size:11px;color:var(--ink-soft);margin-bottom:6px">Touch — bottom sheet</div>
+    <div style="background:var(--bar);border-radius:16px 16px 0 0;padding:12px;font-family:var(--font-touch)">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <span style="font-weight:700;font-size:16px">Who is this?</span>
+        <span style="color:var(--ink-muted);font-size:20px">✕</span>
+      </div>
+      <input type="text" placeholder="Search…" style="width:100%;padding:12px;font-size:16px;border-radius:10px;border:1px solid var(--field-border);background:var(--canvas);color:var(--ink-strong);margin-bottom:10px">
+      <div style="display:flex;flex-direction:column;gap:5px">
+        <button style="display:flex;align-items:center;justify-content:space-between;width:100%;text-align:left;padding:14px;font-family:inherit;font-size:16px;border:1px solid var(--panel-border);border-radius:10px;background:var(--overlay);color:var(--ink-strong)">Marion <span style="color:#9aa;font-size:13px">212</span></button>
+        <button style="display:flex;align-items:center;justify-content:space-between;width:100%;text-align:left;padding:14px;font-family:inherit;font-size:16px;border:1px solid var(--accent);border-radius:10px;background:var(--accent-fill);color:var(--on-accent-bright)">＋ New person</button>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

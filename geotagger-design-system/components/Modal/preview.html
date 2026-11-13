@@ -1,0 +1,44 @@
+<!-- @dsCard group="Overlays" height=330 subtitle="The month picker over a dimmed page" -->
+<!DOCTYPE html>
+<html>
+<body>
+<div class="gt-surface" id="root" style="padding:0;position:relative;height:330px;overflow:hidden">
+  <div class="gt-toolbar">
+    <div class="toolbar-group">
+      <a class="button active" href="#">🏠 Home</a>
+      <a class="button" href="#">🔎 Search</a>
+    </div>
+  </div>
+  <div style="background:var(--pane);height:100%"></div>
+
+  <div class="modal">
+    <div class="modal-content" style="width:440px">
+      <span class="modal-close" title="Close">×</span>
+      <h2>Jump to a month</h2>
+      <div style="margin-bottom:16px">
+        <div style="font-size:16px;font-weight:600;color:var(--accent-text);margin-bottom:8px;padding:4px 0;border-bottom:1px solid var(--panel-border);display:flex;align-items:baseline;gap:10px">
+          2011
+          <span style="font-size:11px;font-weight:400;color:#5a8ab8;text-decoration:underline;text-underline-offset:2px">browse all</span>
+        </div>
+        <div class="month-item">
+          <span class="month-name">August</span>
+          <span class="month-counts">
+            <span class="count-badge count-geotagged">212 geotagged</span>
+            <span class="count-badge count-not-geotagged">41 not</span>
+            <span class="count-badge count-total">253</span>
+          </span>
+        </div>
+        <div class="month-item">
+          <span class="month-name">July</span>
+          <span class="month-counts">
+            <span class="count-badge count-geotagged">96 geotagged</span>
+            <span class="count-badge count-not-geotagged">188 not</span>
+            <span class="count-badge count-total">284</span>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

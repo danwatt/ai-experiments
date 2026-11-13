@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RPR1 / YLK1 Codec Lab design system</title>
+<meta name="description" content="An instrument panel for two text codecs from a 1993 Game Boy. Flat panels on a dark field, hairlines instead of shadows, a pixel face for structure, one blue ramp and one scarce amber accent.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Silkscreen:wght@400;700&display=swap">
+<link rel="stylesheet" href="dist/tokens.css">
+<link rel="stylesheet" href="components/bundle.css">
+<style>
+  /* Page chrome only. Colors, type and spacing come from this system's own tokens. */
+  *, *::before, *::after { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--ground); color: var(--ink); font-family: var(--font-mono); font-size: 14px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+  a { color: var(--hot); }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .92em; color: var(--hot); }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 24px max(16px, env(safe-area-inset-right, 0px)) 96px max(16px, env(safe-area-inset-left, 0px)); }
+  .topbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .topbar a { font-weight: 600; text-decoration: none; }
+  .seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 4px; overflow: hidden; }
+  .seg button { appearance: none; border: 0; background: var(--panel); color: var(--ink-soft); font: inherit; font-size: 12px; padding: 5px 12px; cursor: pointer; }
+  .seg button + button { border-left: 1px solid var(--rule); }
+  .seg button[aria-pressed="true"] { background: var(--dmg-2); color: var(--ink); }
+  .hero { margin-top: 40px; }
+  .eyebrow { margin: 0 0 8px; color: var(--ink-soft); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; font-family: var(--font-pixel); }
+  h1 { margin: 0; font-family: var(--font-pixel); font-size: clamp(30px, 6vw, 52px); line-height: 1.1; font-weight: 700; }
+  .lead { max-width: 70ch; color: var(--ink-soft); font-size: 15px; margin: 16px 0 0; }
+  .links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+  .links a { border: 1px solid var(--rule); border-radius: 4px; padding: 6px 12px; text-decoration: none; background: var(--panel); font-weight: 600; font-size: 13px; }
+  .cover { position: relative; margin-top: 32px; border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; }
+  .cover iframe { border: 0; display: block; transform-origin: 0 0; }
+  nav.sections { position: sticky; top: 0; z-index: 5; display: flex; gap: 4px; flex-wrap: wrap; margin: 32px -16px 0; padding: 10px 16px; background: var(--ground); border-bottom: 1px solid var(--rule); }
+  nav.sections a { padding: 4px 10px; border-radius: 4px; text-decoration: none; color: var(--ink-soft); font-weight: 600; font-size: 13px; }
+  nav.sections a:hover { background: var(--panel); color: var(--ink); }
+  section { margin-top: 56px; scroll-margin-top: 60px; }
+  .sechead { display: flex; justify-content: space-between; align-items: end; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
+  h2 { margin: 0; font-family: var(--font-pixel); font-size: 22px; font-weight: 700; }
+  h3 { margin: 32px 0 12px; font-size: 15px; font-weight: 700; }
+  h3 small { color: var(--ink-soft); font-weight: 400; margin-left: 6px; }
+  h4 { margin: 0; font-size: 14px; }
+  .note { color: var(--ink-soft); max-width: 80ch; margin: 0 0 12px; }
+  #filter { font: inherit; font-size: 13px; padding: 6px 10px; border-radius: 4px; border: 1px solid var(--rule); background: var(--panel); color: var(--ink); width: 240px; max-width: 100%; }
+
+  .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+  .sw { border: 1px solid var(--rule); border-radius: 6px; background: var(--panel); overflow: hidden; min-width: 0; }
+  .sw[hidden] { display: none; }
+  .sw__chip { height: 56px; border-bottom: 1px solid var(--rule); }
+  .sw__body { padding: 10px 12px 12px; display: grid; gap: 2px; }
+  .sw__name { font-weight: 600; color: var(--ink); }
+  .sw__hex { font-family: ui-monospace, Menlo, monospace; font-size: 11px; color: var(--ink-soft); overflow-wrap: anywhere; }
+  .sw__use { font-size: 12px; color: var(--ink-soft); margin-top: 4px; }
+
+  .specimens { display: grid; gap: 1px; background: var(--rule); border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; }
+  .spec { background: var(--panel); padding: 14px 16px; display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 4px 20px; align-items: baseline; }
+  .spec__meta { display: grid; gap: 2px; font-size: 12px; color: var(--ink-soft); }
+  .spec__sample { color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+  .spec__use { grid-column: 2; font-size: 12px; color: var(--ink-soft); }
+  @media (max-width: 640px) { .spec { grid-template-columns: 1fr; } .spec__use { grid-column: 1; } }
+
+  .tablewrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 6px; background: var(--panel); }
+  table.scale { width: 100%; border-collapse: collapse; }
+  table.scale td { padding: 10px 14px; border-top: 1px solid var(--rule); vertical-align: middle; }
+  table.scale tr:first-child td { border-top: 0; }
+  td.num { font-family: ui-monospace, Menlo, monospace; font-size: 12px; color: var(--ink-soft); white-space: nowrap; max-width: 280px; overflow-wrap: anywhere; white-space: normal; }
+  td.use { font-size: 12px; color: var(--ink-soft); min-width: 220px; }
+  td.viz { min-width: 90px; }
+  .bar { display: block; height: 10px; border-radius: 2px; background: var(--hot); }
+  .bar--thin { height: 6px; }
+  .box { display: inline-block; width: 44px; height: 44px; border: 1px solid var(--hot); background: color-mix(in srgb, var(--hot) 18%, transparent); }
+  .box--shadow { background: var(--rule); border-color: transparent; border-radius: 6px; }
+
+  .cards { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .card { border: 1px solid var(--rule); border-radius: 6px; background: var(--panel); overflow: hidden; min-width: 0; }
+  .card header { padding: 12px 14px 10px; display: flex; flex-direction: column; gap: 2px; }
+  .card header span { font-size: 12px; color: var(--ink-soft); }
+  .card iframe { display: block; width: 100%; border: 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); background: var(--ground); }
+  .guide { padding: 10px 14px; font-size: 13px; color: var(--ink-soft); }
+  .guide summary { cursor: pointer; font-weight: 600; color: var(--ink); }
+  .guide h4 { margin: 14px 0 4px; color: var(--ink); }
+  .guide p { margin: 8px 0; }
+  .guide ul { padding-left: 20px; margin: 8px 0; }
+  footer { margin-top: 72px; color: var(--ink-soft); font-size: 12px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <a href="../">← All experiments</a>
+    <div class="seg" role="group" aria-label="Theme"><button type="button" data-theme-choice="dark" aria-pressed="true">Dark</button><button type="button" data-theme-choice="light" aria-pressed="false">Light</button></div>
+  </div>
+
+  <header class="hero">
+    <p class="eyebrow">Design system · from danwatt/repair-compress-demo</p>
+    <h1>RPR1 / YLK1 Codec Lab</h1>
+    <div class="lead"><p style="margin:0">An instrument panel for two text codecs from a 1993 Game Boy. Flat panels on a dark field, hairlines instead of shadows, a pixel face for structure, one blue ramp and one scarce amber accent.</p></div>
+    <div class="links">
+      <a href="README.html">Read the guide</a>
+      <a href="tokens.json">tokens.json</a>
+      <a href="dist/tokens.css">tokens.css</a>
+      <a href="components/bundle.css">bundle.css</a>
+    </div>
+  </header>
+  <div class="cover" id="cover"><iframe title="Cover" tabindex="-1" style="width:960px;height:288px" srcdoc="&lt;!doctype html&gt;&lt;html&gt;&lt;head&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=Silkscreen:wght@400;700&amp;display=swap&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;dist/tokens.css&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;components/bundle.css&quot;&gt;&lt;style&gt;html,body{margin:0}body{background:var(--ground);color:var(--ink);font-family:var(--font-mono);padding:16px}body{padding:0!important;overflow:hidden}&lt;/style&gt;&lt;script src=&quot;https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js&quot;&gt;&lt;/script&gt;&lt;script src=&quot;https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js&quot;&gt;&lt;/script&gt;&lt;script src=&quot;components/bundle.js&quot;&gt;&lt;/script&gt;&lt;/head&gt;&lt;body&gt;
+&lt;div id=&quot;cover&quot;&gt;
+  &lt;!--
+    blocks: dmg-4 slab 240x152 · hot 124x76 · lcd 184x60 (bleeds off the right edge) ·
+            a stream strip of five unequal bands in sym-word, sym-rule, sym-esc, sym-word, sym-rule
+    arrangement: one tall slab with two satellites, under a full-width strip of unequal bands —
+            the stream strip the lab draws over every encoded passage
+    pattern: tiles cut by the radius tokens, six merged two-wide — a Re-Pair rule is one symbol
+            standing for a pair of words, so the grid of word cells is broken by wider rule cells.
+            A generic technical system would land on a plain dot grid; the merged pairs are this codec.
+    scales: cell 20px on a 22px pitch (space-1 gutter), strip bands on 20px multiples,
+            radius-sm on every tile and band, radius-xs nowhere below 10px, gutters space-1
+  --&gt;
+  &lt;svg viewBox=&quot;0 0 960 288&quot; width=&quot;960&quot; height=&quot;288&quot; role=&quot;img&quot; aria-label=&quot;RPR1 / YLK1 Codec Lab&quot;&gt;
+    &lt;rect class=&quot;strip-word&quot; x=&quot;520&quot; y=&quot;24&quot; width=&quot;140&quot; height=&quot;56&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;strip-rule&quot; x=&quot;664&quot; y=&quot;24&quot; width=&quot;64&quot; height=&quot;56&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;strip-esc&quot;  x=&quot;732&quot; y=&quot;24&quot; width=&quot;40&quot; height=&quot;56&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;strip-word&quot; x=&quot;776&quot; y=&quot;24&quot; width=&quot;100&quot; height=&quot;56&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;strip-rule&quot; x=&quot;880&quot; y=&quot;24&quot; width=&quot;80&quot;  height=&quot;56&quot; rx=&quot;2&quot;/&gt;
+
+    &lt;rect class=&quot;slab&quot; x=&quot;520&quot; y=&quot;112&quot; width=&quot;240&quot; height=&quot;152&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;cell&quot; x=&quot;530&quot; y=&quot;122&quot; width=&quot;20&quot; height=&quot;20&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;cell&quot; x=&quot;552&quot; y=&quot;122&quot; width=&quot;20&quot; height=&quot;20&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;rule&quot; x=&quot;574&quot; y=&quot;122&quot; width=&quot;42&quot; height=&quot;20&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;cell&quot; x=&quot;618&quot; y=&quot;122&quot; width=&quot;20&quot; height=&quot;20&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;cell&quot; x=&quot;640&quot; y=&quot;122&quot; width=&quot;20&quot; height=&quot;20&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;cell&quot; x=&quot;662&quot; y=&quot;122&quot; width=&quot;20&quot; height=&quot;20&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;cell&quot; x=&quot;684&quot; y=&quot;122&quot; width=&quot;20&quot; height=&quot;20&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;cell&quot; x=&quot;706&quot; y=&quot;122&quot; width=&quot;20&quot; height=&quot;20&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;cell&quot; x=&quot;728&quot; y=&quot;122&quot; width=&quot;20&quot; height=&quot;20&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;cell&quot; x=&quot;530&quot; y=&quot;144&quot; width=&quot;20&quot; height=&quot;20&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;cell&quot; x=&quot;552&quot; y=&quot;144&quot; width=&quot;20&quot; height=&quot;20&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;cell&quot; x=&quot;574&quot; y=&quot;144&quot; width=&quot;20&quot; height=&quot;20&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;cell&quot; x=&quot;596&quot; y=&quot;144&quot; width=&quot;20&quot; height=&quot;20&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;cell&quot; x=&quot;618&quot; y=&quot;144&quot; width=&quot;20&quot; height=&quot;20&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;cell&quot; x=&quot;640&quot; y=&quot;144&quot; width=&quot;20&quot; height=&quot;20&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;rule&quot; x=&quot;662&quot; y=&quot;144&quot; width=&quot;42&quot; height=&quot;20&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;cell&quot; x=&quot;706&quot; y=&quot;144&quot; width=&quot;20&quot; height=&quot;20&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;cell&quot; x=&quot;728&quot; y=&quot;144&quot; width=&quot;20&quot; height=&quot;20&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;rule&quot; x=&quot;530&quot; y=&quot;166&quot; width=&quot;42&quot; height=&quot;20&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;cell&quot; x=&quot;574&quot; y=&quot;166&quot; width=&quot;20&quot; height=&quot;20&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;cell&quot; x=&quot;596&quot; y=&quot;166&quot; width=&quot;20&quot; height=&quot;20&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;cell&quot; x=&quot;618&quot; y=&quot;166&quot; width=&quot;20&quot; height=&quot;20&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;cell&quot; x=&quot;640&quot; y=&quot;166&quot; width=&quot;20&quot; height=&quot;20&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;cell&quot; x=&quot;662&quot; y=&quot;166&quot; width=&quot;20&quot; height=&quot;20&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;cell&quot; x=&quot;684&quot; y=&quot;166&quot; width=&quot;20&quot; height=&quot;20&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;cell&quot; x=&quot;706&quot; y=&quot;166&quot; width=&quot;20&quot; height=&quot;20&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;cell&quot; x=&quot;728&quot; y=&quot;166&quot; width=&quot;20&quot; height=&quot;20&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;cell&quot; x=&quot;530&quot; y=&quot;188&quot; width=&quot;20&quot; height=&quot;20&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;cell&quot; x=&quot;552&quot; y=&quot;188&quot; width=&quot;20&quot; height=&quot;20&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;cell&quot; x=&quot;574&quot; y=&quot;188&quot; width=&quot;20&quot; height=&quot;20&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;cell&quot; x=&quot;596&quot; y=&quot;188&quot; width=&quot;20&quot; height=&quot;20&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;rule&quot; x=&quot;618&quot; y=&quot;188&quot; width=&quot;42&quot; height=&quot;20&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;cell&quot; x=&quot;662&quot; y=&quot;188&quot; width=&quot;20&quot; height=&quot;20&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;cell&quot; x=&quot;684&quot; y=&quot;188&quot; width=&quot;20&quot; height=&quot;20&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;cell&quot; x=&quot;706&quot; y=&quot;188&quot; width=&quot;20&quot; height=&quot;20&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;cell&quot; x=&quot;728&quot; y=&quot;188&quot; width=&quot;20&quot; height=&quot;20&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;cell&quot; x=&quot;530&quot; y=&quot;210&quot; width=&quot;20&quot; height=&quot;20&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;cell&quot; x=&quot;552&quot; y=&quot;210&quot; width=&quot;20&quot; height=&quot;20&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;cell&quot; x=&quot;574&quot; y=&quot;210&quot; width=&quot;20&quot; height=&quot;20&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;cell&quot; x=&quot;596&quot; y=&quot;210&quot; width=&quot;20&quot; height=&quot;20&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;cell&quot; x=&quot;618&quot; y=&quot;210&quot; width=&quot;20&quot; height=&quot;20&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;cell&quot; x=&quot;640&quot; y=&quot;210&quot; width=&quot;20&quot; height=&quot;20&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;cell&quot; x=&quot;662&quot; y=&quot;210&quot; width=&quot;20&quot; height=&quot;20&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;cell&quot; x=&quot;684&quot; y=&quot;210&quot; width=&quot;20&quot; height=&quot;20&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;rule&quot; x=&quot;706&quot; y=&quot;210&quot; width=&quot;42&quot; height=&quot;20&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;cell&quot; x=&quot;530&quot; y=&quot;232&quot; width=&quot;20&quot; height=&quot;20&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;cell&quot; x=&quot;552&quot; y=&quot;232&quot; width=&quot;20&quot; height=&quot;20&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;cell&quot; x=&quot;574&quot; y=&quot;232&quot; width=&quot;20&quot; height=&quot;20&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;rule&quot; x=&quot;596&quot; y=&quot;232&quot; width=&quot;42&quot; height=&quot;20&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;cell&quot; x=&quot;640&quot; y=&quot;232&quot; width=&quot;20&quot; height=&quot;20&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;cell&quot; x=&quot;662&quot; y=&quot;232&quot; width=&quot;20&quot; height=&quot;20&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;cell&quot; x=&quot;684&quot; y=&quot;232&quot; width=&quot;20&quot; height=&quot;20&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;cell&quot; x=&quot;706&quot; y=&quot;232&quot; width=&quot;20&quot; height=&quot;20&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;cell&quot; x=&quot;728&quot; y=&quot;232&quot; width=&quot;20&quot; height=&quot;20&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;accent&quot; x=&quot;776&quot; y=&quot;112&quot; width=&quot;124&quot; height=&quot;76&quot; rx=&quot;2&quot;/&gt;
+    &lt;rect class=&quot;glass&quot;  x=&quot;776&quot; y=&quot;204&quot; width=&quot;184&quot; height=&quot;60&quot; rx=&quot;2&quot;/&gt;
+  &lt;/svg&gt;
+  &lt;div class=&quot;name&quot;&gt;RPR1 / YLK1&lt;br&gt;Codec Lab&lt;/div&gt;
+  &lt;div class=&quot;tagline&quot;&gt;An instrument panel for two text codecs from a 1993 Game Boy.&lt;/div&gt;
+&lt;/div&gt;
+&lt;style&gt;
+  #cover {
+    position: relative;
+    width: 960px;
+    height: 288px;
+    background: var(--ground);
+    overflow: hidden;
+  }
+  #cover svg { position: absolute; inset: 0; display: block; }
+  .slab   { fill: var(--dmg-4); }
+  .accent { fill: var(--hot); }
+  .glass  { fill: var(--lcd); }
+  .cell   { fill: var(--ground); }
+  .rule   { fill: var(--hot); }
+  .strip-word { fill: var(--sym-word); }
+  .strip-rule { fill: var(--sym-rule); }
+  .strip-esc  { fill: var(--sym-esc); }
+  .name {
+    position: absolute;
+    left: 40px;
+    bottom: 76px;
+    width: 440px;
+    font-family: var(--font-pixel);
+    font-size: 56px;
+    line-height: 0.95;
+    color: var(--ink);
+  }
+  .tagline {
+    position: absolute;
+    left: 40px;
+    bottom: 40px;
+    width: 440px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    line-height: 1.4;
+    color: var(--ink-soft);
+  }
+&lt;/style&gt;
+&lt;/body&gt;&lt;/html&gt;"></iframe></div>
+
+  <nav class="sections" aria-label="Sections"><a href="#colors">Colors</a><a href="#type">Type</a><a href="#spacing">Spacing</a><a href="#radius">Radius</a><a href="#shadow">Shadow</a><a href="#components">Components</a></nav>
+  <section id="colors"><div class="sechead"><h2>Colors</h2><input id="filter" type="search" placeholder="Filter 38 colors" aria-label="Filter colors"></div><div class="swatches" id="swatches"><div class="sw" data-name="ground"><div class="sw__chip" style="background:var(--ground)"></div><div class="sw__body"><code class="sw__name">ground</code><span class="sw__hex">dark #0a0e1a · light #f4f6fb</span><span class="sw__use">Page background. Every demo page sets it on body.</span></div></div><div class="sw" data-name="panel"><div class="sw__chip" style="background:var(--panel)"></div><div class="sw__body"><code class="sw__name">panel</code><span class="sw__hex">dark #121a2e · light #ffffff</span><span class="sw__use">Raised surface: panels, table wells, sticky table headers, the current tab.</span></div></div><div class="sw" data-name="ink"><div class="sw__chip" style="background:var(--ink)"></div><div class="sw__body"><code class="sw__name">ink</code><span class="sw__hex">dark #f2f4fa · light #131829</span><span class="sw__use">Body text on ground and panel.</span></div></div><div class="sw" data-name="ink-soft"><div class="sw__chip" style="background:var(--ink-soft)"></div><div class="sw__body"><code class="sw__name">ink-soft</code><span class="sw__hex">dark #8b96b3 · light #5a6480</span><span class="sw__use">Secondary text: theses, field labels, table headers, notes, footers.</span></div></div><div class="sw" data-name="rule"><div class="sw__chip" style="background:var(--rule)"></div><div class="sw__body"><code class="sw__name">rule</code><span class="sw__hex">dark #253253 · light #d3dae8</span><span class="sw__use">Hairline: every 1px border, table row divider, tab bar underline.</span></div></div><div class="sw" data-name="dmg-4"><div class="sw__chip" style="background:var(--dmg-4)"></div><div class="sw__body"><code class="sw__name">dmg-4</code><span class="sw__hex">dark #5b9dff · light #1a5fd0</span><span class="sw__use">Brightest step of the blue ramp: page titles, headline figures, words in tables.</span></div></div><div class="sw" data-name="dmg-3"><div class="sw__chip" style="background:var(--dmg-3)"></div><div class="sw__body"><code class="sw__name">dmg-3</code><span class="sw__hex">dark #3d7fd9 · light #2f66b5</span><span class="sw__use">Eyebrows and stage labels. Fails 4.5:1 on panel in Dark (4.32) as the source has it.</span></div></div><div class="sw" data-name="dmg-2"><div class="sw__chip" style="background:var(--dmg-2)"></div><div class="sw__body"><code class="sw__name">dmg-2</code><span class="sw__hex">dark #2a5aa8 · light #4d84d6</span><span class="sw__use">Mid ramp step: chart fills, rule-depth shading.</span></div></div><div class="sw" data-name="dmg-1"><div class="sw__chip" style="background:var(--dmg-1)"></div><div class="sw__body"><code class="sw__name">dmg-1</code><span class="sw__hex">dark #163262 · light #9dbdf0</span><span class="sw__use">Darkest ramp step: the deepest fill in stream strips and charts.</span></div></div><div class="sw" data-name="hot"><div class="sw__chip" style="background:var(--hot)"></div><div class="sw__body"><code class="sw__name">hot</code><span class="sw__hex">dark #e8b923 · light #8a6408</span><span class="sw__use">The accent: links, the current tab's label and its 2px inset top rule, emphasised numbers, inline code.</span></div></div><div class="sw" data-name="hot-soft"><div class="sw__chip" style="background:var(--hot-soft)"></div><div class="sw__body"><code class="sw__name">hot-soft</code><span class="sw__hex">dark #f6d878 · light #b98a12</span><span class="sw__use">Softer accent for markers and fills, not body text (Light is 3.1:1 on panel).</span></div></div><div class="sw" data-name="warn"><div class="sw__chip" style="background:var(--warn)"></div><div class="sw__body"><code class="sw__name">warn</code><span class="sw__hex">dark #ffb454 · light #a35c00</span><span class="sw__use">Amber signal: escape symbols, costly outcomes, the .bad state.</span></div></div><div class="sw" data-name="good"><div class="sw__chip" style="background:var(--good)"></div><div class="sw__body"><code class="sw__name">good</code><span class="sw__hex">dark #008a63 · light #00684a</span><span class="sw__use">Green signal: an encoded word, a cheap outcome. Fails 4.5:1 in Dark (4.42 on ground) as the source has it.</span></div></div><div class="sw" data-name="pink"><div class="sw__chip" style="background:var(--pink)"></div><div class="sw__body"><code class="sw__name">pink</code><span class="sw__hex">dark #ff6b9a · light #c22a5c</span><span class="sw__use">Verse boundaries and other structural markers in decoded text.</span></div></div><div class="sw" data-name="chain"><div class="sw__chip" style="background:var(--chain)"></div><div class="sw__body"><code class="sw__name">chain</code><span class="sw__hex">dark #e8b923 · light #8a6408</span><span class="sw__use">The YLK1 link chain drawn across cells.</span></div></div><div class="sw" data-name="chapter-marker"><div class="sw__chip" style="background:var(--chapter-marker)"></div><div class="sw__body"><code class="sw__name">chapter-marker</code><span class="sw__hex">dark #f6d878 · light #b98a12</span><span class="sw__use">Chapter boundary underline, drawn as a 2-3px inset box-shadow.</span></div></div><div class="sw" data-name="verse-marker"><div class="sw__chip" style="background:var(--verse-marker)"></div><div class="sw__body"><code class="sw__name">verse-marker</code><span class="sw__hex">dark #ff6b9a · light #c22a5c</span><span class="sw__use">Verse boundary underline, drawn as a 2-3px inset box-shadow.</span></div></div><div class="sw" data-name="sym-esc"><div class="sw__chip" style="background:var(--sym-esc)"></div><div class="sw__body"><code class="sw__name">sym-esc</code><span class="sw__hex">dark #ffb454 · light #a35c00</span><span class="sw__use">RPR1 stream strip: an escaped literal. One hue per symbol kind.</span></div></div><div class="sw" data-name="sym-esc-lo"><div class="sw__chip" style="background:var(--sym-esc-lo)"></div><div class="sw__body"><code class="sw__name">sym-esc-lo</code><span class="sw__hex">dark #977044 · light #c49670</span><span class="sw__use">Low end of the escape ramp. Computed from the source's oklab color-mix.</span></div></div><div class="sw" data-name="sym-esc-hi"><div class="sw__chip" style="background:var(--sym-esc-hi)"></div><div class="sw__body"><code class="sw__name">sym-esc-hi</code><span class="sw__hex">dark #ffd7a7 · light #462400</span><span class="sw__use">High end of the escape ramp. Computed from the source's oklab color-mix.</span></div></div><div class="sw" data-name="sym-word"><div class="sw__chip" style="background:var(--sym-word)"></div><div class="sw__body"><code class="sw__name">sym-word</code><span class="sw__hex">dark #008a63 · light #00684a</span><span class="sw__use">RPR1 stream strip: a dictionary word symbol.</span></div></div><div class="sw" data-name="sym-rule"><div class="sw__chip" style="background:var(--sym-rule)"></div><div class="sw__body"><code class="sw__name">sym-rule</code><span class="sw__hex">dark #163262 · light #9dbdf0</span><span class="sw__use">RPR1 stream strip: a Re-Pair rule symbol.</span></div></div><div class="sw" data-name="sym-rule-lo"><div class="sw__chip" style="background:var(--sym-rule-lo)"></div><div class="sw__body"><code class="sw__name">sym-rule-lo</code><span class="sw__hex">dark #122445 · light #bed3f5</span><span class="sw__use">Low end of the rule ramp. Computed from the source's oklab color-mix.</span></div></div><div class="sw" data-name="sym-rule-hi"><div class="sw__chip" style="background:var(--sym-rule-hi)"></div><div class="sw__body"><code class="sw__name">sym-rule-hi</code><span class="sw__hex">dark #778aa8 · light #43526a</span><span class="sw__use">High end of the rule ramp. Computed from the source's oklab color-mix.</span></div></div><div class="sw" data-name="sym-direct"><div class="sw__chip" style="background:var(--sym-direct)"></div><div class="sw__body"><code class="sw__name">sym-direct</code><span class="sw__hex">dark #35406b · light #b9c0d8</span><span class="sw__use">YLK1 cell: a direct entry, the quietest kind.</span></div></div><div class="sw" data-name="sym-delta"><div class="sw__chip" style="background:var(--sym-delta)"></div><div class="sw__body"><code class="sw__name">sym-delta</code><span class="sw__hex">dark #2a5aa8 · light #4d84d6</span><span class="sw__use">YLK1 cell: a delta entry.</span></div></div><div class="sw" data-name="sym-delta-lo"><div class="sw__chip" style="background:var(--sym-delta-lo)"></div><div class="sw__body"><code class="sw__name">sym-delta-lo</code><span class="sw__hex">dark #214179 · light #7fa7e3</span><span class="sw__use">Low end of the delta ramp. Computed from the source's oklab color-mix.</span></div></div><div class="sw" data-name="sym-delta-hi"><div class="sw__chip" style="background:var(--sym-delta-hi)"></div><div class="sw__body"><code class="sw__name">sym-delta-hi</code><span class="sw__hex">dark #80b4ff · light #0f4295</span><span class="sw__use">High end of the delta ramp. Computed from the source's oklab color-mix.</span></div></div><div class="sw" data-name="sym-terminal"><div class="sw__chip" style="background:var(--sym-terminal)"></div><div class="sw__body"><code class="sw__name">sym-terminal</code><span class="sw__hex">dark #008a63 · light #00684a</span><span class="sw__use">YLK1 cell: a terminal, where a chain ends.</span></div></div><div class="sw" data-name="sym-shortcut"><div class="sw__chip" style="background:var(--sym-shortcut)"></div><div class="sw__body"><code class="sw__name">sym-shortcut</code><span class="sw__hex">dark #ffb454 · light #a35c00</span><span class="sw__use">YLK1 cell: a shortcut entry.</span></div></div><div class="sw" data-name="lcd"><div class="sw__chip" style="background:var(--lcd)"></div><div class="sw__body"><code class="sw__name">lcd</code><span class="sw__hex">#b9c6a8</span><span class="sw__use">The LCD glass. A physical colour: identical in both themes.</span></div></div><div class="sw" data-name="lcd-well"><div class="sw__chip" style="background:var(--lcd-well)"></div><div class="sw__body"><code class="sw__name">lcd-well</code><span class="sw__hex">#aebc9c</span><span class="sw__use">The glass a shade down, behind the lit area. Physical: identical in both themes.</span></div></div><div class="sw" data-name="lcd-bezel"><div class="sw__chip" style="background:var(--lcd-bezel)"></div><div class="sw__body"><code class="sw__name">lcd-bezel</code><span class="sw__hex">#0f1410</span><span class="sw__use">The black frame the glass sits in, a source literal with no variable of its own. Physical: identical in both themes.</span></div></div><div class="sw" data-name="lcd-ink"><div class="sw__chip" style="background:var(--lcd-ink)"></div><div class="sw__body"><code class="sw__name">lcd-ink</code><span class="sw__hex">#232a1c</span><span class="sw__use">A lit segment on the glass. 8.3:1 on lcd. Physical: identical in both themes.</span></div></div><div class="sw" data-name="lcd-dim"><div class="sw__chip" style="background:var(--lcd-dim)"></div><div class="sw__body"><code class="sw__name">lcd-dim</code><span class="sw__hex">#7b8a68</span><span class="sw__use">An unlit or printed label on the glass, 2.1:1 on lcd by design — never real text. Physical: identical in both themes.</span></div></div><div class="sw" data-name="case"><div class="sw__chip" style="background:var(--case)"></div><div class="sw__body"><code class="sw__name">case</code><span class="sw__hex">#1c2331</span><span class="sw__use">The device shell. Physical: identical in both themes.</span></div></div><div class="sw" data-name="case-edge"><div class="sw__chip" style="background:var(--case-edge)"></div><div class="sw__body"><code class="sw__name">case-edge</code><span class="sw__hex">#2c3547</span><span class="sw__use">The shell's lit edge, its 1px border. Physical: identical in both themes.</span></div></div><div class="sw" data-name="case-face"><div class="sw__chip" style="background:var(--case-face)"></div><div class="sw__body"><code class="sw__name">case-face</code><span class="sw__hex">#222a3b</span><span class="sw__use">The shell's top face, where its gradient starts. Physical: identical in both themes.</span></div></div></div></section><section id="type"><div class="sechead"><h2>Type</h2></div><h3>Interface <small>mono</small></h3><div class="specimens"><div class="spec"><div class="spec__meta"><code>body</code><span>14px / 1.5 · 400</span></div><div class="spec__sample" style="font-family:var(--font-mono);font-size:14px;line-height:1.5;font-weight:400">Sphinx of black quartz, judge my vow</div><div class="spec__use">Set on body. Everything inherits it.</div></div><div class="spec"><div class="spec__meta"><code>body-sm</code><span>12px / 1.5 · 400</span></div><div class="spec__sample" style="font-family:var(--font-mono);font-size:12px;line-height:1.5;font-weight:400">Sphinx of black quartz, judge my vow</div><div class="spec__use">Tables, chips, readouts, verdicts.</div></div><div class="spec"><div class="spec__meta"><code>micro</code><span>11px / 1.5 · 400</span></div><div class="spec__sample" style="font-family:var(--font-mono);font-size:11px;line-height:1.5;font-weight:400">Sphinx of black quartz, judge my vow</div><div class="spec__use">Field labels, legends, hints, footers.</div></div><div class="spec"><div class="spec__meta"><code>micro-caps</code><span>10px / 1.4 · 400</span></div><div class="spec__sample" style="font-family:var(--font-mono);font-size:10px;line-height:1.4;font-weight:400;letter-spacing:0.06em">Sphinx of black quartz, judge my vow</div><div class="spec__use">Stat keys and small captions, uppercased in CSS.</div></div><div class="spec"><div class="spec__meta"><code>input</code><span>15px / 1.4 · 400</span></div><div class="spec__sample" style="font-family:var(--font-mono);font-size:15px;line-height:1.4;font-weight:400">Sphinx of black quartz, judge my vow</div><div class="spec__use">Search inputs. Number inputs use body-sm at 13px.</div></div><div class="spec"><div class="spec__meta"><code>stat-value</code><span>19px / 1.3 · 400</span></div><div class="spec__sample" style="font-family:var(--font-mono);font-size:19px;line-height:1.3;font-weight:400">Sphinx of black quartz, judge my vow</div><div class="spec__use">A stat's value, with font-variant-numeric: tabular-nums.</div></div><div class="spec"><div class="spec__meta"><code>figure</code><span>48px / 1 · 600</span></div><div class="spec__sample" style="font-family:var(--font-mono);font-size:48px;line-height:1;font-weight:600">Sphinx of black quartz, judge my vow</div><div class="spec__use">The headline figure. The source sets clamp(30px, 7vw, 48px); this is its ceiling.</div></div></div><h3>Pixel <small>pixel</small></h3><div class="specimens"><div class="spec"><div class="spec__meta"><code>page-title</code><span>34px / 1.25 · 400</span></div><div class="spec__sample" style="font-family:var(--font-pixel);font-size:34px;line-height:1.25;font-weight:400">Sphinx of black quartz, judge my vow</div><div class="spec__use">h1. The source sets clamp(20px, 4.4vw, 34px); this is its ceiling.</div></div><div class="spec"><div class="spec__meta"><code>section-head</code><span>12px / 1.3 · 400</span></div><div class="spec__sample" style="font-family:var(--font-pixel);font-size:12px;line-height:1.3;font-weight:400">Sphinx of black quartz, judge my vow</div><div class="spec__use">h3 inside a codec head.</div></div><div class="spec"><div class="spec__meta"><code>tab-label</code><span>11px / 1.2 · 400</span></div><div class="spec__sample" style="font-family:var(--font-pixel);font-size:11px;line-height:1.2;font-weight:400;letter-spacing:0.06em">Sphinx of black quartz, judge my vow</div><div class="spec__use">A tab's name in the tab bar.</div></div><div class="spec"><div class="spec__meta"><code>eyebrow</code><span>10px / 1.2 · 400</span></div><div class="spec__sample" style="font-family:var(--font-pixel);font-size:10px;line-height:1.2;font-weight:400;letter-spacing:0.12em">Sphinx of black quartz, judge my vow</div><div class="spec__use">The eyebrow above a page title and the stage label above a section, uppercased in CSS. Stage labels use 0.1em.</div></div></div></section><section id="spacing"><div class="sechead"><h2>Spacing</h2></div><p class="note">The source declares no spacing variables. These steps are the padding and gap values its stylesheets actually use; the values are observed, the names are ours.</p><div class="tablewrap"><table class="scale"><tbody><tr><td><code>space-1</code></td><td class="num">2px</td><td class="viz"><span class="bar" style="width:2.0px"></span></td><td class="use">Tab bar gap, tightest chip rows.</td></tr><tr><td><code>space-2</code></td><td class="num">4px</td><td class="viz"><span class="bar" style="width:4.0px"></span></td><td class="use">Row gap in wrapping legends and term lists.</td></tr><tr><td><code>space-3</code></td><td class="num">6px</td><td class="viz"><span class="bar" style="width:6.0px"></span></td><td class="use">Swatch-to-label gap, small chip padding.</td></tr><tr><td><code>space-4</code></td><td class="num">8px</td><td class="viz"><span class="bar" style="width:8.0px"></span></td><td class="use">Readout padding, chip padding, tab padding.</td></tr><tr><td><code>space-5</code></td><td class="num">10px</td><td class="viz"><span class="bar" style="width:10.0px"></span></td><td class="use">The default gap: baseline rows, query bars, legend column gap.</td></tr><tr><td><code>space-6</code></td><td class="num">12px</td><td class="viz"><span class="bar" style="width:12.0px"></span></td><td class="use">Input padding, stage label bottom margin.</td></tr><tr><td><code>space-7</code></td><td class="num">14px</td><td class="viz"><span class="bar" style="width:14.0px"></span></td><td class="use">Panel padding, stat grid row gap.</td></tr><tr><td><code>space-8</code></td><td class="num">18px</td><td class="viz"><span class="bar" style="width:18.0px"></span></td><td class="use">Two-column grid gap.</td></tr><tr><td><code>space-9</code></td><td class="num">20px</td><td class="viz"><span class="bar" style="width:20.0px"></span></td><td class="use">Page gutter, stat grid column gap, device padding.</td></tr><tr><td><code>space-10</code></td><td class="num">32px</td><td class="viz"><span class="bar" style="width:32.0px"></span></td><td class="use">Page top padding, section rhythm (sections use 34px).</td></tr></tbody></table></div></section><section id="radius"><div class="sechead"><h2>Radius</h2></div><p class="note">The source declares no radius variables. Every value here is one it uses literally; the names are ours.</p><div class="tablewrap"><table class="scale"><tbody><tr><td><code>radius-xs</code></td><td class="num">1px</td><td class="viz"><span class="box" style="border-radius:var(--radius-xs)"></span></td><td class="use">Legend swatches.</td></tr><tr><td><code>radius-sm</code></td><td class="num">2px</td><td class="viz"><span class="box" style="border-radius:var(--radius-sm)"></span></td><td class="use">The default, and by far the most common: panels, chips, inputs, bars, table wells, tab tops.</td></tr><tr><td><code>radius-md</code></td><td class="num">3px</td><td class="viz"><span class="box" style="border-radius:var(--radius-md)"></span></td><td class="use">The LCD glass and the stream modal.</td></tr><tr><td><code>radius-lg</code></td><td class="num">4px</td><td class="viz"><span class="box" style="border-radius:var(--radius-lg)"></span></td><td class="use">Occasional larger inset blocks.</td></tr><tr><td><code>radius-xl</code></td><td class="num">8px</td><td class="viz"><span class="box" style="border-radius:var(--radius-xl)"></span></td><td class="use">The black LCD frame around the glass.</td></tr><tr><td><code>radius-device</code></td><td class="num">18px</td><td class="viz"><span class="box" style="border-radius:var(--radius-device)"></span></td><td class="use">The device shell.</td></tr></tbody></table></div></section><section id="shadow"><div class="sechead"><h2>Shadow</h2></div><p class="note">Every shadow the source uses literally. Hex is written out because the token reader drops var() inside a shadow.</p><div class="tablewrap"><table class="scale"><tbody><tr><td><code>shadow-device</code></td><td class="num">0 30px 60px -30px #000000, inset 0 1px 0 #3b4560</td><td class="viz"><span class="box box--shadow" style="box-shadow:var(--shadow-device)"></span></td><td class="use">The device shell lifted off the page.</td></tr><tr><td><code>shadow-lcd-frame</code></td><td class="num">inset 0 2px 8px #000000</td><td class="viz"><span class="box box--shadow" style="box-shadow:var(--shadow-lcd-frame)"></span></td><td class="use">The black frame's well around the glass.</td></tr><tr><td><code>shadow-lcd-glass</code></td><td class="num">inset 0 0 0 1px #00000030, inset 0 0 24px #7d8a6a55</td><td class="viz"><span class="box box--shadow" style="box-shadow:var(--shadow-lcd-glass)"></span></td><td class="use">The glass's own edge and vignette.</td></tr><tr><td><code>shadow-modal</code></td><td class="num">0 18px 70px #000000bb</td><td class="viz"><span class="box box--shadow" style="box-shadow:var(--shadow-modal)"></span></td><td class="use">The stream modal.</td></tr><tr><td><code>shadow-tab-current</code></td><td class="num">{&#x27;dark&#x27;: &#x27;inset 0 2px 0 #e8b923&#x27;, &#x27;light&#x27;: &#x27;inset 0 2px 0 #8a6408&#x27;}</td><td class="viz"><span class="box box--shadow" style="box-shadow:var(--shadow-tab-current)"></span></td><td class="use">The 2px accent rule marking the current tab.</td></tr><tr><td><code>shadow-sticky-head</code></td><td class="num">{&#x27;dark&#x27;: &#x27;inset 0 -1px 0 #253253&#x27;, &#x27;light&#x27;: &#x27;inset 0 -1px 0 #d3dae8&#x27;}</td><td class="viz"><span class="box box--shadow" style="box-shadow:var(--shadow-sticky-head)"></span></td><td class="use">A sticky table header's bottom hairline, where a border would scroll away.</td></tr></tbody></table></div></section><section id="components"><div class="sechead"><h2>Components</h2></div><h3 class="group">Data</h3><div class="cards"><article class="card" id="c-Legend"><header><h4>Legend</h4><span>solid, ramp and marker swatches</span></header><iframe class="fit" title="Legend preview" loading="lazy" style="height:190px" srcdoc="&lt;!doctype html&gt;&lt;html&gt;&lt;head&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=Silkscreen:wght@400;700&amp;display=swap&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;dist/tokens.css&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;components/bundle.css&quot;&gt;&lt;style&gt;html,body{margin:0}body{background:var(--ground);color:var(--ink);font-family:var(--font-mono);padding:16px}&lt;/style&gt;&lt;script src=&quot;https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js&quot;&gt;&lt;/script&gt;&lt;script src=&quot;https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js&quot;&gt;&lt;/script&gt;&lt;script src=&quot;components/bundle.js&quot;&gt;&lt;/script&gt;&lt;/head&gt;&lt;body&gt;
+&lt;div id=&quot;root&quot;&gt;&lt;/div&gt;
+&lt;script&gt;
+  var h = React.createElement;
+  var CL = window.CodecLab;
+  ReactDOM.createRoot(document.getElementById(&quot;root&quot;)).render(
+    h(&quot;div&quot;, { style: { display: &quot;grid&quot;, gap: &quot;var(--space-8)&quot; } },
+      h(CL.Legend, { items: [
+        { label: &quot;word&quot;, color: &quot;var(--sym-word)&quot;, strong: true },
+        { label: &quot;rule&quot;, color: &quot;var(--sym-rule)&quot; },
+        { label: &quot;escape&quot;, color: &quot;var(--sym-esc)&quot; }
+      ] }),
+      h(CL.Legend, { items: [
+        { label: &quot;rule depth&quot;, ramp: [&quot;var(--sym-rule-lo)&quot;, &quot;var(--sym-rule-hi)&quot;] },
+        { label: &quot;escape cost&quot;, ramp: [&quot;var(--sym-esc-lo)&quot;, &quot;var(--sym-esc-hi)&quot;] }
+      ] }),
+      h(CL.Legend, { items: [
+        { label: &quot;chapter boundary&quot;, marker: &quot;var(--chapter-marker)&quot; },
+        { label: &quot;verse boundary&quot;, marker: &quot;var(--verse-marker)&quot; }
+      ] })
+    )
+  );
+&lt;/script&gt;
+&lt;/body&gt;&lt;/html&gt;"></iframe><details class="guide"><summary>Usage guidelines</summary><p>Says what each colour in a strip, chart or marked passage means. Hand-written from <code>demo.html</code> and <code>demo-search.html</code> (<code>.legend</code>, <code>.legend i</code>, <code>.legend i.ramp</code>, <code>.legend i.marker</code>).</p>
+<p><strong>When to use it.</strong> Directly under the thing it explains — a stream strip, a bar, a marked verse. Every coloured encoding in this system carries one: the <code>sym-*</code> colours mean nothing without it.</p>
+<p><strong>What it gives you.</strong> A wrapping row of swatch-plus-label pairs at 11px in <code>ink-soft</code>, <code>space-2</code> between rows and <code>space-8</code> between items. Three swatch shapes: a 10px solid square at <code>radius-xs</code>, a 34px gradient for a ramp, and an 18px panel chip with an inset underline for a text marker.</p>
+<p><strong>What you supply.</strong> <code>items</code>. Pass <code>color</code> for a solid, <code>ramp: [lo, hi]</code> for a gradient, or <code>marker</code> for an underline chip — as token references (<code>"var(--sym-word)"</code>), not raw hex, so both themes follow. Set <code>strong</code> on the item the reader should notice; it moves that label to <code>ink</code>.</p>
+<p>Props: <code>items</code>, <code>className</code>.</p></details></article><article class="card" id="c-StatGrid"><header><h4>StatGrid</h4><span>key / value / note readouts</span></header><iframe class="fit" title="StatGrid preview" loading="lazy" style="height:200px" srcdoc="&lt;!doctype html&gt;&lt;html&gt;&lt;head&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=Silkscreen:wght@400;700&amp;display=swap&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;dist/tokens.css&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;components/bundle.css&quot;&gt;&lt;style&gt;html,body{margin:0}body{background:var(--ground);color:var(--ink);font-family:var(--font-mono);padding:16px}&lt;/style&gt;&lt;script src=&quot;https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js&quot;&gt;&lt;/script&gt;&lt;script src=&quot;https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js&quot;&gt;&lt;/script&gt;&lt;script src=&quot;components/bundle.js&quot;&gt;&lt;/script&gt;&lt;/head&gt;&lt;body&gt;
+&lt;div id=&quot;root&quot;&gt;&lt;/div&gt;
+&lt;script&gt;
+  var h = React.createElement;
+  var CL = window.CodecLab;
+  ReactDOM.createRoot(document.getElementById(&quot;root&quot;)).render(
+    h(CL.Panel, null,
+      h(CL.StatGrid, { stats: [
+        { k: &quot;Corpus&quot;, v: &quot;4.51 MB&quot;, n: &quot;kjv.csv, as read&quot; },
+        { k: &quot;Encoded&quot;, v: &quot;1.18 MB&quot;, n: &quot;RPR1 stream + dictionary&quot;, tone: &quot;good&quot; },
+        { k: &quot;Ratio&quot;, v: &quot;3.82x&quot;, n: &quot;against raw text&quot;, tone: &quot;hot&quot; },
+        { k: &quot;Escapes&quot;, v: &quot;41,208&quot;, n: &quot;literals that paid full price&quot;, tone: &quot;warn&quot; }
+      ] })
+    )
+  );
+&lt;/script&gt;
+&lt;/body&gt;&lt;/html&gt;"></iframe><details class="guide"><summary>Usage guidelines</summary><p>The key / value / note readout grid that reports what a codec run cost. Hand-written from <code>demo.html</code> (<code>.stat-grid</code>, <code>.stat .k</code>, <code>.stat .v</code>, <code>.stat .n</code>).</p>
+<p><strong>When to use it.</strong> Inside a <code>Panel</code>, to report the numbers a run produced. Four to six stats read well; beyond that the columns get thin.</p>
+<p><strong>What it gives you.</strong> <code>repeat(auto-fit, minmax(150px, 1fr))</code> columns with <code>space-7</code> row and <code>space-9</code> column gaps. Keys are 10px uppercase <code>ink-soft</code>, tracked 0.06em. Values are 19px in tabular figures, <code>ink</code> by default. Notes are 10px <code>ink-soft</code>.</p>
+<p><strong>What you supply.</strong> <code>stats</code>, each <code>{ k, v, n?, tone? }</code>. <code>tone</code> colours the value by what it means: <code>good</code> for a win, <code>warn</code> for a cost, <code>hot</code> for the figure the section is about. Leave it off for a plain measurement — the tones are signals, not decoration. Format numbers before you pass them; the component only sets tabular figures so columns line up.</p>
+<p>Props: <code>stats</code>, <code>className</code>.</p></details></article></div><h3 class="group">Device</h3><div class="cards"><article class="card" id="c-LcdScreen"><header><h4>LcdScreen</h4><span>case, bezel and glass</span></header><iframe class="fit" title="LcdScreen preview" loading="lazy" style="height:340px" srcdoc="&lt;!doctype html&gt;&lt;html&gt;&lt;head&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=Silkscreen:wght@400;700&amp;display=swap&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;dist/tokens.css&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;components/bundle.css&quot;&gt;&lt;style&gt;html,body{margin:0}body{background:var(--ground);color:var(--ink);font-family:var(--font-mono);padding:16px}&lt;/style&gt;&lt;script src=&quot;https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js&quot;&gt;&lt;/script&gt;&lt;script src=&quot;https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js&quot;&gt;&lt;/script&gt;&lt;script src=&quot;components/bundle.js&quot;&gt;&lt;/script&gt;&lt;/head&gt;&lt;body&gt;
+&lt;div id=&quot;root&quot;&gt;&lt;/div&gt;
+&lt;script&gt;
+  var h = React.createElement;
+  var LcdScreen = window.CodecLab.LcdScreen;
+  ReactDOM.createRoot(document.getElementById(&quot;root&quot;)).render(
+    h(LcdScreen, {
+      width: &quot;44ch&quot;,
+      label: &quot;Franklin KJV · emulator&quot;,
+      lines: [
+        &quot;JOHN 3:16&quot;,
+        &quot;For God so loved the world, that he&quot;,
+        &quot;gave his only begotten Son, that&quot;,
+        &quot;whosoever believeth in him should&quot;,
+        &quot;not perish, but have everlasting life.&quot;,
+        { text: &quot;── SEARCH   LOOKUP   NEXT ──&quot;, dim: true }
+      ]
+    })
+  );
+&lt;/script&gt;
+&lt;/body&gt;&lt;/html&gt;"></iframe><details class="guide"><summary>Usage guidelines</summary><p>The Franklin-style handheld: case, black bezel and green glass around fixed lines of text. Hand-written from <code>demo-reader.html</code> (<code>.device</code>, <code>.lcd-frame</code>, <code>.lcd</code>, <code>.lcd .glow</code>).</p>
+<p><strong>When to use it.</strong> To show what the device itself would display — a verse as the hardware renders it, a menu, a search prompt. It is a frame around content, not a text renderer: the original paints its glyphs on a <code>&lt;canvas&gt;</code> with the curved LCD font from <code>lcd-font.js</code>, and this component sets ordinary mono text on the glass instead. Say so wherever the distinction matters.</p>
+<p><strong>What it gives you.</strong> A case in a <code>case-face</code> to <code>case</code> gradient with a <code>case-edge</code> border, <code>radius-device</code>, <code>shadow-device</code> and <code>space-9</code> of padding, capped at 860px; a <code>lcd-bezel</code> frame at <code>radius-xl</code> with <code>shadow-lcd-frame</code>; and the glass in <code>lcd</code> at <code>radius-md</code> with <code>shadow-lcd-glass</code> and a highlight overlay. Lines are <code>lcd-ink</code> on <code>lcd</code> at 8.3:1.</p>
+<p><strong>What you supply.</strong> <code>lines</code> — strings, or <code>{ text, dim }</code> for an unlit or printed row. <code>dim</code> is <code>lcd-dim</code>, 2.1:1 on the glass by design: use it for a segment that is off or a legend printed on the bezel, never for text a reader needs. Lines do not wrap (<code>white-space: pre</code>); break them yourself to the character width you are emulating, and set <code>width</code> in <code>ch</code> to match. <code>label</code> prints a caption on the case below the glass.</p>
+<p>The case and glass colours are the same in both themes — a physical object does not change colour when the page does.</p>
+<p>Props: <code>lines</code>, <code>width</code>, <code>label</code>, <code>className</code>.</p></details></article></div><h3 class="group">Labels</h3><div class="cards"><article class="card" id="c-StageLabel"><header><h4>StageLabel</h4><span>numbered section label, pixel face</span></header><iframe class="fit" title="StageLabel preview" loading="lazy" style="height:170px" srcdoc="&lt;!doctype html&gt;&lt;html&gt;&lt;head&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=Silkscreen:wght@400;700&amp;display=swap&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;dist/tokens.css&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;components/bundle.css&quot;&gt;&lt;style&gt;html,body{margin:0}body{background:var(--ground);color:var(--ink);font-family:var(--font-mono);padding:16px}&lt;/style&gt;&lt;script src=&quot;https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js&quot;&gt;&lt;/script&gt;&lt;script src=&quot;https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js&quot;&gt;&lt;/script&gt;&lt;script src=&quot;components/bundle.js&quot;&gt;&lt;/script&gt;&lt;/head&gt;&lt;body&gt;
+&lt;div id=&quot;root&quot;&gt;&lt;/div&gt;
+&lt;script&gt;
+  var h = React.createElement;
+  var StageLabel = window.CodecLab.StageLabel;
+  ReactDOM.createRoot(document.getElementById(&quot;root&quot;)).render(
+    h(&quot;div&quot;, { style: { display: &quot;grid&quot;, gap: &quot;var(--space-9)&quot; } },
+      h(StageLabel, { num: &quot;01&quot;, hint: &quot;4.5 MB of KJV text&quot; }, &quot;Read the corpus&quot;),
+      h(StageLabel, { num: &quot;02&quot;, hint: &quot;31,102 verses, 12,617 distinct words&quot; }, &quot;Build the dictionary&quot;),
+      h(StageLabel, null, &quot;No number, no hint&quot;)
+    )
+  );
+&lt;/script&gt;
+&lt;/body&gt;&lt;/html&gt;"></iframe><details class="guide"><summary>Usage guidelines</summary><p>The numbered label that heads each step of a walkthrough. Hand-written from <code>demo-search.html</code> (<code>.stage-label</code>).</p>
+<p><strong>When to use it.</strong> Above a section that is one step in a sequence — reading the corpus, building the dictionary, encoding, decoding. For the label above a page title use the <code>eyebrow</code> type style directly; this component is the section-level one, and it carries a number and a right-aligned aside.</p>
+<p><strong>What it gives you.</strong> Pixel face at 10px, uppercased, tracked 0.1em, in <code>dmg-3</code>, with <code>space-6</code> beneath it. The number is <code>hot</code>. The hint drops back to the mono face at 11px in <code>ink-soft</code>, un-uppercased, pushed to the right edge with <code>margin-left: auto</code>.</p>
+<p><strong>What you supply.</strong> The label text as children; <code>num</code> and <code>hint</code> are optional. Keep the hint to one short clause — it shares a baseline with the label and does not wrap gracefully.</p>
+<p>Note: <code>dmg-3</code> on <code>panel</code> is 4.3:1 in the Dark theme, just under 4.5:1. That is how the repository ships it. On a panel, prefer <code>ink-soft</code> for anything a reader must read.</p>
+<p>Props: <code>num</code>, <code>children</code>, <code>hint</code>, <code>className</code>.</p></details></article></div><h3 class="group">Layout</h3><div class="cards"><article class="card" id="c-Panel"><header><h4>Panel</h4><span>panel ground, hairline, 2px radius</span></header><iframe class="fit" title="Panel preview" loading="lazy" style="height:220px" srcdoc="&lt;!doctype html&gt;&lt;html&gt;&lt;head&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=Silkscreen:wght@400;700&amp;display=swap&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;dist/tokens.css&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;components/bundle.css&quot;&gt;&lt;style&gt;html,body{margin:0}body{background:var(--ground);color:var(--ink);font-family:var(--font-mono);padding:16px}&lt;/style&gt;&lt;script src=&quot;https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js&quot;&gt;&lt;/script&gt;&lt;script src=&quot;https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js&quot;&gt;&lt;/script&gt;&lt;script src=&quot;components/bundle.js&quot;&gt;&lt;/script&gt;&lt;/head&gt;&lt;body&gt;
+&lt;div id=&quot;root&quot;&gt;&lt;/div&gt;
+&lt;script&gt;
+  var h = React.createElement;
+  var Panel = window.CodecLab.Panel;
+  var root = ReactDOM.createRoot(document.getElementById(&quot;root&quot;));
+  root.render(
+    h(&quot;div&quot;, { style: { display: &quot;grid&quot;, gap: &quot;var(--space-8)&quot;, fontFamily: &quot;var(--font-mono)&quot;, fontSize: &quot;12px&quot;, color: &quot;var(--ink)&quot; } },
+      h(Panel, null,
+        h(&quot;div&quot;, { style: { fontFamily: &quot;var(--font-pixel)&quot;, fontSize: &quot;12px&quot;, color: &quot;var(--dmg-4)&quot;, marginBottom: &quot;var(--space-5)&quot; } }, &quot;RPR1&quot;),
+        h(&quot;div&quot;, { style: { color: &quot;var(--ink-soft)&quot;, maxWidth: &quot;66ch&quot; } },
+          &quot;The default panel: 14px of padding, one hairline in &quot;, h(&quot;code&quot;, { style: { color: &quot;var(--hot)&quot; } }, &quot;rule&quot;), &quot;, a 2px corner.&quot;)
+      ),
+      h(Panel, { flush: true },
+        h(&quot;div&quot;, { style: { padding: &quot;var(--space-4) var(--space-5)&quot;, borderBottom: &quot;1px solid var(--rule)&quot;, color: &quot;var(--ink-soft)&quot;, fontSize: &quot;11px&quot; } }, &quot;flush — for a table well or a chart that bleeds&quot;),
+        h(&quot;div&quot;, { style: { padding: &quot;var(--space-4) var(--space-5)&quot;, fontVariantNumeric: &quot;tabular-nums&quot; } }, &quot;31,102 verses · 4.5 MB · 1.2 MB encoded&quot;)
+      )
+    )
+  );
+&lt;/script&gt;
+&lt;/body&gt;&lt;/html&gt;"></iframe><details class="guide"><summary>Usage guidelines</summary><p>The surface every section of a codec page sits on. Hand-written from <code>demo-search.html</code> (<code>.panel</code>) — the same three lines appear in all six demo pages.</p>
+<p><strong>When to use it.</strong> Any block of readouts, a chart, a table well, a control column. It is the only container the system has: there is no card with a shadow, no nested panel. Panels sit directly on <code>ground</code>, in a one- or two-column grid with <code>space-8</code> between them.</p>
+<p><strong>What it gives you.</strong> <code>panel</code> ground, a 1px <code>rule</code> border, <code>radius-sm</code>, <code>space-7</code> of padding, <code>ink</code> text in the mono family.</p>
+<p><strong>What you supply.</strong> Everything inside. Set <code>flush</code> when the content owns its own padding — a scrolling table well, or a bar that should meet the border. A panel does not scroll on its own: put <code>max-height</code> and <code>overflow: auto</code> on your inner element, as the source's <code>.table-wrap</code> does.</p>
+<p>Props: <code>children</code>, <code>flush</code>, <code>className</code>.</p></details></article></div><h3 class="group">Navigation</h3><div class="cards"><article class="card" id="c-TabBar"><header><h4>TabBar</h4><span>the shared page switcher</span></header><iframe class="fit" title="TabBar preview" loading="lazy" style="height:150px" srcdoc="&lt;!doctype html&gt;&lt;html&gt;&lt;head&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=Silkscreen:wght@400;700&amp;display=swap&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;dist/tokens.css&quot;&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;components/bundle.css&quot;&gt;&lt;style&gt;html,body{margin:0}body{background:var(--ground);color:var(--ink);font-family:var(--font-mono);padding:16px}&lt;/style&gt;&lt;script src=&quot;https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js&quot;&gt;&lt;/script&gt;&lt;script src=&quot;https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js&quot;&gt;&lt;/script&gt;&lt;script src=&quot;components/bundle.js&quot;&gt;&lt;/script&gt;&lt;/head&gt;&lt;body&gt;
+&lt;div id=&quot;root&quot;&gt;&lt;/div&gt;
+&lt;script&gt;
+  var h = React.createElement;
+  var TabBar = window.CodecLab.TabBar;
+  var PAGES = [
+    { href: &quot;demo.html&quot;, label: &quot;RPR1&quot;, note: &quot;compression lab&quot; },
+    { href: &quot;demo-ylk1.html&quot;, label: &quot;YLK1&quot;, note: &quot;link chase&quot; },
+    { href: &quot;demo-verse.html&quot;, label: &quot;Verse&quot;, note: &quot;one verse, address by address&quot; },
+    { href: &quot;demo-search.html&quot;, label: &quot;Search&quot;, note: &quot;one query, both codecs&quot; },
+    { href: &quot;demo-reader.html&quot;, label: &quot;Reader&quot;, note: &quot;the curved LCD font&quot; },
+    { href: &quot;demo-device.html&quot;, label: &quot;Device&quot;, note: &quot;the whole machine&quot; }
+  ];
+  function Demo() {
+    var state = React.useState(&quot;demo-ylk1.html&quot;);
+    return h(&quot;div&quot;, { style: { fontFamily: &quot;var(--font-mono)&quot; } },
+      h(TabBar, { items: PAGES, current: state[0], onSelect: function (item) { state[1](item.href); } }),
+      h(&quot;div&quot;, { style: { marginTop: &quot;var(--space-9)&quot;, fontSize: &quot;11px&quot;, color: &quot;var(--ink-soft)&quot; } }, &quot;Current tab lifts onto panel and takes a 2px accent rule along its top.&quot;)
+    );
+  }
+  ReactDOM.createRoot(document.getElementById(&quot;root&quot;)).render(h(Demo));
+&lt;/script&gt;
+&lt;/body&gt;&lt;/html&gt;"></iframe><details class="guide"><summary>Usage guidelines</summary><p>The page switcher shared by all six demos. Hand-written from <code>nav.js</code>, which injects the same markup and CSS at the top of <code>.wrap</code> on every page.</p>
+<p><strong>When to use it.</strong> One per page, first thing inside the page wrapper, for switching between sibling views. It is a navigation bar, not a tab widget: in the original each tab is a link to another document.</p>
+<p><strong>What it gives you.</strong> Tabs on a shared <code>rule</code> hairline, each with a pixel-face label in <code>dmg-3</code> and a mono note in <code>ink-soft</code>. Hover lifts a tab onto <code>panel</code> and brightens its label to <code>dmg-4</code>. The current tab sits on <code>panel</code>, takes <code>shadow-tab-current</code> (a 2px <code>hot</code> rule along its top) and turns its label <code>hot</code>. Focus draws a 2px <code>hot</code> outline, offset 2px.</p>
+<p><strong>What you supply.</strong> <code>items</code> (label, optional one-line note, href) and <code>current</code> — matched on <code>href</code> first, then <code>label</code>. Pass <code>onSelect</code> to switch views in place instead of navigating; without it the tabs behave as links and the current one swallows its own click. The original hides the notes below 620px; this component does not, so keep the notes to three or four words.</p>
+<p>Props: <code>items</code>, <code>current</code>, <code>onSelect</code>, <code>label</code>, <code>className</code>.</p></details></article></div></section>
+
+  <footer>Exported from the Claude design system (named “RePair Compress Blue” there); page generated by <code>scripts/build-design-demo.py</code> from <code>tokens.json</code> and each component's <code>preview.html</code>.</footer>
+</div>
+<script>
+(function () {
+  var root = document.documentElement;
+  var frames = function () { return Array.prototype.slice.call(document.querySelectorAll('iframe')); };
+  function setTheme(t) {
+    root.setAttribute('data-theme', t);
+    document.querySelectorAll('[data-theme-choice]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.themeChoice === t)); });
+    frames().forEach(function (f) { try { f.contentDocument.documentElement.setAttribute('data-theme', t); } catch (e) {} });
+    try { localStorage.setItem('repair-compress-design-system-theme', t); } catch (e) {}
+  }
+  document.querySelectorAll('[data-theme-choice]').forEach(function (b) { b.addEventListener('click', function () { setTheme(b.dataset.themeChoice); }); });
+  var saved = null; try { saved = localStorage.getItem('repair-compress-design-system-theme'); } catch (e) {}
+  if (saved && document.querySelector('[data-theme-choice="' + saved + '"]')) setTheme(saved);
+
+  // size each preview frame to its content
+  function fit(f) {
+    try {
+      var d = f.contentDocument; if (!d || !d.body) return;
+      f.style.height = '0px';
+      var h = Math.ceil(d.documentElement.scrollHeight);
+      f.style.height = (h > 20 ? h + 2 : 160) + 'px';
+    } catch (e) {}
+  }
+  frames().forEach(function (f) {
+    if (f.closest('#cover')) return;
+    f.addEventListener('load', function () {
+      try { f.contentDocument.documentElement.setAttribute('data-theme', root.getAttribute('data-theme')); } catch (e) {}
+      fit(f); setTimeout(function () { fit(f); }, 150); setTimeout(function () { fit(f); }, 800);
+      try { new ResizeObserver(function () { fit(f); }).observe(f.contentDocument.body); } catch (e) {}
+    });
+  });
+
+  // scale the 960px cover to the column width
+  var cover = document.getElementById('cover');
+  if (cover) {
+    var cf = cover.querySelector('iframe'), ch = parseFloat(cf.style.height);
+    function scale() { var s = cover.clientWidth / 960; cf.style.transform = 'scale(' + s + ')'; cover.style.height = (ch * s) + 'px'; }
+    scale(); window.addEventListener('resize', scale);
+    cf.addEventListener('load', function () { try { cf.contentDocument.documentElement.setAttribute('data-theme', root.getAttribute('data-theme')); } catch (e) {} });
+  }
+
+  // color filter
+  var filter = document.getElementById('filter');
+  if (filter) filter.addEventListener('input', function () {
+    var q = filter.value.trim().toLowerCase();
+    document.querySelectorAll('#swatches .sw').forEach(function (el) { el.hidden = q && el.textContent.toLowerCase().indexOf(q) < 0; });
+  });
+})();
+</script>
+</body>
+</html>

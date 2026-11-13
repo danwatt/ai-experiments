@@ -1,0 +1,33 @@
+<!-- @dsCard group="Overlays" height=250 subtitle="Place popup, source photo popup, marker dot and basemap switcher" -->
+<!DOCTYPE html>
+<html>
+<body>
+<div class="gt-surface" id="root" style="padding:16px">
+  <div style="background:#2b3a34;background-image:linear-gradient(0deg,rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:32px 32px;border-radius:6px;padding:18px;display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap">
+    <div class="gt-popup">
+      <div class="map-popup-name">Skagen</div>
+      <div class="map-popup-region">Nordjylland</div>
+      <div class="map-popup-country">Denmark</div>
+      <div class="map-popup-meta">8,181 inhabitants · 2.4 km away</div>
+    </div>
+
+    <div class="source-popup">
+      <img alt="" src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Crect width='150' height='150' fill='%23394a5a'/%3E%3Cpath d='M0 108 L42 70 L78 100 L110 78 L150 118 L150 150 L0 150 Z' fill='rgba(0,0,0,.3)'/%3E%3Ccircle cx='118' cy='32' r='13' fill='rgba(255,255,255,.14)'/%3E%3C/svg%3E">
+      <div class="source-popup-label">IMG_4820.CR2</div>
+      <div class="source-popup-time">14 Aug 2011 · 16:19</div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;align-items:flex-start">
+      <div class="basemap-control">
+        <button class="basemap-btn active">OSM Standard</button>
+        <button class="basemap-btn">Humanitarian</button>
+        <button class="basemap-btn">Topo</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--ink-secondary)">
+        <span class="place-dot"></span> a place from the offline index
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,175 @@
+/* RPR1 / YLK1 Codec Lab — rules for the six components, on tokens only.
+   Every value is a token: no literal a token already holds. */
+
+.cl-panel {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  padding: var(--space-7);
+  color: var(--ink);
+  font-family: var(--font-mono);
+}
+.cl-panel--flush { padding: 0; }
+
+/* Tab bar ---------------------------------------------------------------- */
+
+.cl-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  border-bottom: 1px solid var(--rule);
+  font-family: var(--font-mono);
+}
+.cl-tabs__tab {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: var(--space-4) var(--space-7) 9px;
+  text-decoration: none;
+  border: 1px solid transparent;
+  border-bottom: 0;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  margin-bottom: -1px;
+  color: var(--ink-soft);
+  background: transparent;
+}
+.cl-tabs__label {
+  font-family: var(--font-pixel);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--dmg-3);
+}
+.cl-tabs__note { font-size: 10px; color: var(--ink-soft); }
+.cl-tabs__tab:hover { background: var(--panel); border-color: var(--rule); }
+.cl-tabs__tab:hover .cl-tabs__label { color: var(--dmg-4); }
+.cl-tabs__tab[aria-current="page"] {
+  background: var(--panel);
+  border-color: var(--rule);
+  box-shadow: var(--shadow-tab-current);
+  cursor: default;
+}
+.cl-tabs__tab[aria-current="page"] .cl-tabs__label { color: var(--hot); }
+.cl-tabs__tab:focus-visible { outline: 2px solid var(--hot); outline-offset: 2px; }
+
+/* Stage label ------------------------------------------------------------ */
+
+.cl-stage {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-5);
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dmg-3);
+  margin-bottom: var(--space-6);
+}
+.cl-stage__num { color: var(--hot); }
+.cl-stage__hint {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink-soft);
+  margin-left: auto;
+}
+
+/* Stat grid -------------------------------------------------------------- */
+
+.cl-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--space-7) var(--space-9);
+  font-family: var(--font-mono);
+}
+.cl-stats__k {
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.cl-stats__v {
+  font-size: 19px;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.cl-stats__v--hot { color: var(--hot); }
+.cl-stats__v--good { color: var(--good); }
+.cl-stats__v--warn { color: var(--warn); }
+.cl-stats__n { font-size: 10px; color: var(--ink-soft); }
+
+/* Legend ----------------------------------------------------------------- */
+
+.cl-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-8);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+.cl-legend__item { display: flex; align-items: center; gap: var(--space-3); color: var(--ink-soft); }
+.cl-legend__swatch {
+  width: 10px;
+  height: 10px;
+  display: inline-block;
+  border-radius: var(--radius-xs);
+}
+.cl-legend__swatch--ramp { width: 34px; }
+.cl-legend__swatch--marker {
+  width: 18px;
+  height: 10px;
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 0;
+}
+.cl-legend__item b { color: var(--ink); font-weight: 500; }
+
+/* LCD screen ------------------------------------------------------------- */
+
+.cl-lcd {
+  background: linear-gradient(180deg, var(--case-face), var(--case));
+  border: 1px solid var(--case-edge);
+  border-radius: var(--radius-device);
+  padding: var(--space-9);
+  box-shadow: var(--shadow-device);
+  max-width: 860px;
+}
+.cl-lcd__frame {
+  background: var(--lcd-bezel);
+  border-radius: var(--radius-xl);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-lcd-frame);
+}
+.cl-lcd__glass {
+  position: relative;
+  background: var(--lcd);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-lcd-glass);
+  padding: var(--space-5) var(--space-6);
+}
+.cl-lcd__glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(120% 80% at 50% 0%, #ffffff22, transparent 60%);
+}
+.cl-lcd__line {
+  position: relative;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--lcd-ink);
+  white-space: pre;
+  overflow: hidden;
+  text-overflow: clip;
+}
+.cl-lcd__line--dim { color: var(--lcd-dim); }
+.cl-lcd__label {
+  margin-top: var(--space-4);
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}

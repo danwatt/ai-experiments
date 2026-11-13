@@ -1,0 +1,25 @@
+{
+  "title": "GeoTagger",
+  "eyebrow": "Design system \u00b7 from danwatt/geo-tagger",
+  "tagline": "A photo library, put in its place. Near-black surfaces so the only saturated colour on screen is the photograph, one blue accent, status colours that always carry a word, and emoji for icons.",
+  "artifact": "https://claude.ai/artifact/4XM3bFHYvH9TQMVVyvhTvG",
+  "surfaceClass": "gt-surface",
+  "react": false,
+  "fonts": null,
+  "page": {
+    "bg": "canvas",
+    "surface": "pane",
+    "ink": "ink",
+    "muted": "ink-muted",
+    "line": "hairline",
+    "accent": "accent-text",
+    "accentFill": "accent-fill",
+    "onAccent": "on-accent"
+  },
+  "themes": [
+    "dark"
+  ],
+  "bodyFont": "ui",
+  "headFont": "ui",
+  "previewPad": "0"
+}

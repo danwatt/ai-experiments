@@ -1,0 +1,52 @@
+<!-- @dsCard group="Data" height=330 subtitle="Detail metadata, an editable record table, and key caps" -->
+<!DOCTYPE html>
+<html>
+<body>
+<div class="gt-surface" id="root" style="padding:16px">
+  <div style="display:grid;grid-template-columns:300px 1fr;gap:20px;align-items:start">
+    <div style="background:var(--pane);padding:10px;border-radius:6px">
+      <div style="font-size:11px;color:var(--ink-soft);margin-bottom:8px">Detail pane</div>
+      <table class="gt-meta-table">
+        <tr><td>File</td><td>IMG_4821.CR2</td></tr>
+        <tr><td>Taken</td><td>2011-08-14 16:22:03</td></tr>
+        <tr><td>Camera</td><td>Canon EOS 40D</td></tr>
+        <tr><td>Coordinates</td><td>57.72091, 10.58390</td></tr>
+        <tr><td>Place</td><td>Skagen, Nordjylland, Denmark</td></tr>
+        <tr><td>People</td><td>Marion, Elias</td></tr>
+        <tr><td>Sidecar</td><td>IMG_4821.xmp — written</td></tr>
+      </table>
+    </div>
+
+    <div>
+      <div style="font-size:11px;color:var(--ink-soft);margin-bottom:8px">People Manager — edits write on blur</div>
+      <table class="gt-data-table">
+        <thead><tr><th>Name</th><th>Born</th><th>Family</th><th style="text-align:right">Faces</th><th></th></tr></thead>
+        <tbody>
+          <tr>
+            <td><input class="edit-input" value="Marion" style="width:100%;background:transparent;border:1px solid transparent;border-radius:4px;color:var(--ink);font-family:inherit;font-size:12px;padding:3px 5px"></td>
+            <td><input class="edit-input" value="1974-03-02" style="width:130px;background:transparent;border:1px solid transparent;border-radius:4px;color:var(--ink);font-family:inherit;font-size:12px;padding:3px 5px"></td>
+            <td><select class="gt-select" style="width:100%;font-size:12px;background:var(--overlay);border-color:#3a3a3a"><option>Watson</option></select></td>
+            <td style="text-align:right;color:var(--ink-dim)">212</td>
+            <td style="text-align:right"><button class="button" style="font-size:11px;padding:2px 6px;background:none;border-color:transparent;color:var(--ink-ghost)">Delete</button></td>
+          </tr>
+          <tr>
+            <td><input class="edit-input" value="Elias" style="width:100%;background:var(--canvas);border:1px solid var(--accent);border-radius:4px;color:var(--ink);font-family:inherit;font-size:12px;padding:3px 5px"></td>
+            <td><input class="edit-input" value="2006-11-19" style="width:130px;background:transparent;border:1px solid transparent;border-radius:4px;color:var(--ink);font-family:inherit;font-size:12px;padding:3px 5px"></td>
+            <td><select class="gt-select" style="width:100%;font-size:12px;background:var(--overlay);border-color:#3a3a3a"><option>Watson</option></select></td>
+            <td style="text-align:right;color:var(--ink-dim)">88</td>
+            <td style="text-align:right"><button class="button" style="font-size:11px;padding:2px 6px;background:none;border-color:transparent;color:var(--ink-ghost)">Delete</button></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div style="margin-top:14px;font-size:11px;color:var(--ink-soft)">Key caps in the shortcuts table</div>
+      <div style="margin-top:6px;display:flex;gap:14px;font-size:12px;align-items:center">
+        <span><span class="gt-kbd">J</span> / <span class="gt-kbd">K</span> next, previous face</span>
+        <span><span class="gt-kbd">Enter</span> accept suggestion</span>
+        <span><span class="gt-kbd">X</span> ignore</span>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

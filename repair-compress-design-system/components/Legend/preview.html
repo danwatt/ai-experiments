@@ -1,0 +1,23 @@
+<!-- @dsCard group="Data" height=190 subtitle="solid, ramp and marker swatches" -->
+<div id="root"></div>
+<script>
+  var h = React.createElement;
+  var CL = window.CodecLab;
+  ReactDOM.createRoot(document.getElementById("root")).render(
+    h("div", { style: { display: "grid", gap: "var(--space-8)" } },
+      h(CL.Legend, { items: [
+        { label: "word", color: "var(--sym-word)", strong: true },
+        { label: "rule", color: "var(--sym-rule)" },
+        { label: "escape", color: "var(--sym-esc)" }
+      ] }),
+      h(CL.Legend, { items: [
+        { label: "rule depth", ramp: ["var(--sym-rule-lo)", "var(--sym-rule-hi)"] },
+        { label: "escape cost", ramp: ["var(--sym-esc-lo)", "var(--sym-esc-hi)"] }
+      ] }),
+      h(CL.Legend, { items: [
+        { label: "chapter boundary", marker: "var(--chapter-marker)" },
+        { label: "verse boundary", marker: "var(--verse-marker)" }
+      ] })
+    )
+  );
+</script>

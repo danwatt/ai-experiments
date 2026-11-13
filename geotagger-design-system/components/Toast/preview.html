@@ -1,0 +1,24 @@
+<!-- @dsCard group="Overlays" height=210 subtitle="Confirmation and failure, over the Quick Tag action bar" -->
+<!DOCTYPE html>
+<html>
+<body>
+<div class="gt-surface" id="root" style="padding:16px;display:flex;gap:16px;flex-wrap:wrap">
+  <div style="flex:1;min-width:280px;position:relative;border:1px solid var(--hairline);border-radius:8px;overflow:hidden;height:170px;background:var(--pane)">
+    <div style="position:absolute;left:50%;bottom:78px;transform:translateX(-50%)">
+      <span class="gt-toast" style="font-family:var(--font-touch)">Tagged as Marion</span>
+    </div>
+    <div class="gt-actions" style="position:absolute;left:0;right:0;bottom:0">
+      <button class="act skip">Skip</button>
+      <button class="act primary">Yes, tag</button>
+      <button class="act">Someone else</button>
+    </div>
+  </div>
+
+  <div style="flex:1;min-width:280px;position:relative;border:1px solid var(--hairline);border-radius:8px;overflow:hidden;height:170px;background:var(--pane)">
+    <div style="position:absolute;left:50%;bottom:24px;transform:translateX(-50%);width:max-content">
+      <span class="gt-toast err">Could not rename family — name already in use</span>
+    </div>
+  </div>
+</div>
+</body>
+</html>

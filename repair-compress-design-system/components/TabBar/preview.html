@@ -1,0 +1,22 @@
+<!-- @dsCard group="Navigation" height=150 subtitle="the shared page switcher" -->
+<div id="root"></div>
+<script>
+  var h = React.createElement;
+  var TabBar = window.CodecLab.TabBar;
+  var PAGES = [
+    { href: "demo.html", label: "RPR1", note: "compression lab" },
+    { href: "demo-ylk1.html", label: "YLK1", note: "link chase" },
+    { href: "demo-verse.html", label: "Verse", note: "one verse, address by address" },
+    { href: "demo-search.html", label: "Search", note: "one query, both codecs" },
+    { href: "demo-reader.html", label: "Reader", note: "the curved LCD font" },
+    { href: "demo-device.html", label: "Device", note: "the whole machine" }
+  ];
+  function Demo() {
+    var state = React.useState("demo-ylk1.html");
+    return h("div", { style: { fontFamily: "var(--font-mono)" } },
+      h(TabBar, { items: PAGES, current: state[0], onSelect: function (item) { state[1](item.href); } }),
+      h("div", { style: { marginTop: "var(--space-9)", fontSize: "11px", color: "var(--ink-soft)" } }, "Current tab lifts onto panel and takes a 2px accent rule along its top.")
+    );
+  }
+  ReactDOM.createRoot(document.getElementById("root")).render(h(Demo));
+</script>

@@ -1,0 +1,34 @@
+<!-- @dsCard group="Forms" height=230 subtitle="Toolbar input, labelled form field, focus and touch sizes" -->
+<!DOCTYPE html>
+<html>
+<body>
+<div class="gt-surface" id="root" style="padding:16px;display:flex;flex-direction:column;gap:18px">
+  <div class="gt-toolbar" style="border-radius:4px;border-bottom:none">
+    <input class="gt-input" type="text" style="width:280px" value="D:\Photos" aria-label="Library folder">
+    <button class="button">Scan</button>
+  </div>
+
+  <div style="display:flex;gap:14px;align-items:flex-end">
+    <div class="search-field">
+      <label for="p-loc">Place</label>
+      <input class="gt-input" id="p-loc" type="text" style="width:180px" value="Skagen">
+    </div>
+    <div class="search-field">
+      <label for="p-from">Taken after</label>
+      <input class="gt-input" id="p-from" type="text" style="width:130px" placeholder="yyyy-mm-dd">
+    </div>
+    <div class="search-field">
+      <label for="p-foc">Focused</label>
+      <input class="gt-input" id="p-foc" type="text" style="width:160px;border-color:var(--accent)" value="Marion">
+    </div>
+    <button class="button primary">Search</button>
+  </div>
+
+  <div style="max-width:320px">
+    <div style="font-size:11px;color:var(--ink-soft);margin-bottom:6px">Touch size — 16px, radius-10, on canvas</div>
+    <input type="text" placeholder="Search people…"
+      style="width:100%;font-family:var(--font-touch);font-size:16px;padding:12px;border-radius:10px;border:1px solid var(--field-border);background:var(--canvas);color:var(--ink-strong)">
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!-- @dsCard group="Data" height=260 subtitle="Four-way library split, plus coverage by month" -->
+<!DOCTYPE html>
+<html>
+<body>
+<div class="gt-surface" id="root" style="padding:16px">
+  <div class="card">
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <h2>Face coverage</h2>
+      <span class="mode-toggle">
+        <button class="active">Photos</button>
+        <button>Faces</button>
+      </span>
+    </div>
+    <div class="coverage-bar">
+      <div class="cov-full" style="width:46%"></div>
+      <div class="cov-partial" style="width:19%"></div>
+      <div class="cov-none" style="width:12%"></div>
+      <div class="cov-noface" style="width:23%"></div>
+    </div>
+    <div class="coverage-legend">
+      <span class="lg"><span class="sw cov-full"></span>Fully labeled · 22,172</span>
+      <span class="lg"><span class="sw cov-partial"></span>Some labeled · 9,158</span>
+      <span class="lg"><span class="sw cov-none"></span>None labeled · 5,784</span>
+      <span class="lg"><span class="sw cov-noface"></span>No faces detected · 11,087</span>
+    </div>
+
+    <div style="display:flex;align-items:flex-end;gap:1px;height:80px;padding:18px 4px 0;position:relative;overflow-x:auto;margin-top:4px">
+      <span style="position:absolute;top:2px;left:4px;font-size:9px;color:var(--ink-faint)">2009</span>
+      <span style="position:absolute;top:2px;left:160px;font-size:9px;color:var(--ink-faint)">2011</span>
+      <span id="months" style="display:flex;align-items:flex-end;gap:1px;height:100%"></span>
+    </div>
+    <a class="undated-link" href="#" style="display:block;margin-top:6px;font-size:12px;color:var(--accent-text);text-decoration:none">1,204 photos have no date →</a>
+  </div>
+</div>
+<script>
+  // Coverage by month: each 4px column stacks untagged over tagged.
+  const host = document.getElementById('months');
+  for (let i = 0; i < 64; i++) {
+    const pct = Math.round(30 + 60 * Math.abs(Math.sin(i / 7)));
+    const bar = document.createElement('span');
+    bar.style.cssText = 'flex:0 0 4px;height:100%;display:flex;flex-direction:column;cursor:pointer';
+    bar.innerHTML = '<span style="width:100%;background:var(--control-hover);height:' + (100 - pct) + '%"></span>' +
+                    '<span style="width:100%;background:var(--success);height:' + pct + '%"></span>';
+    host.appendChild(bar);
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!-- @dsCard group="Data" height=220 subtitle="Filter chips, family chips, list counts and summary badges" -->
+<!DOCTYPE html>
+<html>
+<body>
+<div class="gt-surface" id="root" style="padding:16px;display:flex;flex-direction:column;gap:18px">
+  <div>
+    <div style="font-size:11px;color:var(--ink-soft);margin-bottom:6px">Applied people filters</div>
+    <div style="display:flex;flex-wrap:wrap;gap:4px">
+      <span class="person-chip">Marion <button title="Remove">✕</button></span>
+      <span class="person-chip">Elias <button title="Remove">✕</button></span>
+      <span class="person-chip">Jonas <button title="Remove">✕</button></span>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-size:11px;color:var(--ink-soft);margin-bottom:6px">Families</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px">
+      <span class="family-chip"><span class="family-name">Watson</span><span class="family-count">14</span></span>
+      <span class="family-chip"><span class="family-name">Lindqvist</span><span class="family-count">6</span></span>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:24px;flex-wrap:wrap">
+    <div style="min-width:220px">
+      <div style="font-size:11px;color:var(--ink-soft);margin-bottom:6px">People list rows</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;padding:6px 8px;border-radius:4px;border:1px solid transparent">
+        <span>Marion</span><span class="person-count">212</span>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;padding:6px 8px;border-radius:4px;background:var(--accent-fill);border:1px solid var(--accent);color:var(--on-accent)">
+        <span>Elias</span><span class="person-count" style="background:var(--accent-fill-deep);color:#bcdcff">88</span>
+      </div>
+    </div>
+
+    <div>
+      <div style="font-size:11px;color:var(--ink-soft);margin-bottom:6px">August 2011</div>
+      <div class="month-counts">
+        <span class="count-badge count-geotagged">212 geotagged</span>
+        <span class="count-badge count-not-geotagged">41 not geotagged</span>
+        <span class="count-badge count-total">253 total</span>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,13 @@
+<!-- @dsCard group="Labels" height=170 subtitle="numbered section label, pixel face" -->
+<div id="root"></div>
+<script>
+  var h = React.createElement;
+  var StageLabel = window.CodecLab.StageLabel;
+  ReactDOM.createRoot(document.getElementById("root")).render(
+    h("div", { style: { display: "grid", gap: "var(--space-9)" } },
+      h(StageLabel, { num: "01", hint: "4.5 MB of KJV text" }, "Read the corpus"),
+      h(StageLabel, { num: "02", hint: "31,102 verses, 12,617 distinct words" }, "Build the dictionary"),
+      h(StageLabel, null, "No number, no hint")
+    )
+  );
+</script>

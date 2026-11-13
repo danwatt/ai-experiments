@@ -1,0 +1,35 @@
+<!-- @dsCard group="Navigation" height=200 subtitle="Groups, a spacer, and a sticky pane header" -->
+<!DOCTYPE html>
+<html>
+<body>
+<div class="gt-surface" id="root" style="padding:0">
+  <div class="gt-toolbar">
+    <div class="toolbar-group">
+      <a class="button active" href="#">🔎 Search</a>
+    </div>
+    <div class="toolbar-group">
+      <input class="gt-input" style="width:260px" type="text" value="D:\Photos\2011" aria-label="Library folder">
+      <button class="button">Scan</button>
+    </div>
+    <div class="toolbar-spacer"></div>
+    <div class="toolbar-group">
+      <label style="font-size:12px;color:#bbb;display:inline-flex;align-items:center;gap:4px">
+        <input type="checkbox" checked style="accent-color:var(--accent);margin:0"> Suggested only
+      </label>
+      <select class="gt-select"><option>All cameras</option></select>
+    </div>
+  </div>
+
+  <div style="background:var(--pane);height:110px">
+    <div class="gt-toolbar" style="background:var(--chrome);padding:6px 10px">
+      <span style="font-size:12px;color:#bbb">Sticky pane header</span>
+      <div class="toolbar-spacer"></div>
+      <span style="font-size:12px;color:var(--ink-secondary)">412 selected</span>
+      <button class="button icon-btn" title="Accept">✓</button>
+      <button class="button icon-btn" title="Unassign">✕</button>
+      <button class="button icon-btn" title="Ignore">🚫</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>
