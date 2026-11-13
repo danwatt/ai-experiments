@@ -40,11 +40,17 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px s
 .trip-pick { background: var(--field); border: 1px solid var(--field-border); border-radius: 4px; padding: 4px 10px; color: var(--ink-strong); font-size: 12px; width: 190px; }
 .tb-data { font-size: 11px; color: var(--ink-soft); white-space: nowrap; }
 .dot-ok { color: var(--success); } .dot-bad { color: var(--danger); } .dot-wait { color: var(--warn); }
+.mapview { flex: 1; display: flex; flex-direction: column; min-height: 0; }
 .body { flex: 1; display: flex; min-height: 0; }
-.mapcol { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.mapcol { flex: 1; display: flex; flex-direction: column; min-width: 0; position: relative; }
+/* The side panel folds away to give the map the whole width. */
+.side-toggle { position: absolute; right: 0; top: 50%; transform: translateY(-50%); z-index: 800; width: 18px; height: 52px; padding: 0; border: 1px solid var(--field-border); border-right: 0; border-radius: 6px 0 0 6px; background: var(--overlay); color: var(--ink-secondary); font-size: 11px; cursor: pointer; box-shadow: var(--shadow-control); }
+.side-toggle:hover { background: var(--control-hover); color: var(--ink-strong); }
+.app.side-closed .side { display: none; }
 .map { position: relative; flex: 1; background: #202327; }
 .status { height: 22px; line-height: 22px; flex-shrink: 0; background: var(--rail); border-top: 1px solid var(--hairline); font-size: 11px; color: var(--ink-soft); padding: 0 10px; display: flex; gap: 14px; white-space: nowrap; overflow: hidden; }
 .status b { color: var(--ink-secondary); font-weight: 600; }
+#status-msg { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .status .warn { color: var(--warn-text); } .status .bad { color: var(--danger-text); }
 
 /* ---------- banner over the map (errors) ---------- */
@@ -72,6 +78,8 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px s
 .leaflet-popup-content-wrapper, .leaflet-popup-tip { background: var(--overlay); color: var(--ink); border: 1px solid var(--field-border); box-shadow: var(--shadow-popup); }
 .leaflet-popup-content-wrapper { border-radius: 6px; }
 .leaflet-popup-content { margin: 10px 12px; font-size: 12px; line-height: 16px; }
+/* Map cards scroll inside themselves rather than running off the map (map.js sets --card-max). */
+.map-card .leaflet-popup-content { max-height: var(--card-max, 60vh); overflow-y: auto; }
 .leaflet-container a.leaflet-popup-close-button { color: var(--ink-dim); }
 .leaflet-interactive.route-hit { cursor: grab; }
 .map.dragging-route, .map.dragging-route .leaflet-interactive { cursor: grabbing !important; }
@@ -89,6 +97,10 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px s
 .mklab b { color: var(--ink-strong); font-weight: 600; }
 .mk.thru + .mklab { left: 24px; top: 1px; }
 .wp-icon { overflow: visible; }
+.lab-off { visibility: hidden; }
+.mk:hover + .mklab.lab-off, .bk:hover + .bklab.lab-off, .alt:hover + .altlab.lab-off { visibility: visible; z-index: 2; }
+.map.no-labels .mklab, .map.no-labels .bklab, .map.no-labels .zlab, .map.no-labels .chipmap.day, .map.no-labels .altlab { visibility: hidden; }
+.map.no-labels .mk:hover + .mklab, .map.no-labels .bk:hover + .bklab, .map.no-labels .alt:hover + .altlab { visibility: visible; }
 .chipmap { background: var(--label-bg); border: 1px dashed var(--field-border); border-radius: 20px; padding: 1px 9px; font-size: 11px; line-height: 17px; color: var(--ink-secondary); white-space: nowrap; cursor: pointer; display: inline-block; transform: translate(-50%, -50%); }
 .chipmap b { color: var(--ink-strong); font-weight: 600; }
 .chipmap:hover { border-color: var(--accent); color: var(--on-accent); }
@@ -306,7 +318,10 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px s
 .tl-stop.sel { box-shadow: 0 0 0 2px var(--accent); }
 .tl-stop.pinned { border-color: var(--warn); }
 .tl-end { position: absolute; top: 24px; width: 24px; height: 24px; transform: translateX(-50%); border-radius: 50%; display: grid; place-items: center; background: var(--accent-fill-strong); border: 2px solid var(--on-accent); color: var(--white); font-size: 11px; font-weight: 700; }
-.tl-thru { position: absolute; top: 30px; width: 11px; height: 11px; transform: translateX(-50%) rotate(45deg); background: var(--canvas); border: 1.5px solid var(--accent-text); }
+/* Start, end and through markers sit on top of the driving blocks they mark. */
+.tl-end, .tl-thru { z-index: 2; }
+.tl-thru { position: absolute; top: 28px; width: 15px; height: 15px; transform: translateX(-50%) rotate(45deg); background: var(--canvas); border: 1.5px solid var(--accent-text); border-radius: 2px; display: grid; place-items: center; }
+.tl-thru > span { transform: rotate(-45deg); font-size: 9px; font-weight: 700; line-height: 1; color: var(--accent-text); }
 .tl-due { position: absolute; top: 18px; height: 36px; border-left: 1px dashed var(--ink-muted); }
 .tl-due span { position: absolute; top: -14px; left: 0; transform: translateX(-50%); font-size: 9px; line-height: 12px; color: var(--ink-muted); white-space: nowrap; }
 .tl-win { position: absolute; top: 20px; height: 32px; border: 1px dashed var(--accent); background: rgba(74, 144, 217, 0.12); border-radius: 3px; }

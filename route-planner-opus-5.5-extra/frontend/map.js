@@ -2,7 +2,7 @@
 // them (click to add, drag a waypoint, drag the route line, right-click menu,
 // draw and edit zones). It reads `state` and changes the trip through edits.js.
 
-import { state, updateUi, requestBody, setShowStops } from "./state.js";
+import { state, updateUi, requestBody, setShowStops, setShowLabels } from "./state.js";
 import {
   letter, appendWaypoint, addMiddle, makeStart, makeEnd, insertWaypoint, newWaypoint, insertIndexForRouteIndex,
   bestInsertIndex, km, removeWaypoint, setWaypoint, adoptAlternate, addZone, setZone, removeZone,
@@ -68,7 +68,7 @@ export function initMap(onHint) {
     markers: L.layerGroup().addTo(map),
     preview: L.layerGroup().addTo(map),
   };
-  popup = L.popup({ closeButton: true, autoPan: true, offset: [0, -8], maxWidth: 360, className: "card" });
+  popup = L.popup({ closeButton: true, autoPan: true, offset: [0, -8], maxWidth: 360, className: "map-card" });
   map.on("popupclose", (e) => {
     if (e.popup !== popup) return;
     cardKey = null;
@@ -81,6 +81,7 @@ export function initMap(onHint) {
   addLayerControl();
   watchSize();
   map.on("zoomend", renderStops);
+  map.on("zoomend", () => requestAnimationFrame(declutter));
   setUpGeoman();
   setUpContextMenu();
   map.on("click", onMapClick);
@@ -207,7 +208,52 @@ export function renderMap(what) {
   renderCard();
   renderLayerControl();
   if (what === "route-fit") fitTrip();
+  requestAnimationFrame(declutter);
 }
+
+// ---------- labels ----------
+
+// Labels are hidden where they would cover a more important label or a marker;
+// hovering a marker shows its label again. Most important first: waypoints,
+// the open stop, the selected day's stops, the selected day's chip, other
+// days' stops, other day chips, zones that are on, zones that are off (only
+// zoomed in), the picker's alternatives. "Labels" in the layer box hides them all.
+const LABEL_PAD = 3;
+
+function declutter() {
+  if (!map) return;
+  const box = map.getContainer();
+  box.classList.toggle("no-labels", !state.ui.showLabels);
+  const stops = [...box.querySelectorAll(".bklab")];
+  const day = String(state.ui.day);
+  const groups = [
+    [...box.querySelectorAll(".mklab")],
+    stops.filter((e) => e.dataset.sel === "1"),
+    stops.filter((e) => e.dataset.sel !== "1" && e.dataset.day === day),
+    [...box.querySelectorAll(".chipmap.day.sel")],
+    stops.filter((e) => e.dataset.sel !== "1" && e.dataset.day !== day),
+    [...box.querySelectorAll(".chipmap.day:not(.sel)")],
+    [...box.querySelectorAll(".zlab:not(.off)")],
+    map.getZoom() >= 9 ? [...box.querySelectorAll(".zlab.off")] : [],
+    [...box.querySelectorAll(".altlab")],
+  ];
+  const all = [...box.querySelectorAll(".mklab, .bklab, .chipmap.day, .zlab, .altlab")];
+  all.forEach((e) => e.classList.add("lab-off"));
+  if (!state.ui.showLabels) return;
+  // Markers are obstacles too (shrunk a little: a label sits right next to its own).
+  const taken = [...box.querySelectorAll(".mk, .bk")].map((e) => shrink(e.getBoundingClientRect(), 2));
+  for (const el of groups.flat()) {
+    el.classList.remove("lab-off");
+    const r = el.getBoundingClientRect();
+    if (!r.width) continue;
+    const grown = shrink(r, -LABEL_PAD);
+    if (taken.some((t) => overlaps(grown, t))) el.classList.add("lab-off");
+    else taken.push(r);
+  }
+}
+
+const shrink = (r, by) => ({ left: r.left + by, right: r.right - by, top: r.top + by, bottom: r.bottom - by });
+const overlaps = (a, b) => a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom;
 
 // Fit the map to the route (or the waypoints). If the map has no size yet
 // (the page loaded in a hidden tab or pane), fitBounds would pick the highest
@@ -569,12 +615,14 @@ function addLayerControl() {
     options: { position: "topright" },
     onAdd() {
       const el = L.DomUtil.create("div", "layers");
-      el.innerHTML = `<label class="ly"><input type="checkbox" id="ly-stops"> Candidate stops</label>
+      el.innerHTML = `<label class="ly" title="Labels that would overlap hide; hover a marker to see its label"><input type="checkbox" id="ly-labels"> Labels</label>
+        <label class="ly"><input type="checkbox" id="ly-stops"> Candidate stops</label>
         <div class="ly-note" id="ly-note"></div>
         <div class="ly-key"><span><i class="cp rest_area"><span class="g">🅿</span></i> rest area</span><span><i class="cp exit"><span class="g">116</span></i> exit</span><span><i class="cp town"><span class="g">🏘</span></i> town</span><span><i class="cp other"><span class="g">•</span></i> other</span><span class="ly-sub">number = places to eat</span></div>`;
       L.DomEvent.disableClickPropagation(el);
       L.DomEvent.disableScrollPropagation(el);
       el.querySelector("#ly-stops").addEventListener("change", (e) => setShowStops(e.target.checked));
+      el.querySelector("#ly-labels").addEventListener("change", (e) => setShowLabels(e.target.checked));
       return el;
     },
   });
@@ -584,6 +632,7 @@ function addLayerControl() {
 function renderLayerControl() {
   const box = document.getElementById("ly-stops");
   if (!box) return;
+  document.getElementById("ly-labels").checked = state.ui.showLabels;
   box.checked = state.ui.showStops;
   document.querySelector(".layers .ly-key").hidden = !state.ui.showStops;
   const note = document.getElementById("ly-note");
@@ -688,10 +737,17 @@ function fitPicker(r, always) {
   if (r.window) pts.push(...routeBetween(r.window.earliest_mile, r.window.hard_mile));
   if (pts.length < 2) pts.push(...routeBetween(r.mile - 20, r.mile + 20));
   const bounds = L.latLngBounds(pts);
+  map.invalidateSize({ pan: false }); // the day strip may have just appeared under the map
   const size = map.getSize();
-  const top = Math.min(380, size.y * 0.55);
-  if (!always && map.getBounds().contains(bounds) && map.latLngToContainerPoint([r.lat, r.lon]).y > top) return;
-  map.fitBounds(bounds, { paddingTopLeft: [60, top], paddingBottomRight: [60, 30], maxZoom: 10 });
+  // Room above for the card as tall as it really is (it is capped to fit the map).
+  const card = popup.getElement()?.offsetHeight || 320;
+  const top = Math.min(card + 45, size.y - 40); // + the card's tip and offset
+  const p = map.latLngToContainerPoint([r.lat, r.lon]);
+  const fits = map.getBounds().contains(bounds) && p.y > top && p.y < size.y - 30;
+  if (!always && fits) { if (popup.isOpen()) popup.update(); return; }
+  map.fitBounds(bounds, { paddingTopLeft: [60, top], paddingBottomRight: [60, 40], maxZoom: 10 });
+  // Once the map has moved, let Leaflet nudge the card fully into view.
+  map.once("moveend", () => { if (popup.isOpen()) popup.update(); });
 }
 
 // The candidate nearest a point on the map (skipped ones excluded): where a
@@ -717,10 +773,10 @@ function renderBreaks() {
     const label = night ? `🛏 <b>${clockOf(r.arrive)}</b> · ${escapeHtml(r.name)}` : `<b>${clockOf(r.arrive)}</b> · ${escapeHtml(r.name)}`;
     const marker = L.marker([r.lat, r.lon], {
       pane: "breaks", draggable: r.type !== "fuel", autoPan: true, pmIgnore: true, riseOnHover: true,
-      icon: L.divIcon({ className: "bk-icon", iconSize: [0, 0], html: `<div class="${cls}">${glyph}</div><div class="bklab">${label}</div>` }),
+      icon: L.divIcon({ className: "bk-icon", iconSize: [0, 0], html: `<div class="${cls}">${glyph}</div><div class="bklab" data-day="${r.day}" data-sel="${state.ui.selectedBreak === r.stop_key ? 1 : 0}">${label}</div>` }),
       title: `${STOP_NAME[r.type]} at ${r.name}, ${clockOf(r.arrive)}. Click for alternatives; drag to another stop to pin it.`,
     });
-    marker.on("click", (e) => { L.DomEvent.stop(e); selectBreak(r.stop_key, { pan: true }); });
+    marker.on("click", (e) => { L.DomEvent.stop(e); selectBreak(r.stop_key); });
     marker.on("drag", () => {
       const c = nearestCandidate(marker.getLatLng());
       statusHint(c ? `<b>Moving the break</b> · release to pin ${escapeHtml(c.name)} (mile ${miles(c.mile)})` : null);
@@ -868,8 +924,13 @@ let cardKey = null; // what the open card shows, e.g. "wp:abc"
 // Rebuild the card unless the user is typing in it and it still shows the
 // same thing (a route arriving must not wipe a half-typed name).
 function setCard(key, latlng, html, wire) {
-  const typing = map.hasLayer(popup) && popup.getElement()?.contains(document.activeElement) && cardKey === key;
+  // Keep the card as it is only while someone types in one of its fields. A clicked
+  // button also keeps focus, and must not stop the card from showing the change.
+  const active = document.activeElement;
+  const typing = map.hasLayer(popup) && cardKey === key && popup.getElement()?.contains(active) && active.matches("input, textarea, select");
   popup.setLatLng(latlng);
+  // A long card scrolls inside itself rather than running off the map.
+  map.getContainer().style.setProperty("--card-max", `${Math.max(200, map.getContainer().clientHeight - 130)}px`);
   if (!typing) {
     popup.setContent(html);
     cardKey = key;
@@ -966,7 +1027,7 @@ function wireWaypointCard(el, wp) {
 
 function zoneCard(zone) {
   const types = ZONE_TYPES.map((t) =>
-    `<button class="cand ${zone.type === t.type ? "on" : ""}" data-ztype="${t.type}"><span>${t.icon}</span><span>${t.label}<small>${t.note}</small></span><span>${zone.type === t.type ? "✓" : ""}</span></button>`).join("");
+    `<button class="cand ${zone.type === t.type ? "on" : ""}" data-ztype="${t.type}"><span>${t.icon}</span><span title="${t.note}">${t.label}</span><span>${zone.type === t.type ? "✓" : ""}</span></button>`).join("");
   const editing = state.ui.editingZone === zone.id;
   return `<div class="pop">
     <h5>${zoneType(zone.type).icon} <input class="fld" name="zname" value="${escapeHtml(zone.name)}" placeholder="Name this zone" style="flex:1"></h5>

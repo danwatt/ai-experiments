@@ -28,12 +28,13 @@
   <section class="settings" id="view-settings" hidden></section>
   <section class="exp" id="view-export" hidden></section>
 
-  <div class="body" id="view-map">
+  <div class="mapview" id="view-map">
+  <div class="body">
     <div class="mapcol">
       <div class="map" id="map">
         <div class="banner" id="banner" hidden></div>
       </div>
-      <div class="timeline" id="daystrip" hidden></div>
+      <button class="side-toggle" id="side-toggle" title="Hide the side panel" aria-label="Hide the side panel">▸</button>
     </div>
 
     <aside class="side">
@@ -52,6 +53,8 @@
       <div class="list" id="tab-zones" hidden></div>
       <div class="side-foot" id="side-foot"></div>
     </aside>
+  </div>
+  <div class="timeline" id="daystrip" hidden></div>
   </div>
 
   <footer class="status" id="status">

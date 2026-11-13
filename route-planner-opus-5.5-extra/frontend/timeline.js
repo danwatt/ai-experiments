@@ -93,7 +93,7 @@ export function renderDayStrip() {
       h += `<span class="tl-clock" style="left:${X(arrive)}px" title="Clock change at mile ${r.mile}"><span>🕐 ${escapeHtml(r.tz)} (was ${clockOf(r.before)})</span></span>`;
       prevLeave = arrive;
     } else if (r.type === "through") {
-      h += `<span class="tl-thru" style="left:${X(arrive)}px" title="${escapeHtml(r.name)}"></span>`;
+      h += `<span class="tl-thru" style="left:${X(arrive)}px" title="${escapeHtml(r.name)}"><span>${i >= 0 ? letter(i) : ""}</span></span>`;
       prevLeave = arrive;
     } else if (leaving || r.type === "start") {
       prevLeave = minutesOf(leaving ? r.depart : r.depart, d.date);

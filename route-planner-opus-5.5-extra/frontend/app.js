@@ -1,7 +1,7 @@
 // Entry point: wires the map, the sidebar, the toolbar and the status bar to
 // the trip state, and asks for the first route.
 
-import { state, subscribe, updateUi, replaceTrip, scheduleRoute, hasDraft, tripFromFile } from "./state.js";
+import { state, subscribe, updateUi, replaceTrip, scheduleRoute, hasDraft, tripFromFile, setSideOpen } from "./state.js";
 import { initMap, renderMap, fitTrip, refreshMapSize } from "./map.js";
 import { initSidebar, renderSidebar } from "./sidebar.js";
 import { renderDayStrip } from "./timeline.js";
@@ -23,6 +23,7 @@ function render(what) {
   $("btn-settings").classList.toggle("on", view === "settings");
   $("btn-export").classList.toggle("on", view === "export");
   if (view === "map") {
+    renderSidePanel();
     renderMap(what);
     renderSidebar();
     renderDayStrip();
@@ -37,6 +38,15 @@ function render(what) {
   shownView = view;
   renderBanner();
   renderStatus();
+}
+
+// The side panel can fold away; the map (and the day strip under both) take the room.
+function renderSidePanel() {
+  document.querySelector(".app").classList.toggle("side-closed", !state.ui.sideOpen);
+  const t = $("side-toggle");
+  t.textContent = state.ui.sideOpen ? "▸" : "◂";
+  t.title = state.ui.sideOpen ? "Hide the side panel" : "Show the itinerary, waypoints and zones";
+  t.setAttribute("aria-label", t.title);
 }
 
 function renderBanner() {
@@ -94,6 +104,7 @@ function initToolbar() {
   const toggle = (name) => updateUi((u) => { u.view = u.view === name ? "map" : name; });
   $("btn-settings").addEventListener("click", () => toggle("settings"));
   $("btn-export").addEventListener("click", () => (state.ui.view === "export" ? toggle("export") : showExport()));
+  $("side-toggle").addEventListener("click", () => setSideOpen(!state.ui.sideOpen));
 }
 
 // The server's defaults and the zone library, then, on a first visit, the Colorado loop to look at.

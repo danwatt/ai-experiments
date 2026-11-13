@@ -204,6 +204,27 @@ export function setShowStops(on) {
   updateUi((u) => { u.showStops = on; if (!on) u.selectedStop = null; });
 }
 
+// Same for the side panel and the map labels.
+const SIDE_KEY = "road-trip-planner.side-open";
+const LABELS_KEY = "road-trip-planner.map-labels";
+const loadFlag = (key) => {
+  try {
+    return localStorage.getItem(key) !== "0";
+  } catch {
+    return true;
+  }
+};
+
+export function setSideOpen(on) {
+  try { localStorage.setItem(SIDE_KEY, on ? "1" : "0"); } catch { /* not kept */ }
+  updateUi((u) => { u.sideOpen = on; });
+}
+
+export function setShowLabels(on) {
+  try { localStorage.setItem(LABELS_KEY, on ? "1" : "0"); } catch { /* not kept */ }
+  updateUi((u) => { u.showLabels = on; });
+}
+
 const draft = load();
 
 export const state = {
@@ -220,7 +241,7 @@ export const state = {
   stopsLoading: false,
   stopsError: null,
   ui: {
-    tab: "itinerary", tool: "pan", selected: null, selectedZone: null, selectedStop: null, editingZone: null, drag: null, showStops: loadShowStops(),
+    tab: "itinerary", tool: "pan", selected: null, selectedZone: null, selectedStop: null, editingZone: null, drag: null, showStops: loadShowStops(), sideOpen: loadFlag(SIDE_KEY), showLabels: loadFlag(LABELS_KEY),
     selectedBreak: null, // stop_key of the planned break whose picker is open
     pickerFocus: null, // stop_key of the line chosen inside the picker
     day: 1, // the day the day strip shows

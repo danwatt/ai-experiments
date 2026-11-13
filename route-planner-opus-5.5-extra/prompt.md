@@ -1,10 +1,10 @@
 # Prompts
 
 - **Model:** claude-opus-5-5
-- **Effort:** xhigh
+- **Effort:** medium, xhigh
 - **Session(s):** 27bcf8ed-f26c-4700-b7c2-f06a27a5f6e0
-- **Tokens:** input 276, output 375952, cache read 52900334, cache write 1937951
-- **Cost (tokscale estimate):** $33.6
+- **Tokens:** input 336, output 394420, cache read 66087268, cache write 1981579
+- **Cost (tokscale estimate):** $36.96
 
 ## You
 
@@ -501,3 +501,54 @@ Screenshot done and a small sidebar overflow fixed. Making the landing-card and 
 ![screenshot 31](prompt-assets/031.webp)
 
 README and screenshots done. Writing this session's prompt.md, then the landing card.
+
+The road trip planner is committed as `1efbc11` on a new local branch, `route-planner-opus-5.5-extra`. I branched rather than committing to master directly, so the commit doesn't land there without your OK. Nothing is pushed. Your changes under `politics/` and the `watt-logo-variations/` folder stay uncommitted and untouched.
+
+**What's in the commit**
+- **The whole project** (268 files, 5.6 MB). Map data and trip files stay out because they're gitignored.
+- **README:** a screenshot of the Colorado loop plus three smaller ones (zone library, settings, export), how to run it, and a table of the six phases linking each one's notes and session record.
+- **[prompt.md](route-planner-opus-5.5-extra/prompt.md)** for this planning session: your 10 prompts and 31 screenshots. It recorded Opus 5.5 at xhigh effort, $33.60.
+- **Landing card** in the `tools` section of `demos.js`. It links the README, the prompt and the design mockups, with the image in `screenshots/projects/`. I checked that `demos.js` still loads, but couldn't check the card on the rendered landing page: the in-app browser opens local pages without running their scripts.
+- **The fix to `scripts/prompt-md.sh`,** so a record from a session started by another session opens with its brief.
+
+**Fixed while taking screenshots:** at normal window widths the sidebar's trip summary overflowed and cut off "5 days" and "arrive". The numbers now wrap onto a second line.
+
+**Total cost:** about $96, of which $33.60 was this session and $62.16 the six phase sessions.
+
+**Still running:** both Docker containers are up, with Valhalla using about 2.9 GB. `make down` in `route-planner-opus-5.5-extra/` stops them; the data stays in `data/` for the next `make up`.
+
+## You
+
+Yes, merge to master
+
+## Claude
+
+Master now includes the road trip planner (`1efbc11`), and I deleted the temporary branch. Master is one commit ahead of `origin/master` and nothing is pushed. Pushing master will trigger the GitHub Pages build and add the new card to the landing page. Your changes under `politics/` and the `watt-logo-variations/` folder are still uncommitted, as before.
+
+## You
+
+Please serve the app locally
+
+## Claude
+
+The app is running at http://localhost:8000, and I've opened it in the browser pane. You can also open that address in your own browser.
+
+Valhalla and the places database were already up. `make up` restarted the API container, which answered again within a few seconds. Run `make down` in `route-planner-opus-5.5-extra/` when you want to stop it.
+
+## You
+
+![screenshot 32](prompt-assets/032.webp)
+
+We need to make some visual updates. here are my annotations
+
+## Claude
+
+Making the three changes now: collapsible side panel, fewer overlapping map labels, full-width day strip.
+
+Now the edits.
+
+![screenshot 33](prompt-assets/033.webp)
+
+Changes are in; checking the panel toggle in the browser.
+
+![screenshot 34](prompt-assets/034.webp)
