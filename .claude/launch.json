@@ -259,6 +259,17 @@
       ],
       "port": 8791,
       "url": "http://localhost:8791"
+    },
+    {
+      "name": "zip-radius-voronoi",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8829"
+      ],
+      "port": 8829,
+      "url": "http://localhost:8829"
     }
   ]
 }
