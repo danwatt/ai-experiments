@@ -66,6 +66,12 @@ button:focus-visible{outline:4px solid var(--gold);outline-offset:3px}
 .today i.on{background:var(--gold);border-color:var(--gold);box-shadow:0 0 8px rgba(255,200,61,.7)}
 .mission{text-align:center;font-size:20px}
 .mission .pill{display:inline-block;padding:10px 20px}
+.stepline{text-align:center;color:var(--soft);font-weight:800;font-size:15px;margin-top:10px;line-height:1.4}
+.stepline b{color:#fff}
+.steps{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.steps span{font-size:13px;font-weight:800;padding:5px 10px;border-radius:999px;background:rgba(255,255,255,.07);color:var(--muted)}
+.steps span.done{background:rgba(95,227,166,.2);color:#b9f5d8}
+.steps span.cur{background:var(--accent);color:#fff}
 .seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:8px;margin-bottom:10px}
 .seg button{background:var(--glass);border:2px solid var(--glass-line);border-radius:16px;padding:14px 6px;font-weight:800;font-size:17px;line-height:1.15}
 .seg button small{display:block;font-size:12px;font-weight:700;color:var(--muted);margin-top:3px}
@@ -226,6 +232,7 @@ td.num,th.num{text-align:right}
 .s-learning{background:#ffd76a}
 .s-trouble{background:#ff8a80}
 .s-mastered{background:#5fe3a6}
+.s-placed{background:#b9f0d6}
 .legend{display:flex;flex-wrap:wrap;gap:10px 16px;margin-top:12px;font-size:13px;color:var(--soft)}
 .legend span{display:flex;align-items:center;gap:6px}
 .legend i{width:14px;height:14px;border-radius:4px;display:inline-block}
@@ -272,6 +279,7 @@ td.num,th.num{text-align:right}
 
     <div class="lbl">Today’s mission</div>
     <div class="mission"><span class="pill" id="missionLine"></span></div>
+    <div class="stepline" id="stepLine"></div>
 
     <button class="big" id="launchBtn">🚀 Launch!</button>
     <button class="prog" id="progBtn" aria-label="Open my star map">
@@ -393,7 +401,16 @@ td.num,th.num{text-align:right}
         </div>
       </div>
       <div class="lbl" style="margin:12px 0 8px">How far</div>
-      <div class="seg" id="rangeSeg" style="margin-bottom:0"></div>
+      <div class="seg" id="rangeSeg"></div>
+      <div class="lbl" style="margin:12px 0 8px">New facts arrive</div>
+      <div class="seg" id="ladderSeg" style="margin-bottom:0">
+        <button data-ladder="1">Step by step<small>one strategy at a time</small></button>
+        <button data-ladder="0">All at once<small>any fact in the mission</small></button>
+      </div>
+      <div id="ladderBox">
+        <div class="steps" id="stepList"></div>
+        <p class="note" id="ladderNote" style="margin:10px 0 0"></p>
+      </div>
     </div>
 
     <div class="panel">
@@ -421,6 +438,7 @@ td.num,th.num{text-align:right}
       <div class="fgrid" id="fgrid"></div>
       <div class="legend">
         <span><i class="s-mastered"></i>Mastered (right &amp; under 3s, 3× in a row, over 2+ days)</span>
+        <span><i class="s-placed"></i>Known at check flight (confirmed by later checks)</span>
         <span><i class="s-learning"></i>Learning</span>
         <span><i class="s-trouble"></i>Needs work (misses or over 6s)</span>
         <span><i class="s-unseen"></i>Not seen yet</span>
@@ -461,7 +479,9 @@ td.num,th.num{text-align:right}
     <div class="panel">
       <h2>Data</h2>
       <p class="note">Everything is stored only in this browser (localStorage). Export a copy to keep a backup.</p>
+      <p class="note" id="appNote"></p>
       <div class="statbtns">
+        <button id="updateBtn">Check for update</button>
         <button id="exportBtn">Export JSON</button>
         <button id="resetBtn" class="danger">Reset all progress</button>
       </div>
@@ -478,6 +498,10 @@ const KEY = 'factRocket.v1';
 const BATCH = 10;
 const FAST = 3000, SLOW = 6000;           // ms thresholds for stars / mastery
 const TROUBLE_MAX = 4, NEW_MAX = 3;       // per round: facts to fix, brand-new facts
+const DAY = 864e5;
+const REVIEW = [2, 5, 12, 30, 60];        // days until a mastered fact is checked again; grows with each quick answer
+const REVIEW_MAX = 3;                     // per round: mastered facts due for a check
+const PLACE_N = 5;                        // check flight: facts sampled from each step
 const TYPING = 2000;                      // ms allowed for tapping the answer before it counts as thinking
 const MAX_MS = 20000;                     // cap on a recorded answer time (walked away from the card)
 const ROCKET = `<svg class="rocket" viewBox="0 0 64 124" aria-hidden="true">
@@ -525,7 +549,8 @@ const $ = s => document.querySelector(s);
 const now = () => performance.now();
 
 /* ================= storage ================= */
-const DEFAULT = {v: 1, settings: {op: 'add', range: 20, level: 1, muted: false, skin: 0}, facts: {}, batches: [], stars: 0, launches: 0, best: {}};
+// placed: missions whose check flight is finished. steps: furthest ladder step reached, per mission.
+const DEFAULT = {v: 1, settings: {op: 'add', range: 20, level: 1, muted: false, skin: 0, ladder: true}, facts: {}, batches: [], stars: 0, launches: 0, best: {}, placed: {}, steps: {}};
 let S, storageOk = true;
 
 function load() {
@@ -585,7 +610,9 @@ function trivial(f) {
 const dayOf = x => x.t ? new Date(x.t).toDateString() : 'old';
 
 function status(s) {
-  if (!s || !s.recent.length) return 'unseen';
+  if (!s) return 'unseen';
+  if (s.p) return 'mastered';   // known at the check flight, until an answer says otherwise
+  if (!s.recent.length) return 'unseen';
   const r = s.recent, last3 = r.slice(-3);
   // Mastered = three quick, correct answers in a row that span at least two days.
   if (last3.length === 3 && last3.every(x => x.ok && x.ms < FAST) && new Set(last3.map(dayOf)).size >= 2) return 'mastered';
@@ -602,21 +629,125 @@ function recentAvg(s) {
 
 function weight(f) {
   const s = S.facts[f.k];
-  let w = {unseen: 3, mastered: 0.4, trouble: 6, learning: 2.5}[status(s)];
-  if (s) w += Math.min((Date.now() - s.last) / 864e5 * 0.3, 1.5);  // stale facts drift back in
+  const st = status(s);
+  let w = {unseen: 3, mastered: 0.2, trouble: 6, learning: 2.5}[st];
+  if (s && st !== 'mastered') w += Math.min((Date.now() - s.last) / DAY * 0.3, 1.5);  // stale facts drift back in (mastered ones have due dates)
   if (trivial(f)) w *= 0.3;
   const last = s && s.recent[s.recent.length - 1];
   if (last && last.ok && last.ms < FAST && last.t && isToday(last.t)) w *= 0.4;  // quick today: let it rest
   return w;
 }
 
+/* ---------- the ladder: facts arrive one strategy at a time ---------- */
+// [name, test on the related adding or times fact, strong facts needed to pass (rule steps: a sample is enough)]
+// A fact belongs to the first step whose test it passes. 9 − 4 sits with 5 + 4; 42 ÷ 6 sits with 7 × 6.
+const LADDER = {
+  add: [
+    ['Plus 0 and 1', (a, b) => Math.min(a, b) <= 1, 8],
+    ['Plus 2', (a, b) => Math.min(a, b) === 2],
+    ['Doubles', (a, b) => a === b],
+    ['Make 10', (a, b) => a + b === 10],
+    ['Plus 10', (a, b) => Math.max(a, b) === 10, 8],
+    ['Near doubles', (a, b) => Math.abs(a - b) === 1],
+    ['Plus 9', (a, b) => Math.max(a, b) === 9],
+    ['Plus 8', (a, b) => Math.max(a, b) === 8],
+    ['Last few', () => true],
+  ],
+  mul: [
+    ['Times 0 and 1', (a, b) => Math.min(a, b) <= 1, 8],
+    ['Times 2', (a, b) => a === 2 || b === 2],
+    ['Times 10', (a, b) => a === 10 || b === 10, 8],
+    ['Times 5', (a, b) => a === 5 || b === 5],
+    ['Squares', (a, b) => a === b],
+    ['Times 3', (a, b) => a === 3 || b === 3],
+    ['Times 4', (a, b) => a === 4 || b === 4],
+    ['Times 9', (a, b) => a === 9 || b === 9],
+    ['Sixes, sevens, eights', (a, b) => Math.max(a, b) <= 8],
+    ['Times 11', (a, b) => a === 11 || b === 11],
+    ['Times 12', () => true],
+  ],
+};
+const stepDefs = f => LADDER[f.op === 'x' || f.op === '/' ? 'mul' : 'add'];
+const stepIdx = f => { const a = f.op === '+' || f.op === 'x' ? f.a : f.ans; return stepDefs(f).findIndex(d => d[1](a, f.b)); };
+const stepName = f => stepDefs(f)[stepIdx(f)][0];
+const ladderOn = () => S.settings.ladder !== false;
+const missionKey = (op, size) => `${op}-${size}`;
+
+// The steps of one mission, each with its facts. Steps with no facts at this size are left out.
+function ladder(op, size) {
+  const pure = op === 'add' || op === 'mul';
+  const steps = LADDER[isMul(op) ? 'mul' : 'add'].map(([name, , need]) => ({name: pure || name === 'Last few' ? name : name + ' family', need, facts: []}));
+  for (const f of allFacts(op, size)) steps[stepIdx(f)].facts.push(f);
+  return steps.filter(st => st.facts.length);
+}
+const quickLast = s => { const last = s && s.recent[s.recent.length - 1]; return !!last && last.ok && last.ms < FAST; };
+// Strong = mastered, or quick and right the last time. A step is passed when most of its facts are strong.
+const strong = s => status(s) === 'mastered' || quickLast(s);
+function stepProgress(step) {
+  const have = step.facts.filter(f => strong(S.facts[f.k])).length, need = Math.min(step.need || Infinity, Math.ceil(step.facts.length * 0.8));
+  return {have, need, passed: have >= need};
+}
+// Index of the step being worked on (= steps.length once every step is passed). Never moves back.
+function frontier(op, size, steps = ladder(op, size)) {
+  let i = steps.findIndex(st => !stepProgress(st).passed);
+  if (i < 0) i = steps.length;
+  return Math.min(steps.length, Math.max(i, S.steps[missionKey(op, size)] || 0));
+}
+const needsPlacement = (op, size) => ladderOn() && !S.placed[missionKey(op, size)] && frontier(op, size) < ladder(op, size).length;
+const dueOf = s => s.due || s.last + REVIEW[0] * DAY;
+const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+
+// Check flight: a few facts from each step, starting where he is, to find what he already knows.
+// Returns the cards plus a plan of which cards test which step.
+function pickPlacement(op, size) {
+  const steps = ladder(op, size), out = [], plan = [], fams = new Set();
+  for (let i = frontier(op, size, steps); i < steps.length; i++) {
+    const pool = shuffle(steps[i].facts.slice()).sort((x, y) => !!S.facts[x.k] - !!S.facts[y.k]);  // unseen facts first
+    const pick = [];
+    for (const f of pool) {
+      if (pick.length === PLACE_N) break;
+      if (!fams.has(f.fam)) { fams.add(f.fam); pick.push(f); }
+    }
+    if (out.length + pick.length > BATCH) break;
+    out.push(...pick);
+    plan.push({i, keys: pick.map(f => f.k)});
+  }
+  for (const f of pickBatch(op, size)) if (out.length < BATCH && !fams.has(f.fam)) { fams.add(f.fam); out.push(f); }
+  return {queue: out, plan};
+}
+// After a check flight: every step whose sample was answered quickly counts as known.
+// Its facts become provisionally mastered and are checked again in a couple of days. Returns the names of those steps.
+function placeResults(g) {
+  const steps = ladder(g.op, g.range), known = [], t = Date.now();
+  const quick = k => g.items.some(x => x.k === k && !x.retry && x.ok && x.ms < FAST);
+  for (const {i, keys} of g.plan) {
+    if (keys.filter(quick).length < keys.length - Math.floor(keys.length * 0.2)) break;
+    for (const f of steps[i].facts) {
+      const s = S.facts[f.k];
+      if (!s) S.facts[f.k] = {n: 0, ok: 0, sumOk: 0, recent: [], last: 0, p: 1, iv: 0, due: t + REVIEW[0] * DAY};
+      else if (quickLast(s) && status(s) !== 'mastered') Object.assign(s, {p: 1, iv: 0, due: t + REVIEW[0] * DAY});
+    }
+    known.push(steps[i].name);
+  }
+  const at = frontier(g.op, g.range, steps);
+  if (at >= steps.length || at <= g.plan[g.plan.length - 1].i) S.placed[missionKey(g.op, g.range)] = 1;  // found his level
+  return known;
+}
+
 // Build a round of 10 distinct facts (never both 3+5 and 5+3) in this order of priority:
 //   1. facts that need work, so a miss always comes back next round
-//   2. a few brand-new facts
-//   3. facts already seen, so most of the round feels doable
-//   4. easy new facts (0s and 1s), then anything left, if the round is still short
+//   2. mastered facts that are due for a check
+//   3. a few brand-new facts (step by step: from the earliest step that still has some)
+//   4. facts already seen, so most of the round feels doable
+//   5. easy new facts (0s and 1s), then anything left, if the round is still short
 function pickBatch(op, range) {
-  const all = allFacts(op, range).map(f => ({f, w: weight(f), st: status(S.facts[f.k])}));
+  let facts = allFacts(op, range), newStep = null;
+  if (ladderOn()) {
+    const steps = ladder(op, range), open = steps.slice(0, frontier(op, range, steps) + 1);
+    facts = open.flatMap(st => st.facts);
+    newStep = open.find(st => st.facts.some(f => status(S.facts[f.k]) === 'unseen'));
+  }
+  const all = facts.map(f => ({f, w: weight(f), st: status(S.facts[f.k])}));
   const out = [], fams = new Set();
   const draw = (pool, n) => {
     pool = pool.slice();
@@ -632,27 +763,33 @@ function pickBatch(op, range) {
   };
   const trouble = all.filter(p => p.st === 'trouble');
   draw(trouble, TROUBLE_MAX);
+  draw(all.filter(p => p.st === 'mastered' && Date.now() >= dueOf(S.facts[p.f.k])), REVIEW_MAX);
   // with a big pile of facts to fix, slow down on new ones
-  draw(all.filter(p => p.st === 'unseen' && !trivial(p.f)), trouble.length >= 6 ? 1 : NEW_MAX);
+  const fresh = trouble.length >= 6 ? 1 : newStep && newStep.need ? 5 : NEW_MAX;
+  if (newStep) draw(all.filter(p => p.st === 'unseen' && newStep.facts.includes(p.f)), fresh);
+  else draw(all.filter(p => p.st === 'unseen' && !trivial(p.f)), fresh);
   draw(all.filter(p => p.st === 'learning' || p.st === 'mastered'), BATCH);
   draw(all.filter(p => p.st === 'unseen' && trivial(p.f)), BATCH);
   draw(all, BATCH);
-  for (let i = out.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [out[i], out[j]] = [out[j], out[i]];
-  }
-  return out;
+  return shuffle(out);
 }
 
 // First answers only: comeback cards are not recorded, since the answer was just shown.
+// A mastered fact carries a due date. Quick and right when due: the next check moves further out.
+// Slow or wrong: it stops being mastered and has to be earned again.
 function recordFact(k, ms, ok) {
   const s = S.facts[k] || (S.facts[k] = {n: 0, ok: 0, sumOk: 0, recent: [], last: 0});
+  const t = Date.now(), was = status(s) === 'mastered', due = was && t >= dueOf(s);
   ms = Math.round(ms);
   s.n++;
   if (ok) { s.ok++; s.sumOk += ms; }
-  s.recent.push({ms, ok, t: Date.now()});
+  s.recent.push({ms, ok, t});
   if (s.recent.length > 6) s.recent.shift();
-  s.last = Date.now();
+  s.last = t;
+  if (!(ok && ms < FAST)) delete s.p;
+  if (status(s) !== 'mastered') { delete s.iv; delete s.due; }
+  else if (!was) { s.iv = 0; s.due = t + REVIEW[0] * DAY; }
+  else if (due) { s.iv = Math.min((s.iv || 0) + 1, REVIEW.length - 1); s.due = t + REVIEW[s.iv] * DAY; }
 }
 
 /* ================= sound ================= */
@@ -749,6 +886,21 @@ function renderHome() {
     .map(([v, t, sub]) => `<button data-size="${v}" class="${v === range ? 'sel' : ''}">${t}${sub ? `<small>${sub}</small>` : ''}</button>`).join('');
   $('#missionLine').textContent = `${OP_ICON[op]} ${OP_NAME[op]} · ${sizeLabel(op, range)}`;
 
+  // Ladder: where he is, for him (home) and for grown-ups (mission panel).
+  const on = ladderOn(), steps = ladder(op, range), at = frontier(op, range, steps), place = needsPlacement(op, range);
+  $('#launchBtn').textContent = place ? '🧭 Check flight' : '🚀 Launch!';
+  $('#stepLine').innerHTML = !on ? '' : place ? 'First, a check flight to see what you already know!'
+    : at >= steps.length ? '🏁 Every step unlocked. Keep them all gold!'
+    : `Step ${at + 1} of ${steps.length} · <b>${steps[at].name}</b>`;
+  document.querySelectorAll('#ladderSeg button').forEach(b => b.classList.toggle('sel', (b.dataset.ladder === '1') === on));
+  $('#ladderBox').hidden = !on;
+  $('#stepList').innerHTML = steps.map((st, i) => {
+    const pr = stepProgress(st);
+    return `<span class="${i < at ? 'done' : i === at ? 'cur' : ''}">${i < at ? '✓' : i === at ? '▶' : '🔒'} ${st.name}${i === at ? ` ${pr.have}/${pr.need}` : ''}</span>`;
+  }).join('');
+  $('#ladderNote').textContent = (place ? 'The next rockets are a check flight: a few facts from each step. Steps he answers quickly count as known and get checked again in 2 days. '
+    : 'A step opens when most facts in the one before were answered right in under 3 seconds. ') + 'Earlier steps keep coming back for review.';
+
   const t = tally(op, range);
   $('#barM').style.width = t.mastered / t.total * 100 + '%';
   $('#barL').style.width = t.learning / t.total * 100 + '%';
@@ -786,6 +938,10 @@ const missionTab = () => ({sub: 'sub', mul: 'mul', mixmd: 'mul', div: 'div'})[S.
 $('#rangeSeg').addEventListener('click', e => {
   const b = e.target.closest('button'); if (!b) return;
   S.settings[isMul(S.settings.op) ? 'level' : 'range'] = +b.dataset.size; save(); renderHome();
+});
+$('#ladderSeg').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  S.settings.ladder = b.dataset.ladder === '1'; save(); renderHome();
 });
 $('#skins').addEventListener('click', e => {
   const b = e.target.closest('button'); if (!b || b.disabled) return;
@@ -899,8 +1055,10 @@ document.addEventListener('visibilitychange', () => {
 
 function startBatch() {
   const op = S.settings.op, range = missionSize();
-  G = {op, range, queue: pickBatch(op, range).map(f => ({f, retry: false})), cells: Array(BATCH).fill(''),
-       done: 0, firstTry: 0, stars: 0, streak: 0, bestStreak: 0, ms: 0, items: [], missed: []};
+  const place = needsPlacement(op, range) ? pickPlacement(op, range) : null;
+  G = {op, range, queue: (place ? place.queue : pickBatch(op, range)).map(f => ({f, retry: false})), cells: Array(BATCH).fill(''),
+       done: 0, firstTry: 0, stars: 0, streak: 0, bestStreak: 0, ms: 0, items: [], missed: [],
+       plan: place && place.plan.length ? place.plan : null, stepAt: frontier(op, range)};
   G.wasMastered = new Set(G.queue.filter(c => status(S.facts[c.f.k]) === 'mastered').map(c => c.f.k));
   tone([392, 523], {gap: 0.1});
   show('play');
@@ -921,7 +1079,7 @@ function next() {
   G.maxLen = isMul(G.op) ? 3 : 2;
   const tag = $('#cardTag');
   tag.className = 'tag' + (c.retry ? ' comeback' : '');
-  tag.textContent = c.retry ? '🔁 Comeback card!' : (!S.facts[f.k] ? '✨ New fact' : '');
+  tag.textContent = c.retry ? '🔁 Comeback card!' : G.plan ? '🧭 Check flight' : (!S.facts[f.k] ? '✨ New fact' : '');
   $('#help').hidden = true;
   const card = $('#card');
   card.className = 'card';
@@ -1124,6 +1282,15 @@ function finish() {
   if (!prevBest || ms < prevBest) S.best[key] = ms;
   S.batches.push({t: Date.now(), op: g.op, range: g.range, ms, first: g.firstTry, stars: g.stars, streak: g.bestStreak, items: g.items});
   if (S.batches.length > 500) S.batches.splice(0, S.batches.length - 500);
+  // Ladder: credit a check flight, then see whether a new step opened.
+  const lines = [], mkey = missionKey(g.op, g.range);
+  if (g.plan) {
+    const known = placeResults(g);
+    if (known.length) lines.push(`🧭 You already know: ${known.join(', ')}!`);
+  }
+  const steps = ladder(g.op, g.range), stepNow = S.steps[mkey] = frontier(g.op, g.range, steps);
+  if (ladderOn() && (g.plan ? S.placed[mkey] : stepNow > g.stepAt))
+    lines.push(stepNow >= steps.length ? '🏁 Every step unlocked!' : g.plan ? `Check flight done. Your step: ${steps[stepNow].name}.` : `🔓 New step unlocked: ${steps[stepNow].name}!`);
   save();
 
   $('#launchzone').innerHTML = planetEl(dest, 110) + `<div class="flyer">${ROCKET}</div>`;
@@ -1137,13 +1304,14 @@ function finish() {
   const firsts = g.items.filter(x => !x.retry);
   const newly = firsts.filter(x => !g.wasMastered.has(x.k) && status(S.facts[x.k]) === 'mastered').map(x => showFact(parseKey(x.k)));
   const quick = firsts.filter(x => x.ok && x.ms < FAST).length;
-  const lines = [];
-  if (newly.length) lines.push(`🏆 Mastered: ${newly.slice(0, 4).join(', ')}${newly.length > 4 ? ` and ${newly.length - 4} more` : ''}!`);
+  const calm = !lines.length && !newly.length;
+  if (g.plan && lines.length) {}  // the check flight lines say it all
+  else if (newly.length) lines.push(`🏆 Mastered: ${newly.slice(0, 4).join(', ')}${newly.length > 4 ? ` and ${newly.length - 4} more` : ''}!`);
   else if (quick) lines.push(`⚡ ${quick} quick answer${quick === 1 ? '' : 's'}! Quick again on another day = mastered.`);
   else lines.push('Every flight makes the facts stick. Keep flying!');
   SKINS.filter(s => s[4] > starsBefore && s[4] <= S.stars).forEach(s => lines.push(`🚀 New rocket unlocked: ${s[0]}!`));
   const rec = $('#resRecord');
-  rec.classList.toggle('calm', !newly.length && lines.length === 1);
+  rec.classList.toggle('calm', calm && lines.length === 1);
   rec.innerHTML = lines.join('<br>');
 
   const missed = g.missed.map(parseKey);
@@ -1176,6 +1344,7 @@ function confetti() {
   }
 }
 $('#againBtn').addEventListener('click', startBatch);
+// (During a check flight, "Fly again" simply carries on with the next steps.)
 $('#homeBtn').addEventListener('click', () => { renderHome(); show('home'); });
 
 /* ================= grown-ups ================= */
@@ -1215,8 +1384,8 @@ function renderStats() {
 
 function cellHtml(k) {
   const s = S.facts[k], st = status(s), avg = recentAvg(s);
-  const text = st === 'unseen' ? '·' : avg === null ? '✕' : secs(avg);
-  return `<div class="f s-${st}${k === selKey ? ' sel' : ''}" data-k="${k}" title="${showFact(parseKey(k))}">${text}</div>`;
+  const text = st === 'unseen' ? '·' : avg !== null ? secs(avg) : s.p ? '✓' : '✕';
+  return `<div class="f s-${s && s.p ? 'placed' : st}${k === selKey ? ' sel' : ''}" data-k="${k}" title="${showFact(parseKey(k))}">${text}</div>`;
 }
 // Grid of every fact for one operation; `cell` renders one square from its key.
 // [symbol, first column, last column, last row, key for (row, column) or null, what rows and columns mean, biggest mission size]
@@ -1265,7 +1434,7 @@ function renderMap() {
   let text = GRIDS[mapOp][5];
   if (mapKey) {
     const f = parseKey(mapKey), st = kidStatus(mapKey);
-    text = st === 'unseen' ? `${showFact(f)}: not met yet.`
+    text = st === 'unseen' ? `${showFact(f)}: not met yet. It lives in “${stepName(f)}”.`
       : `${showFact(f)} = ${f.ans} · ${st === 'mastered' ? '⭐ Mastered!' : 'Learning. Keep answering it quickly!'}`;
   }
   $('#mdetail').textContent = text;
@@ -1282,12 +1451,16 @@ $('#mapBack').addEventListener('click', () => { renderHome(); show('home'); });
 function renderDetail() {
   if (!selKey) { $('#detail').textContent = GRIDS[gridOp][5]; return; }
   const f = parseKey(selKey), s = S.facts[selKey];
-  if (!s) { $('#detail').textContent = `${showFact(f)} = ${f.ans}: not practiced yet.`; return; }
-  const avg = recentAvg(s);
-  $('#detail').textContent = `${showFact(f)} = ${f.ans}: ${s.n} tries, ${s.ok} right` +
-    (avg !== null ? `, recent avg ${secs(avg)}s` : '') +
-    `, last seen ${new Date(s.last).toLocaleDateString(undefined, {month: 'short', day: 'numeric'})}` +
-    ` (recent: ${s.recent.map(x => x.ok ? secs(x.ms) + 's' : '✕').join(' · ')})`;
+  const date = t => new Date(t).toLocaleDateString(undefined, {month: 'short', day: 'numeric'});
+  const head = `${showFact(f)} = ${f.ans} (${stepName(f)})`;
+  if (!s) { $('#detail').textContent = `${head}: not practiced yet.`; return; }
+  const avg = recentAvg(s), check = status(s) === 'mastered' ? ` Next check: ${date(dueOf(s))}.` : '';
+  $('#detail').textContent = !s.n ? `${head}: counted as known at the check flight, not asked yet.${check}`
+    : `${head}: ${s.n} tries, ${s.ok} right` +
+      (avg !== null ? `, recent avg ${secs(avg)}s` : '') +
+      `, last seen ${date(s.last)}` +
+      ` (recent: ${s.recent.map(x => x.ok ? secs(x.ms) + 's' : '✕').join(' · ')}).` +
+      (s.p ? ' Known at check flight.' : '') + check;
 }
 $('#gridTabs').addEventListener('click', e => {
   const b = e.target.closest('button'); if (!b) return;
@@ -1349,8 +1522,11 @@ function packState() {
   const f = {};
   for (const [k, s] of Object.entries(S.facts))
     f[k] = [s.n, s.ok, s.sumOk, sec(s.last), ...s.recent.flatMap(x => [x.ok ? x.ms : -x.ms - 1, sec(x.t)])];
+  // check-flight flag and review schedule, only for facts that have them (older apps ignore this part)
+  const x = {};
+  for (const [k, s] of Object.entries(S.facts)) if (s.p || s.due) x[k] = [s.p ? 1 : 0, s.iv || 0, sec(s.due)];
   const {op, range, level, skin} = S.settings;
-  return {v: 1, at: sec(Date.now()), set: [op, range, level, skin], stars: S.stars, launches: S.launches, best: S.best, f,
+  return {v: 1, at: sec(Date.now()), x, pl: Object.keys(S.placed), sp: S.steps, set: [op, range, level, skin], stars: S.stars, launches: S.launches, best: S.best, f,
     b: S.batches.map(b => [sec(b.t), b.op, b.range, b.ms, b.first, b.stars, b.streak, Math.round(batchAvg(b) ?? -1)])};
 }
 
@@ -1360,7 +1536,7 @@ function unpackState(P) {
   if (!P || P.v !== 1 || typeof P.f !== 'object' || !Array.isArray(P.b)) throw new Error('bad code');
   const facts = {};
   for (const [k, a] of Object.entries(P.f)) {
-    if (!parseKey(k) || !Array.isArray(a) || a.length < 4 || a.length % 2 || !a.every(x => typeof x === 'number' && isFinite(x))) continue;
+    if (!/^\d+[-+x/]\d+$/.test(k) || !Array.isArray(a) || a.length < 4 || a.length % 2 || !a.every(x => typeof x === 'number' && isFinite(x))) continue;
     const recent = [];
     for (let i = 4; i < a.length && recent.length < 6; i += 2) {
       const e = a[i] >= 0 ? {ms: a[i], ok: true} : {ms: -a[i] - 1, ok: false};
@@ -1368,14 +1544,23 @@ function unpackState(P) {
       recent.push(e);
     }
     facts[k] = {n: a[0], ok: a[1], sumOk: a[2], recent, last: a[3] * 1000};
+    const e = P.x && P.x[k];
+    if (Array.isArray(e) && e.every(num)) {
+      if (e[0]) facts[k].p = 1;
+      if (e[2]) { facts[k].iv = Math.min(e[1], REVIEW.length - 1); facts[k].due = e[2] * 1000; }
+    }
   }
+  const mkey = k => typeof k === 'string' && /^[a-z]+-\d+$/.test(k);
+  const placed = (Array.isArray(P.pl) ? P.pl : []).filter(mkey);
+  const steps = {};
+  for (const [k, v] of Object.entries(P.sp || {})) if (mkey(k) && num(v)) steps[k] = Math.round(v);
   const batches = P.b.filter(b => Array.isArray(b) && OP_NAME[b[1]] && [0, 2, 3, 4, 5, 6].every(i => num(b[i])))
     .map(b => ({t: b[0] * 1000, op: b[1], range: b[2], ms: b[3], first: b[4], stars: b[5], streak: b[6], avg: b[7] >= 0 ? b[7] : null, items: []}));
   const best = {};
   for (const [k, v] of Object.entries(P.best || {})) if (/^[a-z]+-\d+$/.test(k) && num(v)) best[k] = v;
   const [op, range, level, skin] = Array.isArray(P.set) ? P.set : [];
   const set = OP_NAME[op] && [10, 20].includes(range) && [1, 2].includes(level) ? {op, range, level, skin: SKINS[skin] ? skin : 0} : null;
-  return {at: num(P.at) ? P.at * 1000 : 0, facts, batches, best, set, stars: num(P.stars) ? Math.round(P.stars) : 0, launches: num(P.launches) ? Math.round(P.launches) : 0};
+  return {at: num(P.at) ? P.at * 1000 : 0, facts, batches, best, set, placed, steps, stars: num(P.stars) ? Math.round(P.stars) : 0, launches: num(P.launches) ? Math.round(P.launches) : 0};
 }
 
 // Combine incoming progress with what is here. Safe to run twice with the same code.
@@ -1386,6 +1571,8 @@ function mergeState(P) {
     const mine = S.facts[k];
     if (!mine || sec(mine.last) < sec(s.last)) { S.facts[k] = s; facts++; }   // newer history wins
   }
+  for (const k of P.placed) S.placed[k] = 1;
+  for (const [k, v] of Object.entries(P.steps)) S.steps[k] = Math.max(S.steps[k] || 0, v);
   const have = new Set(S.batches.map(b => sec(b.t)));
   const add = P.batches.filter(b => !have.has(sec(b.t)));
   S.batches = S.batches.concat(add).sort((a, b) => a.t - b.t).slice(-500);
@@ -1455,6 +1642,38 @@ $('#xferLoad').addEventListener('click', async () => {
   applySkin(); gridOp = missionTab(); selKey = null; renderStats();
   $('#xferBox').hidden = true;
   xferMsg(r.rockets || r.facts ? `Done. Added ${r.rockets} rocket${r.rockets === 1 ? '' : 's'} and updated ${r.facts} fact${r.facts === 1 ? '' : 's'}. ⭐ ${S.stars} total.` : 'Done. This device already had everything in that code.');
+});
+
+/* ================= offline copy (service worker) ================= */
+// sw.js keeps the app on the device so it opens with no connection. It refreshes its copy in the
+// background, so a new version normally appears one launch late; "Check for update" fetches it now.
+// Not registered on localhost (it would get in the way of development) unless the address has ?sw.
+const SW_CACHE = 'fact-rocket-v1';   // same name and files as in sw.js
+const SW_FILES = ['./', 'manifest.webmanifest', 'icon.svg', 'icon-180.png', 'icon-192.png', 'icon-512.png'];
+const swWanted = 'serviceWorker' in navigator && (!/^(localhost|127\.0\.0\.1)$/.test(location.hostname) || location.search.includes('sw'));
+let offlineReady = false;
+function appNote(extra) {
+  const built = new Date(document.lastModified).toLocaleString(undefined, {month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit'});
+  $('#appNote').textContent = `App version: ${built}. ` + (offlineReady ? 'Saved on this device, so it also works with no connection.'
+    : 'Not saved for offline use in this browser.') + (extra ? ' ' + extra : '');
+}
+if (swWanted) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+  navigator.serviceWorker.ready.then(() => { offlineReady = true; appNote(); });
+}
+appNote();
+$('#updateBtn').addEventListener('click', async () => {
+  if (!offlineReady) return location.reload();
+  appNote('Checking…');
+  try {
+    const cache = await caches.open(SW_CACHE), old = await cache.match('./');
+    const fresh = await Promise.all(SW_FILES.map(f => fetch(f, {cache: 'reload'}).then(r => { if (!r.ok) throw new Error(r.status); return r; })));
+    const same = old && await old.clone().text() === await fresh[0].clone().text();
+    await Promise.all(fresh.map((r, i) => cache.put(SW_FILES[i], r)));
+    if (same) return appNote('This is the newest version.');
+    appNote('New version found. Restarting…');
+    setTimeout(() => location.reload(), 600);
+  } catch (e) { appNote('Could not check: no connection?'); }
 });
 
 /* ================= starfield ================= */
