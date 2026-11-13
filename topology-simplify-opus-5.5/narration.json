@@ -1,0 +1,99 @@
+{
+  "voice": "Heart",
+  "scenes": [
+    {
+      "id": "intro",
+      "title": "Too many points",
+      "lines": [
+        "This is a map of four made-up counties.",
+        "Their outlines use about eleven hundred points, far more than it takes to draw the map this small.",
+        "Simplification throws points away, so the map is smaller to send and faster to draw.",
+        "The question is what else gets thrown away with them."
+      ]
+    },
+    {
+      "id": "dp",
+      "title": "How Douglas–Peucker works",
+      "lines": [
+        "The usual method is Douglas–Peucker.",
+        "Draw a shortcut between the two ends of a line, and find the point farthest from it.",
+        "If that point sits outside your tolerance, keep it, and repeat on each half.",
+        "If not, drop every point in between.",
+        "The bigger the tolerance, the fewer points survive."
+      ],
+      "say": { "Douglas–Peucker": "Douglas Poyker" }
+    },
+    {
+      "id": "naive",
+      "title": "One shape at a time",
+      "lines": [
+        "Now run it on the map one county at a time.",
+        "These two neighbors share a border, but each county stores its own copy and simplifies it alone.",
+        "They keep different points, so the border splits in two.",
+        "Gold marks the gaps that belong to no county.",
+        "Red marks the land that both of them claim."
+      ]
+    },
+    {
+      "id": "invalid",
+      "title": "Broken shapes",
+      "lines": [
+        "A single shape can break, too.",
+        "Drop the points on this headland, and the lake ends up outside its own island.",
+        "Straighten the far shore of this inlet, and it cuts right through the spit.",
+        "And a small islet collapses into a line with no area at all.",
+        "Each of these is an invalid geometry."
+      ]
+    },
+    {
+      "id": "arcs",
+      "title": "Topology first",
+      "lines": [
+        "A topology-preserving simplifier starts from the structure instead.",
+        "Topology is which shapes touch, which borders they share, and what sits inside what.",
+        "Each shared border becomes one arc, stored once.",
+        "Where three borders meet is a node, and nodes never move.",
+        "Each arc is simplified a single time, and both neighbors use the result.",
+        "There's only one copy, so the two sides can't drift apart."
+      ]
+    },
+    {
+      "id": "checks",
+      "title": "Checking every shortcut",
+      "lines": [
+        "It also checks each shortcut before taking it.",
+        "Would the new segment cross another line? Would it sweep a lake to the wrong side?",
+        "If so, that point stays.",
+        "The lake stays on its island, the inlet stays open, and the islet keeps at least a triangle."
+      ]
+    },
+    {
+      "id": "compare",
+      "title": "Side by side",
+      "lines": [
+        "Here are both at once, with the tolerance climbing.",
+        "On the left, every border tears into slivers.",
+        "On the right, the map stays seamless.",
+        "It keeps a few more points where it has to, and stores each border only once."
+      ]
+    },
+    {
+      "id": "tools",
+      "title": "Where to find it",
+      "lines": [
+        "In PostGIS, ST_Simplify works one shape at a time and runs no checks.",
+        "ST_SimplifyPreserveTopology keeps each shape valid, but it can't see the neighbors, so shared borders can still pull apart.",
+        "For a whole map, use ST_CoverageSimplify, or an arc-based tool like mapshaper or TopoJSON.",
+        "Simplify the borders, not the shapes."
+      ],
+      "say": {
+        "ST_SimplifyPreserveTopology": "S T Simplify Preserve Topology",
+        "ST_CoverageSimplify": "S T Coverage Simplify",
+        "ST_Simplify": "S T Simplify",
+        "PostGIS": "Post G I S",
+        "mapshaper": "map shaper",
+        "TopoJSON": "Topo Jason"
+      }
+    }
+  ]
+}

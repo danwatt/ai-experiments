@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Within 10 Miles</title>
+  <meta name="description" content="A narrated motion graphic on how a ZIP code radius search works: centroids, bounding boxes, haversine distance, and Voronoi cells.">
+  <link rel="stylesheet" href="../bluebonnet-design-system/dist/bluebonnet.css">
+  <script>
+    // saved theme before first paint; default is dark
+    (function () {
+      var t = 'dark';
+      try { t = localStorage.getItem('zipvor-theme') || 'dark'; } catch (e) {}
+      if (t === 'auto') document.documentElement.removeAttribute('data-theme');
+      else document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--surface); color: var(--ink); }
+    .wrap { max-width: 1180px; margin: 0 auto; padding: 0 var(--space-4); }
+    @media (min-width: 768px) { .wrap { padding: 0 var(--space-6); } }
+
+    header.bar { border-bottom: 1px solid var(--line); background: var(--surface); }
+    header.bar .wrap { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); min-height: 56px; flex-wrap: wrap; }
+    .brand { font: 700 17px/22px var(--font-display); color: var(--ink); text-decoration: none; }
+    .seg { display: inline-flex; border: 1px solid var(--line-strong); border-radius: var(--radius-md); overflow: hidden; }
+    .seg button { font: 600 13px/18px var(--font-body); padding: 6px 12px; background: transparent; color: var(--ink-muted); border: 0; cursor: pointer; transition: background-color .12s ease, color .12s ease; }
+    .seg button + button { border-left: 1px solid var(--line); }
+    .seg button[aria-pressed="true"] { background: var(--bluebonnet-soft); color: var(--bluebonnet); }
+    .seg button:focus-visible { outline: 2px solid var(--bluebonnet); outline-offset: -2px; }
+
+    .intro { padding: var(--space-6) 0 var(--space-4); }
+    .intro h1 { margin: 0 0 var(--space-2); }
+    .intro p { margin: 0; color: var(--ink-muted); max-width: 65ch; }
+
+    .player { border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface-raised); overflow: hidden; }
+    .stage { position: relative; aspect-ratio: 16 / 9; background: var(--surface-sunken); }
+    .stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+    .start { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-3);
+             background: color-mix(in srgb, var(--surface-sunken) 55%, transparent); border: 0; cursor: pointer; color: var(--ink); width: 100%; }
+    .start[hidden] { display: none; }
+    .start .disc { width: 72px; height: 72px; border-radius: var(--radius-pill); background: var(--bluebonnet); color: var(--on-bluebonnet); display: grid; place-items: center; }
+    .start .lbl { font: 600 15px/20px var(--font-body); }
+    .start .sub { font: 400 13px/18px var(--font-body); color: var(--ink-muted); }
+    .start:focus-visible .disc { outline: 2px solid var(--bluebonnet); outline-offset: 3px; }
+
+    .controls { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-4); border-top: 1px solid var(--line); flex-wrap: wrap; }
+    .icon-btn { width: 40px; height: 40px; border-radius: var(--radius-md); border: 1px solid var(--line-strong); background: var(--surface-raised); color: var(--ink); display: grid; place-items: center; cursor: pointer; flex: none; transition: border-color .12s ease, color .12s ease; }
+    .icon-btn:hover { border-color: var(--bluebonnet); color: var(--bluebonnet); }
+    .icon-btn:focus-visible { outline: 2px solid var(--bluebonnet); outline-offset: 2px; }
+    .icon-btn[aria-pressed="false"] { color: var(--ink-muted); }
+    .icon-btn svg { width: 20px; height: 20px; }
+    .icon-btn svg[hidden] { display: none; }
+    .time { font: 400 13px/18px var(--font-mono); color: var(--ink-muted); min-width: 92px; }
+    .scrub { position: relative; flex: 1 1 240px; height: 40px; display: flex; align-items: center; }
+    .scrub input { width: 100%; margin: 0; accent-color: var(--bluebonnet); cursor: pointer; position: relative; z-index: 1; background: transparent; }
+    .ticks { position: absolute; left: 0; right: 0; top: 50%; height: 0; pointer-events: none; }
+    .ticks i { position: absolute; top: -9px; width: 1px; height: 18px; background: var(--line-strong); }
+    @media (max-width: 600px) { .scrub { order: -1; flex-basis: 100%; } .time { margin-right: auto; } }
+    .rate { font: 600 13px/18px var(--font-body); width: auto; padding: 0 10px; }
+
+    .caption { padding: var(--space-4); border-top: 1px solid var(--line); min-height: 112px; }
+    .caption .kicker { color: var(--ink-muted); }
+    .caption .line { margin: var(--space-1) 0 0; font: 400 18px/28px var(--font-body); color: var(--ink); max-width: 70ch; }
+    .caption.off .line { visibility: hidden; }
+    @media (max-width: 600px) { .caption .line { font-size: 16px; line-height: 24px; } .caption { min-height: 132px; } }
+
+    .chapters { list-style: none; padding: 0; margin: var(--space-6) 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: var(--space-2); }
+    .chapters button { width: 100%; text-align: left; display: flex; gap: var(--space-3); align-items: baseline; padding: var(--space-2) var(--space-3);
+                       background: var(--surface-raised); border: 1px solid var(--line); border-radius: var(--radius-md); color: var(--ink); cursor: pointer; font: 400 14px/20px var(--font-body); transition: border-color .12s ease, background-color .12s ease; }
+    .chapters button:hover { border-color: var(--bluebonnet); }
+    .chapters button:focus-visible { outline: 2px solid var(--bluebonnet); outline-offset: 2px; }
+    .chapters button.on { border-color: var(--bluebonnet); background: var(--bluebonnet-soft); }
+    .chapters .n { font: 400 12px/20px var(--font-mono); color: var(--ink-muted); min-width: 34px; }
+
+    .notes { color: var(--ink-muted); padding-bottom: var(--space-12); max-width: 70ch; }
+    .notes p { margin: 0 0 var(--space-2); }
+    .frame-only header.bar, .frame-only .intro, .frame-only .controls, .frame-only .caption, .frame-only .chapters, .frame-only .notes { display: none; }
+    .frame-only main.wrap { max-width: none; padding: 0; }
+    .frame-only .player { border: 0; border-radius: 0; }
+    @media (prefers-reduced-motion: reduce) { .seg button, .icon-btn, .chapters button { transition: none; } }
+  </style>
+</head>
+<body>
+  <header class="bar">
+    <div class="wrap">
+      <a class="brand" href="../">ai-experiments</a>
+      <div class="seg" role="group" aria-label="Color theme">
+        <button type="button" data-theme-btn="dark">Dark</button>
+        <button type="button" data-theme-btn="light">Light</button>
+        <button type="button" data-theme-btn="auto">Auto</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="intro">
+      <h1 class="text-h1">Within 10 miles</h1>
+      <p>How a ZIP code radius search finds what's nearby, and how Voronoi cells show which areas a search circle really covers. About 3½ minutes, narrated.</p>
+    </section>
+
+    <div class="player">
+      <div class="stage" id="stage">
+        <canvas id="cv" aria-label="Animated map illustrating the narration" role="img"></canvas>
+        <button class="start" id="start" type="button">
+          <span class="disc"><svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg></span>
+          <span class="lbl">Play explainer</span>
+          <span class="sub">Sound on · 3:36</span>
+        </button>
+      </div>
+      <div class="controls">
+        <button class="icon-btn" id="play" type="button" aria-label="Play">
+          <svg id="ic-play" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>
+          <svg id="ic-pause" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" hidden><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>
+        </button>
+        <span class="time" id="time">0:00 / 0:00</span>
+        <div class="scrub">
+          <div class="ticks" id="ticks"></div>
+          <input id="scrub" type="range" min="0" max="1" step="0.01" value="0" aria-label="Seek">
+        </div>
+        <button class="icon-btn rate" id="rate" type="button" aria-label="Playback speed">1×</button>
+        <button class="icon-btn" id="cc" type="button" aria-pressed="true" aria-label="Captions">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10 10.5a2 2 0 1 0 0 3M17 10.5a2 2 0 1 0 0 3"/></svg>
+        </button>
+        <button class="icon-btn" id="mute" type="button" aria-pressed="true" aria-label="Sound">
+          <svg id="ic-vol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg>
+          <svg id="ic-mute" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" hidden><path d="M11 5 6 9H3v6h3l5 4V5z"/><path d="m22 9-6 6M16 9l6 6"/></svg>
+        </button>
+      </div>
+      <div class="caption" id="caption" aria-live="polite">
+        <div class="kicker text-label" id="kicker">Chapter 1</div>
+        <p class="line" id="line">Press play to start.</p>
+      </div>
+    </div>
+
+    <ol class="chapters" id="chapters"></ol>
+
+    <section class="notes text-small">
+      <p>The map is illustrative: about 60 made-up ZIP codes and 150 stores on a 64 × 36 mile field, laid out to look like a metro area. Distances on it are flat-plane miles; a real search uses haversine on latitude and longitude.</p>
+      <p>Narration: <span id="voice">Voicebox</span>, rendered from <a href="script.json">script.json</a> by <a href="build_narration.py">build_narration.py</a>. Voronoi and Delaunay geometry: d3-delaunay. Keyboard: space plays or pauses, arrow keys skip 5 seconds.</p>
+    </section>
+  </main>
+
+  <audio id="audio" src="audio/narration.mp3" preload="auto"></audio>
+  <script src="https://cdn.jsdelivr.net/npm/d3-delaunay@6.0.4/dist/d3-delaunay.min.js"></script>
+  <script src="narration.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,50 @@
+[
+  {"id": "intro", "title": "The question", "lines": [
+    "Type in a ZIP code, pick ten miles, and a store locator hands back everything nearby.",
+    "Here's what happens between that click and the list of results."]},
+  {"id": "centroid", "title": "A ZIP becomes a point", "lines": [
+    "A ZIP code isn't really a place. It's a bundle of mail routes, drawn as an irregular shape.",
+    "So the first step swaps the ZIP for a single point: its centroid.",
+    "That's a latitude and longitude, looked up from a table of roughly forty thousand ZIP codes."]},
+  {"id": "naive", "title": "Measure everything", "lines": [
+    "The simplest search measures the distance from that point to every store, using the haversine formula for distance on a sphere.",
+    "It works. But it means thousands of trig calculations for every single query."]},
+  {"id": "bbox", "title": "Box first, circle second", "lines": [
+    "So we cheat first. A box ten miles in each direction is just four numbers: a minimum and maximum latitude and longitude.",
+    "An ordinary database index throws out everything outside the box almost for free.",
+    "Only stores inside the box get the exact distance check, and the ones in the corners, outside the circle, are dropped."]},
+  {"id": "ziplist", "title": "Which ZIPs are nearby?", "lines": [
+    "Often a record only has a ZIP code, not coordinates. Then the question changes: which ZIP codes are within ten miles?",
+    "The usual answer is every ZIP whose centroid falls inside the circle.",
+    "That list goes straight into a query: where zip is in this set."]},
+  {"id": "edges", "title": "Centroids hide the shape", "lines": [
+    "But a centroid hides the shape around it.",
+    "A ZIP whose center sits just outside the circle can still reach well inside it, and it gets left out.",
+    "To reason about that, we need to know which area belongs to which point."]},
+  {"id": "voronoi", "title": "Growing Voronoi cells", "lines": [
+    "That's exactly what a Voronoi diagram gives us.",
+    "Let every centroid grow outward at the same speed. Wherever two growing regions meet, they stop.",
+    "Each finished cell holds every spot on the map that's closer to its centroid than to any other."]},
+  {"id": "delaunay", "title": "Edges and neighbors", "lines": [
+    "The boundaries aren't arbitrary. Each edge sits exactly halfway between two neighboring centroids, at a right angle to the line that joins them.",
+    "Connect every pair of neighbors and you get the Delaunay triangulation, the Voronoi diagram's twin."]},
+  {"id": "reverse", "title": "Which ZIP is this?", "lines": [
+    "Cells also answer the reverse question.",
+    "Drop a pin anywhere, and the cell it lands in names its nearest ZIP centroid. That's a good guess at its ZIP code, with no boundary files at all."]},
+  {"id": "classify", "title": "Cells meet the circle", "lines": [
+    "Now lay the search circle over the cells.",
+    "Some cells sit entirely inside: definitely in. Some never touch it: definitely out.",
+    "The interesting ones straddle the edge. Counting every cell that touches the circle, instead of every centroid inside it, catches the ZIPs the simple test missed."]},
+  {"id": "walk", "title": "Walk the neighbors", "lines": [
+    "Neighbors also make the search fast.",
+    "Start from the cell under the search point. Step to its neighbors, then their neighbors, and stop wherever a cell no longer touches the circle.",
+    "The search only visits cells near the answer, never the whole country."]},
+  {"id": "precompute", "title": "Do it ahead of time", "lines": [
+    "In production this is usually done ahead of time.",
+    "For every ZIP code, store the list of ZIPs within five, ten and twenty five miles.",
+    "A radius search becomes one lookup, and the exact distance check runs only on what comes back."]},
+  {"id": "recap", "title": "Recap", "lines": [
+    "So: turn the ZIP into a point. Filter cheaply with a box. Measure exactly with haversine.",
+    "And use Voronoi cells to see which areas your circle really covers.",
+    "That's a ZIP code radius search."]}
+]
