@@ -1,0 +1,504 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Hexfold — 2048 on a hexagonal grid</title>
+<style>
+  :root {
+    --bg: #12141a;
+    --panel: #1b1e27;
+    --cell: #232733;
+    --text: #e8ecf3;
+    --muted: #8a93a6;
+    --accent: #b455f0;
+    --move: 120ms;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    display: flex;
+    justify-content: center;
+    overscroll-behavior: none;
+  }
+  main {
+    width: 100%;
+    max-width: 560px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+  header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  h1 { margin: 0; font-size: 28px; letter-spacing: -0.02em; }
+  h1 small { display: block; font-size: 12px; font-weight: 500; color: var(--muted); letter-spacing: 0; }
+  .stats { display: flex; gap: 8px; }
+  .stat {
+    background: var(--panel);
+    border-radius: 10px;
+    padding: 6px 14px;
+    min-width: 72px;
+    text-align: center;
+  }
+  .stat span { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+  .stat b { font-size: 20px; font-variant-numeric: tabular-nums; }
+  .bar { width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .bar p { margin: 0; font-size: 13px; color: var(--muted); }
+  button {
+    font: inherit;
+    color: var(--text);
+    background: var(--panel);
+    border: 1px solid #2c3140;
+    border-radius: 9px;
+    padding: 8px 14px;
+    cursor: pointer;
+  }
+  button:hover:not(:disabled) { background: #262a37; }
+  button:disabled { opacity: 0.4; cursor: default; }
+  button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .buttons { display: flex; gap: 8px; }
+
+  #board {
+    position: relative;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    cursor: grab;
+  }
+  .hex {
+    position: absolute;
+    left: 0; top: 0;
+    will-change: transform;
+  }
+  .hex > div {
+    width: 100%; height: 100%;
+    clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .cell > div { background: var(--cell); }
+  .tile { transition: transform var(--move) ease-out; z-index: 2; }
+  .tile.dying { z-index: 1; }
+  .tile.spawn > div { animation: spawn 180ms ease-out var(--move) backwards; }
+  .tile.pop > div { animation: pop 180ms ease-out; }
+  @keyframes spawn { from { transform: scale(0); } to { transform: scale(1); } }
+  @keyframes pop { 0% { transform: scale(1); } 45% { transform: scale(1.18); } 100% { transform: scale(1); } }
+
+  #overlay {
+    position: absolute; inset: 0; z-index: 5;
+    display: none;
+    flex-direction: column; align-items: center; justify-content: center; gap: 12px;
+    background: rgba(18, 20, 26, 0.82);
+    backdrop-filter: blur(3px);
+    border-radius: 16px;
+    text-align: center;
+  }
+  #overlay.show { display: flex; animation: fade 300ms ease-out; }
+  #overlay h2 { margin: 0; font-size: 34px; }
+  #overlay p { margin: 0; color: var(--muted); }
+  @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+
+  .compass {
+    display: grid;
+    grid-template-columns: repeat(4, 44px);
+    gap: 6px;
+    justify-content: center;
+  }
+  .compass button { padding: 0; height: 40px; font-weight: 600; grid-column: span 1; }
+  .compass .row { display: contents; }
+  .compass button i { font-style: normal; color: var(--muted); font-size: 11px; margin-left: 3px; }
+  .pad { visibility: hidden; }
+  footer { font-size: 12px; color: var(--muted); text-align: center; line-height: 1.5; }
+  kbd {
+    background: var(--panel); border: 1px solid #2c3140; border-radius: 4px;
+    padding: 0 5px; font: inherit; font-size: 11px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :root { --move: 0ms; }
+    .tile.spawn > div, .tile.pop > div { animation: none; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Hexfold<small>2048 on a hexagonal grid</small></h1>
+    <div class="stats">
+      <div class="stat"><span>Score</span><b id="score">0</b></div>
+      <div class="stat"><span>Best</span><b id="best">0</b></div>
+    </div>
+  </header>
+  <div class="bar">
+    <p>Slide in six directions. Merge matching tiles to reach <b>2048</b>.</p>
+    <div class="buttons">
+      <button id="undo" title="Undo (U)">Undo</button>
+      <button id="new">New</button>
+    </div>
+  </div>
+
+  <div id="board" aria-label="Game board">
+    <div id="overlay">
+      <h2 id="overlay-title"></h2>
+      <p id="overlay-text"></p>
+      <div class="buttons">
+        <button id="keep">Keep going</button>
+        <button id="again">New game</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="compass" aria-label="Move controls">
+    <span class="pad"></span>
+    <button data-dir="NW" aria-label="Move up-left">↖<i>Q</i></button>
+    <button data-dir="NE" aria-label="Move up-right">↗<i>E</i></button>
+    <span class="pad"></span>
+    <button data-dir="W" aria-label="Move left" style="grid-column: 1 / span 2; justify-self: start; width: 44px; margin-left: -25px">←<i>A</i></button>
+    <button data-dir="E" aria-label="Move right" style="grid-column: 3 / span 2; justify-self: end; width: 44px; margin-right: -25px">→<i>D</i></button>
+    <span class="pad"></span>
+    <button data-dir="SW" aria-label="Move down-left">↙<i>Z</i></button>
+    <button data-dir="SE" aria-label="Move down-right">↘<i>C</i></button>
+    <span class="pad"></span>
+  </div>
+
+  <footer>
+    Swipe or drag on the board, tap the arrows, or use
+    <kbd>Q</kbd> <kbd>E</kbd> <kbd>A</kbd> <kbd>D</kbd> <kbd>Z</kbd> <kbd>C</kbd>
+    (also <kbd>←</kbd> <kbd>→</kbd> and numpad). <kbd>U</kbd> undo.
+  </footer>
+</main>
+
+<script>
+(() => {
+  'use strict';
+
+  const R = 2;                       // grid radius: 19 cells
+  const GOAL = 2048;
+  const MOVE_MS = matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 120;
+  const SAVE_KEY = 'hexfold-state-v1';
+  const BEST_KEY = 'hexfold-best-v1';
+  const SQ3 = Math.sqrt(3);
+
+  // Axial directions for pointy-top hexes, clockwise starting east.
+  const DIR_ORDER = ['E', 'SE', 'SW', 'W', 'NW', 'NE'];
+  const DIRS = { E: [1, 0], SE: [0, 1], SW: [-1, 1], W: [-1, 0], NW: [0, -1], NE: [1, -1] };
+
+  const COLORS = {
+    2: ['#3d4f69', '#dcebf8'], 4: ['#2f5f80', '#e8f4fc'], 8: ['#1f7a8c', '#ffffff'],
+    16: ['#17a08f', '#ffffff'], 32: ['#3fb26b', '#0d1a12'], 64: ['#93c83e', '#141c08'],
+    128: ['#e3c530', '#1f1a04'], 256: ['#f29b2b', '#231503'], 512: ['#ee6a3b', '#ffffff'],
+    1024: ['#e0457b', '#ffffff'], 2048: ['#b455f0', '#ffffff'],
+  };
+  const BEYOND = ['#f3f5f9', '#12141a'];
+
+  const boardEl = document.getElementById('board');
+  const overlayEl = document.getElementById('overlay');
+  const scoreEl = document.getElementById('score');
+  const bestEl = document.getElementById('best');
+  const undoBtn = document.getElementById('undo');
+
+  const key = (q, r) => q + ',' + r;
+  const inGrid = (q, r) => Math.abs(q) <= R && Math.abs(r) <= R && Math.abs(q + r) <= R;
+  const CELLS = [];
+  for (let q = -R; q <= R; q++) for (let r = -R; r <= R; r++) if (inGrid(q, r)) CELLS.push([q, r]);
+
+  let tiles = [];          // {q, r, v, el}
+  let grid = new Map();    // "q,r" -> tile
+  let score = 0;
+  let best = 0;
+  let won = false;         // goal reached at some point this game
+  let over = false;
+  let overlayOpen = false;
+  let prev = null;         // snapshot for undo
+  let size = 40;           // hex circumradius in px
+  let cellEls = [];
+
+  // ---------- storage ----------
+  const store = {
+    get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+    set(k, v) { try { localStorage.setItem(k, v); } catch { /* private mode */ } },
+  };
+
+  const snapshot = () => ({ tiles: tiles.map(t => ({ q: t.q, r: t.r, v: t.v })), score, won });
+
+  function save() {
+    store.set(SAVE_KEY, JSON.stringify(snapshot()));
+    store.set(BEST_KEY, String(best));
+  }
+
+  // ---------- layout ----------
+  function measure() {
+    const availW = Math.min(boardEl.parentElement.clientWidth - 32, 528);
+    const availH = Math.max(window.innerHeight - 330, 240);
+    size = Math.max(18, Math.min(availW / (SQ3 * (2 * R + 1) + 0.5), availH / (3 * R + 2.5)));
+    boardEl.style.width = (SQ3 * size * (2 * R + 1) + size * 0.5) + 'px';
+    boardEl.style.height = (size * (3 * R + 2) + size * 0.5) + 'px';
+  }
+
+  function place(el, q, r) {
+    const w = SQ3 * size * 0.94, h = 2 * size * 0.94;
+    const x = boardEl.clientWidth / 2 + size * SQ3 * (q + r / 2) - w / 2;
+    const y = boardEl.clientHeight / 2 + size * 1.5 * r - h / 2;
+    el.style.width = w + 'px';
+    el.style.height = h + 'px';
+    el.style.transform = `translate(${x}px, ${y}px)`;
+  }
+
+  function paint(t) {
+    const inner = t.el.firstChild;
+    const [bg, fg] = COLORS[t.v] || BEYOND;
+    const digits = String(t.v).length;
+    inner.textContent = t.v;
+    inner.style.background = bg;
+    inner.style.color = fg;
+    inner.style.fontSize = (size * (digits <= 2 ? 0.72 : digits === 3 ? 0.58 : digits === 4 ? 0.46 : 0.38)) + 'px';
+  }
+
+  function makeHex(cls) {
+    const el = document.createElement('div');
+    el.className = 'hex ' + cls;
+    el.appendChild(document.createElement('div'));
+    return el;
+  }
+
+  function layout() {
+    measure();
+    cellEls.forEach((el, i) => place(el, CELLS[i][0], CELLS[i][1]));
+    for (const t of tiles) {
+      t.el.style.transition = 'none';
+      place(t.el, t.q, t.r);
+      paint(t);
+      void t.el.offsetWidth;
+      t.el.style.transition = '';
+    }
+  }
+
+  // ---------- tiles ----------
+  function addTile(q, r, v, animate) {
+    const el = makeHex('tile' + (animate ? ' spawn' : ''));
+    const t = { q, r, v, el };
+    place(el, q, r);
+    paint(t);
+    boardEl.appendChild(el);
+    tiles.push(t);
+    grid.set(key(q, r), t);
+    return t;
+  }
+
+  function spawn() {
+    const empty = CELLS.filter(([q, r]) => !grid.has(key(q, r)));
+    if (!empty.length) return;
+    const [q, r] = empty[Math.floor(Math.random() * empty.length)];
+    addTile(q, r, Math.random() < 0.9 ? 2 : 4, true);
+  }
+
+  function load(state) {
+    boardEl.querySelectorAll('.tile').forEach(el => el.remove());
+    tiles = [];
+    grid = new Map();
+    for (const t of state.tiles) addTile(t.q, t.r, t.v, false);
+    score = state.score;
+    won = !!state.won;
+    over = !canMove();
+    updateHud();
+  }
+
+  function newGame() {
+    hideOverlay();
+    load({ tiles: [], score: 0, won: false });
+    prev = null;
+    spawn();
+    spawn();
+    over = false;
+    updateHud();
+    save();
+  }
+
+  function canMove() {
+    if (tiles.length < CELLS.length) return true;
+    for (const t of tiles) {
+      for (const d of ['E', 'SE', 'SW']) {
+        const o = grid.get(key(t.q + DIRS[d][0], t.r + DIRS[d][1]));
+        if (o && o.v === t.v) return true;
+      }
+    }
+    return false;
+  }
+
+  // ---------- moving ----------
+  function move(dir) {
+    if (over || overlayOpen) return;
+    const [dq, dr] = DIRS[dir];
+    const ds = -dq - dr;
+    // Tiles furthest along the direction go first (cube-coordinate dot product).
+    const rank = t => t.q * dq + t.r * dr + (-t.q - t.r) * ds;
+    const order = [...tiles].sort((a, b) => rank(b) - rank(a));
+    const before = snapshot();
+    const merged = new Set();
+    let moved = false;
+    let reachedGoal = false;
+
+    for (const t of order) {
+      let q = t.q, r = t.r, target = null;
+      for (;;) {
+        const nq = q + dq, nr = r + dr;
+        if (!inGrid(nq, nr)) break;
+        const o = grid.get(key(nq, nr));
+        if (!o) { q = nq; r = nr; continue; }
+        if (o.v === t.v && !merged.has(o)) target = o;
+        break;
+      }
+      if (target) {
+        grid.delete(key(t.q, t.r));
+        tiles.splice(tiles.indexOf(t), 1);
+        target.v *= 2;
+        merged.add(target);
+        score += target.v;
+        if (target.v === GOAL) reachedGoal = true;
+        t.el.classList.add('dying');
+        place(t.el, target.q, target.r);
+        const dead = t.el;
+        setTimeout(() => {
+          dead.remove();
+          if (!target.el.isConnected) return;
+          paint(target);
+          target.el.classList.remove('pop', 'spawn');
+          void target.el.offsetWidth;
+          target.el.classList.add('pop');
+        }, MOVE_MS);
+        moved = true;
+      } else if (q !== t.q || r !== t.r) {
+        grid.delete(key(t.q, t.r));
+        t.q = q; t.r = r;
+        grid.set(key(q, r), t);
+        place(t.el, q, r);
+        moved = true;
+      }
+    }
+
+    if (!moved) return;
+    prev = before;
+    spawn();
+    if (score > best) best = score;
+    updateHud();
+
+    if (reachedGoal && !won) {
+      won = true;
+      setTimeout(() => showOverlay('You made 2048!', 'Score ' + score + '. Keep going for a higher tile?', true), MOVE_MS + 250);
+    } else if (!canMove()) {
+      over = true;
+      setTimeout(() => showOverlay('No moves left', 'Final score ' + score + '.', false), MOVE_MS + 350);
+    }
+    save();
+  }
+
+  function undo() {
+    if (!prev) return;
+    hideOverlay();
+    load(prev);
+    prev = null;
+    updateHud();
+    save();
+  }
+
+  // ---------- HUD ----------
+  function updateHud() {
+    scoreEl.textContent = score;
+    bestEl.textContent = best;
+    undoBtn.disabled = !prev;
+  }
+
+  function showOverlay(title, text, canContinue) {
+    document.getElementById('overlay-title').textContent = title;
+    document.getElementById('overlay-text').textContent = text;
+    document.getElementById('keep').style.display = canContinue ? '' : 'none';
+    overlayEl.classList.add('show');
+    overlayOpen = true;
+  }
+
+  function hideOverlay() {
+    overlayEl.classList.remove('show');
+    overlayOpen = false;
+  }
+
+  // ---------- input ----------
+  const KEYS = {
+    q: 'NW', e: 'NE', a: 'W', d: 'E', z: 'SW', c: 'SE',
+    w: 'NW', x: 'SW',
+    ArrowLeft: 'W', ArrowRight: 'E',
+    Home: 'NW', PageUp: 'NE', End: 'SW', PageDown: 'SE',
+    '7': 'NW', '9': 'NE', '4': 'W', '6': 'E', '1': 'SW', '3': 'SE',
+  };
+
+  document.addEventListener('keydown', e => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+    if (k === 'u' || k === 'Backspace') { e.preventDefault(); undo(); return; }
+    const dir = KEYS[k];
+    if (dir) { e.preventDefault(); move(dir); }
+  });
+
+  let drag = null;
+  boardEl.addEventListener('pointerdown', e => {
+    if (e.target.closest('button')) return;
+    drag = { x: e.clientX, y: e.clientY, id: e.pointerId };
+    boardEl.setPointerCapture(e.pointerId);
+  });
+  boardEl.addEventListener('pointermove', e => {
+    if (!drag || e.pointerId !== drag.id) return;
+    const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+    if (Math.hypot(dx, dy) < Math.max(22, size * 0.5)) return;
+    drag = null;
+    const sector = ((Math.round(Math.atan2(dy, dx) / (Math.PI / 3)) % 6) + 6) % 6;
+    move(DIR_ORDER[sector]);
+  });
+  const endDrag = () => { drag = null; };
+  boardEl.addEventListener('pointerup', endDrag);
+  boardEl.addEventListener('pointercancel', endDrag);
+
+  document.querySelectorAll('.compass button').forEach(b =>
+    b.addEventListener('click', () => move(b.dataset.dir)));
+  document.getElementById('new').addEventListener('click', newGame);
+  document.getElementById('again').addEventListener('click', newGame);
+  document.getElementById('keep').addEventListener('click', hideOverlay);
+  undoBtn.addEventListener('click', undo);
+  window.addEventListener('resize', layout);
+
+  // ---------- boot ----------
+  for (const [q, r] of CELLS) {
+    const el = makeHex('cell');
+    cellEls.push(el);
+    boardEl.insertBefore(el, overlayEl);
+  }
+  measure();
+  cellEls.forEach((el, i) => place(el, CELLS[i][0], CELLS[i][1]));
+  best = Number(store.get(BEST_KEY)) || 0;
+
+  let saved = null;
+  try { saved = JSON.parse(store.get(SAVE_KEY)); } catch { /* corrupt save */ }
+  const valid = saved && Array.isArray(saved.tiles) && saved.tiles.length &&
+    saved.tiles.every(t => inGrid(t.q, t.r) && t.v >= 2);
+  if (valid) {
+    load(saved);
+    if (over) showOverlay('No moves left', 'Final score ' + score + '.', false);
+  } else {
+    newGame();
+  }
+
+  // Test hook.
+  window.__hexfold = { move, load, state: snapshot, canMove };
+})();
+</script>
+</body>
+</html>
