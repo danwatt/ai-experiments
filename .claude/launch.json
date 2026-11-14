@@ -282,6 +282,18 @@
         "games/2048-fable-5.2-medium-all-out"
       ],
       "port": 8802
+    },
+    {
+      "name": "2048-boot",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8791",
+        "-d",
+        "games/2048-boot-opus-5.5"
+      ],
+      "port": 8791
     }
   ]
 }

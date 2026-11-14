@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hex 2048 Boot Sector</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root {
+  --bg: #e9e6df;
+  --panel: #f6f4ef;
+  --ink: #1d1c1a;
+  --muted: #6c6860;
+  --line: #cfc9bd;
+  --accent: #b5480f;
+  --bezel: #2b2a27;
+  --key: #fffdf8;
+  --key-ink: #1d1c1a;
+  --hex-off: #a7a196;
+  --hex-hi: #b5480f;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121211;
+    --panel: #1b1b19;
+    --ink: #e8e5de;
+    --muted: #8f8a80;
+    --line: #34322e;
+    --accent: #f08a4b;
+    --bezel: #050505;
+    --key: #26251f;
+    --key-ink: #e8e5de;
+    --hex-off: #5a564f;
+    --hex-hi: #f08a4b;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121211; --panel: #1b1b19; --ink: #e8e5de; --muted: #8f8a80; --line: #34322e;
+  --accent: #f08a4b; --bezel: #050505; --key: #26251f; --key-ink: #e8e5de;
+  --hex-off: #5a564f; --hex-hi: #f08a4b; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font: 14px/1.5 "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  min-height: 100vh;
+}
+main { max-width: 1120px; margin: 0 auto; padding: 28px 16px 48px; }
+header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 18px; margin-bottom: 18px; }
+h1 { font-size: 20px; font-weight: 600; margin: 0; letter-spacing: .02em; }
+h1 span { color: var(--accent); }
+.sub { color: var(--muted); }
+.sub b { color: var(--ink); font-weight: 500; }
+
+.layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 20px; align-items: start; }
+@media (max-width: 900px) { .layout { grid-template-columns: minmax(0, 1fr); } }
+
+.crt {
+  background: var(--bezel);
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: 0 1px 0 rgba(255,255,255,.04) inset, 0 12px 30px -18px rgba(0,0,0,.6);
+  position: relative;
+}
+.fit { position: relative; width: 100%; overflow: hidden; }
+#screen { transform-origin: 0 0; position: absolute; left: 0; top: 0; }
+#screen > div { white-space: pre; font: 16px/16px monospace; color: #aaa; }
+#screen canvas { display: block; image-rendering: pixelated; }
+#screen > div:empty { display: none; }
+.status {
+  position: absolute; inset: 18px; display: grid; place-items: center;
+  color: #9a968e; font-size: 13px; pointer-events: none;
+}
+.status.gone { display: none; }
+.bar { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; align-items: center; }
+button {
+  font: inherit; color: var(--key-ink); background: var(--key);
+  border: 1px solid var(--line); border-radius: 8px; padding: 6px 12px; cursor: pointer;
+}
+button:hover { border-color: var(--accent); }
+button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.bar .spacer { flex: 1; }
+.bar a { color: var(--accent); }
+
+aside { display: grid; gap: 16px; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+.card h2 { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 0 0 10px; }
+.card p { margin: 0 0 8px; }
+.card p:last-child { margin-bottom: 0; }
+
+.pad { display: grid; grid-template-columns: repeat(3, 62px); grid-template-rows: repeat(6, 28px); column-gap: 2px; justify-content: center; margin: 4px 0 12px; }
+.pad button { grid-row: span 2; padding: 0; clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%); border: 0; border-radius: 0; background: var(--hex-off); color: #fff; font-weight: 600; line-height: 1.1; }
+.pad button:hover, .pad button:active { background: var(--hex-hi); }
+.pad button small { display: block; font-weight: 400; font-size: 10px; opacity: .85; }
+.pad .n  { grid-column: 2; grid-row: 1 / span 2; }
+.pad .nw { grid-column: 1; grid-row: 2 / span 2; }
+.pad .ne { grid-column: 3; grid-row: 2 / span 2; }
+.pad .sw { grid-column: 1; grid-row: 4 / span 2; }
+.pad .se { grid-column: 3; grid-row: 4 / span 2; }
+.pad .s  { grid-column: 2; grid-row: 5 / span 2; }
+.pad .c  { grid-column: 2; grid-row: 3 / span 2; background: var(--line); pointer-events: none; }
+.keys { color: var(--muted); font-size: 12.5px; text-align: center; }
+kbd { font: inherit; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; padding: 0 5px; background: var(--key); color: var(--ink); }
+
+.bytes { display: flex; align-items: baseline; gap: 8px; }
+.bytes .n { font-size: 26px; font-weight: 600; }
+.meter { height: 8px; border-radius: 4px; background: var(--line); overflow: hidden; margin: 6px 0 8px; display: flex; }
+.meter i { display: block; height: 100%; }
+.meter .code { background: var(--accent); }
+.meter .sig { background: var(--ink); }
+.legend { font-size: 12px; color: var(--muted); }
+
+.dump-wrap { margin-top: 20px; }
+.dump-wrap h2 { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 0 0 10px; }
+pre.dump {
+  margin: 0; padding: 14px 16px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+  font-size: 12.5px; line-height: 1.55; overflow-x: auto;
+}
+pre.dump .o { color: var(--muted); }
+pre.dump .z { color: var(--hex-off); }
+pre.dump .s { color: var(--accent); font-weight: 600; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>HEX 2048 <span>/</span> boot sector</h1>
+    <div class="sub">x86 real-mode assembly, <b id="used">…</b> of 510 bytes, booted from a floppy by SeaBIOS inside <b>v86</b></div>
+  </header>
+
+  <div class="layout">
+    <section>
+      <div class="crt">
+        <div class="fit" id="fit">
+          <div id="screen"><div></div><canvas></canvas></div>
+        </div>
+        <div class="status" id="status">booting…</div>
+      </div>
+      <div class="bar">
+        <button id="reboot" type="button">Reboot</button>
+        <button id="newgame" type="button">New game (R)</button>
+        <span class="spacer"></span>
+        <a href="hex2048.asm">hex2048.asm</a>
+        <a href="hex2048.img" download>hex2048.img</a>
+      </div>
+    </section>
+
+    <aside>
+      <div class="card">
+        <h2>Controls</h2>
+        <div class="pad" id="pad">
+          <button class="c" type="button" tabindex="-1" aria-hidden="true"></button>
+          <button class="nw" data-sc="16" type="button" aria-label="Up-left">Q<small>NW</small></button>
+          <button class="n" data-sc="17" type="button" aria-label="Up">W<small>N</small></button>
+          <button class="ne" data-sc="18" type="button" aria-label="Up-right">E<small>NE</small></button>
+          <button class="sw" data-sc="30" type="button" aria-label="Down-left">A<small>SW</small></button>
+          <button class="s" data-sc="31" type="button" aria-label="Down">S<small>S</small></button>
+          <button class="se" data-sc="32" type="button" aria-label="Down-right">D<small>SE</small></button>
+        </div>
+        <p class="keys"><kbd>Q</kbd><kbd>W</kbd><kbd>E</kbd> / <kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> or numpad <kbd>7</kbd><kbd>8</kbd><kbd>9</kbd> / <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd>. Click the screen first so it gets the keys.</p>
+      </div>
+      <div class="card">
+        <h2>Size</h2>
+        <div class="bytes"><span class="n" id="used2">…</span><span class="sub">bytes of code and data</span></div>
+        <div class="meter" id="meter"></div>
+        <div class="legend" id="legend"></div>
+      </div>
+      <div class="card">
+        <h2>How it fits</h2>
+        <p>The board is a 7×7 grid of axial hex coordinates with a wall ring, so the six slide directions are just index offsets: ±1, ±6, ±7.</p>
+        <p>Tiles are visited front-first and slide until they hit a wall, a different tile or a merge. Merged cells get bit 7 set so they can't merge twice; the redraw clears it.</p>
+        <p>Each hex is three text rows: <code>▄▄▄▄▄</code>, a 7-cell face with the number, <code>▀▀▀▀▀</code>. Blink is turned off so the faces can use bright backgrounds.</p>
+      </div>
+    </aside>
+  </div>
+
+  <div class="dump-wrap">
+    <h2>The whole program</h2>
+    <pre class="dump" id="dump">loading…</pre>
+  </div>
+</main>
+
+<script src="v86/libv86.js"></script>
+<script>
+(async () => {
+  const img = new Uint8Array(await (await fetch("hex2048.img")).arrayBuffer());
+
+  // size: last non-zero byte before the 55 AA signature
+  let end = 510;
+  while (end > 0 && img[end - 1] === 0) end--;
+  for (const id of ["used", "used2"]) document.getElementById(id).textContent = end;
+  const pad = 510 - end;
+  document.getElementById("meter").innerHTML =
+    `<i class="code" style="width:${end / 5.12}%"></i><i style="width:${pad / 5.12}%"></i><i class="sig" style="width:${2 / 5.12}%"></i>`;
+  document.getElementById("legend").textContent = `${end} used · ${pad} spare · 2 signature (55 AA)`;
+
+  // hex dump
+  const hx = n => n.toString(16).padStart(2, "0");
+  let out = "";
+  for (let row = 0; row < 512; row += 16) {
+    out += `<span class="o">${(0x7c00 + row).toString(16)}</span>  `;
+    for (let i = row; i < row + 16; i++) {
+      const cls = i >= 510 ? "s" : i >= end ? "z" : "";
+      out += (cls ? `<span class="${cls}">${hx(img[i])}</span>` : hx(img[i])) + (i % 16 === 7 ? "  " : " ");
+    }
+    out += "\n";
+  }
+  document.getElementById("dump").innerHTML = out.trimEnd();
+
+  // v86 wants a standard floppy size: pad the sector out to 1.44 MB
+  const floppy = new Uint8Array(1474560);
+  floppy.set(img);
+
+  const screen = document.getElementById("screen");
+  const fit = document.getElementById("fit");
+  const status = document.getElementById("status");
+
+  const emu = new V86({
+    wasm_path: "v86/v86.wasm",
+    bios: { url: "v86/seabios.bin" },
+    vga_bios: { url: "v86/vgabios.bin" },
+    fda: { buffer: floppy.buffer },
+    boot_order: 0x321,
+    fastboot: true,
+    memory_size: 8 * 1024 * 1024,
+    vga_memory_size: 2 * 1024 * 1024,
+    screen: { container: screen, use_graphical_text: true },
+    autostart: true,
+  });
+  window.emu = emu;
+
+  // scale the 720x400 VGA text screen to the bezel width at the 4:3 shape a CRT gave it
+  function rescale() {
+    const w = Math.max(screen.scrollWidth, 1), h = Math.max(screen.scrollHeight, 1);
+    const W = fit.clientWidth, H = W * 3 / 4;
+    screen.style.transform = `scale(${W / w}, ${H / h})`;
+    fit.style.height = H + "px";
+  }
+  new ResizeObserver(rescale).observe(fit);
+  emu.add_listener("emulator-started", () => status.classList.add("gone"));
+  setInterval(rescale, 250);
+
+  const tap = sc => { emu.keyboard_send_scancodes([sc, sc | 0x80]); };
+  document.querySelectorAll("#pad button[data-sc]").forEach(b =>
+    b.addEventListener("click", () => tap(+b.dataset.sc)));
+  document.getElementById("newgame").addEventListener("click", () => tap(0x13));
+  document.getElementById("reboot").addEventListener("click", () => emu.restart());
+})();
+</script>
+</body>
+</html>
