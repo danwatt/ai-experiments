@@ -33,6 +33,7 @@
 
     /* Filters */
     .filters { position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--paper) 92%, transparent); backdrop-filter: blur(6px); border-block: 1px solid var(--rule); padding: 12px 0; margin-top: 24px; }
+    .filters .wrap + .wrap { margin-top: 8px; }
     .filters .wrap { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
     .filters span { font: 500 12px "JetBrains Mono", monospace; color: var(--ink-2); margin-right: 4px; }
     .chip { font: 500 13px Inter, sans-serif; border: 1px solid var(--rule); background: var(--card); color: var(--ink); padding: 5px 12px; border-radius: 999px; cursor: pointer; display: inline-flex; gap: 6px; align-items: center; }
@@ -80,7 +81,7 @@
     </div>
   </header>
 
-  <nav class="filters" aria-label="Filter by model"><div class="wrap" id="filters"><span>Model</span></div></nav>
+  <nav class="filters" aria-label="Filters"><div class="wrap" id="filters"><span>Model</span></div><div class="wrap" id="turn-filters"><span>Turns</span></div></nav>
 
   <main class="wrap" id="chapters"></main>
 
@@ -98,18 +99,32 @@
     document.getElementById("stats").innerHTML =
       `<div><b>${DEMOS.length}</b>demos</div><div><b>${models.length}</b>models</div><div><b>${prompts}</b>with prompts</div><div><b>${Object.keys(SECTIONS).length}</b>chapters</div>`;
 
-    const filters = document.getElementById("filters");
-    ["All", ...models].forEach((m, i) => {
+    const BUCKETS = [
+      ["Any", () => true],
+      ["One-shot", t => t === 1],
+      ["2–5", t => t >= 2 && t <= 5],
+      ["6–10", t => t >= 6 && t <= 10],
+      ["11+", t => t >= 11],
+      ["No prompt", t => t == null],
+    ];
+    const sel = { model: "All", bucket: 0 };
+    const applyFilters = () => {
+      document.querySelectorAll(".card").forEach(card => {
+        const t = card.dataset.turns === "" ? null : +card.dataset.turns;
+        card.hidden = (sel.model !== "All" && card.dataset.model !== sel.model) || !BUCKETS[sel.bucket][1](t);
+      });
+      document.querySelectorAll(".chapter").forEach(ch => ch.hidden = !ch.querySelector(".card:not([hidden])"));
+    };
+    const addChips = (box, labels, onPick, html) => labels.forEach((l, i) => {
       const b = document.createElement("button");
       b.className = "chip"; b.setAttribute("aria-pressed", i === 0);
-      b.innerHTML = (m === "All" ? "" : `<i style="--c:${c(m)}"></i>`) + esc(m);
-      b.onclick = () => {
-        filters.querySelectorAll(".chip").forEach(x => x.setAttribute("aria-pressed", x === b));
-        document.querySelectorAll(".card").forEach(card => card.hidden = m !== "All" && card.dataset.model !== m);
-        document.querySelectorAll(".chapter").forEach(ch => ch.hidden = !ch.querySelector(".card:not([hidden])"));
-      };
-      filters.appendChild(b);
+      b.innerHTML = html(l, i);
+      b.onclick = () => { box.querySelectorAll(".chip").forEach(x => x.setAttribute("aria-pressed", x === b)); onPick(l, i); applyFilters(); };
+      box.appendChild(b);
     });
+    addChips(document.getElementById("filters"), ["All", ...models], m => sel.model = m,
+      m => (m === "All" ? "" : `<i style="--c:${c(m)}"></i>`) + esc(m));
+    addChips(document.getElementById("turn-filters"), BUCKETS.map(b => b[0]), (_, i) => sel.bucket = i, esc);
 
     document.getElementById("chapters").innerHTML = Object.entries(SECTIONS).map(([key, sec], i) => `
       <section class="chapter">
@@ -119,13 +134,13 @@
           ${sec.blurb ? `<p>${esc(sec.blurb)}</p>` : ""}
         </div>
         <div class="cards">${DEMOS.filter(d => d.s === key).map(d => `
-          <article class="card" data-model="${esc(d.model || "")}">
+          <article class="card" data-model="${esc(d.model || "")}" data-turns="${d.turns ?? ""}">
             ${d.img ? `<img src="${d.img}" alt="" loading="lazy" width="640" height="400">` : `<div class="noimg">${esc(d.t)}</div>`}
             <div class="body">
               <h3><a href="${d.href}">${esc(d.t)}</a></h3>
               <p>${esc(d.d)}</p>
               ${d.links ? `<div class="links">${d.links.map(([l, h]) => `<a href="${h}">${esc(l)}</a>`).join("")}</div>` : ""}
-              <div class="tags">${d.model ? `<span class="tag" style="--c:${c(d.model)}">${esc(d.model)}</span>` : ""}${d.effort ? `<span class="tag">${esc(d.effort)}</span>` : ""}</div>
+              <div class="tags">${d.model ? `<span class="tag" style="--c:${c(d.model)}">${esc(d.model)}</span>` : ""}${d.effort ? `<span class="tag">${esc(d.effort)}</span>` : ""}${d.turns ? `<span class="tag">${d.turns} ${d.turns === 1 ? "turn" : "turns"}</span>` : ""}</div>
             </div>
           </article>`).join("")}
         </div>
