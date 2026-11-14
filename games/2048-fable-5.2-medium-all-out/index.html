@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#eceef6">
+<meta name="description" content="Facet: 2048 on a hexagonal grid. Slide cut-gem tiles in six directions, with three boards, three modes, a bot, replays and badges.">
+<title>Facet · hex 2048</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-10 -9 20 18'%3E%3Cpath d='M10 0 5 8.66H-5L-10 0-5-8.66H5Z' fill='%236a4df0'/%3E%3Cpath d='M6 0 3 5.2H-3L-6 0-3-5.2H3Z' fill='%23b9a8ff'/%3E%3C/svg%3E">
+<script>
+// Resolve the theme before first paint.
+(function () {
+  var t = null;
+  try { t = (JSON.parse(localStorage.getItem('facet:prefs')) || {}).theme; } catch (e) {}
+  if (t !== 'light' && t !== 'dark') t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  document.documentElement.dataset.theme = t;
+})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app" id="app">
+  <header class="head">
+    <div class="brand">
+      <h1 class="title">
+        <svg class="logo" viewBox="-1 -1 2 2" aria-hidden="true" id="logo"></svg>
+        <span>Facet</span>
+      </h1>
+      <p class="tagline">2048, cut six ways</p>
+    </div>
+    <div class="scores">
+      <div class="score" id="scoreBox"><span class="score-label">Score</span><span class="score-value" id="score">0</span></div>
+      <div class="score" id="bestBox"><span class="score-label">Best</span><span class="score-value" id="best">0</span></div>
+    </div>
+  </header>
+
+  <nav class="setup" aria-label="Board and mode">
+    <div class="segs" id="boards" role="group" aria-label="Board"></div>
+    <div class="segs" id="modes" role="group" aria-label="Mode"></div>
+  </nav>
+
+  <div class="status" id="status">
+    <div class="chip goal" id="goalChip"></div>
+    <button class="chip bot" id="botChip" type="button" hidden></button>
+    <div class="chip next" id="nextChip" title="The next tile to appear"></div>
+  </div>
+
+  <main class="stage-wrap">
+    <div class="stage" id="stage">
+      <svg class="board-svg" id="boardSvg" aria-hidden="true"></svg>
+      <div class="tiles" id="tiles" aria-hidden="true"></div>
+      <canvas class="fx" id="fx" aria-hidden="true"></canvas>
+      <div id="arrows"></div>
+      <div class="veil" id="veil" hidden>
+        <div class="card" role="dialog" aria-labelledby="cardTitle" aria-describedby="cardText">
+          <div class="card-tile" id="cardTile" aria-hidden="true"></div>
+          <h2 class="card-title" id="cardTitle"></h2>
+          <p class="card-text" id="cardText"></p>
+          <div class="card-actions" id="cardActions"></div>
+        </div>
+      </div>
+    </div>
+    <div class="replaybar" id="replayBar" hidden>
+      <button class="icon-btn" id="rpStart" type="button" aria-label="Back to start" title="Back to start">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5v14M19 5l-9 7 9 7z"/></svg>
+      </button>
+      <button class="icon-btn primary" id="rpPlay" type="button" aria-label="Play or pause" title="Play / pause (Space)"></button>
+      <input class="rp-slider" id="rpSlider" type="range" min="0" max="1" value="0" step="1" aria-label="Replay position">
+      <span class="rp-count" id="rpCount">0 / 0</span>
+      <button class="icon-btn text" id="rpSpeed" type="button" aria-label="Replay speed" title="Speed">1×</button>
+      <button class="icon-btn" id="rpLink" type="button" aria-label="Copy replay link" title="Copy replay link">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3A4 4 0 0 0 11 18.7l1-1"/></svg>
+      </button>
+      <button class="icon-btn" id="rpExit" type="button" aria-label="Close replay" title="Close replay (Esc)">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+    </div>
+  </main>
+
+  <div class="actions" id="actions">
+    <div class="main-actions">
+      <button class="btn" id="undoBtn" type="button" title="Undo (Z)">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg><span>Undo</span>
+      </button>
+      <button class="btn" id="hintBtn" type="button" title="Hint (H)">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 18h5M10.5 21h3"/><path d="M12 3a6 6 0 0 0-3.7 10.7c.7.6 1.2 1.4 1.2 2.3h5c0-.9.5-1.7 1.2-2.3A6 6 0 0 0 12 3z"/></svg><span>Hint</span>
+      </button>
+      <button class="btn" id="autoBtn" type="button" title="Let the bot play (P)" aria-pressed="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true" id="autoIcon"></svg><span>Auto</span>
+      </button>
+      <button class="btn primary" id="newBtn" type="button" title="New game (N)">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.6-5.9"/><path d="M20 4v5h-5"/></svg><span id="newLabel">New</span>
+      </button>
+    </div>
+    <div class="side-actions">
+      <button class="icon-btn" id="replayBtn" type="button" aria-label="Watch replay of this game" title="Replay this game (R)">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5v6h6"/><path d="M4.6 11A8 8 0 1 1 6 16.5"/><path d="M10.5 9.5v5l4-2.5z"/></svg>
+      </button>
+      <button class="icon-btn" id="statsBtn" type="button" aria-label="Stats, badges and help" title="Stats, badges, help (?)">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 6H4v1a3 3 0 0 0 3 3M17 6h3v1a3 3 0 0 1-3 3M12 14v4M8.5 20h7"/></svg>
+      </button>
+      <button class="icon-btn" id="soundBtn" type="button" aria-label="Sound" title="Sound (M)" aria-pressed="true"></button>
+      <button class="icon-btn" id="themeBtn" type="button" aria-label="Switch theme" title="Light / dark"></button>
+    </div>
+  </div>
+
+  <section class="help" aria-labelledby="helpTitle">
+    <h2 class="help-title" id="helpTitle">How to play</h2>
+    <div class="help-body">
+      <div class="keys" id="keys" aria-hidden="true"></div>
+      <p>Each move slides <em>every</em> tile as far as it goes along one of six directions. Two equal tiles that meet fuse into one.
+        <span class="desktop-only">Use the keys, drag the board, or click an arrow.</span>
+        <span class="touch-only">Drag the board in any of the six directions, or tap an arrow.</span></p>
+    </div>
+    <p class="shortcuts desktop-only"><span><kbd>Z</kbd>undo</span><span><kbd>H</kbd>hint</span><span><kbd>P</kbd>bot</span><span><kbd>R</kbd>replay</span><span><kbd>N</kbd>new</span><span><kbd>M</kbd>sound</span></p>
+  </section>
+</div>
+
+<dialog class="sheet" id="sheet" aria-labelledby="sheetTitle">
+  <div class="sheet-head">
+    <div class="tabs" role="tablist" id="tabs">
+      <button type="button" role="tab" data-tab="stats" aria-selected="true" id="sheetTitle">Stats</button>
+      <button type="button" role="tab" data-tab="badges" aria-selected="false">Badges</button>
+      <button type="button" role="tab" data-tab="help" aria-selected="false">Guide</button>
+    </div>
+    <button class="icon-btn" id="sheetClose" type="button" aria-label="Close">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+  </div>
+  <div class="sheet-body" id="sheetBody"></div>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="sr-only" id="announcer" aria-live="polite"></div>
+<noscript><p style="text-align:center;padding:24px">Facet needs JavaScript to run.</p></noscript>
+
+<script src="engine.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

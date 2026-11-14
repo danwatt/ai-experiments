@@ -270,6 +270,18 @@
       ],
       "port": 8829,
       "url": "http://localhost:8829"
+    },
+    {
+      "name": "facet-hex-2048",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8802",
+        "-d",
+        "games/2048-fable-5.2-medium-all-out"
+      ],
+      "port": 8802
     }
   ]
 }
