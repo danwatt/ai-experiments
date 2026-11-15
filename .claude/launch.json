@@ -185,7 +185,7 @@
         "http.server",
         "8811",
         "-d",
-        "election-gas-prices-sonnet-5.5-high"
+        "."
       ],
       "port": 8811
     },
