@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>One Acre, Two Fuels</title>
+<meta name="description" content="How far one acre of corn ethanol drives a gasoline car versus how far one acre of solar panels drives an electric vehicle, state by state, with every loss counted.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <div class="wrap top-row">
+    <span class="brand">One Acre, Two Fuels</span>
+    <button id="theme" class="ghost" aria-label="Toggle light or dark theme">◐</button>
+  </div>
+</header>
+
+<main>
+<section class="hero wrap">
+  <p class="kicker">Corn ethanol vs. solar electricity, per acre per year</p>
+  <h1>How far does one acre drive you?</h1>
+  <p class="lede">Plant an acre in corn and the ethanol goes into gasoline. Cover the same acre with solar panels and the power charges an electric car. Pick a state; every number below follows from public data and the assumptions you can change at the bottom of the page.</p>
+
+  <div class="controls">
+    <label>State <select id="state"></select></label>
+    <label>Corn year
+      <select id="year">
+        <option value="avg">2023–25 average</option>
+        <option value="2025">2025</option>
+        <option value="2024">2024</option>
+        <option value="2023">2023</option>
+      </select>
+    </label>
+    <label>Solar layout
+      <select id="mount">
+        <option value="trk">Single-axis tracking</option>
+        <option value="fix">Fixed tilt</option>
+      </select>
+    </label>
+    <label class="check"><input type="checkbox" id="net"> Subtract energy used to make each fuel</label>
+  </div>
+
+  <p class="mount-note" id="mountNote"></p>
+
+  <div class="duel">
+    <article class="side corn">
+      <h2><span class="dot"></span>Corn ethanol</h2>
+      <div class="big" id="cornMiles">–</div>
+      <div class="unit">miles per year in a gasoline car</div>
+      <div class="sub" id="cornSub"></div>
+    </article>
+    <div class="vs">
+      <div class="ratio" id="ratio">–</div>
+      <div class="ratio-l">more miles from solar</div>
+    </div>
+    <article class="side sun">
+      <h2><span class="dot"></span>Solar electricity</h2>
+      <div class="big" id="sunMiles">–</div>
+      <div class="unit">miles per year in an electric car</div>
+      <div class="sub" id="sunSub"></div>
+    </article>
+  </div>
+
+  <div class="cars">
+    <div class="cars-head">
+      <h3>Cars kept on the road for a year</h3>
+      <p class="note">One square = one car driven <span id="carYearMi">12,000</span> miles.</p>
+    </div>
+    <div class="cars-row corn"><span class="cars-l" id="cornCars"></span><div class="grid" id="cornGrid"></div></div>
+    <div class="cars-row sun"><span class="cars-l" id="sunCars"></span><div class="grid" id="sunGrid"></div></div>
+  </div>
+</section>
+
+<section class="wrap block">
+  <h2 class="sec"><span class="dot corn-c"></span>The corn path: field to fuel tank</h2>
+  <p class="sec-lede" id="cornLede"></p>
+  <ol class="flow" id="cornFlow"></ol>
+
+  <div class="card sk-card">
+    <h3>Where the corn acre's energy goes</h3>
+    <p class="note" id="cornSkNote"></p>
+    <p class="sk-hint">Swipe sideways to see the whole diagram.</p><div class="sk-scroll"><div id="cornSankey" class="sankey"></div></div>
+  </div>
+
+  <div class="two">
+    <div class="card">
+      <h3>What a bushel becomes</h3>
+      <p class="note">A dry-grind mill splits each 56&nbsp;lb bushel into fuel, feed, oil and gas.</p>
+      <div id="bushel" class="stackbar"></div>
+      <ul class="legend" id="bushelLegend"></ul>
+    </div>
+    <div class="card">
+      <h3>Where U.S. ethanol went in 2025</h3>
+      <p class="note">16.5 billion gallons made; your acre's gallons follow the same split.</p>
+      <div id="dist" class="stackbar"></div>
+      <ul class="legend" id="distLegend"></ul>
+      <p class="note small">Nearly all domestic ethanol is splash-blended into gasoline at about 1,300 terminals and sold as E10. E15 is growing (27% of Iowa gasoline sales in 2025) and E85 is a niche fuel for flex-fuel vehicles. The national blend rate averaged 10.5%.</p>
+    </div>
+  </div>
+</section>
+
+<section class="wrap block">
+  <h2 class="sec"><span class="dot sun-c"></span>The solar path: sunlight to wheels</h2>
+  <p class="sec-lede" id="sunLede"></p>
+  <div class="card sk-card">
+    <h3>Where the solar acre's energy goes</h3>
+    <p class="note" id="sunSkNote"></p>
+    <p class="sk-hint">Swipe sideways to see the whole diagram.</p><div class="sk-scroll"><div id="sunSankey" class="sankey"></div></div>
+  </div>
+  <div class="card" style="margin-top:16px">
+    <h3>Electricity from the plant to the wheels</h3>
+    <p class="note">Bars are to scale with the electricity the acre sends to the grid. Each step shows what it costs.</p>
+    <div id="waterfall" class="waterfall"></div>
+  </div>
+</section>
+
+<section class="wrap block">
+  <h2 class="sec">Sunlight to wheels</h2>
+  <p class="sec-lede">Both fuels start as sunlight falling on the same acre. Corn stores it in starch at a fraction of a percent; panels turn it straight into electricity. Log scale.</p>
+  <div class="card">
+    <div id="s2w"></div>
+    <p class="note small">Wheel energy uses fueleconomy.gov's ranges: a gasoline engine gets about 16–25% of fuel energy to the wheels (20% used here); an EV's drivetrain sends roughly 87% of battery energy to the wheels.</p>
+  </div>
+</section>
+
+<section class="wrap block">
+  <h2 class="sec">Every state</h2>
+  <p class="sec-lede">Miles per acre per year for each state with a NASS corn yield, with your current assumptions. Sunny states gain more from solar than good soil gains from corn. Log scale; tap a row to select it.</p>
+  <div class="card">
+    <div class="sort">Sort by
+      <button data-sort="ratio" class="chip on">solar ÷ corn</button>
+      <button data-sort="sun" class="chip">solar miles</button>
+      <button data-sort="corn" class="chip">corn miles</button>
+      <button data-sort="name" class="chip">name</button>
+    </div>
+    <div id="states" class="states"></div>
+  </div>
+</section>
+
+<section class="wrap block" id="assumptions">
+  <h2 class="sec">Assumptions</h2>
+  <p class="sec-lede">Defaults come from the sources listed below. Change any of them and the whole page updates.</p>
+  <div class="three">
+    <fieldset class="card"><legend>Corn and ethanol</legend><div id="fCorn"></div></fieldset>
+    <fieldset class="card"><legend>Solar and grid</legend><div id="fSun"></div></fieldset>
+    <fieldset class="card"><legend>Vehicles</legend><div id="fCar"></div>
+      <div class="presets"><span>EV preset</span>
+        <button class="chip" data-ev="25">Efficient sedan</button>
+        <button class="chip" data-ev="29">Tesla fleet</button>
+        <button class="chip" data-ev="31">Average EV</button>
+        <button class="chip" data-ev="46">Electric pickup</button>
+      </div>
+    </fieldset>
+  </div>
+  <button id="reset" class="ghost">Reset to defaults</button>
+</section>
+
+<section class="wrap block notes">
+  <h2 class="sec">How the numbers work</h2>
+  <div class="two">
+    <div>
+      <h3>Corn</h3>
+      <p>Miles = yield (bu/acre) × ethanol (gal/bu) × ethanol energy ÷ energy a car burns per mile. A car rated on E10 burns 112,114 BTU per gallon of fuel; at 25.5 mpg that is about 4,400 BTU a mile, so a gallon of ethanol (76,330 BTU) drives roughly two-thirds as far as a gallon of E10.</p>
+      <p>"Subtract energy used" removes the fossil energy spent on fertilizer, farm diesel, drying, hauling and distilling, using the ratio from USDA's 2015 energy balance: about 2 units of ethanol energy out for each unit of fossil energy in.</p>
+      <p>The acre's distillers grains go back to feedlots and dairies, which is why the net land use of ethanol is lower than its gross acreage. That feed value is real but drives no miles, so it is shown and not counted.</p>
+    </div>
+    <div>
+      <h3>Solar</h3>
+      <p>Electricity per acre = plant density (MW of panels per fenced acre, from LBNL's survey of 736 U.S. plants; the fixed-tilt default is trimmed from 0.35 to 0.32 so the per-acre gap matches LBNL's measured energy density) × annual yield per kW in that state. Yields come from NLR's PVWatts v8 model at 8 locations, and for the other states from a fit of those results to 10 years of measured irradiance (Open-Meteo ERA5, 2016–2025) at a farming area in each state. The fit is within about 4% of PVWatts at the calibration points.</p>
+      <p>From the plant, power loses about 5% on the grid (EIA). Some of it is charged at night, so a share passes through a grid battery (EIA reports about 82% round trip). The EV's EPA rating is measured at the wall and already includes about 12% charging loss; changing the charging efficiency here scales from that.</p>
+      <p>"Subtract energy used" removes the energy to build the panels, racking and inverters, spread over the plant's life (an energy payback of about 1.5 years against a 30-year life).</p>
+    </div>
+  </div>
+  <p>The corn Sankey counts the grain's chemical energy at about 16.6 MJ per dry kilogram (roughly 99 kWh per bushel), with fermentation losing about 5% of the ethanol's energy as heat; the distillers grains and corn oil carry the rest. Fossil inputs are split about 25% farming, 70% at the mill and 5% hauling, following the shares in USDA's energy balance. The stalks and cobs left in the field are not shown.</p>
+  <p class="small">Not counted: water, fertilizer runoff, wildlife, food and feed value, grid upgrades, the energy to build cars and batteries, land value, or the fact that solar farms are often co-located with grazing. This page compares energy and miles only.</p>
+</section>
+
+<section class="wrap block sources">
+  <h2 class="sec">Sources</h2>
+  <ul>
+    <li>USDA NASS, <a href="https://esmis.nal.usda.gov/sites/default/release-files/795725/cropan26.pdf">Crop Production 2025 Summary</a> (Jan 2026): corn-for-grain yield by state, 2023–2025.</li>
+    <li>Bolinger &amp; Bolinger, LBNL, <a href="https://emp.lbl.gov/publications/land-requirements-utility-scale-pv">Land Requirements for Utility-Scale PV</a> (IEEE J. Photovoltaics, 2022): 0.24 MWdc/acre tracking, 0.35 fixed tilt; 394 vs. 447 MWh/acre/yr.</li>
+    <li>NLR (formerly NREL), <a href="https://pvwatts.nlr.gov/">PVWatts v8</a>: tracking and fixed-tilt yield, 14% system losses, DC/AC 1.3, NSRDB TMY weather.</li>
+    <li><a href="https://open-meteo.com/en/docs/historical-weather-api">Open-Meteo historical weather API</a> (ERA5): daily shortwave radiation, 2016–2025.</li>
+    <li>USDA, <a href="https://www.usda.gov/sites/default/files/documents/2015EnergyBalanceCornEthanol.pdf">2015 Energy Balance for the Corn-Ethanol Industry</a>: energy out vs. fossil energy in.</li>
+    <li>Renewable Fuels Association, <a href="https://ethanolrfa.org/media-and-news/category/news-releases/article/2026/01/u-s-ethanol-blend-rate-tops-11-in-october-as-e15-expansion-continues">blend rate</a> and <a href="https://ethanolrfa.org/media-and-news/category/news-releases/article/2026/03/rfa-iowa-e15-sales-up-60-in-2025-shattering-record">Iowa E15</a> releases; 2025 production and exports as reported from EIA data by <a href="https://www.rfdtv.com/u-s-ethanol-production-reaches-record-levels-during-2025?p=4">RFD-TV</a>.</li>
+    <li>DOE Alternative Fuels Data Center, <a href="https://afdc.energy.gov/fuels/properties">fuel properties</a>: ethanol 76,330 BTU/gal, E10 112,114 BTU/gal (lower heating value).</li>
+    <li>EPA, <a href="https://www.epa.gov/automotive-trends/highlights-automotive-trends-report">2025 Automotive Trends Report</a>: MY2024 new-vehicle fuel economy 25.5 mpg without EVs and plug-ins; Tesla fleet 117 MPGe.</li>
+    <li>EIA, <a href="https://www.eia.gov/tools/faqs/faq.php?id=105&amp;t=3">transmission and distribution losses</a> (about 5%) and <a href="https://www.eia.gov/todayinenergy/detail.php?id=46756">utility battery round-trip efficiency</a> (about 82%).</li>
+    <li>fueleconomy.gov, <a href="https://www.fueleconomy.gov/feg/atv.shtml">where the energy goes</a> (gasoline) and <a href="https://www.fueleconomy.gov/feg/atv-ev.shtml">all-electric vehicles</a>.</li>
+  </ul>
+</section>
+</main>
+
+<footer class="wrap foot">Energy only. Built from public data; see <a href="#assumptions">assumptions</a>.</footer>
+
+<div id="tip" class="tip" role="tooltip" hidden></div>
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

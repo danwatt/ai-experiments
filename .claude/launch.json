@@ -294,6 +294,18 @@
         "games/2048-boot-opus-5.5"
       ],
       "port": 8791
+    },
+    {
+      "name": "corn-vs-solar",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8833",
+        "-d",
+        "corn-vs-solar"
+      ],
+      "port": 8833
     }
   ]
 }
