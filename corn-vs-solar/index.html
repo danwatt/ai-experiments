@@ -47,6 +47,7 @@
 
   <div class="duel">
     <article class="side corn">
+      <div class="art" id="cornArt" aria-hidden="true"></div>
       <h2><span class="dot"></span>Corn ethanol</h2>
       <div class="big" id="cornMiles">–</div>
       <div class="unit">miles per year in a gasoline car</div>
@@ -57,6 +58,7 @@
       <div class="ratio-l">more miles from solar</div>
     </div>
     <article class="side sun">
+      <div class="art" id="sunArt" aria-hidden="true"></div>
       <h2><span class="dot"></span>Solar electricity</h2>
       <div class="big" id="sunMiles">–</div>
       <div class="unit">miles per year in an electric car</div>
@@ -116,16 +118,6 @@
     <div id="waterfall" class="waterfall"></div>
   </div>
 </section>
-
-<section class="wrap block">
-  <h2 class="sec">Sunlight to wheels</h2>
-  <p class="sec-lede">Both fuels start as sunlight falling on the same acre. Corn stores it in starch at a fraction of a percent; panels turn it straight into electricity. Log scale.</p>
-  <div class="card">
-    <div id="s2w"></div>
-    <p class="note small">Wheel energy uses fueleconomy.gov's ranges: a gasoline engine gets about 16–25% of fuel energy to the wheels (20% used here); an EV's drivetrain sends roughly 87% of battery energy to the wheels.</p>
-  </div>
-</section>
-
 <section class="wrap block">
   <h2 class="sec">Every state</h2>
   <p class="sec-lede">Miles per acre per year for each state with a NASS corn yield, with your current assumptions. Sunny states gain more from solar than good soil gains from corn. Log scale; tap a row to select it.</p>
@@ -138,6 +130,26 @@
     </div>
     <div id="states" class="states"></div>
   </div>
+</section>
+
+<section class="wrap block" id="national">
+  <h2 class="sec">The national picture</h2>
+  <p class="sec-lede">How much U.S. land grows corn, how much of it feeds ethanol plants, and how much is covered by utility-scale solar farms. Squares are drawn to scale by area.</p>
+  <div class="nat">
+    <div class="card nat-map">
+      <div id="natSquares"></div>
+      <ul class="legend nat-leg" id="natLegend"></ul>
+    </div>
+    <div class="card nat-side">
+      <h3>What that land delivered in 2025</h3>
+      <p class="note">Miles of driving from each year's output, using the vehicle and grid assumptions below.</p>
+      <div id="natBars"></div>
+      <div class="field"><label for="p_acresMw">Solar land per MWac</label><output id="o_acresMw"></output>
+        <input type="range" id="p_acresMw" min="3.5" max="10" step="0.1" value="6">
+        <div class="h">Fenced area. LBNL 2019 medians: 3.6 acres fixed tilt, 5.6 tracking; older plants used 8–9 (NREL 2013). 6 blends the fleet.</div></div>
+    </div>
+  </div>
+  <p class="small" id="natNotes"></p>
 </section>
 
 <section class="wrap block" id="assumptions">
@@ -174,7 +186,7 @@
       <p>"Subtract energy used" removes the energy to build the panels, racking and inverters, spread over the plant's life (an energy payback of about 1.5 years against a 30-year life).</p>
     </div>
   </div>
-  <p>The corn Sankey counts the grain's chemical energy at about 16.6 MJ per dry kilogram (roughly 99 kWh per bushel), with fermentation losing about 5% of the ethanol's energy as heat; the distillers grains and corn oil carry the rest. Fossil inputs are split about 25% farming, 70% at the mill and 5% hauling, following the shares in USDA's energy balance. The stalks and cobs left in the field are not shown.</p>
+  <p>The corn Sankey counts the grain's chemical energy at about 16.6 MJ per dry kilogram (roughly 99 kWh per bushel), with fermentation losing about 5% of the ethanol's energy as heat; the distillers grains and corn oil carry the rest. Fossil inputs are split about 25% farming, 70% at the mill and 5% hauling, following the shares in USDA's energy balance. The stalks and cobs left in the field are not shown. The engine and drivetrain steps use fueleconomy.gov's ranges: a gasoline engine gets about 16–25% of fuel energy to the wheels (20% used here) and an EV sends roughly 87% of battery energy to the wheels.</p>
   <p class="small">Not counted: water, fertilizer runoff, wildlife, food and feed value, grid upgrades, the energy to build cars and batteries, land value, or the fact that solar farms are often co-located with grazing. This page compares energy and miles only.</p>
 </section>
 
@@ -187,6 +199,9 @@
     <li><a href="https://open-meteo.com/en/docs/historical-weather-api">Open-Meteo historical weather API</a> (ERA5): daily shortwave radiation, 2016–2025.</li>
     <li>USDA, <a href="https://www.usda.gov/sites/default/files/documents/2015EnergyBalanceCornEthanol.pdf">2015 Energy Balance for the Corn-Ethanol Industry</a>: energy out vs. fossil energy in.</li>
     <li>Renewable Fuels Association, <a href="https://ethanolrfa.org/media-and-news/category/news-releases/article/2026/01/u-s-ethanol-blend-rate-tops-11-in-october-as-e15-expansion-continues">blend rate</a> and <a href="https://ethanolrfa.org/media-and-news/category/news-releases/article/2026/03/rfa-iowa-e15-sales-up-60-in-2025-shattering-record">Iowa E15</a> releases; 2025 production and exports as reported from EIA data by <a href="https://www.rfdtv.com/u-s-ethanol-production-reaches-record-levels-during-2025?p=4">RFD-TV</a>.</li>
+    <li>USDA, <a href="https://www.usda.gov/oce/commodity/wasde">WASDE</a> (Nov–Dec 2025): 5.6 billion bushels of 2025/26 corn to ethanol.</li>
+    <li>EIA, <a href="https://www.eia.gov/todayinenergy/detail.php?id=67367">Today in Energy</a>: 296 TWh of utility-scale solar generation in 2025; <a href="https://www.eia.gov/todayinenergy/detail.php?id=66604">31 GW added in 2024, a 34% increase</a>; 27.7 GW added in 2025 as reported by <a href="https://electrek.co/2026/02/26/eia-renewable-energy-capacity-2026/">Electrek</a>.</li>
+    <li>NREL, <a href="https://www.nrel.gov/docs/fy13osti/56290.pdf">Land-Use Requirements for Solar Power Plants in the United States</a> (2013): 8.9 acres/MWac total area for plants built before 2013.</li>
     <li>DOE Alternative Fuels Data Center, <a href="https://afdc.energy.gov/fuels/properties">fuel properties</a>: ethanol 76,330 BTU/gal, E10 112,114 BTU/gal (lower heating value).</li>
     <li>EPA, <a href="https://www.epa.gov/automotive-trends/highlights-automotive-trends-report">2025 Automotive Trends Report</a>: MY2024 new-vehicle fuel economy 25.5 mpg without EVs and plug-ins; Tesla fleet 117 MPGe.</li>
     <li>EIA, <a href="https://www.eia.gov/tools/faqs/faq.php?id=105&amp;t=3">transmission and distribution losses</a> (about 5%) and <a href="https://www.eia.gov/todayinenergy/detail.php?id=46756">utility battery round-trip efficiency</a> (about 82%).</li>

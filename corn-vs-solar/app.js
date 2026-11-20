@@ -107,7 +107,7 @@
   sel.value = state.ab;
   sel.addEventListener("change", () => { state.ab = sel.value; setHash(); render(); });
   $("#year").addEventListener("change", (e) => { state.year = e.target.value; render(); });
-  $("#mount").addEventListener("change", (e) => { state.mount = e.target.value; render(); });
+  $("#mount").addEventListener("change", (e) => { state.mount = e.target.value; render(); renderArt(); });
   $("#net").addEventListener("change", (e) => { state.net = e.target.checked; render(); });
   function setHash() { try { history.replaceState(null, "", "#s=" + state.ab); } catch (e) {} }
 
@@ -186,9 +186,9 @@
     $("#mountNote").innerHTML = `Tracking panels follow the sun, so each kW makes about ${nf((1 / perKw - 1) * 100)}% more than a fixed panel. But tracker rows need wide gaps to avoid shading each other when tilted at low sun, so an acre holds ${nf(P.densTrk, 2)} MW of tracking panels versus ${nf(P.densFix, 2)} MW fixed. Per acre, fixed tilt comes out <b>${nf(Math.abs(perAcre - 1) * 100)}% ${perAcre >= 1 ? "ahead" : "behind"}</b>. Most new U.S. plants still track: land is a small share of cost, and trackers make cheaper power and more of it in the late afternoon.`;
     renderCorn(s, m);
     renderSun(s, m);
-    renderS2W(m);
     renderSankeys(s, m);
     renderStates();
+    renderNational();
   }
 
   function grid(el, n) {
@@ -260,32 +260,183 @@
     $("#waterfall").innerHTML = h;
   }
 
-  function renderS2W(m) {
-    const cornWheel = (state.net ? m.ethNetKwh : m.ethKwh) * ICE_DRIVE;
-    const rows = [
-      ["Sunlight on the acre", m.sunKwh, m.sunKwh],
-      ["Fuel / electricity made", state.net ? m.ethNetKwh : m.ethKwh, m.acKwh],
-      ["Energy at the wheels", cornWheel, m.wheelKwh],
+  // ---------- card art
+  const AW = 250, AH = 120, GY = 104;
+  function cornArt() {
+    let h = `<svg viewBox="0 0 ${AW} ${AH}">`;
+    h += `<circle class="sunball" cx="214" cy="20" r="11"/>`;
+    for (let i = 0; i < 8; i++) { const a = (i / 8) * Math.PI * 2; h += `<line class="ray" x1="${214 + Math.cos(a) * 15}" y1="${20 + Math.sin(a) * 15}" x2="${214 + Math.cos(a) * 20}" y2="${20 + Math.sin(a) * 20}"/>`; }
+    h += `<rect class="gnd" x="0" y="${GY}" width="${AW}" height="${AH - GY}" rx="3"/>`;
+    const stalk = (x, base, sc, k) => {
+      const ht = 78 * sc, top = base - ht, sway = ((k * 37) % 7 - 3) * 0.6 * sc;
+      let g = `<path class="stem" stroke-width="${2.2 * sc}" d="M${x} ${base} Q${x + sway} ${base - ht / 2} ${x + sway * 1.6} ${top}"/>`;
+      for (let j = 0; j < 4; j++) {
+        const y = base - ht * (0.22 + j * 0.17), dir = j % 2 ? -1 : 1, L = (24 - j * 3) * sc;
+        g += `<path class="${j % 2 ? "leaf" : "leaf2"}" d="M${x + sway * (1 - y / base)} ${y} q${dir * L * 0.5} ${-L * 0.45} ${dir * L} ${L * 0.15} q${-dir * L * 0.55} ${-L * 0.15} ${-dir * L} ${-L * 0.15}z"/>`;
+      }
+      const ex = x + sway * 0.8 + 2 * sc, ey = base - ht * 0.5;
+      g += `<ellipse class="ear" cx="${ex + 3 * sc}" cy="${ey}" rx="${2.6 * sc}" ry="${7 * sc}" transform="rotate(18 ${ex + 3 * sc} ${ey})"/>`;
+      const tx = x + sway * 1.6;
+      g += `<line class="tassel" x1="${tx}" y1="${top}" x2="${tx}" y2="${top - 8 * sc}"/><line class="tassel" x1="${tx}" y1="${top - 2 * sc}" x2="${tx - 5 * sc}" y2="${top - 7 * sc}"/><line class="tassel" x1="${tx}" y1="${top - 2 * sc}" x2="${tx + 5 * sc}" y2="${top - 7 * sc}"/>`;
+      return g;
+    };
+    h += `<g class="back">`;
+    for (let i = 0; i < 10; i++) h += stalk(12 + i * 25, GY - 2, 0.62, i + 3);
+    h += `</g>`;
+    for (let i = 0; i < 7; i++) h += stalk(18 + i * 36, GY + 6, 1, i);
+    return h + "</svg>";
+  }
+
+  // end-on view of rows; GCR sets row pitch (fixed ~0.46, tracking ~0.35)
+  let artRaf = 0;
+  function solarArt(mode) {
+    const tracking = mode === "trk";
+    const w = 40, pitch = w / (tracking ? 0.35 : 0.46), tilt = 25 * Math.PI / 180;
+    const rows = (base, sc, step, cls) => {
+      const n = Math.floor((AW - 16) / (step * sc)) + 1, x0 = (AW - (n - 1) * step * sc) / 2;
+      let g = "";
+      for (let i = 0; i < n; i++) {
+        const x = x0 + i * step * sc, hw = (w / 2) * sc, t = 5 * sc;
+        if (tracking) {
+          const py = base - 30 * sc;
+          g += `<g class="${cls}"><line class="post" x1="${x}" y1="${base}" x2="${x}" y2="${py}" stroke-width="${2 * sc}"/>` +
+            `<g class="pv" data-tx="${x}" data-ty="${py}" transform="translate(${x} ${py})"><rect class="panel" x="${-hw}" y="${-t / 2}" width="${2 * hw}" height="${t}" rx="${sc}"/>` +
+            `<line class="glint" x1="${-hw + 3}" y1="${-t / 2 + 1}" x2="${hw - 3}" y2="${-t / 2 + 1}"/></g>` +
+            `<circle cx="${x}" cy="${py}" r="${1.8 * sc}" class="post" fill="currentColor"/></g>`;
+        } else {
+          // south (left) facing: low edge left, high edge right
+          const cy = base - 22 * sc, dx = hw * Math.cos(tilt), dy = hw * Math.sin(tilt);
+          const lx = x - dx, ly = cy + dy, rx = x + dx, ry = cy - dy;
+          g += `<g class="${cls}"><line class="post" x1="${lx + 3 * sc}" y1="${base}" x2="${lx + 3 * sc}" y2="${ly}" stroke-width="${1.8 * sc}"/>` +
+            `<line class="post" x1="${rx - 3 * sc}" y1="${base}" x2="${rx - 3 * sc}" y2="${ry}" stroke-width="${1.8 * sc}"/>` +
+            `<g transform="translate(${x} ${cy}) rotate(${-25})"><rect class="panel" x="${-hw}" y="${-t / 2}" width="${2 * hw}" height="${t}" rx="${sc}"/>` +
+            `<line class="glint" x1="${-hw + 3}" y1="${-t / 2 + 1}" x2="${hw - 3}" y2="${-t / 2 + 1}"/></g></g>`;
+        }
+      }
+      return g;
+    };
+    let h = `<svg viewBox="0 0 ${AW} ${AH}"><circle class="sunball" cx="${tracking ? 125 : 40}" cy="${tracking ? 20 : 18}" r="11"/>`;
+    h += `<rect class="gnd" x="0" y="${GY}" width="${AW}" height="${AH - GY}" rx="3"/>`;
+    h += rows(GY - 16, 0.55, pitch, "back");
+    h += rows(GY + 6, 1, pitch, "");
+    return h + "</svg>";
+  }
+  function renderArt() {
+    $("#cornArt").innerHTML = cornArt();
+    const el = $("#sunArt");
+    el.innerHTML = solarArt(state.mount);
+    cancelAnimationFrame(artRaf);
+    const sunEl = el.querySelector(".sunball"), pvs = [...el.querySelectorAll(".pv")];
+    const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const place = (t) => {
+      // t in [0,1): sun rises left (east), sets right (west)
+      const a = Math.PI * (1 - t), cx = AW / 2 + Math.cos(a) * 110, cy = 92 - Math.sin(a) * 78;
+      sunEl.setAttribute("cx", cx.toFixed(1)); sunEl.setAttribute("cy", cy.toFixed(1));
+      sunEl.style.opacity = Math.min(1, Math.sin(a) * 3).toFixed(2);
+      if (state.mount === "trk") {
+        const ang = Math.max(-55, Math.min(55, (t - 0.5) * 120));
+        pvs.forEach((g) => g.setAttribute("transform", `translate(${g.dataset.tx} ${g.dataset.ty}) rotate(${ang.toFixed(1)})`));
+      }
+    };
+    if (state.mount !== "trk") return;
+    if (still) { place(0.62); return; }
+    const t0 = performance.now();
+    const tick = (now) => { place((((now - t0) / 9000) + 0.15) % 1); artRaf = requestAnimationFrame(tick); };
+    artRaf = requestAnimationFrame(tick);
+  }
+
+  // ---------- national picture
+  const NAT = {
+    crops: 311.541e6,       // NASS principal crops planted, 2025
+    corn: 98.788e6,         // corn planted, all purposes, 2025
+    cornProd: 17.0205e9,    // bu, 2025
+    cornYield: 186.5,
+    ethBu: 5.6e9,           // WASDE 2025/26 corn for ethanol
+    ddgsShare: 15.5 / 56,   // share of each bushel's mass returned as distillers grains
+    ethGal: 16.49e9,        // 2025 fuel ethanol production
+    solarGWac: 150,         // ~122 GW end-2024 (31 GW = +34%) + 27.7 GW in 2025
+    solarTWh: 296,          // EIA, utility-scale 2025
+    roofTWh: 93,            // EIA, small-scale (rooftop) 2025
+    roofYield: 1250,        // kWh per kWdc per year, typical U.S. rooftop (assumption)
+  };
+  P.acresMw = 6; DEFAULTS.acresMw = 6;
+  const amw = $("#p_acresMw");
+  amw.addEventListener("input", () => { P.acresMw = +amw.value; renderNational(); });
+
+  function renderNational() {
+    amw.value = P.acresMw;
+    $("#o_acresMw").textContent = nf(P.acresMw, 1) + " acres";
+    const ethShare = NAT.ethBu / NAT.cornProd;
+    const ethAcres = NAT.corn * ethShare, netEth = ethAcres * (1 - NAT.ddgsShare);
+    const solarAcres = NAT.solarGWac * 1000 * P.acresMw;
+    // miles
+    const ethMiles = (NAT.ethGal * ETH_BTU * (state.net ? 1 - 1 / P.eroiEth : 1)) / (E10_BTU / P.mpg);
+    const chain = (1 - P.td / 100) * (1 - (P.storShare / 100) * (1 - P.storRte / 100)) * (state.net ? Math.max(0, 1 - P.payback / P.life) : 1);
+    const solarMiles = (NAT.solarTWh * 1e9 * chain * (P.chg / 100 / EPA_CHG)) / (P.kwh100 / 100);
+
+    // nested squares, bottom-left anchored, area to scale
+    const roofKwdc = (NAT.roofTWh * 1e9) / NAT.roofYield;
+    const roofAcres = roofKwdc / MODULE_KW_M2 / ACRE_M2;               // panel area on roofs
+    const roofLandEq = (NAT.roofTWh / NAT.solarTWh) * solarAcres;      // land a ground plant would need
+    const S = 552, pad = 4, W = S + pad * 2 + 150, H = S + pad * 2;
+    const side = (a) => S * Math.sqrt(a / NAT.crops);
+    const sq = [
+      ["All principal crops", NAT.crops, "color-mix(in srgb, var(--line) 60%, transparent)", "var(--muted)"],
+      ["Corn", NAT.corn, "color-mix(in srgb, var(--corn) 22%, var(--surface))", "var(--corn)"],
+      ["Corn for ethanol", ethAcres, "color-mix(in srgb, var(--corn) 55%, var(--surface))", "var(--corn)"],
+      ["…net of feed returned", netEth, "var(--corn)", "var(--corn)"],
     ];
-    const lo = 1e3, hi = Math.pow(10, Math.ceil(Math.log10(m.sunKwh)));
-    const W = 640, H = 22, pad = 0;
-    const x = (v) => pad + ((Math.log10(Math.max(v, lo)) - Math.log10(lo)) / (Math.log10(hi) - Math.log10(lo))) * (W - pad - 80);
-    let h = '<div class="s2w">';
-    for (const [lab, c, su] of rows) {
-      h += `<div class="lab">${lab}</div><svg viewBox="0 0 ${W} ${H * 2 + 6}" role="img" aria-label="${lab}: corn ${mwh(c)}, solar ${mwh(su)}">`;
-      [[c, "var(--corn)", 0], [su, "var(--sun)", H + 4]].forEach(([v, col, y]) => {
-        h += `<rect x="0" y="${y}" width="${x(v)}" height="${H}" rx="3" fill="${col}"/>`;
-        h += `<text x="${x(v) + 6}" y="${y + H / 2 + 4}" fill="var(--ink)" style="font:600 12px var(--mono)">${mwh(v)}${v !== m.sunKwh ? " · " + pct(v / m.sunKwh) : ""}</text>`;
-      });
-      h += "</svg>";
-    }
-    h += `<div></div><svg viewBox="0 0 ${W} 18" class="s2w-axis">`;
-    for (let p = Math.log10(lo); p <= Math.log10(hi); p++) {
-      const v = Math.pow(10, p);
-      h += `<line x1="${x(v)}" x2="${x(v)}" y1="0" y2="5"/><text x="${x(v)}" y="16" text-anchor="middle">${v >= 1e6 ? v / 1e6 + " GWh" : v / 1e3 + " MWh"}</text>`;
-    }
-    h += "</svg></div>";
-    $("#s2w").innerHTML = h;
+    let h = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Nested squares sized by acreage: principal crops ${sig(NAT.crops)} acres, corn ${sig(NAT.corn)}, corn for ethanol ${sig(ethAcres)}, solar ${sig(solarAcres)}">`;
+    sq.forEach(([n, a, fill, stroke], i) => {
+      const d = side(a);
+      h += `<rect x="${pad}" y="${pad + S - d}" width="${d}" height="${d}" fill="${fill}" stroke="${stroke}" stroke-width="${i === 0 ? 1 : 1.2}" ${i === 0 ? 'stroke-dasharray="4 3"' : ""} rx="2"/>`;
+    });
+    const labels = [[NAT.crops, "All principal crops planted", NAT.crops], [NAT.corn, "Corn", NAT.corn]];
+    labels.forEach(([a, n, v]) => {
+      const d = side(a);
+      h += `<text x="${pad + d - 8}" y="${pad + S - d + 18}" text-anchor="end">${n}<tspan class="v" x="${pad + d - 8}" dy="14">${nf(v / 1e6, 1)}M acres</tspan></text>`;
+    });
+    const dn = side(netEth);
+    h += `<text x="${pad + 10}" y="${pad + S - dn + 20}" style="fill:var(--surface)">Corn for ethanol<tspan x="${pad + 10}" dy="17" style="font:400 13px var(--mono);fill:var(--surface)">${nf(ethAcres / 1e6, 1)}M acres</tspan><tspan x="${pad + 10}" dy="16" style="font:400 13px var(--mono);fill:var(--surface)">${nf(netEth / 1e6, 1)}M net of feed</tspan></text>`;
+    // solar square, placed to the right of the ethanol square
+    const ds = side(solarAcres), de = side(ethAcres);
+    const sx = pad + de + 26, sy = pad + S - ds;
+    h += `<rect x="${sx}" y="${sy}" width="${Math.max(ds, 1)}" height="${Math.max(ds, 1)}" fill="var(--sun)" rx="1"/>`;
+    h += `<line x1="${sx + ds / 2}" y1="${sy - 4}" x2="${sx + ds / 2}" y2="${sy - 40}" stroke="var(--sun)"/>`;
+    h += `<text x="${sx + ds / 2 + 6}" y="${sy - 30}">Utility-scale solar<tspan class="v" x="${sx + ds / 2 + 6}" dy="14">${nf(solarAcres / 1e6, 2)}M acres</tspan></text>`;
+    // rooftop solar, outside the land: panel area, dashed
+    const dr = side(roofAcres), rx = pad + S + 24, ry = pad + S - dr;
+    h += `<rect x="${rx}" y="${ry}" width="${Math.max(dr, 1)}" height="${Math.max(dr, 1)}" fill="color-mix(in srgb, var(--sun) 25%, transparent)" stroke="var(--sun)" stroke-dasharray="2 2" rx="1"/>`;
+    h += `<line x1="${rx + dr / 2}" y1="${ry - 4}" x2="${rx + dr / 2}" y2="${ry - 64}" stroke="var(--sun)" stroke-dasharray="2 2"/>`;
+    h += `<text x="${rx}" y="${ry - 124}">Rooftop solar<tspan class="v" x="${rx}" dy="16">${nf(roofAcres / 1e6, 2)}M acres</tspan><tspan class="v" x="${rx}" dy="16">of panels,</tspan><tspan class="v" x="${rx}" dy="16">on roofs</tspan></text>`;
+    h += "</svg>";
+    $("#natSquares").innerHTML = h;
+    $("#natLegend").innerHTML = [
+      ["color-mix(in srgb, var(--line) 60%, transparent)", "All principal crops planted, 2025", NAT.crops],
+      ["color-mix(in srgb, var(--corn) 22%, var(--surface))", "Corn planted (grain and silage)", NAT.corn],
+      ["color-mix(in srgb, var(--corn) 55%, var(--surface))", `Corn for ethanol, ${pct(ethShare)} of the crop`, ethAcres],
+      ["var(--corn)", `Same, minus the ${pct(NAT.ddgsShare)} returned as cattle feed`, netEth],
+      ["var(--sun)", `Utility-scale solar, ~${NAT.solarGWac} GWac × ${nf(P.acresMw, 1)} acres/MW`, solarAcres],
+      ["color-mix(in srgb, var(--sun) 25%, transparent)", `Rooftop solar panel area (on roofs, not cropland); a ground plant making the same ${NAT.roofTWh} TWh would need ${nf(roofLandEq / 1e6, 2)}M acres`, roofAcres],
+    ].map(([c, n, v]) => `<li><i style="background:${c}"></i><span>${n}</span><b>${nf(v / 1e6, v < 1e6 ? 2 : 1)}M</b></li>`).join("");
+
+    const maxA = ethAcres, maxM = Math.max(ethMiles, solarMiles), maxD = Math.max(ethMiles / ethAcres, solarMiles / solarAcres);
+    const bar = (lab, v, max, col, txt) => `<div class="nb-row"><span>${lab}</span><div class="tr"><span style="width:${Math.max(0.4, (v / max) * 100)}%;background:${col}"></span></div><b>${txt}</b></div>`;
+    $("#natBars").innerHTML = `
+      <div class="nb"><div class="nb-h"><span>Corn ethanol</span><b>${nf(NAT.ethGal / 1e9, 1)}B gal</b></div>
+        ${bar("Land", ethAcres, maxA, "var(--corn)", nf(ethAcres / 1e6, 1) + "M ac")}
+        ${bar("Miles", ethMiles, maxM, "var(--corn)", nf(ethMiles / 1e9) + "B mi")}
+        ${bar("Per acre", ethMiles / ethAcres, maxD, "var(--corn)", sig(ethMiles / ethAcres) + " mi")}</div>
+      <div class="nb"><div class="nb-h"><span>Utility-scale solar</span><b>${NAT.solarTWh} TWh</b></div>
+        ${bar("Land", solarAcres, maxA, "var(--sun)", nf(solarAcres / 1e6, 2) + "M ac")}
+        ${bar("Miles", solarMiles, maxM, "var(--sun)", nf(solarMiles / 1e9) + "B mi")}
+        ${bar("Per acre", solarMiles / solarAcres, maxD, "var(--sun)", sig(solarMiles / solarAcres) + " mi")}</div>
+      <div class="nat-call">Solar farms use <b>${pct(solarAcres / ethAcres)}</b> as much land as ethanol corn (${nf(ethAcres / solarAcres)}× less) yet their 2025 output could drive <b>${nf(solarMiles / ethMiles, 1)}×</b> as many EV miles as all U.S. ethanol drove gasoline-car miles.</div>`;
+    $("#natNotes").textContent =
+      `Corn acreage and production: NASS 2025. Ethanol share: 5.6 billion of 17.0 billion bushels (USDA WASDE 2025/26 projection) applied to planted acres; exported ethanol is included. ` +
+      `Solar capacity is estimated (about 122 GWac at the end of 2024 plus 27.7 GW built in 2025) and its land uses the slider; rooftop solar's square is the panel area, from EIA's 93 TWh of small-scale generation at about 1,250 kWh per kW and 20%-efficient panels; it sits on existing roofs and is left out of the miles. ` +
+      `Solar miles use 2025 utility-scale generation (EIA, 296 TWh) through the same grid, storage and charging losses as above; plants built late in 2025 contributed only part of a year, so per-acre solar is slightly understated. ` +
+      `For scale, the contiguous U.S. covers about 1.9 billion acres.`;
   }
 
   // ---------- sankeys
@@ -436,6 +587,7 @@
     }));
   }
 
+  renderArt();
   let rz;
   addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(render, 150); });
   render();

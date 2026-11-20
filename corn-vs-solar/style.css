@@ -133,14 +133,9 @@ input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--sun); }
 .wf.result .n { font-weight: 700; }
 .wf.result .val { color: var(--sun); font-size: 15px; }
 
-/* sunlight to wheels */
-.s2w { display: grid; grid-template-columns: 130px 1fr; gap: 6px 14px; align-items: center; }
-.s2w .lab { font-size: 13px; color: var(--muted); text-align: right; }
-.s2w svg { width: 100%; height: auto; display: block; overflow: visible; }
-.s2w-axis text, .st-axis text { fill: var(--muted); font: 11px var(--mono); }
-.s2w-axis line, .st-axis line { stroke: var(--line); }
-
 /* states */
+.st-axis text { fill: var(--muted); font: 11px var(--mono); }
+.st-axis line { stroke: var(--line); }
 .sort { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 13px; color: var(--muted); margin-bottom: 12px; }
 .chip { border: 1px solid var(--line); background: none; border-radius: 999px; padding: 4px 11px; font-size: 13px; }
 .chip.on { background: var(--ink); color: var(--bg); border-color: var(--ink); }
@@ -190,8 +185,6 @@ legend { font-weight: 700; font-size: 15px; padding: 0 6px; margin-left: -6px; }
   .cars-row { grid-template-columns: 1fr; gap: 6px; }
   .wf { grid-template-columns: 1fr 84px; }
   .wf .bar { grid-column: 1 / -1; grid-row: 2; }
-  .s2w { grid-template-columns: 1fr; }
-  .s2w .lab { text-align: left; }
   .states { grid-template-columns: 92px 1fr 52px; }
   select { min-width: 0; }
   .controls label { flex: 1 1 140px; }
@@ -210,3 +203,39 @@ legend { font-weight: 700; font-size: 15px; padding: 0 6px; margin-left: -6px; }
 .sankey .col-h { fill: var(--muted); font: 600 10px var(--body); text-transform: uppercase; letter-spacing: .08em; }
 .sk-hint { display: none; font-size: 12px; color: var(--muted); margin: 0 0 6px; }
 @media (max-width: 720px) { .sk-hint { display: block; } }
+
+/* national */
+.nat { display: grid; grid-template-columns: 1.15fr 1fr; gap: 16px; }
+.nat-map svg { width: 100%; height: auto; display: block; }
+.nat-map text { font: 600 15px var(--body); fill: var(--ink); }
+.nat-map text .v { font: 400 13px var(--mono); fill: var(--muted); }
+.nat-leg { margin-top: 12px; }
+.nb { margin: 14px 0 4px; }
+.nb-h { display: flex; justify-content: space-between; gap: 8px; font-size: 14px; font-weight: 600; }
+.nb-h b { font: 600 13px var(--mono); }
+.nb-row { display: grid; grid-template-columns: 70px 1fr 96px; gap: 8px; align-items: center; font-size: 12px; color: var(--muted); margin-top: 5px; }
+.nb-row .tr { height: 14px; background: color-mix(in srgb, var(--line) 50%, transparent); border-radius: 3px; overflow: hidden; }
+.nb-row .tr span { display: block; height: 100%; border-radius: 3px; }
+.nb-row b { font: 600 12px var(--mono); color: var(--ink); text-align: right; }
+.nat-call { margin-top: 14px; padding: 12px 14px; border-radius: 10px; background: color-mix(in srgb, var(--sun) 10%, transparent); font-size: 14px; }
+.nat-call b { font-family: var(--mono); }
+@media (max-width: 860px) { .nat { grid-template-columns: 1fr; } }
+
+/* card art */
+.art { position: absolute; top: 12px; right: 14px; width: 40%; max-width: 230px; pointer-events: none; color: color-mix(in srgb, var(--ink) 55%, var(--surface)); }
+.art svg { display: block; width: 100%; height: auto; overflow: visible; }
+.side > :not(.art) { position: relative; }
+.art .gnd { fill: color-mix(in srgb, var(--corn) 18%, var(--surface)); }
+.sun .art .gnd { fill: color-mix(in srgb, #7a9a4a 18%, var(--surface)); }
+.art .sunball { fill: #f2b632; }
+.art .ray { stroke: #f2b632; stroke-width: 1.4; stroke-linecap: round; opacity: .6; }
+.art .stem { stroke: #5f7f2f; stroke-linecap: round; fill: none; }
+.art .leaf { fill: #6f9238; }
+.art .leaf2 { fill: #8aab4c; }
+.art .tassel { stroke: #d9a521; stroke-width: 1.2; stroke-linecap: round; }
+.art .ear { fill: #e8c25a; stroke: #b88a1c; stroke-width: .6; }
+.art .post { stroke: color-mix(in srgb, var(--ink) 55%, var(--surface)); stroke-width: 1.6; }
+.art .panel { fill: var(--sun); stroke: color-mix(in srgb, var(--sun) 55%, #0a1a33); stroke-width: .8; }
+.art .glint { stroke: rgba(255,255,255,.55); stroke-width: .8; }
+.art .back { opacity: .5; }
+@media (max-width: 720px) { .art { width: 40%; top: 10px; right: 10px; } }
