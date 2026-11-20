@@ -296,6 +296,18 @@
       "port": 8791
     },
     {
+      "name": "us-oil-gas",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8831",
+        "-d",
+        "us-oil-gas"
+      ],
+      "port": 8831
+    },
+    {
       "name": "corn-vs-solar",
       "runtimeExecutable": "python3",
       "runtimeArgs": [

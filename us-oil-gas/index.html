@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wellhead to Water</title>
+<meta name="description" content="US oil and gas month by month: production by state since 1981, shale basins, national history since 1920, and exports by destination region. EIA data.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600&family=Barlow:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root, :root[data-theme="dark"] {
+  --bg: #0E0D0B; --panel: #1A1814; --pipe: #2E2A23; --pipe-2: #3D372D;
+  --sand: #9A8E78; --ink: #E8DCC4; --ink-strong: #F6EEDC;
+  --oil: #F2A33A; --oil-hot: #FFD27A; --gas: #5BA8FF; --gas-hot: #A9D4FF; --flare: #FF6B2C;
+  --none: #211E19; --stripe: #F2A33A;
+}
+:root[data-theme="light"] {
+  --bg: #F4EEE2; --panel: #FBF7EE; --pipe: #DCD2BF; --pipe-2: #C9BDA5;
+  --sand: #6F634D; --ink: #1A1814; --ink-strong: #0E0D0B;
+  --oil: #B8670F; --oil-hot: #8F5210; --gas: #1F6FB8; --gas-hot: #0E3A66; --flare: #C4421A;
+  --none: #ECE4D4; --stripe: #C47A1E;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); }
+body { font: 15px/1.55 Barlow, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+.wrap { max-width: 1180px; margin: 0 auto; padding: 24px 16px 48px; }
+.hd { font-family: "Barlow Condensed", sans-serif; font-weight: 600; letter-spacing: .01em; line-height: 1.05; }
+.mono { font-family: "IBM Plex Mono", ui-monospace, monospace; }
+.cap { font: 500 12px/1.3 "IBM Plex Mono", monospace; color: var(--sand); letter-spacing: .06em; margin: 0 0 6px; }
+.fuel-oil { --fuel: var(--oil); --fuel-hot: var(--oil-hot); }
+.fuel-gas { --fuel: var(--gas); --fuel-hot: var(--gas-hot); }
+
+header.top { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
+.kicker { font: 500 12px "IBM Plex Mono", monospace; color: var(--fuel); letter-spacing: .14em; margin: 0 0 4px; }
+h1 { font-size: clamp(34px, 6vw, 54px); margin: 0; color: var(--ink-strong); }
+.sub { margin: 6px 0 0; color: var(--sand); max-width: 62ch; }
+.controls { display: flex; gap: 8px; align-items: center; }
+.seg { display: inline-flex; border: 1px solid var(--pipe-2); border-radius: 4px; overflow: hidden; }
+.seg button { font: 600 15px "Barlow Condensed", sans-serif; letter-spacing: .03em; background: none; color: var(--sand);
+  border: 0; padding: 6px 16px; cursor: pointer; }
+.seg button + button { border-left: 1px solid var(--pipe-2); }
+.seg button[aria-pressed="true"] { background: var(--fuel); color: var(--bg); }
+.seg.small button { font: 500 12px "IBM Plex Mono", monospace; padding: 4px 10px; letter-spacing: 0; }
+.seg.small button[aria-pressed="true"] { background: var(--pipe-2); color: var(--ink-strong); }
+.icon-btn { background: none; border: 1px solid var(--pipe-2); color: var(--sand); border-radius: 4px; width: 34px; height: 34px;
+  cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+.icon-btn:hover, .seg button:hover { color: var(--ink-strong); }
+.seg button[aria-pressed="true"]:hover { color: var(--bg); }
+.hazard { height: 6px; margin: 18px 0; border-radius: 2px; opacity: .5;
+  background: repeating-linear-gradient(135deg, var(--stripe) 0 9px, transparent 9px 18px); }
+
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.panel { background: var(--panel); border: 1px solid var(--pipe); border-radius: 6px; padding: 14px; min-width: 0; }
+.kpi .val { font: 500 26px/1.1 "IBM Plex Mono", monospace; color: var(--ink-strong); white-space: nowrap; }
+.kpi .val.fuel { color: var(--fuel); }
+.kpi .unit { font-size: 13px; color: var(--sand); }
+.kpi .note { font: 12px "IBM Plex Mono", monospace; color: var(--sand); margin-top: 4px; min-height: 1em; }
+.up { color: var(--fuel) !important; } .down { color: var(--flare) !important; }
+
+section { margin-top: 14px; }
+.sec-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
+h2 { font-size: 26px; margin: 0; color: var(--ink-strong); }
+.sec-head p { margin: 2px 0 0; color: var(--sand); font-size: 14px; }
+
+.map-grid { display: grid; grid-template-columns: minmax(0, 2.1fr) minmax(220px, 1fr); gap: 16px; }
+@media (max-width: 760px) { .map-grid { grid-template-columns: minmax(0, 1fr); } }
+#tilemap { width: 100%; display: block; }
+#tilemap text { font: 500 11px "IBM Plex Mono", monospace; pointer-events: none; }
+#tilemap .tile { cursor: pointer; }
+#tilemap .tile:hover, #tilemap .tile.sel { stroke: var(--ink-strong); stroke-width: 1.5; }
+.legend { display: flex; align-items: center; gap: 2px; font: 11px "IBM Plex Mono", monospace; color: var(--sand); flex-wrap: wrap; margin-top: 8px; }
+.legend i { display: inline-block; width: 30px; height: 10px; border-radius: 1px; }
+.legend span { margin-right: 6px; }
+.toplist .row { display: grid; grid-template-columns: 92px minmax(0, 1fr) 64px; gap: 8px; align-items: center; font-size: 14px; padding: 3px 0; cursor: pointer; }
+.toplist .row:hover .nm, .toplist .row.sel .nm { color: var(--ink-strong); }
+#explist .row { grid-template-columns: 150px minmax(0, 1fr) 48px; }
+.toplist .nm { color: var(--sand); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.toplist .bar { height: 8px; background: var(--fuel); border-radius: 1px; }
+.toplist .v { font: 12px "IBM Plex Mono", monospace; text-align: right; }
+.detail { border-top: 1px solid var(--pipe); margin-top: 12px; padding-top: 12px; }
+.detail .hd { font-size: 22px; color: var(--ink-strong); }
+#spark { width: 100%; height: 70px; display: block; }
+
+.timebar { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 12px; margin: 0 -16px 10px;
+  padding: 10px 16px; background: var(--bg); border-bottom: 1px solid transparent; }
+.timebar.stuck { border-bottom-color: var(--pipe); }
+.timebar .fuel-tag { font: 600 16px "Barlow Condensed", sans-serif; color: var(--fuel); display: none; white-space: nowrap; flex: none; }
+@media (max-width: 520px) { .timebar #min-label { display: none; } }
+.scroll-x { overflow-x: auto; }
+@media (max-width: 760px) { #hist { min-width: 720px; } }
+.timebar.stuck .fuel-tag { display: inline; }
+.play { width: 36px; height: 36px; border-radius: 50%; border: 0; background: var(--fuel); color: var(--bg); cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; flex: none; }
+.timebar .mono { font-size: 12px; color: var(--sand); }
+#month-label { font-size: 15px; color: var(--ink-strong); min-width: 76px; text-align: right; }
+input[type=range] { flex: 1; min-width: 0; accent-color: var(--fuel); height: 24px; }
+
+.chart { width: 100%; display: block; overflow: visible; }
+.chart text { font: 11px "IBM Plex Mono", monospace; fill: var(--sand); }
+.chart .grid line { stroke: var(--pipe); }
+.chart .domain { display: none; }
+.chart .tick line { stroke: var(--pipe); }
+.chart .ann text { fill: var(--ink); }
+.chart-tools { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.keys { display: flex; gap: 14px; flex-wrap: wrap; font: 12px "IBM Plex Mono", monospace; color: var(--sand); margin-top: 6px; }
+.keys label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+.keys .sw { width: 18px; height: 0; border-top: 2px solid; display: inline-block; }
+.keys input { accent-color: var(--fuel); margin: 0; }
+
+.two { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr)); gap: 14px; }
+#worldmap { overflow: hidden; }
+#worldmap .land { fill: var(--none); stroke: var(--pipe); stroke-width: .5; }
+#worldmap .arc { fill: none; stroke: var(--fuel); stroke-linecap: round; opacity: .85; }
+#worldmap .node { fill: var(--fuel-hot); }
+#worldmap .origin { fill: var(--flare); }
+#worldmap text { font: 500 11px "IBM Plex Mono", monospace; fill: var(--ink); paint-order: stroke; stroke: var(--bg); stroke-width: 3px; stroke-linejoin: round; }
+.empty { font: 13px "IBM Plex Mono", monospace; color: var(--sand); padding: 6px 0; }
+
+#tip { position: fixed; pointer-events: none; z-index: 10; background: var(--panel); border: 1px solid var(--pipe-2); border-radius: 4px;
+  padding: 8px 10px; font: 12px/1.5 "IBM Plex Mono", monospace; color: var(--ink); opacity: 0; transition: opacity .1s; max-width: 260px; }
+#tip b { font-weight: 500; color: var(--ink-strong); }
+footer { margin-top: 28px; color: var(--sand); font-size: 13px; border-top: 1px solid var(--pipe); padding-top: 14px; }
+footer a { color: var(--ink); }
+footer ul { margin: 6px 0 0; padding-left: 18px; }
+</style>
+</head>
+<body class="fuel-oil">
+<div class="wrap">
+  <header class="top">
+    <div>
+      <p class="kicker">Field report · EIA monthly</p>
+      <h1 class="hd">Wellhead to water</h1>
+      <p class="sub">US oil and gas, month by month: where it comes out of the ground, how it got here, and where it ships. <span id="asof"></span></p>
+    </div>
+    <div class="controls">
+      <div class="seg" role="group" aria-label="Fuel">
+        <button data-fuel="oil" aria-pressed="true">Oil</button><button data-fuel="gas" aria-pressed="false">Gas</button>
+      </div>
+      <button class="icon-btn" id="theme" aria-label="Toggle light and dark">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+      </button>
+    </div>
+  </header>
+  <div class="hazard"></div>
+
+  <div class="timebar" id="timebar">
+    <span class="fuel-tag" id="bar-val"></span>
+    <button class="play" id="play" aria-label="Play">
+      <svg id="play-ico" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4v16l13-8z"/></svg>
+    </button>
+    <span class="mono" id="min-label"></span>
+    <input type="range" id="slider" step="1" aria-label="Month">
+    <span class="mono" id="month-label"></span>
+  </div>
+  <div class="kpis" id="kpis"></div>
+
+  <section class="panel">
+    <div class="sec-head">
+      <div><h2 class="hd">By state</h2><p id="map-sub"></p></div>
+    </div>
+    <div class="map-grid">
+      <div>
+        <svg id="tilemap" viewBox="0 0 600 400" role="img" aria-label="Tile map of US states shaded by production"></svg>
+        <div class="legend" id="legend"></div>
+      </div>
+      <div>
+        <p class="cap" id="top-cap">Top producers</p>
+        <div class="toplist" id="toplist"></div>
+        <div class="detail" id="detail"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="sec-head">
+      <div><h2 class="hd">The long view</h2><p id="hist-sub"></p></div>
+      <div class="chart-tools">
+        <div class="seg small" role="group" aria-label="Range" id="range">
+          <button data-range="all" aria-pressed="true">All</button><button data-range="1981">1981+</button><button data-range="2005">2005+</button>
+        </div>
+        <div class="seg small" role="group" aria-label="Overlay" id="overlay">
+          <button data-ov="none" aria-pressed="true">No overlay</button><button data-ov="price" aria-pressed="false">Price</button><button data-ov="rigs" aria-pressed="false">Rigs</button>
+        </div>
+      </div>
+    </div>
+    <div class="scroll-x"><svg class="chart" id="hist" viewBox="0 0 1100 360"></svg></div>
+    <div class="keys" id="hist-keys"></div>
+  </section>
+
+  <div class="two">
+    <section class="panel">
+      <div class="sec-head">
+        <div><h2 class="hd">Shale basins</h2><p id="basin-sub"></p></div>
+        <div class="seg small" role="group" aria-label="Basin measure" id="basin-mode">
+          <button data-bm="prod" aria-pressed="true">Output</button><button data-bm="rigs" aria-pressed="false">Rigs</button>
+        </div>
+      </div>
+      <svg class="chart" id="basins" viewBox="0 0 560 300"></svg>
+      <div class="keys" id="basin-keys"></div>
+    </section>
+
+    <section class="panel">
+      <div class="sec-head">
+        <div><h2 class="hd">Trade flows</h2><p id="exp-sub"></p></div>
+        <div class="chart-tools">
+          <div class="seg small" role="group" aria-label="Direction" id="exp-dir">
+            <button data-dir="exp" aria-pressed="true">Exports</button><button data-dir="imp" aria-pressed="false">Imports</button>
+          </div>
+          <div class="seg small" role="group" aria-label="Product" id="exp-kind"></div>
+        </div>
+      </div>
+      <svg id="worldmap" class="chart" viewBox="0 0 560 300" role="img" aria-label="Trade flows between the US Gulf Coast and world regions"></svg>
+      <div class="toplist" id="explist"></div>
+    </section>
+  </div>
+
+  <footer>
+    <div><b>Sources.</b> US Energy Information Administration, <a href="https://www.eia.gov/opendata/">API v2</a>: crude field production, natural gas marketed production, petroleum and gas exports and imports, Short-Term Energy Outlook shale regions, WTI and Henry Hub spot prices. <span id="retrieved"></span></div>
+    <ul>
+      <li>Federal offshore Gulf of America and Pacific are separate tiles; state values cover state lands and waters only.</li>
+      <li>Monthly state gas data starts 1989 for most states, later for a few; earlier months show as no data. EIA withholds some small values.</li>
+      <li>Shale regions come from STEO history (Dec 2008 onward, rigs from 2013); "Rest of Lower 48" excludes the Gulf.</li>
+      <li>Exports by destination start 1993 for crude, 2004 for products. LNG before 2016 is almost all Alaska to Japan. Imports by origin skip EIA's group totals (OPEC, Persian Gulf) so regions aren't double counted. Arcs meet the US at the Gulf Coast for simplicity.</li>
+    </ul>
+  </footer>
+</div>
+<div id="tip"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
