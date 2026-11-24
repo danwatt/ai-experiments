@@ -1,0 +1,219 @@
+{
+  "voice": "Heart",
+  "tracks": {
+    "real": "Today's dollars",
+    "nominal": "Plain dollars"
+  },
+  "scenes": [
+    {
+      "id": "promise",
+      "title": "The 8% promise",
+      "lines": [
+        "You've saved a million dollars, and it's time to retire. How much can you spend each year?",
+        "Dave Ramsey's answer is about eight percent. On a million dollars, that's eighty thousand a year.",
+        "His reasoning: good growth stock funds average ten to twelve percent over the long run, so your investments keep replacing what you take, and the extra covers inflation.",
+        "Most retirement research lands closer to four percent. That's forty thousand a year."
+      ]
+    },
+    {
+      "id": "ramsey-world",
+      "title": "In Ramsey's world",
+      "lines": [
+        "Here's Ramsey's world. Stocks return twelve percent every single year, and prices rise four percent.",
+        "You take eighty thousand the first year, and give yourself a four percent raise every year after that.",
+        "Thirty years later the balance has grown to three point two million, which buys what one million did on day one. It never runs out.",
+        "But real markets don't move at one steady speed, and the order of the good and bad years matters. So from here, choose how to count. Plain dollars, the same eighty thousand dollar check every year. Or today's dollars, eighty thousand dollars of buying power every year, raised with inflation."
+      ]
+    },
+    {
+      "id": "real-intro",
+      "track": "real",
+      "title": "Counting in today's dollars",
+      "lines": [
+        "In today's dollars, the nest egg is a million dollars at November 2026 prices, and you spend eighty thousand dollars of that buying power every year, no matter what the market does.",
+        "That's the lifestyle Ramsey's math promises: steady, and never running out."
+      ]
+    },
+    {
+      "id": "retire-2000",
+      "track": "real",
+      "title": "Retire in January 2000",
+      "lines": [
+        "Say you retired in January 2000, at the top of the dot-com boom.",
+        "The market fell three years in a row. Your eighty thousand still came out every year, from a shrinking pile.",
+        "Then came 2008. By 2009, nine years in, the money was gone."
+      ]
+    },
+    {
+      "id": "backwards",
+      "track": "real",
+      "title": "Same years, backwards",
+      "lines": [
+        "Here's the strange part. From 2000 through 2025, stocks averaged more than five percent a year after inflation.",
+        "Take those same twenty-six years and play them in reverse order, with the good years first.",
+        "Same returns, same average. This time you'd still have nearly a million dollars today.",
+        "The order of the years did all the damage. That's sequence of returns risk."
+      ]
+    },
+    {
+      "id": "every",
+      "track": "real",
+      "title": "Every retirement since 1945",
+      "lines": [
+        "Here's every retirement that started from 1945 on, each taking eighty thousand of today's dollars a year from a million.",
+        "Of the fifty-two that have had a full thirty years, only thirty-one made it. That's about six in ten.",
+        "Ten more that started from 1997 on have already run out, including the retirees of 2000 and 2007.",
+        "At four percent, forty thousand a year, fifty of the fifty-two made it."
+      ]
+    },
+    {
+      "id": "inheritance",
+      "track": "real",
+      "title": "An inheritance for the grandchildren?",
+      "lines": [
+        "Ramsey often quotes Proverbs thirteen twenty-two: a good man leaves an inheritance to his children's children.",
+        "So what was left after thirty years? Here's what each retirement that began from 1945 to 1996 left behind, in today's dollars.",
+        "Twenty-one of the fifty-two left nothing at all. Seven more left less than the million they started with.",
+        "At four percent, only two ran dry, and the typical retiree left more than four million dollars of today's money."
+      ]
+    },
+    {
+      "id": "percent",
+      "track": "real",
+      "title": "Another way: 8% of what's left",
+      "lines": [
+        "There's another way to read eight percent: take eight percent of whatever is in the account at the start of each year.",
+        "That can never run out. But now your paycheck rises and falls with the market.",
+        "Here's how it works. In January 2000 you have a million dollars and take out eighty thousand. The other nine hundred and twenty thousand stays invested. Stocks lose nine percent that year, and prices rise about three percent. So you start 2001 with about eight hundred and nine thousand in today's dollars, and eight percent of that is about sixty-five thousand.",
+        "Keep going, and after the 2008 crash, the 2009 check was twenty-two thousand.",
+        "From then on it never topped thirty-eight thousand. Planned for eighty thousand, living on about thirty."
+      ]
+    },
+    {
+      "id": "percent-every",
+      "track": "real",
+      "title": "Every retiree's leanest year",
+      "lines": [
+        "Here's the leanest year for every retirement that began from 1945 to 1996, taking eight percent of what's left.",
+        "The typical retiree's leanest year paid about thirty-eight thousand dollars, less than half the eighty they planned on.",
+        "Twenty-nine of the fifty-two had at least one year below forty thousand. The worst, retiring in 1962, got by one year on eighteen thousand.",
+        "The money lasts, but the lifestyle doesn't."
+      ]
+    },
+    {
+      "id": "why",
+      "track": "real",
+      "title": "Why the first years matter",
+      "lines": [
+        "Why does the order matter so much? Because every withdrawal takes a bigger bite out of a smaller pile.",
+        "For the 2000 retiree, the first year's eighty thousand was about nine percent of the balance. By 2002 it was seventeen percent. By 2006, a quarter of what was left.",
+        "Money spent after a crash isn't there for the recovery."
+      ]
+    },
+    {
+      "id": "takeaway",
+      "track": "real",
+      "title": "What history says",
+      "lines": [
+        "Ramsey's eight percent works when the early years are kind. In today's dollars, since 1945, it failed about four times in ten.",
+        "Four percent isn't exciting, but it survived almost every start date on record.",
+        "The long-run average doesn't pay your bills. The order of the years decides."
+      ]
+    },
+    {
+      "id": "nominal-intro",
+      "track": "nominal",
+      "title": "Counting in plain dollars",
+      "lines": [
+        "In plain dollars, you take the same eighty thousand dollar check every year, and every balance is what the statement said.",
+        "No raises. That's a gentler test for the portfolio, but prices still rise, so each check buys a little less."
+      ]
+    },
+    {
+      "id": "retire-2000-nominal",
+      "track": "nominal",
+      "title": "Retire in January 2000",
+      "lines": [
+        "Say you retired in January 2000, at the top of the dot-com boom.",
+        "The market fell three years in a row. Your eighty thousand still came out every year, from a shrinking pile.",
+        "Then came 2008. By 2010, eleven years in, the money was gone."
+      ]
+    },
+    {
+      "id": "backwards-nominal",
+      "track": "nominal",
+      "title": "Same years, backwards",
+      "lines": [
+        "Here's the strange part. From 2000 through 2025, stocks averaged eight percent a year. Exactly Ramsey's number.",
+        "Take those same twenty-six years and play them in reverse order, with the good years first.",
+        "Same returns, same average. This time you'd have three point two million dollars today.",
+        "The order of the years did all the damage. That's sequence of returns risk."
+      ]
+    },
+    {
+      "id": "every-nominal",
+      "track": "nominal",
+      "title": "Every retirement since 1945",
+      "lines": [
+        "Here's every retirement that started from 1945 on, each taking eighty thousand a year from a million.",
+        "Of the fifty-two that have had a full thirty years, forty-eight made it. Flat checks are much easier on a portfolio.",
+        "But five more that started from 1998 to 2002 have already run out.",
+        "And the four full-length failures all retired in the mid to late 1960s, just before a decade of inflation and flat markets."
+      ]
+    },
+    {
+      "id": "inheritance-nominal",
+      "track": "nominal",
+      "title": "An inheritance for the grandchildren?",
+      "lines": [
+        "Ramsey often quotes Proverbs thirteen twenty-two: a good man leaves an inheritance to his children's children.",
+        "So what was left after thirty years? Here's what each retirement that began from 1945 to 1996 left behind, in plain dollars.",
+        "On paper, most left millions. But four left nothing, and once you account for thirty years of rising prices, fifteen of the fifty-two left less than the buying power of the million they started with.",
+        "And part of what was left came from the flat check itself. As prices rose, the family lived on less and less."
+      ]
+    },
+    {
+      "id": "percent-nominal",
+      "track": "nominal",
+      "title": "Another way: 8% of what's left",
+      "lines": [
+        "There's another way to read eight percent: take eight percent of whatever is in the account at the start of each year.",
+        "That can never run out. But now your paycheck rises and falls with the market.",
+        "Here's how it works. In January 2000 you have a million dollars and take out eighty thousand. The other nine hundred and twenty thousand stays invested, and stocks lose nine percent that year. So you start 2001 with about eight hundred and thirty-seven thousand, and eight percent of that is about sixty-seven thousand.",
+        "Keep going, and after the 2008 crash, the 2009 check was twenty-seven thousand.",
+        "By 2025 it had only climbed back to sixty-two thousand, in dollars that bought far less."
+      ]
+    },
+    {
+      "id": "percent-every-nominal",
+      "track": "nominal",
+      "title": "Every retiree's leanest year",
+      "lines": [
+        "Here's the leanest year for every retirement that began from 1945 to 1996, taking eight percent of what's left, in plain dollars.",
+        "The typical retiree's leanest check was about sixty-three thousand dollars.",
+        "Twenty-four of the fifty-two had at least one year below sixty thousand, and three dipped below forty. And those are plain dollars, while prices kept rising.",
+        "The money lasts, but the paycheck swings with the market."
+      ]
+    },
+    {
+      "id": "hidden-cost",
+      "track": "nominal",
+      "title": "The hidden cost of a flat check",
+      "lines": [
+        "Flat checks have a hidden cost. Prices keep rising.",
+        "Someone who retired in 1982 still got eighty thousand dollars in 2011, their thirtieth year. But it bought what about thirty-three thousand did when they started.",
+        "Across every thirty-year retirement since 1945, that last check bought between seventeen and forty-one thousand of retirement-day dollars."
+      ]
+    },
+    {
+      "id": "takeaway-nominal",
+      "track": "nominal",
+      "title": "What history says",
+      "lines": [
+        "In plain dollars, eight percent usually survived on paper. It failed for the people who retired right before a bad decade.",
+        "And even when it survived, inflation cut the paycheck's buying power roughly in half, or worse.",
+        "Plain dollars or today's dollars, the long-run average doesn't pay your bills. The order of the years decides."
+      ]
+    }
+  ]
+}

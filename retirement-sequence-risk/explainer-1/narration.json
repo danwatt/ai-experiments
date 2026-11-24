@@ -1,0 +1,134 @@
+{
+  "voice": "Heart",
+  "scenes": [
+    {
+      "id": "promise",
+      "title": "The 8% promise",
+      "lines": [
+        "Dave Ramsey tells retirees they can spend eight percent of their savings every year.",
+        "His math is simple. Stocks average twelve percent. Inflation takes four. That leaves eight.",
+        "Most retirement research lands closer to four percent, half the income.",
+        "So let's test both rules against a hundred and fifty years of real stock market history."
+      ]
+    },
+    {
+      "id": "ramsey-world",
+      "title": "Ramsey's world",
+      "lines": [
+        "First, the world Ramsey describes. The market returns exactly twelve percent, every single year.",
+        "Retire with a million dollars, take eighty thousand, and raise it with inflation each year.",
+        "Even here the balance slowly leaks. Twelve percent growth with four percent inflation is really seven point seven percent, not eight.",
+        "But it's close. The money would last forty-four years. The trouble is that real markets don't look like this."
+      ]
+    },
+    {
+      "id": "real-years",
+      "title": "Real years aren't average",
+      "lines": [
+        "Here is every year of the S&P 500 since 1872, with dividends.",
+        "Only twelve of those hundred and fifty-four years landed within two points of twelve percent.",
+        "Forty-one of them lost money. Three lost a third or more.",
+        "An average is something markets drift toward over decades. It's not something they pay you each year."
+      ],
+      "say": { "S&P 500": "S and P five hundred" }
+    },
+    {
+      "id": "average",
+      "title": "The average isn't what you earn",
+      "lines": [
+        "Averages also flatter. Say a hundred dollars gains fifty percent, then loses fifty percent.",
+        "The average of those two years is zero. But you're left with seventy-five dollars.",
+        "Since 1928, the average year returned about twelve percent. That's where Ramsey's number comes from.",
+        "Compounded, money actually grew ten percent a year. After inflation, under seven."
+      ]
+    },
+    {
+      "id": "retiree-1966",
+      "title": "One retiree: 1966",
+      "lines": [
+        "Now let's follow one person. They saved ten thousand dollars a year, in today's money, from 1936 to 1965.",
+        "They retired in 1966 with about two million dollars, and took eight percent: a hundred and fifty-nine thousand a year.",
+        "Then came the worst stretch they could have drawn. Inflation, a flat market, and the crash of 1973 and 74.",
+        "By 1977, eleven years in, the money was gone."
+      ]
+    },
+    {
+      "id": "reverse",
+      "title": "Same returns, backwards",
+      "lines": [
+        "Here's the strange part. Take the exact same thirty years of returns and play them in reverse order.",
+        "Same years. Same average. Same compound growth, about five percent a year after inflation.",
+        "This time the good years come first, and our retiree finishes with one point six million dollars.",
+        "The only thing that changed was the order. That's sequence of returns risk."
+      ]
+    },
+    {
+      "id": "everyone",
+      "title": "Everyone, every year",
+      "lines": [
+        "So run the same plan for everyone who retired in every year from 1902 to 1996.",
+        "Blue lines made it thirty years. Red lines ran dry.",
+        "At eight percent, forty-nine of ninety-five ran out of money.",
+        "The worst, retiring in 1929, was broke in under nine years. And ten people who retired between 1997 and 2007 have already run out."
+      ]
+    },
+    {
+      "id": "four",
+      "title": "At four percent",
+      "lines": [
+        "Here's each retirement as a bar, showing how many years the money lasted.",
+        "Now drop to four percent, with half the money in bonds, the kind of mix Bill Bengen studied when he found the four percent rule.",
+        "Ninety-one of ninety-five made it. The four that didn't all retired in the late sixties, and lasted at least twenty-five years.",
+        "With all stocks, success slides fast past four and a half percent, and eight percent is a coin flip. With half in bonds, eight percent fails four times in five."
+      ]
+    },
+    {
+      "id": "decade",
+      "title": "The first decade decides",
+      "lines": [
+        "Why did some fail? Not because their thirty-year average was bad.",
+        "The 1935 retiree's money grew nine and a half percent a year and still ran out. The 1955 retiree made it on four and a half.",
+        "What matters is the first ten years, while the balance is biggest and every withdrawal bites hardest.",
+        "No one whose first decade averaged under three and a half percent survived. No one above eleven ran out."
+      ]
+    },
+    {
+      "id": "valuation",
+      "title": "Expensive markets, smaller paychecks",
+      "lines": [
+        "The best warning sign has been how expensive stocks were on the day you retired.",
+        "This is Shiller's CAPE ratio: stock prices divided by ten years of earnings. Up is the highest spending rate each retirement could have sustained.",
+        "Every retirement that could support eight percent began with a CAPE of twenty-one and a half or lower.",
+        "As of November 2026, it's thirty-nine. Only 1999 and 2000 started higher."
+      ],
+      "say": { "CAPE": "cape" }
+    },
+    {
+      "id": "fees",
+      "title": "Fees come first",
+      "lines": [
+        "Ramsey also steers people to actively managed funds, often sold with a front-end sales charge.",
+        "Add a typical charge on each deposit, plus about two-thirds of a percent a year in fund expenses.",
+        "At eight percent, failures climb from forty-nine to fifty-seven out of ninety-five."
+      ]
+    },
+    {
+      "id": "flex",
+      "title": "Flexible spending",
+      "lines": [
+        "You can make running out impossible. Just spend eight percent of whatever is left each year.",
+        "But your paycheck moves with the market. Each line is one retiree's income, compared with their first year.",
+        "In the typical retirement, the leanest year paid less than half of what they started with."
+      ]
+    },
+    {
+      "id": "close",
+      "title": "Plan for the sequence",
+      "lines": [
+        "Twelve percent is an average. A retirement doesn't get the average. It gets one sequence of years, in one order.",
+        "Four percent has survived almost every sequence on record. Eight percent survived about half.",
+        "Try your own numbers in the simulator."
+      ]
+    }
+  ]
+}

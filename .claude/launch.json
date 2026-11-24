@@ -330,6 +330,18 @@
         "games/2048-opus-5.2-high-all-out"
       ],
       "port": 8812
+    },
+    {
+      "name": "retirement-sequence-risk",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8835",
+        "-d",
+        "retirement-sequence-risk"
+      ],
+      "port": 8835
     }
   ]
 }

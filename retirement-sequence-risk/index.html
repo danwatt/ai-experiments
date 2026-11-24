@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>8% or 4%? Saving and spending through every year since 1872</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="viz-root">
+  <header class="intro">
+    <p class="kicker">Sequence of returns · S&amp;P 500 history</p>
+    <h1>8% or 4%? Saving and spending through every year since 1872</h1>
+    <p class="lede">Dave Ramsey says a retiree can take 8% a year: stocks average 12%, inflation takes 4%, and 8% is left to spend. The safe-withdrawal research says about 4%. This page runs both rules through real history. Each line is one person who saved for a set number of years, retired, and then drew a fixed, inflation-adjusted income from what they had. Some ran out of money and some did not, and the difference is mostly the order the returns arrived in.</p>
+  </header>
+
+  <section class="card twelve" aria-labelledby="h-twelve">
+    <h2 id="h-twelve">Where "12%" comes from</h2>
+    <p class="note" id="twelve-note"></p>
+    <div class="tiles" id="twelve-tiles"></div>
+  </section>
+
+  <section class="controls card" aria-label="Simulation settings">
+    <div class="presets" role="group" aria-label="Presets">
+      <span class="ctl-label">Presets</span>
+      <button data-preset="ramsey">Ramsey: 8%, all stocks</button>
+      <button data-preset="practiced" title="8%, all stocks, a 5.75% front-end sales load with breakpoints and 0.65% yearly expenses">Ramsey with A-share fees</button>
+      <button data-preset="bengen">Bengen: 4%, 50/50</button>
+      <button data-preset="four100">4%, all stocks</button>
+    </div>
+    <div class="grid">
+      <label class="ctl"><span class="ctl-label">First-year withdrawal <output id="o-wr"></output></span>
+        <input type="range" id="wr" min="2" max="10" step="0.25"><small>of the balance on retirement day, then raised with inflation each year</small></label>
+      <label class="ctl"><span class="ctl-label">Stocks <output id="o-stocks"></output></span>
+        <input type="range" id="stocks" min="0" max="100" step="10"><small>the rest in 10-year Treasuries, rebalanced yearly</small></label>
+      <label class="ctl"><span class="ctl-label">Fund fees <output id="o-fee"></output></span>
+        <input type="range" id="fee" min="0" max="2" step="0.05"><small>expense ratio, taken from returns every year</small></label>
+      <label class="ctl"><span class="ctl-label">Sales load on deposits</span>
+        <select id="load"><option value="0">None (index funds)</option><option value="1">5.75%, with breakpoints</option><option value="2">5.75% flat</option></select>
+        <small>front-end load on A-share funds; breakpoints shrink it as the account grows (5.75% under $25K, 0% at $1M)</small></label>
+      <label class="ctl"><span class="ctl-label">Spending rule</span>
+        <select id="rule"><option value="0">Fixed, raised with inflation</option><option value="1">Skip raise after a losing year</option><option value="2">Guardrails (Guyton-Klinger)</option><option value="3">Same % of balance each year</option></select>
+        <small>how the income changes after the first year</small></label>
+      <label class="ctl"><span class="ctl-label">Years saving <output id="o-save"></output></span>
+        <input type="range" id="save" min="0" max="45" step="1"><small id="save-hint"></small></label>
+      <label class="ctl" id="ctl-contrib"><span class="ctl-label">Saved per year <output id="o-contrib"></output></span>
+        <input type="range" id="contrib" min="1000" max="40000" step="1000"><small>in today's dollars, raised with inflation</small></label>
+      <label class="ctl"><span class="ctl-label">Years in retirement <output id="o-ret"></output></span>
+        <input type="range" id="ret" min="10" max="45" step="1"><small>the money has to last this long</small></label>
+    </div>
+    <div class="row">
+      <span class="ctl-label">History</span>
+      <div class="seg" role="radiogroup" aria-label="History start">
+        <button role="radio" data-from="1872">1872–2025</button>
+        <button role="radio" data-from="1928">1928–2025</button>
+      </div>
+      <small class="muted">1872–1927 from Robert Shiller; 1928 on from Aswath Damodaran (NYU Stern).</small>
+    </div>
+  </section>
+
+  <section class="card" aria-labelledby="h-summary">
+    <h2 id="h-summary" class="sr-only">Summary</h2>
+    <div class="tiles" id="summary"></div>
+    <p class="verdict" id="verdict"></p>
+  </section>
+
+  <section class="card" aria-labelledby="h-paths">
+    <div class="card-head">
+      <h2 id="h-paths">Every saver, from first deposit to last withdrawal</h2>
+      <div class="legend" id="legend-paths"></div>
+    </div>
+    <p class="note">Balance in today's dollars. Hover a line to see who it was; click to pin it below.</p>
+    <div class="chart" id="paths"></div>
+  </section>
+
+  <section class="card" aria-labelledby="h-bars">
+    <div class="card-head">
+      <h2 id="h-bars">How long the money lasted, by year of retirement</h2>
+      <div class="seg small" role="radiogroup" aria-label="Bar measure">
+        <button role="radio" data-barmode="lasted">Years lasted</button>
+        <button role="radio" data-barmode="income">Leanest year's income</button>
+      </div>
+    </div>
+    <div class="legend" id="legend-bars"></div>
+    <p class="note" id="bars-note"></p>
+    <div class="chart" id="bars"></div>
+  </section>
+
+  <section class="card detail" aria-labelledby="h-detail">
+    <div class="card-head">
+      <h2 id="h-detail"></h2>
+      <div class="seg small" id="cohort-nav">
+        <button data-step="-1" aria-label="Previous retirement year">‹ Earlier</button>
+        <button data-step="1" aria-label="Next retirement year">Later ›</button>
+      </div>
+    </div>
+    <div class="tiles" id="detail-tiles"></div>
+    <div class="card-head sub">
+      <h3>Same returns, opposite order</h3>
+      <div class="legend" id="legend-detail"></div>
+    </div>
+    <p class="note" id="reverse-note"></p>
+    <div class="chart" id="detail-balance"></div>
+    <h3>Income each year, in today's dollars</h3>
+    <div class="chart" id="detail-income"></div>
+    <h3>Portfolio return each year of retirement, after fees and inflation</h3>
+    <div class="chart" id="detail-returns"></div>
+  </section>
+
+  <section class="card" aria-labelledby="h-scatter">
+    <div class="card-head">
+      <h2 id="h-scatter">The first decade decides it</h2>
+      <div class="legend" id="legend-scatter"></div>
+    </div>
+    <p class="note" id="scatter-note"></p>
+    <div class="chart" id="scatter"></div>
+  </section>
+
+  <section class="card" aria-labelledby="h-cape">
+    <div class="card-head">
+      <h2 id="h-cape">Expensive markets, smaller paychecks</h2>
+      <div class="legend" id="legend-cape"></div>
+    </div>
+    <p class="note" id="cape-note"></p>
+    <div class="chart" id="cape"></div>
+  </section>
+
+  <section class="card" aria-labelledby="h-sweep">
+    <div class="card-head">
+      <h2 id="h-sweep">Success rate at every withdrawal rate</h2>
+      <div class="legend" id="legend-sweep"></div>
+    </div>
+    <p class="note" id="sweep-note"></p>
+    <div class="chart" id="sweep"></div>
+  </section>
+
+  <section class="card" aria-labelledby="h-table">
+    <details>
+      <summary><h2 id="h-table">Every cohort as a table</h2></summary>
+      <div class="table-wrap"><table id="table"></table></div>
+    </details>
+  </section>
+
+  <section class="card method" aria-labelledby="h-method">
+    <h2 id="h-method">How it works</h2>
+    <ul>
+      <li><b>Returns.</b> Calendar-year total returns with dividends reinvested. S&amp;P 500, 10-year Treasury and CPI inflation for 1928–2025 come from <a href="https://pages.stern.nyu.edu/~adamodar/New_Home_Page/datafile/histret.html">Damodaran's historical returns</a>. 1872–1927 uses <a href="https://shillerdata.com/">Shiller's monthly data</a> (S&amp;P Composite total return, GS10 bond return, CPI) taken December to December. Shiller's prices are monthly averages, so his early years are a little smoother than true year-end figures.</li>
+      <li><b>Everything is in today's dollars.</b> Each year's return is converted to a real return (after inflation), so a flat line means steady purchasing power.</li>
+      <li><b>Saving.</b> The yearly deposit lands at the end of each year and keeps pace with inflation.</li>
+      <li><b>Spending.</b> On retirement day the withdrawal rate sets a dollar income: 8% of $1M is $80,000. That income is raised with inflation every year no matter what the market did, the rule both Ramsey and the 4% research describe. Withdrawals come out at the end of each year, the timing under which Ramsey's arithmetic (12% − 4% = 8%) holds exactly. Taking them at the start of the year would make every result a little worse.</li>
+      <li><b>Spending rules.</b> <i>Fixed</i> is the rule above. <i>Skip raise</i> holds income flat (losing ground to inflation) in any year the portfolio lost money. <i>Guardrails</i> follows Guyton and Klinger: the skip rule, plus a 10% pay cut whenever the current withdrawal is more than 20% above the starting rate (not in the last 15 years), and a 10% raise when it is more than 20% below. <i>Same %</i> withdraws the rate times whatever the balance is, so it never runs out but the income swings with the market. "Leanest year" is the smallest yearly income as a share of the first year's.</li>
+      <li><b>Fees "as practiced".</b> Ramsey sends listeners to SmartVestor Pros and has defended paying front-end sales loads; A-share funds commonly charge up to 5.75% of each deposit, falling at breakpoints as the account grows (5.00% from $25K, 4.50% from $50K, 3.50% from $100K, 2.50% from $250K, 2.00% from $500K, 1.50% from $750K, none from $1M; here measured in today's dollars against the account balance). The preset pairs that with a 0.65% expense ratio, about the average for actively managed stock funds. The load comes off each deposit before it is invested.</li>
+      <li><b>Valuation.</b> CAPE is Shiller's cyclically adjusted P/E: the S&amp;P price divided by ten years of inflation-adjusted earnings, taken in January of the retirement year (from 1881). The highest sustainable rate (SAFEMAX) is the largest fixed, inflation-adjusted withdrawal that would have left exactly $0 at the end, at the chosen stock mix and fees.</li>
+      <li><b>Success</b> means the balance never hit zero during the retirement years. Retirements that haven't finished yet are shown in gray and left out of the success rate, unless they've already run out.</li>
+      <li><b>Not modeled:</b> taxes, Social Security, spending cuts in bad years, international stocks. Real portfolios with fees higher than an index fund do worse than the 0% setting.</li>
+    </ul>
+    <p class="muted">Data: <a href="build-data.py">build-data.py</a> downloads both spreadsheets and writes <code>data.js</code>.</p>
+  </section>
+</main>
+<div class="tip" id="tip" role="tooltip" hidden></div>
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

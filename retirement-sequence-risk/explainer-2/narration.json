@@ -1,0 +1,152 @@
+{
+  "voice": "Heart",
+  "tracks": {
+    "real": "Today's dollars",
+    "nominal": "Plain dollars"
+  },
+  "scenes": [
+    {
+      "id": "family",
+      "title": "Ben and Arthur",
+      "lines": [
+        "Dave Ramsey likes to tell a story about two investors, Ben and Arthur, to show the power of compound growth.",
+        "Here's a different version. Ben is the father. Arthur is his son, born when Ben was twenty-five.",
+        "Each puts two thousand dollars a year into the stock market, from age twenty-seven through sixty-five, just like Arthur in Ramsey's chart. Thirty-nine years. Same plan, same money.",
+        "The only difference is which thirty-nine years they get. Arthur starts twenty-five years after his father."
+      ]
+    },
+    {
+      "id": "steady",
+      "title": "In a twelve percent world",
+      "lines": [
+        "If the market returned twelve percent every year, it wouldn't matter when they started.",
+        "Each would retire with about one point five three million dollars, the same number Ramsey's chart gives Arthur.",
+        "But real markets don't run at one speed, and prices don't stand still. So from here, you choose. Follow the story in plain dollars, the way Ramsey's chart counts them, or in today's dollars, adjusted for inflation."
+      ]
+    },
+    {
+      "id": "real-intro",
+      "track": "real",
+      "title": "Counting in today's dollars",
+      "lines": [
+        "Today means November 2026. Each deposit keeps the buying power of two thousand dollars at November 2026 prices, and every balance is shown in those same dollars.",
+        "Ramsey's twelve percent, less four percent inflation, works out to about four hundred and seventy-six thousand."
+      ]
+    },
+    {
+      "id": "pair-1957",
+      "track": "real",
+      "title": "Ben from 1957, Arthur from 1982",
+      "lines": [
+        "Say Ben invests from 1957 through 1995. His son Arthur invests from 1982 through 2020.",
+        "In the money of the time, Ben's yearly deposit grew from about a hundred and sixty dollars in 1957 to almost nine hundred by 1995. Arthur's went from about five hundred and fifty dollars to about fifteen hundred.",
+        "Ben's money spent its middle years in the flat seventies. He retires in 1995 with three hundred and fifty-six thousand dollars.",
+        "Arthur's biggest years caught two booms, the nineties and the 2010s. He retires in 2020 with five hundred and forty-six thousand. Fifty-three percent more, from the same plan."
+      ]
+    },
+    {
+      "id": "pair-1961",
+      "track": "real",
+      "title": "Ben from 1961, Arthur from 1986",
+      "lines": [
+        "Now shift four years. Ben invests from 1961 through 1999. Arthur, from 1986 through 2024.",
+        "In the money of the time, Ben's deposits ran from about a hundred and seventy-five dollars a year in 1961 to almost a thousand in 1999. Arthur's went from about six hundred and fifty dollars to about eighteen hundred.",
+        "Ben retires at the very top of the dot-com boom, with six hundred and sixty-six thousand dollars.",
+        "Arthur's big balances had to ride out the crashes of 2000 and 2008. He retires with five hundred and one thousand. This time the father has thirty-three percent more."
+      ]
+    },
+    {
+      "id": "windows",
+      "track": "real",
+      "title": "Every 39 years since 1945",
+      "lines": [
+        "Here's every thirty-nine-year window that started between 1945 and 1987. Each bar is what the same two thousand dollars a year grew to.",
+        "The best started in 1961 and ended at the 1999 peak, with six hundred and sixty-six thousand. The worst started in 1946 and ended in 1984, with two hundred and sixty-one thousand. One year can matter too: start in 1969 and it's four hundred and forty-three thousand. Start in 1970, ending in 2008, and it's two hundred and seventy-one.",
+        "Ramsey's twelve percent math says four hundred and seventy-six thousand. Only ten of these forty-three windows got there. None fell below half, so his hedge held, but most came up short.",
+        "Pair every father with a son twenty-five years later, and the son came out ahead thirteen times out of eighteen. In eleven of those pairs, one ended with at least a quarter more than the other."
+      ]
+    },
+    {
+      "id": "why",
+      "track": "real",
+      "title": "Why the late years decide it",
+      "lines": [
+        "What decides it? Not the early years. A young saver's first deposits are small.",
+        "What matters is the market in the last fifteen or twenty years, when most of the money is invested.",
+        "Ben's biggest balances rode the boom of the eighties and nineties, and he retired at the top. Arthur's had to sit through 2008.",
+        "It's sequence of returns risk, at the end of saving instead of the start of spending."
+      ]
+    },
+    {
+      "id": "takeaway",
+      "track": "real",
+      "title": "Same plan, different decades",
+      "lines": [
+        "Both of them did everything right. They started at twenty-seven and never missed a year.",
+        "The difference wasn't discipline. It was which decades they got.",
+        "A plan built on twelve percent every year assumes every stretch of years is the same. History says otherwise."
+      ]
+    },
+    {
+      "id": "nominal-intro",
+      "track": "nominal",
+      "title": "Counting in plain dollars",
+      "lines": [
+        "In plain dollars, each of them deposits exactly two thousand dollars a year, and every balance is what the statement would have said.",
+        "Ramsey's target is the one from his chart: about one point five three million."
+      ]
+    },
+    {
+      "id": "pair-1957-nominal",
+      "track": "nominal",
+      "title": "Ben from 1957, Arthur from 1982",
+      "lines": [
+        "Say Ben invests from 1957 through 1995. His son Arthur invests from 1982 through 2020.",
+        "Ben retires in 1995 with one point three million dollars.",
+        "Arthur retires in 2020 with one point one four million. On paper they're close, and neither reached Ramsey's one point five three."
+      ]
+    },
+    {
+      "id": "pair-1961-nominal",
+      "track": "nominal",
+      "title": "Ben from 1961, Arthur from 1986",
+      "lines": [
+        "Now shift four years. Ben invests from 1961 through 1999. Arthur, from 1986 through 2024.",
+        "Ben retires at the top of the dot-com boom with two point three million dollars, well past Ramsey's number.",
+        "Arthur's big balances rode out the crashes of 2000 and 2008. He retires with one point oh eight million. Ben has more than twice as much."
+      ]
+    },
+    {
+      "id": "windows-nominal",
+      "track": "nominal",
+      "title": "Every 39 years since 1945",
+      "lines": [
+        "Here's every thirty-nine-year window that started between 1945 and 1987, in plain dollars.",
+        "The best started in 1961 and ended at the 1999 peak, with two point three million. The worst started in 1970 and ended in 2008, with eight hundred and twenty-seven thousand. Start one year earlier, in 1969, and it's one point four million.",
+        "Ramsey's chart says one point five three million. Only five of these forty-three windows got there. The worst still reached fifty-four percent of it, so Ramsey's even-if-I'm-half-wrong hedge held.",
+        "Pair every father with a son twenty-five years later, and in plain dollars the father came out ahead sixteen times out of eighteen."
+      ]
+    },
+    {
+      "id": "why-nominal",
+      "track": "nominal",
+      "title": "Why the father usually wins on paper",
+      "lines": [
+        "Why does the father usually win in plain dollars? Partly the market, and partly inflation.",
+        "From 1966 to 1982, stocks returned almost seven percent a year in plain dollars. But prices also rose almost seven percent a year, so after inflation they went nowhere.",
+        "Fast-rising prices make every balance look bigger. And a dollar in 1995 bought about seventy percent more than a dollar in 2020.",
+        "Either way, the late years matter most, when most of the money is invested."
+      ]
+    },
+    {
+      "id": "takeaway-nominal",
+      "track": "nominal",
+      "title": "Same plan, different decades",
+      "lines": [
+        "Both of them did everything right. They started at twenty-seven and never missed a year.",
+        "Ramsey's chart promises one point five three million. Most of these families fell short, and which thirty-nine years they got decided by how much.",
+        "Plain dollars or today's dollars, the lesson is the same. Same plan. Different decades."
+      ]
+    }
+  ]
+}
