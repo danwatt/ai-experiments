@@ -1,12 +1,17 @@
 // Landing-page background: slow flight over an endless wireframe city grid.
+// Registers itself in window.BACKDROPS; index.html starts and stops it. Colors come from the Bluebonnet tokens.
 (() => {
   const cv = document.getElementById("grid-bg");
   if (!cv) return;
   const ctx = cv.getContext("2d");
-  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const reduceMq = matchMedia("(prefers-reduced-motion: reduce)");
+  const darkMq = matchMedia("(prefers-color-scheme: dark)");
   const B = 40, S = 7, H = 85, NEAR = 1.5, FAR = 1100, COLS = 16, SPEED = 10;
-  const RGB = "94,234,212", FILL = "#101318";
-  let w, h, f, hz, dpr;
+  const rgb = hex => { const n = parseInt(hex.replace("#", ""), 16); return `${n >> 16},${n >> 8 & 255},${n & 255}`; };
+  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  let RGB, HI, FILL;
+  const colors = () => { RGB = rgb(css("--bluebonnet")); HI = rgb(css("--bluebonnet-deep")); FILL = css("--surface"); };
+  let w, h, f, hz, dpr, active = false;
 
   function resize() {
     dpr = Math.min(devicePixelRatio || 1, 1.5);
@@ -15,7 +20,8 @@
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     f = Math.max(w, h) * 0.75; hz = h * 0.3;
   }
-  addEventListener("resize", resize); resize();
+  addEventListener("resize", () => { resize(); if (active && reduceMq.matches) frame(40); }); resize(); colors();
+  darkMq.addEventListener("change", () => { colors(); if (active && reduceMq.matches) frame(40); });
 
   const hash = (i, j) => { let n = Math.imul(i, 374761393) ^ Math.imul(j, 668265263); n = Math.imul(n ^ (n >>> 13), 1274126177); return ((n ^ (n >>> 16)) >>> 0) / 4294967296; };
   const fade = dz => Math.max(0, 1 - dz / FAR) ** 1.6;
@@ -54,7 +60,7 @@
       ctx.stroke();
     }
 
-    if (!reduce) for (const s of streaks) {
+    if (!reduceMq.matches) for (const s of streaks) {
       if (s.reset || s.z - camZ > FAR) {
         const side = s.k % 2 ? 1 : -1;
         s.x = side * (B * (1 + Math.floor(Math.random() * 5)));
@@ -64,7 +70,7 @@
       const [ax, ay] = P(s.x, 0.2, s.z - 35), [bx, by] = P(s.x, 0.2, s.z);
       const sg = ctx.createLinearGradient(ax, ay, bx, by);
       const a = fade(s.z - camZ);
-      sg.addColorStop(0, `rgba(${RGB},0)`); sg.addColorStop(1, `rgba(230,255,250,${a})`);
+      sg.addColorStop(0, `rgba(${RGB},0)`); sg.addColorStop(1, `rgba(${HI},${a})`);
       ctx.strokeStyle = sg; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(bx, by); ctx.stroke();
     }
 
@@ -93,14 +99,17 @@
           ctx.fill(); ctx.stroke();
         }
         // Brighter roofline.
-        ctx.strokeStyle = `rgba(220,255,250,${0.6 * a})`;
+        ctx.strokeStyle = `rgba(${HI},${0.6 * a})`;
         ctx.beginPath(); ctx.moveTo(...ftl); ctx.lineTo(...ftr); ctx.stroke();
       }
     }
   }
 
-  if (reduce) { frame(40); addEventListener("resize", () => frame(40)); return; }
+  let raf = 0;
   const t0 = performance.now();
-  const loop = now => { frame(40 + (now - t0) / 1000); requestAnimationFrame(loop); };
-  requestAnimationFrame(loop);
+  const loop = now => { frame(40 + (now - t0) / 1000); raf = requestAnimationFrame(loop); };
+  const start = () => { active = true; cancelAnimationFrame(raf); colors(); if (reduceMq.matches) frame(40); else raf = requestAnimationFrame(loop); };
+  const stop = () => { active = false; cancelAnimationFrame(raf); };
+  reduceMq.addEventListener("change", () => active && start());
+  (window.BACKDROPS ||= {}).grid = { canvas: cv, start, stop };
 })();
