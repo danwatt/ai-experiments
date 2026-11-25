@@ -318,6 +318,18 @@
         "corn-vs-solar"
       ],
       "port": 8833
+    },
+    {
+      "name": "hex2048-allout",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8812",
+        "-d",
+        "games/2048-opus-5.2-high-all-out"
+      ],
+      "port": 8812
     }
   ]
 }
