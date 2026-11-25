@@ -58,6 +58,24 @@
     .notes h2 { margin-top: 0; font-size: 19px; line-height: 26px; }
     .notes p, .notes li { color: var(--ink-muted); font-size: 15px; line-height: 24px; }
     .notes ul { padding-left: 18px; }
+    .matrix { margin-top: var(--space-8); }
+    .matrix h2 { margin: 0 0 var(--space-1); font-size: 22px; }
+    .matrix p { color: var(--ink-muted); font-size: 15px; line-height: 24px; max-width: 80ch; margin: 0 0 var(--space-3); }
+    .matrix .bar { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: center; margin-bottom: var(--space-3); }
+    .matrix .seg { display: inline-flex; border: 1px solid var(--line-strong); border-radius: var(--radius-pill); overflow: hidden; }
+    .matrix .seg button { font: inherit; font-size: 14px; padding: 6px 14px; border: 0; background: transparent; color: var(--ink); cursor: pointer; }
+    .matrix .seg button[aria-pressed="true"] { background: var(--bluebonnet); color: var(--on-bluebonnet); }
+    .matrix .legend { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--ink-muted); }
+    .matrix .legend .ramp { width: 260px; height: 12px; border-radius: 6px; }
+    .matrix .chart { position: relative; }
+    .matrix svg { display: block; width: 100%; height: auto; }
+    .matrix svg text { fill: var(--ink-muted); font-size: 12px; font-family: inherit; }
+    .matrix svg .title { fill: var(--ink); font-size: 13px; font-weight: 600; }
+    .matrix .tip { position: absolute; pointer-events: none; background: var(--surface-raised); border: 1px solid var(--line-strong); border-radius: var(--radius-md);
+      padding: 8px 12px; font-size: 13px; line-height: 19px; box-shadow: var(--shadow-2); white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .matrix .tip[hidden] { display: none; }
+    .matrix .tip b { display: block; font-size: 14px; }
+    .matrix .tip span { color: var(--ink-muted); }
     .data { margin-top: var(--space-6); border-top: 1px solid var(--line); padding-top: var(--space-4); }
     .data summary { cursor: pointer; font-family: var(--font-display); font-weight: 600; font-size: 19px; line-height: 26px; }
     .data p, .data li { color: var(--ink-muted); font-size: 14px; line-height: 22px; max-width: 72ch; }
@@ -179,6 +197,22 @@
     </button>
   </div>
 
+  <section class="matrix" aria-labelledby="matrixTitle">
+    <h2 id="matrixTitle">Every retirement, year by year</h2>
+    <p>Each row is a retirement that started that year with $1 million in the four funds; each square is one year of it, in today's dollars. Read across a row to follow one retiree, or down a diagonal to see one calendar year hit everyone at once: 2008 runs from the first square of the 2008 row up to year 28 of the 1981 row. Hover a square for details.</p>
+    <div class="bar">
+      <div class="seg" role="group" aria-label="What the squares show">
+        <button type="button" data-matrix="pct" aria-pressed="true">Check: 8% of what's left</button>
+        <button type="button" data-matrix="fixed" aria-pressed="false">Balance: $80,000 a year</button>
+      </div>
+      <div class="legend" id="matrixLegend"></div>
+    </div>
+    <div class="chart">
+      <svg id="matrix" role="img" aria-label="Triangular matrix: retirement start year by years into retirement"></svg>
+      <div class="tip" id="matrixTip" hidden></div>
+    </div>
+  </section>
+
   <section class="notes">
     <div>
       <h2>What the animation computes</h2>
@@ -192,6 +226,7 @@
       <h2>The data</h2>
       <ul>
         <li>Calendar-year total returns at NAV, with every dividend and capital-gain distribution reinvested and fund expenses included. Through the mid-1990s they are the funds' published returns: the calendar-year results in their prospectuses and ICA's annual report, filed with the SEC, and Morningstar's annual returns for the early 1980s, which agree with those filings to within a few tenths of a point where they overlap. Yahoo Finance's price history misses many of the distributions in those years and understates the funds by 1 to 13 points a year, so it is used only from 1995–98 on, where it matches the published figures and Capital Group's 1-, 3-, 5-, 10-, 15- and 20-year returns to within 0.01%. Sales charges paid while saving are in the past; only the balance on retirement day matters here. Inflation is the CPI series used across this project.</li>
+        <li>The quote on the "8% of what's left" slide is from chapter 9 of <i>The Total Money Makeover</i>; the bold is added here for emphasis.</li>
         <li>The dotted line on the second slide marks when Ramsey's book <i>The Total Money Makeover</i>, which splits investments 25% each across growth, growth and income, aggressive growth and international funds, was published: September 2003, by Thomas Nelson (<a href="https://en.wikipedia.org/wiki/The_Total_Money_Makeover">Wikipedia</a>, <a href="https://www.bookreporter.com/reviews/the-total-money-makeover-a-proven-plan-for-financial-fitness">Bookreporter</a>).</li>
         <li>Capital World Growth and Income began in March 1993, so for 1981–1993 its quarter uses New Perspective's returns instead, a global fund from the same family. Retirements start every year from 1981 to 2025; only 1981–1996 have a full 30 years.</li>
         <li>Every year's numbers, with a link to each source, are in the <a href="#data">data table</a> at the bottom of the page.</li>
@@ -214,9 +249,10 @@
 
 <script src="../data.js"></script>
 <script src="funds.js?v=4"></script>
-<script src="narration.js?v=12"></script>
+<script src="narration.js?v=15"></script>
 <script src="../kit/explainer-kit.js?v=6"></script>
-<script src="app.js?v=33"></script>
+<script src="app.js?v=42"></script>
 <script src="table.js?v=2"></script>
+<script src="matrix.js?v=1"></script>
 </body>
 </html>

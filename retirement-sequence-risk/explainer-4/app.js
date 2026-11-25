@@ -126,6 +126,30 @@
       p.at4Out = p.at4.filter((r) => r.status === "fail").length;
     });
 
+    // The Total Money Makeover, chapter 9, on living off 8% (shown on the "8% of what's left" slide). Bold = b.
+    const TMMO_QUOTE = [
+      ["You are secure and will leave a nice inheritance when you can "], ["live off of 8 percent of your nest egg per year", "b"],
+      [". If you make 12 percent on your money average and inflation steals 4 percent, "], ["8 percent is a dream number", "b"],
+      [". If you make 12 percent and only pull out 8 percent, you "], ["grow your nest egg by 4 percent per year", "b"],
+      [". That 4 percent keeps your nest egg, and therefore your income, "], ["ahead of inflation \u2019til death do you part", "b"], [".\u201D"],
+    ];
+    const alphaZero = (fn) => { ctx.save(); ctx.globalAlpha = 0; const v = fn(); ctx.restore(); return v; };
+    // Draw runs of [text, "b"?] wrapped to width w from (x, y); returns the height used.
+    function richText(x, y, w, runs, o) {
+      const size = o.size || 20, lh = o.lineHeight || size * 1.5, toks = [];
+      runs.forEach(([s, b]) => s.split(/(\s+)/).forEach((tk) => tk && toks.push({ tk, b: !!b })));
+      let cx = 0, cy = 0;
+      toks.forEach(({ tk, b }) => {
+        font(ctx, size, b ? 700 : 400);
+        const tw = ctx.measureText(tk).width;
+        if (/^\s+$/.test(tk)) { if (cx > 0) cx += tw; return; }
+        if (cx + tw > w && cx > 0) { cx = 0; cy += lh; }
+        text(tk, x + cx, y + cy, { size, weight: b ? 700 : 400, color: b ? C.ink : C.muted });
+        cx += tw;
+      });
+      return cy + lh * 0.3;
+    }
+
     const SCENES = {};
 
     // 1. Ramsey's four funds
@@ -284,16 +308,91 @@
       alpha(bubble, () => c("RETIRED 1997–2008: ALREADY OUT", countTo(t, q(2), BUBBLE.filter((r) => r.status === "fail").length, ofN(BUBBLE.length)), C.danger));
     };
 
+    // 5. Retiring around the book: 2002 to 2005, one line each, drawn as the narrator gets to it
+    SCENES["book-years"] = function (t, q) {
+      const BOOK = 2003 + 8.5 / 12, YEARS = [2002, 2003, 2004, 2005];
+      const look = { 2002: C.danger, 2003: C.blue, 2004: C.fire, 2005: C.winecup };
+      // each line's own draw-in, and which lines the narration is on: 2003 (line 1), 2002 (line 2), 2004 and 2005 (line 3)
+      const drawIn = { 2003: q.lin(1, 0.5, 9.0), 2002: q.lin(2, 0.3, 8.0), 2004: q.lin(3, 0.3, 6.5), 2005: q.lin(3, 0.3, 6.5) };
+      const on = (y) => (t < q(1) ? true : t < q(2) ? y === 2003 : t < q(3) ? y === 2002 : t < q(3) + 9.5 ? y >= 2004 : true);
+      const settle = q.span(3, 9.5, 10.2), dim = (y) => (on(y) ? 1 : lerp(0.25, 1, settle));
+      const A = chartFrame({ x0: 200, x1: 1330, y0: 190, y1: 545, dx: [2002, 2026], dy: [0, 1.6e6], yTicks: [0, 500e3, 1e6, 1.5e6],
+        xTicks: [2002, 2005, 2010, 2015, 2020, 2025], title: `Balance, ${UNIT}; $80,000 a year`, titleGap: 30 });
+      // the 2008 crash and the book, for reference
+      // each year's return underneath, for context: the four funds' average, after inflation
+      const rA = axes({ x0: A.x0, x1: A.x1, y0: 670, y1: 840, dx: A.dx, dy: [-0.45, 0.45] }), bars = span(t, 0.4, 1.6);
+      alpha(span(t, 0.4, 1.0), () => {
+        ctx.fillStyle = rgba(C.danger, 0.08); ctx.fillRect(A.X(2008), A.y0, A.X(2009) - A.X(2008), rA.y1 - A.y0);
+        line(rA.x0, rA.Y(0), rA.x1, rA.Y(0), C.lineStrong, 1);
+        text("The four funds' average return each year, after inflation", rA.x0, 628, { size: 18, color: C.muted });
+      });
+      const retYears = []; for (let y = 2002; y <= F.last; y++) retYears.push(y);
+      barSeries(rA, retYears, { x: (y) => y, value: blendRet, clamp: [-0.45, 0.45], pad: 4, grow: bars, stagger: 6,
+        color: (y, i, v) => (v >= 0 ? C.blue : C.danger), extremes: (v) => v >= 0.2 || v <= -0.15, year: (y) => y }); // -0.15 so 2002's -17% gets a label
+      alpha(q.span(0, 2.5, 3.2), () => {
+        line(A.X(BOOK), A.y0 + 6, A.X(BOOK), A.y1, C.ink, 2, [3, 4]);
+        text("The Total Money Makeover", A.X(BOOK) + 8, A.y0 + 4, { size: 16, weight: 700 });
+        text("September 2003", A.X(BOOK) + 8, A.y0 + 22, { size: 15, color: C.muted });
+      });
+      YEARS.forEach((y0) => {
+        const r = FIXED[y0 - F.first], p = drawIn[y0], col = look[y0];
+        if (p <= 0) return;
+        const pts = r.path.map((v, k) => [k === r.path.length - 1 && r.status === "fail" ? y0 + r.lasted : y0 + k, v]);
+        alpha(dim(y0), () => {
+          lineSeries(A, pts, { progress: p, color: col, width: on(y0) && p < 1 ? 5 : 4, glow: p < 1, t });
+          if (p < 1) return;
+          // where it stands now
+          const fail = r.status === "fail", endX = fail ? A.X(y0 + r.lasted) : A.X(F.last + 1), endY = A.Y(r.end);
+          if (fail) {
+            ctx.strokeStyle = col; ctx.lineWidth = 4; ctx.lineCap = "round"; ctx.beginPath();
+            ctx.moveTo(endX - 9, endY - 9); ctx.lineTo(endX + 9, endY + 9); ctx.moveTo(endX + 9, endY - 9); ctx.lineTo(endX - 9, endY + 9); ctx.stroke();
+          }
+          const label = fail ? `${y0}: out in ${y0 + Math.ceil(r.lasted) - 1}` : `${y0}: ${money(r.end)} left`;
+          // all four in a column at the right edge, the three near zero stacked
+          const ly = { 2002: A.Y(0) + 50, 2003: endY + 6, 2004: endY - 16, 2005: A.Y(0) + 22 }[y0];
+          text(label, A.x1 + 14, ly, { size: 20, weight: 700, color: col });
+        });
+      });
+      // the cushion each had going into 2008
+      alpha(q.span(3, 1.6, 2.3) * (1 - q.span(3, 9.5, 10.2) * 0.4), () => {
+        const px = A.X(2013.4), py = A.Y(1.58e6);
+        text("END OF 2007, BEFORE THE CRASH", px, py, { size: 15, weight: 700, color: C.muted, spacing: 1 });
+        YEARS.forEach((y0, i) => {
+          const v = FIXED[y0 - F.first].path[2008 - y0];
+          text(`${y0}`, px, py + 30 + i * 26, { size: 19, weight: 700, color: look[y0] });
+          text(money(v), px + 150, py + 30 + i * 26, { size: 19, weight: 700, color: look[y0], align: "right" });
+        });
+      });
+      const ys = []; for (let y = 2002; y <= F.last; y++) ys.push(y);
+      columnHovers(A, ys, (y) => hvBox(`End of ${y}`, `${UNIT}; $80,000 a year`, [["Four funds' average, after inflation", spct(blendRet(y))],
+        ...YEARS.filter((y0) => y0 <= y).map((y0) => {
+          const r = FIXED[y0 - F.first], k = y - y0 + 1, v = r.path[k];
+          return [`Retired ${y0}`, v == null ? (r.status === "fail" ? "out" : "") : v > 0 ? dollars(v) : "out"];
+        })]), { align: "start", mark: "line", y1: rA.y1 });
+    };
+
     // 5. 8% of what's left
     SCENES.percent = function (t, q) {
       const r = PCT[2000 - F.first], y0 = 2000, n = r.checks.length;
       const idea = 1 - q.span(1, -0.2, 0.4);
       if (idea > 0) {
-        words("Take 8% of whatever is there,", 800, 400, t, 0.4, { size: 52, align: "center", a: idea, hi: ["8%"] });
-        words("every January.", 800, 470, t, 1.4, { size: 52, align: "center", a: idea, color: C.fire });
+        words("Take 8% of whatever is there,", 580, 400, t, 0.4, { size: 52, align: "center", a: idea, hi: ["8%"] });
+        words("every January.", 580, 470, t, 1.4, { size: 52, align: "center", a: idea, color: C.fire });
       }
-      const A = chartFrame({ x0: 200, x1: 1440, y0: 230, y1: 700, dx: [y0, y0 + n], dy: [0, 100e3], yTicks: [0, 25e3, 50e3, 75e3, 100e3], fade: q.span(1, 0, 0.6),
+      const A = chartFrame({ x0: 170, x1: 1000, y0: 230, y1: 700, dx: [y0, y0 + n], dy: [0, 100e3], yTicks: [0, 25e3, 50e3, 75e3, 100e3], fade: q.span(1, 0, 0.6),
         xTicks: [2000, 2005, 2010, 2015, 2020, 2025], title: `Retired January 2000: each year's check, ${UNIT}` });
+      // what the book says this plan does (not narrated)
+      alpha(q.span(0, 0.8, 1.6), () => {
+        const x = 1050, y = 196, w = 500, size = 24, lh = 36;
+        // measure first (drawn invisibly), so the card fits the text
+        const h = alphaZero(() => richText(0, 0, w - 64, TMMO_QUOTE, { size, lineHeight: lh })), H = 92 + h + 56;
+        ctx.fillStyle = C.raised; ctx.strokeStyle = C.line; ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.roundRect(x, y, w, H, 18); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = C.fire; ctx.fillRect(x, y + 18, 5, H - 36);
+        text("\u201C", x + 22, y + 66, { size: 72, weight: 700, fam: "display", color: C.fire });
+        richText(x + 34, y + 92, w - 64, TMMO_QUOTE, { size, lineHeight: lh });
+        text("Dave Ramsey, The Total Money Makeover, chapter 9", x + 34, y + 92 + h + 22, { size: 17, color: C.muted });
+      });
       alpha(q.span(1, 0, 0.6), () => { line(A.x0, A.Y(80e3), A.x1, A.Y(80e3), C.ink, 2, [8, 6]); text("The plan: $80,000", A.X(2004), A.Y(80e3) - 10, { size: 19, weight: 700 }); });
       const low = Math.min(...r.checks), lowI = r.checks.indexOf(low), spot = q.window(2, 0, 0.6, 2, 3.5, 4.2);
       const bars = barSeries(A, r.checks, {
@@ -307,9 +406,66 @@
         { fade: q.span(1, 4.5, 5.1), grow: q.span(1, 4.5, 5.0), align: "left", dx: 8, color: C.ink });
       // after 2008, the check never got back above this
       const after = Math.max(...r.checks.slice(9));
-      alpha(q.span(1, 7.5, 8.3), () => { line(A.X(2009), A.Y(after), A.x1, A.Y(after), C.fire, 2, [4, 6]); text(`after 2008: never above ${money(after)}`, A.x1, A.Y(after) - 10, { size: 19, weight: 700, align: "right", color: C.fire }); });
-      callout(A.X(y0 + lowI) + 3 + bars.w / 2, A.Y(low) - 4, A.Y(66e3), `${y0 + lowI}: ${money(low)}, the leanest year`, { fade: q.span(2, 0, 0.6), grow: q.span(2, 0, 0.5), align: "center" });
-      pill(800, 790, `Never runs out: ${money(r.end)} left in ${y0 + n - 1}`, "neutral", q.span(2, 2.0, 2.6));
+      alpha(q.span(1, 7.5, 8.3), () => { line(A.X(2009), A.Y(after), A.x1, A.Y(after), C.fire, 2, [4, 6]); text(`after 2008: never above ${money(after)}`, A.X(2009) + 4, A.Y(after) - 10, { size: 19, weight: 700, color: C.fire }); });
+      callout(A.X(y0 + lowI) + 3 + bars.w / 2, A.Y(low) - 4, A.Y(66e3), `${y0 + lowI}: ${money(low)}, the leanest year`, { fade: q.span(2, 0, 0.6), grow: q.span(2, 0, 0.5), align: "right", dx: 14 });
+      pill(585, 790, `Never runs out: ${money(r.end)} left in ${y0 + n - 1}`, "neutral", q.span(2, 2.0, 2.6));
+    };
+
+    // Ramsey's three numbers, checked retirement by retirement: a 12% return, 4% inflation, a nest egg growing 4% a year
+    const nominalBlend = (y) => T.reduce((s, t) => s + F.returns[t][fi(y)], 0) / T.length;
+    const geoMean = (f, a, b) => { let g = 1; for (let y = a; y <= b; y++) g *= 1 + f(y); return Math.pow(g, 1 / (b - a + 1)) - 1; };
+    const CLAIMS = (() => {
+      const per = STARTS.map((y0, k) => {
+        const last = Math.min(y0 + HORIZON - 1, F.last), n = last - y0 + 1, infl = geoMean((y) => H.infl[hi(y)], y0, last);
+        const realGrowth = Math.pow(PCT[k].end / START, 1 / n) - 1; // 8% of what's left, in today's dollars
+        return { y0, n, done: n === HORIZON, ret: geoMean(nominalBlend, y0, last), infl, grow: (1 + realGrowth) * (1 + infl) - 1, real: realGrowth };
+      });
+      const done = per.filter((r) => r.done), med = (f) => done.map(f).sort((x, y) => x - y)[done.length >> 1];
+      return { per, done, med, all: { ret: geoMean(nominalBlend, F.first, F.last), infl: geoMean((y) => H.infl[hi(y)], F.first, F.last) } };
+    })();
+    SCENES.claims = function (t, q) {
+      const LAST_SHOWN = 2010; // later starts have had too few years to say much
+      const rows = [
+        { key: "ret", claim: 0.12, title: "A 12% return?", sub: "four funds, yearly, per retirement", dy: [0, 0.16], ticks: [0, 0.04, 0.08, 0.12], color: C.blue,
+          stat: CLAIMS.med((r) => r.ret), hit: (r) => r.ret >= 0.12, extra: `1981–${F.last} overall: ${pct(CLAIMS.all.ret)}`, at: 1 },
+        { key: "infl", claim: 0.04, title: "4% inflation?", sub: "consumer prices, yearly, per retirement", dy: [0, 0.05], ticks: [0, 0.02, 0.04], color: C.fire,
+          stat: CLAIMS.med((r) => r.infl), hit: (r) => r.infl <= 0.04 /* a ceiling: at or under 4% means his number held */, extra: `1981–${F.last} overall: ${pct(CLAIMS.all.infl)}`, at: 2 },
+        { key: "grow", claim: 0.04, title: "Nest egg grows 4%?", sub: "taking 8% of what's left, yearly", dy: [-0.01, 0.05], ticks: [0, 0.02, 0.04], color: C.winecup,
+          stat: CLAIMS.med((r) => r.grow), hit: (r) => r.grow >= 0.04, extra: `after inflation: ${spct(CLAIMS.med((r) => r.real))} a year`, at: 3 },
+      ];
+      const shown = CLAIMS.per.filter((r) => r.y0 <= LAST_SHOWN), heads = q.span(1, 0, 0.6);
+      alpha(heads, () => {
+        text("TYPICAL FINISHED", 1240, 196, { size: 15, weight: 700, color: C.muted, align: "center", spacing: 1 });
+        text("RAMSEY'S NUMBER HELD", 1440, 196, { size: 15, weight: 700, color: C.muted, align: "center", spacing: 1 });
+      });
+      rows.forEach((R, i) => {
+        const top = 230 + i * 200, show = Math.max(q.span(0, 1.2 + i * 1.2, 1.8 + i * 1.2) * 0.35, q.span(R.at, 0, 0.6));
+        const A = axes({ x0: 450, x1: 1100, y0: top, y1: top + 140, dx: [F.first, LAST_SHOWN + 1], dy: R.dy });
+        alpha(show, () => {
+          text(R.title, 370, top + 50, { size: 28, weight: 700, fam: "display", align: "right", color: R.color });
+          text(R.sub, 370, top + 78, { size: 16, color: C.muted, align: "right" });
+          R.ticks.forEach((v) => { line(A.x0, A.Y(v), A.x1, A.Y(v), v === 0 ? C.lineStrong : C.line, 1); text(pct(v, 0), A.x0 - 10, A.Y(v) + 5, { size: 14, color: C.muted, align: "right" }); });
+          if (i === rows.length - 1) [1985, 1990, 1995, 2000, 2005, 2010].forEach((y) => text(String(y), A.X(y + 0.5), A.y1 + 24, { size: 15, color: C.muted, align: "center" }));
+        });
+        barSeries(A, shown, {
+          x: (r) => r.y0, value: (r) => r[R.key], clamp: R.dy, pad: 2, radius: 2, grow: q.lin(R.at, 0.2, 2.2), stagger: 6,
+          color: () => R.color, alpha: (r) => (r.done ? 1 : 0.45),
+          hover: (r) => hvBox(`Retired ${r.y0}`, r.done ? "30 years" : `${r.n} years so far`, [["Four funds, yearly return", pct(r.ret)], ["Inflation, yearly", pct(r.infl)],
+            ["Nest egg growth, 8% of what's left", spct(r.grow)], ["The same, after inflation", spct(r.real)]]),
+        });
+        // Ramsey's number, as a dashed line
+        alpha(q.span(R.at, 0, 0.6), () => {
+          line(A.x0, A.Y(R.claim), A.x1, A.Y(R.claim), C.ink, 2.5, [8, 6]);
+          text(`Ramsey: ${pct(R.claim, 0)}`, A.x1 - 4, A.Y(R.claim) - 8, { size: 16, weight: 700, align: "right" });
+        });
+        alpha(q.span(R.at, 2.2, 2.8), () => {
+          text(countTo(t, q.at(R.at, 2.2), R.stat, (v) => pct(v)), 1240, top + 72, { size: 40, weight: 700, fam: "display", align: "center", color: R.color });
+          text(R.extra, 1240, top + 104, { size: 16, color: C.muted, align: "center" });
+          text(`${CLAIMS.done.filter(R.hit).length} of ${CLAIMS.done.length}`, 1440, top + 72, { size: 40, weight: 700, fam: "display", align: "center", color: CLAIMS.done.some(R.hit) ? R.color : C.danger });
+          text(`finished retirements`, 1440, top + 104, { size: 16, color: C.muted, align: "center" });
+        });
+      });
+      alpha(q.span(1, 0, 0.6), () => text("Faded bars: retirements still under 30 years.", 450, 870, { size: 16, color: C.muted }));
     };
 
     // 6. Every retiree's leanest year

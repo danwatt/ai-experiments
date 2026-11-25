@@ -63,7 +63,29 @@ One track, no fork. Voiced with Kokoro (Heart) through Voicebox; about 4 minutes
 *On screen:* Spotlight on 1997–2008 · “Retired 1997–2008: already out 8 of 12”
 
 
-## 5. Another way: 8% of what's left
+## 5. Retiring around the book: 2002 to 2005
+
+> Look closer at the four retirements around the book's release, from 2002 to 2005.
+
+*On screen:* Balances for retirements starting 2002–2005, today's dollars, with the four funds' average return each year (after inflation) as bars underneath; a shaded band for 2008 (−38%) and a dotted line at September 2003 for The Total Money Makeover
+
+> Retiring in 2003, the first year gained thirty-one percent, and by 2007 the million had grown to almost one and a half. Even after 2008, it still has more than a million left.
+
+*On screen:* The 2003 line draws in: up to $1.46M by the end of 2007 · “2003: $1.14M left”
+
+> Retiring one year earlier, in 2002, the first year lost seventeen percent. The money never got back to a million, and it ran out in 2021.
+
+*On screen:* The 2002 line draws in · “2002: out in 2021”
+
+> The 2004 and 2005 retirees went into 2008 with much smaller cushions. One has nineteen thousand dollars left, and the other ran out in 2025.
+
+*On screen:* The 2004 and 2005 lines draw in · “End of 2007, before the crash”: 2002 $986K · 2003 $1.46M · 2004 $1.11M · 2005 $1.07M · “2004: $19K left” · “2005: out in 2025”
+
+
+## 6. Another way: 8% of what's left
+
+
+*On screen throughout, not narrated:* a card quoting The Total Money Makeover, chapter 9: “You are secure and will leave a nice inheritance when you can **live off of 8 percent of your nest egg per year**. If you make 12 percent on your money average and inflation steals 4 percent, **8 percent is a dream number**. If you make 12 percent and only pull out 8 percent, you **grow your nest egg by 4 percent per year**. That 4 percent keeps your nest egg, and therefore your income, **ahead of inflation ’til death do you part**.” (bold added)
 
 > Now take eight percent of whatever is there each January instead. The money can't run out, but the paycheck rises and falls with the market.
 
@@ -78,7 +100,26 @@ One track, no fork. Voiced with Kokoro (Heart) through Voicebox; about 4 minutes
 *On screen:* “2023: $30K, the leanest year” · “Never runs out: $494K left in 2025”
 
 
-## 6. Every retiree's leanest year
+## 7. Checking Ramsey's numbers
+
+> That quote rests on three numbers. Here's each one for every retirement in the four funds since 1981.
+
+*On screen:* Three rows, one per number, each a bar per start year 1981–2010 (faded: under 30 years so far), with Ramsey's number as a dashed line
+
+> First, a twelve percent return. Across all forty-five years, the four funds did average a little over twelve. But the typical thirty-year retirement got about eleven, and only three of the sixteen reached twelve.
+
+*On screen:* Row “A 12% return?”: each retirement's yearly four-fund return · typical finished 11.2% (1981–2025 overall 12.2%) · held (12% or more): 3 of 16
+
+> Second, inflation of four percent. That one held up: inflation ran lower, about three percent since 1981, and no finished retirement saw four.
+
+*On screen:* Row “4% inflation?”: yearly inflation per retirement · typical 2.6% (1981–2025 overall 3.0%) · held (at or under 4%): 16 of 16
+
+> Third, a nest egg growing four percent a year. Taking eight percent of what's left, the typical one grew about two percent, and none grew four. With inflation that low, it barely kept pace, and retirees from 1997 to 2008 fell behind.
+
+*On screen:* Row “Nest egg grows 4%?”: yearly growth taking 8% of what's left · typical 2.3%, after inflation −0.2% a year · held (4% or more): 0 of 16
+
+
+## 8. Every retiree's leanest year
 
 > Here's the leanest year for every retirement so far, taking eight percent of what's left.
 
@@ -93,7 +134,7 @@ One track, no fork. Voiced with Kokoro (Heart) through Voicebox; about 4 minutes
 *On screen:* 1999–2001 highlighted · “Retired 1999–2001: leanest so far $30K–$37K”
 
 
-## 7. Against an S&P 500 index fund
+## 9. Against an S&P 500 index fund
 
 > How do the four funds compare with an S&P 500 index fund on its own, taking the same eighty thousand a year?
 
@@ -112,7 +153,7 @@ One track, no fork. Voiced with Kokoro (Heart) through Voicebox; about 4 minutes
 *On screen:* “At 4% a year instead of 8%, neither ever ran out” · column “Checks, 4% of what's left, first $40K”: $40K to $135K · $40K to $130K
 
 
-## 8. What the four funds show
+## 10. What the four funds show
 
 > Spread across four funds, eight percent lasted for every retirement that has had thirty years, and ran out for many that started near the 2000 peak.
 

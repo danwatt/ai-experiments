@@ -95,6 +95,35 @@ window.NARRATION = {
    ]
   },
   {
+   "id": "book-years",
+   "title": "Retiring around the book: 2002 to 2005",
+   "track": null,
+   "audio": "audio/book-years.mp3?v=867b493d",
+   "duration": 44.055,
+   "cues": [
+    {
+     "start": 0.0,
+     "end": 6.45,
+     "text": "Look closer at the four retirements around the book's release, from 2002 to 2005."
+    },
+    {
+     "start": 6.77,
+     "end": 20.02,
+     "text": "Retiring in 2003, the first year gained thirty-one percent, and by 2007 the million had grown to almost one and a half. Even after 2008, it still has more than a million left."
+    },
+    {
+     "start": 20.34,
+     "end": 30.79,
+     "text": "Retiring one year earlier, in 2002, the first year lost seventeen percent. The money never got back to a million, and it ran out in 2021."
+    },
+    {
+     "start": 31.11,
+     "end": 43.735,
+     "text": "The 2004 and 2005 retirees went into 2008 with much smaller cushions. One has nineteen thousand dollars left, and the other ran out in 2025."
+    }
+   ]
+  },
+  {
    "id": "percent",
    "title": "Another way: 8% of what's left",
    "track": null,
@@ -115,6 +144,35 @@ window.NARRATION = {
      "start": 20.59,
      "end": 24.215,
      "text": "In its leanest year it paid thirty thousand dollars."
+    }
+   ]
+  },
+  {
+   "id": "claims",
+   "title": "Checking Ramsey's numbers",
+   "track": null,
+   "audio": "audio/claims.mp3?v=c17838a6",
+   "duration": 49.03,
+   "cues": [
+    {
+     "start": 0.0,
+     "end": 7.175,
+     "text": "That quote rests on three numbers. Here's each one for every retirement in the four funds since 1981."
+    },
+    {
+     "start": 7.495,
+     "end": 21.295,
+     "text": "First, a twelve percent return. Across all forty-five years, the four funds did average a little over twelve. But the typical thirty-year retirement got about eleven, and only three of the sixteen reached twelve."
+    },
+    {
+     "start": 21.615,
+     "end": 32.14,
+     "text": "Second, inflation of four percent. That one held up: inflation ran lower, about three percent since 1981, and no finished retirement saw four."
+    },
+    {
+     "start": 32.46,
+     "end": 48.71,
+     "text": "Third, a nest egg growing four percent a year. Taking eight percent of what's left, the typical one grew about two percent, and none grew four. With inflation that low, it barely kept pace, and retirees from 1997 to 2008 fell behind."
     }
    ]
   },
