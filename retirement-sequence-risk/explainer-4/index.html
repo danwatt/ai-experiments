@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ramsey's four funds: $1 million, 8% a year</title>
+  <meta name="description" content="A narrated motion explainer: $1 million split evenly across four American Funds that fit Ramsey Solutions' growth, growth and income, aggressive growth and international mix, drawn down at 8% a year in every retirement since 1981.">
+  <link rel="stylesheet" href="../../bluebonnet-design-system/dist/bluebonnet.css">
+  <style>
+    body { min-height: 100vh; }
+    .wrap { max-width: 1180px; margin: 0 auto; padding: var(--space-6) var(--space-6) var(--space-12); }
+    .back-sim { display: inline-block; margin-top: var(--space-2); font-size: 15px; font-weight: 600; color: var(--bluebonnet); text-decoration: none; }
+    .back-sim:hover { text-decoration: underline; }
+    header { display: flex; gap: var(--space-4); align-items: flex-start; justify-content: space-between; flex-wrap: wrap; }
+    header h1 { margin: 0 0 var(--space-1); }
+    header p { margin: 0; color: var(--ink-muted); }
+    .stage {
+      position: relative; margin-top: var(--space-6); width: 100%; aspect-ratio: 16 / 9;
+      background: var(--surface-sunken); border: 1px solid var(--line); border-radius: var(--radius-md); overflow: hidden;
+    }
+    .stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+    .start {
+      position: absolute; inset: 0; display: grid; place-items: center; background: transparent; border: 0; cursor: pointer;
+      color: var(--ink); font: inherit;
+    }
+    .start[hidden] { display: none; }
+    .start__inner { display: grid; justify-items: center; gap: var(--space-3); }
+    .start__disc {
+      width: 88px; height: 88px; border-radius: var(--radius-pill); background: var(--bluebonnet); color: var(--on-bluebonnet);
+      display: grid; place-items: center; box-shadow: var(--shadow-2); transition: background-color 120ms;
+    }
+    .start:hover .start__disc { background: var(--bluebonnet-deep); }
+    .start__label { font-family: var(--font-display); font-weight: 600; font-size: 19px; }
+    .start__hint { color: var(--ink-muted); font-size: 14px; }
+    .caption {
+      min-height: 52px; margin: var(--space-3) 0 0; padding: var(--space-3) var(--space-4);
+      background: var(--surface-raised); border: 1px solid var(--line); border-radius: var(--radius-md);
+      font-size: 17px; line-height: 26px; max-width: none;
+    }
+    .caption[hidden] { display: none; }
+    .controls { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: center; margin-top: var(--space-3); }
+    .controls .grow { flex: 1 1 220px; display: flex; align-items: center; gap: var(--space-3); }
+    .time { font-size: 14px; color: var(--ink-muted); white-space: nowrap; min-width: 92px; text-align: right; }
+    input[type=range] { width: 100%; accent-color: var(--bluebonnet); }
+    .scrub { position: relative; flex: 1 1 auto; display: flex; align-items: center; }
+    .scrub input { position: relative; z-index: 1; margin: 0; background: transparent; }
+    /* chapter markers: notches that show above and below the track, under the thumb */
+    .ticks { position: absolute; left: 8px; right: 8px; top: 50%; height: 0; pointer-events: none; }
+    .ticks i { position: absolute; top: -9px; width: 2px; height: 18px; margin-left: -1px; border-radius: 1px; background: var(--ink-muted); opacity: .7; }
+    .scrub-tip {
+      position: absolute; bottom: calc(100% + 10px); transform: translateX(-50%); z-index: 3; pointer-events: none; white-space: nowrap;
+      display: flex; gap: 10px; align-items: baseline; padding: 6px 12px; font-size: 14px; line-height: 20px;
+      background: var(--surface-raised); color: var(--ink); border: 1px solid var(--line-strong); border-radius: var(--radius-md); box-shadow: var(--shadow-2);
+    }
+    .scrub-tip[hidden] { display: none; }
+    .scrub-tip span { color: var(--ink-muted); font-variant-numeric: tabular-nums; }
+    .notes { margin-top: var(--space-8); display: grid; gap: var(--space-6); grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+    .notes h2 { margin-top: 0; font-size: 19px; line-height: 26px; }
+    .notes p, .notes li { color: var(--ink-muted); font-size: 15px; line-height: 24px; }
+    .notes ul { padding-left: 18px; }
+    .data { margin-top: var(--space-6); border-top: 1px solid var(--line); padding-top: var(--space-4); }
+    .data summary { cursor: pointer; font-family: var(--font-display); font-weight: 600; font-size: 19px; line-height: 26px; }
+    .data p, .data li { color: var(--ink-muted); font-size: 14px; line-height: 22px; max-width: 72ch; }
+    .data .sources { padding-left: 0; list-style: none; columns: 2 360px; column-gap: var(--space-6); }
+    .data .sources li { break-inside: avoid; margin-bottom: 4px; }
+    .data .sources b { display: inline-block; min-width: 2.4em; color: var(--ink); }
+    .table-wrap { max-height: 560px; overflow: auto; border: 1px solid var(--line); border-radius: var(--radius-md); margin-top: var(--space-3); }
+    .data table { border-collapse: collapse; width: 100%; font-size: 14px; font-variant-numeric: tabular-nums; }
+    .data th, .data td { padding: 6px 12px; text-align: right; border-bottom: 1px solid var(--line); white-space: nowrap; }
+    .data thead th { position: sticky; top: 0; background: var(--surface-raised); vertical-align: bottom; font-weight: 600; white-space: normal; min-width: 90px; }
+    .data thead th span { display: block; color: var(--ink-muted); font-weight: 400; font-size: 12px; }
+    .data tbody th { text-align: left; font-weight: 600; }
+    .data td.stand { font-style: italic; color: var(--ink-muted); }
+    .data a.src { font-size: 11px; vertical-align: super; margin-left: 3px; text-decoration: none; }
+    .icon { width: 20px; height: 20px; stroke: currentColor; stroke-width: 1.75; fill: none; stroke-linecap: round; stroke-linejoin: round; vertical-align: -4px; }
+    .bb-btn .icon { margin-right: 6px; }
+    .hover {
+      position: absolute; z-index: 3; pointer-events: none; min-width: 260px; max-width: 340px;
+      background: var(--surface-raised); color: var(--ink); border: 1px solid var(--line-strong); border-radius: var(--radius-md);
+      padding: 10px 14px; font-size: 14px; line-height: 20px; box-shadow: var(--shadow-2); font-variant-numeric: tabular-nums;
+    }
+    .hover[hidden] { display: none; }
+    .hover > b { font-size: 16px; }
+    .hover .hv-unit { display: block; color: var(--ink-muted); font-size: 12px; margin-bottom: 6px; }
+    .hover .hv-row { display: flex; justify-content: space-between; gap: 16px; }
+    .hover .hv-row b { white-space: nowrap; }
+    .hover .hv-row span { color: var(--ink-muted); }
+    .hover .hv-total { border-top: 1px solid var(--line); margin-top: 4px; padding-top: 4px; }
+    .choice { position: absolute; inset: 0; display: grid; place-items: end center; padding-bottom: 6%; background: color-mix(in srgb, var(--surface-sunken) 55%, transparent); }
+    .choice[hidden] { display: none; }
+    .choice__inner { display: grid; justify-items: center; gap: var(--space-3); }
+    .choice__q { font-family: var(--font-display); font-weight: 600; font-size: 22px; }
+    .choice__row { display: flex; gap: var(--space-4); flex-wrap: wrap; justify-content: center; }
+    .choice__btn {
+      display: grid; gap: 4px; text-align: left; max-width: 300px; padding: var(--space-3) var(--space-4); cursor: pointer;
+      background: var(--surface-raised); color: var(--ink); font: inherit; border: 2px solid var(--bluebonnet); border-radius: var(--radius-md); box-shadow: var(--shadow-2);
+    }
+    .choice__btn b { font-size: 18px; color: var(--bluebonnet); }
+    .choice__btn span { font-size: 14px; line-height: 20px; color: var(--ink-muted); }
+    .choice__btn--fire { border-color: var(--firewheel); }
+    .choice__btn--fire b { color: var(--firewheel); }
+    .choice__btn:hover { background: var(--bluebonnet-soft); }
+    .choice__timer { min-height: 20px; font-size: 14px; color: var(--ink-muted); }
+    .choice:not([hidden]) .choice__inner { animation: choice-in 0.45s ease-out; }
+    @keyframes choice-in { from { opacity: 0; transform: translateY(14px); } }
+    @media (prefers-reduced-motion: reduce) { .choice:not([hidden]) .choice__inner { animation: none; } }
+    .tracks { display: inline-flex; align-items: center; gap: 2px; }
+    .tracks__label { font-size: 14px; color: var(--ink-muted); margin-right: 4px; }
+    .tracks [aria-pressed="true"] { background: var(--bluebonnet-soft); color: var(--ink); }
+    @media (max-width: 640px) {
+      .wrap { padding: var(--space-4) var(--space-4) var(--space-12); }
+      .caption { font-size: 15px; line-height: 22px; }
+      .time { min-width: 0; }
+      .controls .grow { flex-basis: 100%; order: 3; }
+    }
+    @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+    /* the player (picture, caption, controls) shrinks to fit the window height, so on a wide but
+       short screen the caption and controls stay in view with the picture */
+    .wrap .stage, .wrap .caption, .wrap .controls { max-width: max(560px, calc((100svh - 210px) * 16 / 9)); margin-inline: auto; }
+    /* end screen: the other way of counting, or the simulator */
+    .choice__btn--link { text-decoration: none; }
+    .choice__btn--link b { color: var(--ink); }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <span class="text-label" style="color: var(--bluebonnet)">Retirement explainer · Four funds</span>
+      <h1>Ramsey's four funds: $1 million, 8% a year</h1>
+      <p id="sub">A million dollars split evenly across four American Funds that match Ramsey Solutions' four-fund mix, spent at 8% a year, in every retirement since 1981. In today's dollars. About 3½ minutes.</p>
+      <a class="back-sim" href="../">Try any year yourself in the 8% or 4% simulator <span aria-hidden="true">→</span></a>
+    </div>
+    <button class="bb-btn bb-btn--secondary bb-btn--sm" id="theme" type="button" aria-label="Switch to light theme">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><span>Light</span>
+    </button>
+  </header>
+
+  <div class="stage" id="stage">
+    <canvas id="cv" aria-label="Animated explainer. The caption below follows the narration."></canvas>
+    <div class="hover" id="hover" hidden></div>
+    <button class="start" id="start" type="button">
+      <span class="start__inner">
+        <span class="start__disc"><svg viewBox="0 0 24 24" width="36" height="36" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg></span>
+        <span class="start__label">Play explainer</span>
+        <span class="start__hint" id="startHint">Sound on. Space pauses, arrow keys skip.</span>
+      </span>
+    </button>
+    <div class="choice end" id="end" hidden>
+      <div class="choice__inner">
+        <span class="choice__q">What next?</span>
+        <div class="choice__row">
+          <button class="choice__btn" type="button" id="endOther"><b></b><span></span></button>
+          <a class="choice__btn choice__btn--link" href="../"><b>Try the simulator</b><span>Any start year, withdrawal rate, fees, or way of counting dollars</span></a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p class="caption" id="caption">&nbsp;</p>
+
+  <div class="controls">
+    <button class="bb-btn bb-btn--primary" id="play" type="button">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" id="playIcon"><path d="M7 5v14l12-7z"/></svg><span id="playLabel">Play</span>
+    </button>
+    <div class="grow">
+      <div class="scrub">
+        <div class="ticks" id="ticks" aria-hidden="true"></div>
+        <input type="range" id="scrub" min="0" max="1000" value="0" step="1" aria-label="Position">
+        <div class="scrub-tip" id="scrubTip" hidden></div>
+      </div>
+      <span class="time" id="time">0:00 / 0:00</span>
+    </div>
+    <button class="bb-btn bb-btn--quiet bb-btn--sm" id="mute" type="button" aria-pressed="false">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13" id="waves"/></svg><span id="muteLabel">Mute</span>
+    </button>
+    <button class="bb-btn bb-btn--quiet bb-btn--sm" id="cc" type="button" aria-pressed="true">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10 10.5a2 2 0 1 0 0 3M16 10.5a2 2 0 1 0 0 3"/></svg><span>Captions</span>
+    </button>
+  </div>
+
+  <section class="notes">
+    <div>
+      <h2>What the animation computes</h2>
+      <p>Each retiree starts retirement on January 1 with $1,000,000 already saved in four American Funds Class A shares, a quarter in each: The Growth Fund of America (AGTHX, growth), The Investment Company of America (AIVSX, growth and income), New Perspective Fund (ANWPX, aggressive growth) and Capital World Growth and Income Fund (CWGIX, international). Withdrawals come out of the four evenly; if one fund can't cover its share, the others make it up. Nothing is rebalanced.</p>
+      <p>Two ways to spend 8%. <b>8% of the start</b>: $80,000 at the end of every year, raised with inflation, for 30 years. <b>8% of what's left</b>: 8% of the balance every January, so it never runs out but the check moves with the market. Everything is in today's dollars (November 2026 prices).</p>
+      <p>Rebalancing back to a quarter each every year would have changed little: every finished retirement still lasts, and the same 8 of 12 from 1997–2008 run out, a few months later at most. It leaves a little more at the end and lifts the leanest 8%-of-what's-left checks by one or two thousand dollars. All four are large-company stock funds that move together (each lost 35–39% in 2008), so there's little to rebalance between. That assumes rebalancing is free, as in an IRA; in a taxable account it can trigger capital-gains tax.</p>
+      <p>The comparison holds the same million in an S&amp;P 500 index fund instead, with the same withdrawals.</p>
+      <p>The aside on the first slide: Ramsey Solutions argues that a front-end sales charge pays for an advisor's help (<a href="https://www.daveramsey.com/blog/why-dave-prefers-up-front-fees">why Dave prefers up-front fees</a>, <a href="https://www.ramseysolutions.com/retirement/do-not-be-confused-by-mutual-fund-fees">mutual fund fees</a>); each SmartVestor Pro pays Ramsey Solutions a combination of fees (<a href="https://www.ramseysolutions.com/retirement/us/ga">SmartVestor</a>); and American Funds Class A shares carry a sales charge of up to 5.75%, less on larger purchases and none from $1 million (<a href="https://www.capitalgroup.com/advisor/investments/share-class-information/share-class-pricing.html">Capital Group share-class pricing</a>).</p>
+    </div>
+    <div>
+      <h2>The data</h2>
+      <ul>
+        <li>Calendar-year total returns at NAV, with every dividend and capital-gain distribution reinvested and fund expenses included. Through the mid-1990s they are the funds' published returns: the calendar-year results in their prospectuses and ICA's annual report, filed with the SEC, and Morningstar's annual returns for the early 1980s, which agree with those filings to within a few tenths of a point where they overlap. Yahoo Finance's price history misses many of the distributions in those years and understates the funds by 1 to 13 points a year, so it is used only from 1995–98 on, where it matches the published figures and Capital Group's 1-, 3-, 5-, 10-, 15- and 20-year returns to within 0.01%. Sales charges paid while saving are in the past; only the balance on retirement day matters here. Inflation is the CPI series used across this project.</li>
+        <li>The dotted line on the second slide marks when Ramsey's book <i>The Total Money Makeover</i>, which splits investments 25% each across growth, growth and income, aggressive growth and international funds, was published: September 2003, by Thomas Nelson (<a href="https://en.wikipedia.org/wiki/The_Total_Money_Makeover">Wikipedia</a>, <a href="https://www.bookreporter.com/reviews/the-total-money-makeover-a-proven-plan-for-financial-fitness">Bookreporter</a>).</li>
+        <li>Capital World Growth and Income began in March 1993, so for 1981–1993 its quarter uses New Perspective's returns instead, a global fund from the same family. Retirements start every year from 1981 to 2025; only 1981–1996 have a full 30 years.</li>
+        <li>Every year's numbers, with a link to each source, are in the <a href="#data">data table</a> at the bottom of the page.</li>
+        <li>The S&amp;P 500 comparison uses Vanguard 500 Index Fund (VFINX), built the same way, so its fees are included too.</li>
+        <li>Rebuild with <code>python3 build-funds.py</code>, which writes this explainer's own <code>funds.js</code>.</li>
+        <li>A historical simulation, not a forecast or financial advice.</li>
+      </ul>
+    </div>
+    <div>
+      <h2>More</h2>
+      <p>Explainer 3 runs <a href="../explainer-3/">the same 8% through the S&amp;P 500 since 1945</a>, and the <a href="../">simulator</a> runs any plan through the index's full history. The voice is Kokoro (Heart) rendered by a local Voicebox server; edit <code>narration.json</code> and run <code>python3 build_voice.py</code>.</p>
+    </div>
+  </section>
+
+  <details class="data" id="data">
+    <summary>Data table: every year's returns and where each came from</summary>
+    <div id="dataTable"></div>
+  </details>
+</div>
+
+<script src="../data.js"></script>
+<script src="funds.js?v=4"></script>
+<script src="narration.js?v=12"></script>
+<script src="../kit/explainer-kit.js?v=6"></script>
+<script src="app.js?v=33"></script>
+<script src="table.js?v=2"></script>
+</body>
+</html>

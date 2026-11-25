@@ -1,0 +1,77 @@
+{
+  "voice": "Heart",
+  "scenes": [
+    {
+      "id": "four-funds",
+      "title": "Ramsey's four funds",
+      "lines": [
+        "Ramsey Solutions recommends spreading your investments across four kinds of mutual funds: growth, growth and income, aggressive growth, and international.",
+        "Say that after years of saving, you retire with a million dollars, a quarter of it in each, here in four American Funds that fit those labels."
+      ]
+    },
+    {
+      "id": "history",
+      "title": "How far back the funds go",
+      "lines": [
+        "Three of these funds go back decades. Capital World Growth and Income only started in 1993, so before 1994 its quarter uses New Perspective's returns, a global fund from the same family.",
+        "That gives a retirement starting every year from 1981 on. The first sixteen have had a full thirty years.",
+        "Ramsey's book The Total Money Makeover, which lays out this four-fund mix, came out in September 2003."
+      ]
+    },
+    {
+      "id": "retire-2000",
+      "title": "Retire in January 2000",
+      "lines": [
+        "Say you retired in January 2000 and took eighty thousand dollars a year, raised with inflation, a quarter from each fund.",
+        "The dot-com crash came first. Then in 2008 all four funds lost between thirty-five and thirty-nine percent.",
+        "The money ran out in 2013, thirteen years in. An S&P 500 index fund on its own would have run out four years sooner."
+      ]
+    },
+    {
+      "id": "every",
+      "title": "Every retirement since 1981",
+      "lines": [
+        "Here's every retirement that started from 1981 on, each taking eighty thousand of today's dollars a year.",
+        "All sixteen that have had a full thirty years made it, and every one ended with more than the million it started with.",
+        "But eight of the twelve that started from 1997 to 2008 have already run out, most within twenty years."
+      ]
+    },
+    {
+      "id": "percent",
+      "title": "Another way: 8% of what's left",
+      "lines": [
+        "Now take eight percent of whatever is there each January instead. The money can't run out, but the paycheck rises and falls with the market.",
+        "For the 2000 retiree, the first check was eighty thousand. By 2003 it was forty-six thousand, and after 2008 it never again topped forty-five.",
+        "In its leanest year it paid thirty thousand dollars."
+      ]
+    },
+    {
+      "id": "leanest",
+      "title": "Every retiree's leanest year",
+      "lines": [
+        "Here's the leanest year for every retirement so far, taking eight percent of what's left.",
+        "Among the sixteen finished retirements, the typical leanest year paid about fifty-eight thousand dollars. The worst, retiring in 1996, got by one year on forty-nine thousand.",
+        "Those who retired around 2000 have already had years between thirty and thirty-seven thousand."
+      ]
+    },
+    {
+      "id": "compare",
+      "title": "Against an S&P 500 index fund",
+      "lines": [
+        "How do the four funds compare with an S&P 500 index fund on its own, taking the same eighty thousand a year?",
+        "The S&P fund lasted in fifteen of the sixteen finished retirements. And ten of the twelve that started from 1997 to 2008 have run out, against eight for the four funds.",
+        "Taking eight percent of what's left, the four funds' typical leanest year was fifty-eight thousand dollars, against forty-four for the S&P fund.",
+        "At four percent instead of eight, neither ever ran out. And taking four percent of what's left, the typical retiree never got a check below the first one, forty thousand."
+      ]
+    },
+    {
+      "id": "takeaway",
+      "title": "What the four funds show",
+      "lines": [
+        "Spread across four funds, eight percent lasted for every retirement that has had thirty years, and ran out for many that started near the 2000 peak.",
+        "Taking eight percent of what's left kept the money going, but many years paid far less than the eighty thousand planned.",
+        "Four funds or one index fund: at eight percent, the order of the years decides."
+      ]
+    }
+  ]
+}

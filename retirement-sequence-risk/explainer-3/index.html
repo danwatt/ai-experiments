@@ -42,14 +42,18 @@
     .controls .grow { flex: 1 1 220px; display: flex; align-items: center; gap: var(--space-3); }
     .time { font-size: 14px; color: var(--ink-muted); white-space: nowrap; min-width: 92px; text-align: right; }
     input[type=range] { width: 100%; accent-color: var(--bluebonnet); }
-    .chapters { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-4); padding: 0; list-style: none; max-width: none; }
-    .chapters button {
-      font: inherit; font-size: 14px; line-height: 20px; padding: var(--space-1) var(--space-3); border-radius: var(--radius-pill);
-      border: 1px solid var(--line-strong); background: transparent; color: var(--ink); cursor: pointer; transition: background-color 120ms, color 120ms;
+    .scrub { position: relative; flex: 1 1 auto; display: flex; align-items: center; }
+    .scrub input { position: relative; z-index: 1; margin: 0; background: transparent; }
+    /* chapter markers: notches that show above and below the track, under the thumb */
+    .ticks { position: absolute; left: 8px; right: 8px; top: 50%; height: 0; pointer-events: none; }
+    .ticks i { position: absolute; top: -9px; width: 2px; height: 18px; margin-left: -1px; border-radius: 1px; background: var(--ink-muted); opacity: .7; }
+    .scrub-tip {
+      position: absolute; bottom: calc(100% + 10px); transform: translateX(-50%); z-index: 3; pointer-events: none; white-space: nowrap;
+      display: flex; gap: 10px; align-items: baseline; padding: 6px 12px; font-size: 14px; line-height: 20px;
+      background: var(--surface-raised); color: var(--ink); border: 1px solid var(--line-strong); border-radius: var(--radius-md); box-shadow: var(--shadow-2);
     }
-    .chapters button:hover { background: var(--bluebonnet-soft); }
-    .chapters button[aria-current="true"] { background: var(--bluebonnet); color: var(--on-bluebonnet); border-color: var(--bluebonnet); }
-    .chapters .n { font-variant-numeric: tabular-nums; opacity: .7; margin-right: 6px; }
+    .scrub-tip[hidden] { display: none; }
+    .scrub-tip span { color: var(--ink-muted); font-variant-numeric: tabular-nums; }
     .notes { margin-top: var(--space-8); display: grid; gap: var(--space-6); grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
     .notes h2 { margin-top: 0; font-size: 19px; line-height: 26px; }
     .notes p, .notes li { color: var(--ink-muted); font-size: 15px; line-height: 24px; }
@@ -156,7 +160,11 @@
       <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" id="playIcon"><path d="M7 5v14l12-7z"/></svg><span id="playLabel">Play</span>
     </button>
     <div class="grow">
-      <input type="range" id="scrub" min="0" max="1000" value="0" step="1" aria-label="Position">
+      <div class="scrub">
+        <div class="ticks" id="ticks" aria-hidden="true"></div>
+        <input type="range" id="scrub" min="0" max="1000" value="0" step="1" aria-label="Position">
+        <div class="scrub-tip" id="scrubTip" hidden></div>
+      </div>
       <span class="time" id="time">0:00 / 0:00</span>
     </div>
     <div class="tracks" role="group" aria-label="Count in">
@@ -171,7 +179,6 @@
       <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10 10.5a2 2 0 1 0 0 3M16 10.5a2 2 0 1 0 0 3"/></svg><span>Captions</span>
     </button>
   </div>
-  <ol class="chapters" id="chapters"></ol>
 
   <section class="notes">
     <div>
@@ -196,6 +203,7 @@
 
 <script src="../data.js"></script>
 <script src="narration.js?v=3"></script>
-<script src="app.js?v=14"></script>
+<script src="../kit/explainer-kit.js?v=6"></script>
+<script src="app.js?v=18"></script>
 </body>
 </html>
