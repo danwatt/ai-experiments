@@ -10,7 +10,7 @@ After chapter 2 the viewer chooses how to count. **Plain dollars** uses a flat $
 
 ## 1. Ben and Arthur
 
-> Dave Ramsey likes to tell a story about two investors, Ben and Arthur, to show the power of compound growth.
+> Ramsey Solutions likes to tell a story about two investors, Ben and Arthur, to show the power of compound growth.
 
 *On screen:* Ben (the father) and Arthur avatars appear
 
@@ -104,7 +104,7 @@ After chapter 2 the viewer chooses how to count. **Plain dollars** uses a flat $
 
 *On screen:* Best (1961, ended 1999: $666K), worst (1946, ended 1984: $261K), then 1969: $443K beside 1970: $271K
 
-> Ramsey's twelve percent math says four hundred and seventy-six thousand. Only ten of these forty-three windows got there. None fell below half, so his hedge held, but most came up short.
+> Ramsey's twelve percent math says four hundred and seventy-six thousand. Only ten of these forty-three windows got there. None fell below half, so their hedge held, but most came up short.
 
 *On screen:* Ramsey's dashed $476K line (it stays to the end) and a half line at $238K; counter “Reached Ramsey's number: 10 of 43”
 
@@ -156,7 +156,7 @@ After chapter 2 the viewer chooses how to count. **Plain dollars** uses a flat $
 
 *On screen:* “Plain dollars”: exactly $2,000 a year, and every balance is what the statement said
 
-> Ramsey's target is the one from his chart: about one point five three million.
+> Ramsey's target is the one from their chart: about one point five three million.
 
 *On screen:* “Ramsey's 12% a year: $1.53M after 39 years of $2,000 a year, like Arthur in Ramsey's chart”
 

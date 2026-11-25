@@ -14,11 +14,11 @@ After chapter 2 the viewer chooses how to count. **Plain dollars**: the same $80
 
 *On screen:* “Your nest egg on retirement day: $1,000,000”
 
-> Dave Ramsey's answer is about eight percent. On a million dollars, that's eighty thousand a year.
+> Ramsey Solutions' answer is about eight percent. On a million dollars, that's eighty thousand a year.
 
 *On screen:* “Ramsey: take about 8% a year · $80,000 a year”
 
-> His reasoning: good growth stock funds average ten to twelve percent over the long run, so your investments keep replacing what you take, and the extra covers inflation.
+> Their reasoning: good growth stock funds average ten to twelve percent over the long run, so your investments keep replacing what you take, and the extra covers inflation.
 
 *On screen:* “10–12% fund growth − 8% what you spend = the rest covers inflation”, built one term at a time
 

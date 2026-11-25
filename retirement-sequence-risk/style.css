@@ -1,51 +1,27 @@
-.viz-root {
-  color-scheme: light;
-  --page: #f9f9f7;
-  --surface-1: #fcfcfb;
-  --text-primary: #0b0b0b;
-  --text-secondary: #52514e;
-  --muted: #898781;
-  --grid: #e1e0d9;
-  --axis: #c3c2b7;
-  --border: rgba(11, 11, 11, 0.10);
-  --ok: #2a78d6;
-  --ok-wash: rgba(42, 120, 214, 0.10);
-  --fail: #d03b3b;
-  --running: #b4b2a9;
-  --reverse: #eb6834;
-  --neutral-mid: #f0efec;
-  --accent-bg: #eaf2fc;
-}
-@media (prefers-color-scheme: dark) {
-  :root:where(:not([data-theme="light"])) .viz-root, :root:where(:not([data-theme="light"])) .tip {
-    color-scheme: dark;
-    --page: #0d0d0d;
-    --surface-1: #1a1a19;
-    --text-primary: #f0efec;
-    --text-secondary: #c3c2b7;
-    --grid: #2c2c2a;
-    --axis: #383835;
-    --border: rgba(255, 255, 255, 0.10);
-    --ok: #3987e5;
-    --ok-wash: rgba(57, 135, 229, 0.14);
-    --fail: #e66767;
-    --running: #5c5b56;
-    --reverse: #d95926;
-    --neutral-mid: #383835;
-    --accent-bg: #16243a;
-  }
-}
-:root[data-theme="dark"] .viz-root, :root[data-theme="dark"] .tip {
-  color-scheme: dark;
-  --page: #0d0d0d; --surface-1: #1a1a19; --text-primary: #f0efec; --text-secondary: #c3c2b7;
-  --grid: #2c2c2a; --axis: #383835; --border: rgba(255, 255, 255, 0.10);
-  --ok: #3987e5; --ok-wash: rgba(57, 135, 229, 0.14); --fail: #e66767; --running: #5c5b56;
-  --reverse: #d95926; --neutral-mid: #383835; --accent-bg: #16243a;
+/* Colors come from the Bluebonnet design system (../bluebonnet-design-system), the same as the
+   explainers. These aliases keep the chart rules below readable. Bluebonnet switches them for dark. */
+:root {
+  --page: var(--surface);
+  --surface-1: var(--surface-raised);
+  --text-primary: var(--ink);
+  --text-secondary: var(--ink-muted);
+  --muted: var(--ink-muted);
+  --grid: var(--line);
+  --axis: var(--line-strong);
+  --border: var(--line);
+  --ok: var(--bluebonnet);
+  --ok-wash: color-mix(in srgb, var(--bluebonnet) 14%, transparent);
+  --fail: var(--danger);
+  --running: color-mix(in srgb, var(--ink-muted) 55%, var(--surface));
+  /* the reversed-order line is gold, as in the explainers; darkened toward ink so it holds up on light */
+  --reverse: color-mix(in srgb, var(--firewheel) 80%, var(--ink));
+  --neutral-mid: var(--surface-sunken);
+  --accent-bg: var(--bluebonnet-soft);
 }
 
 * { box-sizing: border-box; }
 html, body { margin: 0; }
-body { font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+body { font-family: var(--font-body); font-size: 15px; line-height: 1.5; }
 .viz-root {
   background: var(--page);
   color: var(--text-primary);
@@ -55,11 +31,12 @@ body { font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
   align-items: center;
 }
 .viz-root > * { width: 100%; max-width: 1080px; }
-a { color: var(--ok); }
-h1 { font-size: 30px; line-height: 1.2; margin: 4px 0 12px; letter-spacing: -0.01em; text-wrap: balance; }
+a { color: var(--bluebonnet); }
+h1, h2 { font-family: var(--font-display); }
+h1 { font-size: 34px; line-height: 1.2; margin: 4px 0 12px; letter-spacing: -0.01em; text-wrap: balance; }
 h2 { font-size: 18px; margin: 0; }
 h3 { font-size: 14px; margin: 14px 0 4px; color: var(--text-secondary); font-weight: 600; }
-.kicker { margin: 0; color: var(--text-secondary); font-size: 13px; letter-spacing: 0.04em; text-transform: uppercase; }
+.kicker { margin: 0; color: var(--bluebonnet); font-size: 13px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
 .lede { margin: 0; max-width: 72ch; color: var(--text-secondary); font-size: 16px; }
 .note { margin: 4px 0 10px; color: var(--text-secondary); font-size: 14px; max-width: 80ch; }
 .muted { color: var(--muted); }
@@ -80,12 +57,19 @@ h3 { font-size: 14px; margin: 14px 0 4px; color: var(--text-secondary); font-wei
 .controls { position: sticky; top: 8px; z-index: 5; box-shadow: 0 6px 20px rgba(0,0,0,0.08); padding: 12px 18px; }
 .controls .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 6px 20px; margin: 8px 0 6px; }
 .controls .ctl small { display: none; }
-.controls .ctl:focus-within small, .controls .ctl:hover small { display: block; position: absolute; transform: translateY(46px); background: var(--surface-1); border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; max-width: 220px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 2; }
+/* the hint hangs below the whole control and lets the pointer through, so it never covers a slider */
+.controls .ctl:focus-within small, .controls .ctl:hover small { display: block; position: absolute; top: calc(100% + 6px); left: 0; pointer-events: none; background: var(--surface-1); border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; max-width: 220px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 2; }
 .ctl { position: relative; }
 .ctl { display: flex; flex-direction: column; gap: 2px; }
 .ctl small, .row small { color: var(--muted); font-size: 12px; }
 .ctl-label { font-size: 13px; font-weight: 600; color: var(--text-secondary); }
 .ctl-label output { color: var(--text-primary); font-variant-numeric: tabular-nums; margin-left: 4px; }
+/* every control in a row lines up: name at the top, its value on a line of its own, and the
+   slider or menu along the bottom edge */
+.controls .grid { align-items: stretch; }
+.ctl > .ctl-label { display: flex; flex-direction: column; margin-bottom: auto; white-space: nowrap; }
+.ctl > .ctl-label output { margin-left: 0; font-size: 15px; font-weight: 700; }
+.ctl > input[type=range] { margin: 6px 0 2px; }
 input[type=range] { width: 100%; accent-color: var(--ok); }
 select { font: inherit; font-size: 13px; color: var(--text-primary); background: var(--surface-1); border: 1px solid var(--axis); border-radius: 8px; padding: 4px 6px; margin-top: 2px; width: 100%; }
 .presets, .row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
@@ -126,7 +110,7 @@ button[aria-pressed="true"], button[aria-checked="true"] { background: var(--acc
 /* charts */
 .chart { position: relative; width: 100%; }
 .chart svg { display: block; width: 100%; overflow: visible; }
-.chart text { font: 11.5px system-ui, -apple-system, sans-serif; fill: var(--muted); font-variant-numeric: tabular-nums; }
+.chart text { font: 11.5px var(--font-body); fill: var(--muted); font-variant-numeric: tabular-nums; }
 .chart text.ink { fill: var(--text-primary); }
 .chart text.ink2 { fill: var(--text-secondary); }
 .chart text.strong { font-weight: 600; }
@@ -187,3 +171,94 @@ tr.sel td { background: var(--accent-bg); }
 .method li { margin: 6px 0; max-width: 85ch; }
 .method li b { color: var(--text-primary); }
 code { font-size: 0.92em; }
+
+/* header with the theme switch, as on the explainers */
+.intro { display: flex; gap: 16px; align-items: flex-start; justify-content: space-between; }
+.intro > div { min-width: 0; }
+.icon { width: 20px; height: 20px; stroke: currentColor; stroke-width: 1.75; fill: none; stroke-linecap: round; stroke-linejoin: round; vertical-align: -4px; }
+#theme { flex: none; display: inline-flex; align-items: center; gap: 6px; }
+@media (prefers-reduced-motion: no-preference) { button { transition: background-color 120ms, border-color 120ms; } }
+
+/* filters above the paths chart: one row, wraps on narrow screens */
+.filters { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; margin: 4px 0 10px; }
+.filters .grp { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.filters .key { margin-right: 6px; vertical-align: middle; }
+.filters .n { color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+.filters button[aria-pressed="false"] { color: var(--text-secondary); }
+.filters button[aria-pressed="false"] .key { opacity: 0.3; }
+.filters button:disabled { opacity: 0.45; cursor: not-allowed; }
+.filters .count { font-size: 13px; color: var(--text-secondary); margin-left: auto; }
+
+/* the detailed settings fold away under the presets */
+.settings > summary { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; margin-top: 10px; list-style: none; cursor: pointer; }
+.settings > summary::-webkit-details-marker { display: none; }
+.settings > summary .ctl-label::before { content: "▸"; display: inline-block; width: 1em; color: var(--text-secondary); transition: transform 120ms; }
+.settings[open] > summary .ctl-label::before { transform: rotate(90deg); }
+.settings > summary:hover .ctl-label { color: var(--bluebonnet); }
+.settings-sum { font-size: 13px; color: var(--text-secondary); }
+.settings[open] .settings-sum { display: none; }
+
+/* step through retirement years from the sticky bar */
+.year-step { display: flex; align-items: center; gap: 6px; margin-left: auto; }
+.year-step button { padding: 3px 10px; font-size: 15px; line-height: 1.2; }
+.year-step button:disabled { opacity: 0.4; cursor: not-allowed; }
+.year-step input[type=range] { width: 140px; }
+.year-out { display: inline-flex; align-items: baseline; gap: 8px; width: 16em; white-space: nowrap; overflow: hidden; font-variant-numeric: tabular-nums; }
+.year-out .yo { overflow: hidden; text-overflow: ellipsis; }
+.year-out b { font-size: 16px; }
+.year-out .yo { font-size: 13px; color: var(--text-secondary); }
+.year-out .yo.fail { color: var(--danger); }
+@media (max-width: 900px) { .year-step { margin-left: 0; } .year-out { width: auto; } }
+
+/* the inheritance note under the bar chart's caption */
+.note.inherit { padding-left: 12px; border-left: 3px solid var(--bluebonnet); }
+.note.inherit:empty { display: none; }
+
+/* the American Funds fees checkbox sits in the grid like the other controls */
+.ctl-check .check { display: flex; align-items: center; gap: 8px; margin-top: auto; font-size: 14px; font-weight: 600; cursor: pointer; }
+.ctl-check .check input { width: 18px; height: 18px; accent-color: var(--bluebonnet); margin: 0; }
+.ctl-check .check-link { font-size: 12.5px; }
+.ctl-check > .ctl-label { margin-bottom: 0; }
+
+/* the selected saver's deposits and balance before retirement */
+.saving { margin-top: 6px; }
+.saving[hidden] { display: none; }
+.chart .line-dep { fill: none; stroke: var(--text-secondary); stroke-width: 2; stroke-dasharray: 5 4; }
+
+/* table: failed retirements tinted red, unfinished ones muted */
+tr.row-fail td { background: color-mix(in srgb, var(--danger) 9%, transparent); }
+tr.row-fail td.lasted { color: var(--danger); font-weight: 600; }
+tr.row-running td { color: var(--text-secondary); }
+tr[data-r] { cursor: pointer; }
+tr[data-r]:hover td { background: var(--accent-bg); }
+th[title] { cursor: help; text-decoration: underline dotted; text-underline-offset: 3px; }
+tr.sel td, tr.row-fail.sel td { background: var(--accent-bg); box-shadow: inset 0 1px 0 var(--bluebonnet), inset 0 -1px 0 var(--bluebonnet); }
+
+/* a tile reporting a retirement that ran out: the same red as the table rows */
+.tile.tile-fail { background: color-mix(in srgb, var(--danger) 9%, transparent); border-color: color-mix(in srgb, var(--danger) 45%, var(--border)); }
+.tile.tile-fail .value { color: var(--danger); }
+.note.detail-cape { margin-top: 12px; }
+
+/* terms link down to their definitions; the sticky settings bar shouldn't cover the landing spot */
+a.term { color: inherit; text-decoration: underline dotted; text-decoration-color: var(--bluebonnet); text-underline-offset: 3px; }
+a.term:hover { color: var(--bluebonnet); text-decoration-style: solid; }
+.method li[id] { scroll-margin-top: 160px; border-radius: 6px; }
+.method li.flash { background: var(--bluebonnet-soft); box-shadow: 0 0 0 6px var(--bluebonnet-soft); transition: background-color 120ms; }
+
+/* the Dollars switch: bottom right of the sticky settings bar, level with the settings summary */
+.controls { position: sticky; }
+.dollars { position: absolute; right: 18px; bottom: 10px; display: flex; align-items: center; gap: 8px; }
+.dollars button { padding: 3px 10px; font-size: 13px; }
+.settings > summary { padding-right: 200px; }
+.settings[open] > summary { padding-right: 0; }
+@media (max-width: 900px) { .dollars { position: static; margin-top: 8px; } .settings > summary { padding-right: 0; } }
+
+/* links to the narrated explainers, under the intro */
+.watch { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-top: 14px; }
+.watch .ctl-label { width: 100%; }
+.watch__item { display: inline-flex; align-items: center; gap: 10px; padding: 8px 14px 8px 10px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--surface-1); color: var(--text-primary); text-decoration: none; transition: background-color 120ms, border-color 120ms; }
+.watch__item:hover { background: var(--bluebonnet-soft); border-color: var(--bluebonnet); }
+.watch__item .icon { width: 22px; height: 22px; fill: var(--bluebonnet); stroke: none; flex: none; }
+.watch__item span { display: grid; }
+.watch__item b { font-size: 14.5px; }
+.watch__item small { font-size: 12.5px; color: var(--text-secondary); }

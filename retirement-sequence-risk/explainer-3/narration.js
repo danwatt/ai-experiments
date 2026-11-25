@@ -10,8 +10,8 @@ window.NARRATION = {
    "id": "promise",
    "title": "The 8% promise",
    "track": null,
-   "audio": "audio/promise.mp3",
-   "duration": 29.955,
+   "audio": "audio/promise.mp3?v=656f065f",
+   "duration": 30.105,
    "cues": [
     {
      "start": 0.0,
@@ -20,17 +20,17 @@ window.NARRATION = {
     },
     {
      "start": 5.87,
-     "end": 12.27,
-     "text": "Dave Ramsey's answer is about eight percent. On a million dollars, that's eighty thousand a year."
+     "end": 12.42,
+     "text": "Ramsey Solutions' answer is about eight percent. On a million dollars, that's eighty thousand a year."
     },
     {
-     "start": 12.59,
-     "end": 23.615,
-     "text": "His reasoning: good growth stock funds average ten to twelve percent over the long run, so your investments keep replacing what you take, and the extra covers inflation."
+     "start": 12.74,
+     "end": 23.765,
+     "text": "Their reasoning: good growth stock funds average ten to twelve percent over the long run, so your investments keep replacing what you take, and the extra covers inflation."
     },
     {
-     "start": 23.935,
-     "end": 29.635,
+     "start": 24.085,
+     "end": 29.785,
      "text": "Most retirement research lands closer to four percent. That's forty thousand a year."
     }
    ]
@@ -39,7 +39,7 @@ window.NARRATION = {
    "id": "ramsey-world",
    "title": "In Ramsey's world",
    "track": null,
-   "audio": "audio/ramsey-world.mp3",
+   "audio": "audio/ramsey-world.mp3?v=1c128a5c",
    "duration": 41.155,
    "cues": [
     {
@@ -68,7 +68,7 @@ window.NARRATION = {
    "id": "real-intro",
    "title": "Counting in today's dollars",
    "track": "real",
-   "audio": "audio/real-intro.mp3",
+   "audio": "audio/real-intro.mp3?v=c9c253c0",
    "duration": 17.865,
    "cues": [
     {
@@ -87,7 +87,7 @@ window.NARRATION = {
    "id": "retire-2000",
    "title": "Retire in January 2000",
    "track": "real",
-   "audio": "audio/retire-2000.mp3",
+   "audio": "audio/retire-2000.mp3?v=6ad2929a",
    "duration": 18.135,
    "cues": [
     {
@@ -111,7 +111,7 @@ window.NARRATION = {
    "id": "backwards",
    "title": "Same years, backwards",
    "track": "real",
-   "audio": "audio/backwards.mp3",
+   "audio": "audio/backwards.mp3?v=b5202e67",
    "duration": 25.68,
    "cues": [
     {
@@ -140,7 +140,7 @@ window.NARRATION = {
    "id": "every",
    "title": "Every retirement since 1945",
    "track": "real",
-   "audio": "audio/every.mp3",
+   "audio": "audio/every.mp3?v=f2b17db8",
    "duration": 29.13,
    "cues": [
     {
@@ -169,7 +169,7 @@ window.NARRATION = {
    "id": "inheritance",
    "title": "An inheritance for the grandchildren?",
    "track": "real",
-   "audio": "audio/inheritance.mp3",
+   "audio": "audio/inheritance.mp3?v=3ec493a1",
    "duration": 32.43,
    "cues": [
     {
@@ -198,7 +198,7 @@ window.NARRATION = {
    "id": "percent",
    "title": "Another way: 8% of what's left",
    "track": "real",
-   "audio": "audio/percent.mp3",
+   "audio": "audio/percent.mp3?v=ca3133a2",
    "duration": 48.575,
    "cues": [
     {
@@ -232,7 +232,7 @@ window.NARRATION = {
    "id": "percent-every",
    "title": "Every retiree's leanest year",
    "track": "real",
-   "audio": "audio/percent-every.mp3",
+   "audio": "audio/percent-every.mp3?v=61cf8e35",
    "duration": 29.655,
    "cues": [
     {
@@ -261,7 +261,7 @@ window.NARRATION = {
    "id": "why",
    "title": "Why the first years matter",
    "track": "real",
-   "audio": "audio/why.mp3",
+   "audio": "audio/why.mp3?v=ce64191c",
    "duration": 23.485,
    "cues": [
     {
@@ -285,7 +285,7 @@ window.NARRATION = {
    "id": "takeaway",
    "title": "What history says",
    "track": "real",
-   "audio": "audio/takeaway.mp3",
+   "audio": "audio/takeaway.mp3?v=27fec43a",
    "duration": 20.186,
    "cues": [
     {
@@ -309,7 +309,7 @@ window.NARRATION = {
    "id": "nominal-intro",
    "title": "Counting in plain dollars",
    "track": "nominal",
-   "audio": "audio/nominal-intro.mp3",
+   "audio": "audio/nominal-intro.mp3?v=2b865885",
    "duration": 15.415,
    "cues": [
     {
@@ -328,7 +328,7 @@ window.NARRATION = {
    "id": "retire-2000-nominal",
    "title": "Retire in January 2000",
    "track": "nominal",
-   "audio": "audio/retire-2000-nominal.mp3",
+   "audio": "audio/retire-2000-nominal.mp3?v=b5c647ee",
    "duration": 17.985,
    "cues": [
     {
@@ -352,7 +352,7 @@ window.NARRATION = {
    "id": "backwards-nominal",
    "title": "Same years, backwards",
    "track": "nominal",
-   "audio": "audio/backwards-nominal.mp3",
+   "audio": "audio/backwards-nominal.mp3?v=d40956a3",
    "duration": 25.805,
    "cues": [
     {
@@ -381,7 +381,7 @@ window.NARRATION = {
    "id": "every-nominal",
    "title": "Every retirement since 1945",
    "track": "nominal",
-   "audio": "audio/every-nominal.mp3",
+   "audio": "audio/every-nominal.mp3?v=f30f8572",
    "duration": 29.93,
    "cues": [
     {
@@ -410,7 +410,7 @@ window.NARRATION = {
    "id": "inheritance-nominal",
    "title": "An inheritance for the grandchildren?",
    "track": "nominal",
-   "audio": "audio/inheritance-nominal.mp3",
+   "audio": "audio/inheritance-nominal.mp3?v=21b3252a",
    "duration": 37.78,
    "cues": [
     {
@@ -439,7 +439,7 @@ window.NARRATION = {
    "id": "percent-nominal",
    "title": "Another way: 8% of what's left",
    "track": "nominal",
-   "audio": "audio/percent-nominal.mp3",
+   "audio": "audio/percent-nominal.mp3?v=4325eede",
    "duration": 46.625,
    "cues": [
     {
@@ -473,7 +473,7 @@ window.NARRATION = {
    "id": "percent-every-nominal",
    "title": "Every retiree's leanest year",
    "track": "nominal",
-   "audio": "audio/percent-every-nominal.mp3",
+   "audio": "audio/percent-every-nominal.mp3?v=5e160467",
    "duration": 29.38,
    "cues": [
     {
@@ -502,7 +502,7 @@ window.NARRATION = {
    "id": "hidden-cost",
    "title": "The hidden cost of a flat check",
    "track": "nominal",
-   "audio": "audio/hidden-cost.mp3",
+   "audio": "audio/hidden-cost.mp3?v=ada89b81",
    "duration": 25.66,
    "cues": [
     {
@@ -526,7 +526,7 @@ window.NARRATION = {
    "id": "takeaway-nominal",
    "title": "What history says",
    "track": "nominal",
-   "audio": "audio/takeaway-nominal.mp3",
+   "audio": "audio/takeaway-nominal.mp3?v=1c913dec",
    "duration": 22.16,
    "cues": [
     {

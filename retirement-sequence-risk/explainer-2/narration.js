@@ -10,27 +10,27 @@ window.NARRATION = {
    "id": "family",
    "title": "Ben and Arthur",
    "track": null,
-   "audio": "audio/family.mp3",
-   "duration": 33.105,
+   "audio": "audio/family.mp3?v=0cb8543d",
+   "duration": 33.43,
    "cues": [
     {
      "start": 0.0,
-     "end": 7.2,
-     "text": "Dave Ramsey likes to tell a story about two investors, Ben and Arthur, to show the power of compound growth."
+     "end": 7.525,
+     "text": "Ramsey Solutions likes to tell a story about two investors, Ben and Arthur, to show the power of compound growth."
     },
     {
-     "start": 7.52,
-     "end": 13.72,
+     "start": 7.845,
+     "end": 14.045,
      "text": "Here's a different version. Ben is the father. Arthur is his son, born when Ben was twenty-five."
     },
     {
-     "start": 14.04,
-     "end": 25.84,
+     "start": 14.365,
+     "end": 26.165,
      "text": "Each puts two thousand dollars a year into the stock market, from age twenty-seven through sixty-five, just like Arthur in Ramsey's chart. Thirty-nine years. Same plan, same money."
     },
     {
-     "start": 26.16,
-     "end": 32.785,
+     "start": 26.485,
+     "end": 33.11,
      "text": "The only difference is which thirty-nine years they get. Arthur starts twenty-five years after his father."
     }
    ]
@@ -39,7 +39,7 @@ window.NARRATION = {
    "id": "steady",
    "title": "In a twelve percent world",
    "track": null,
-   "audio": "audio/steady.mp3",
+   "audio": "audio/steady.mp3?v=d3c8e76b",
    "duration": 26.985,
    "cues": [
     {
@@ -63,7 +63,7 @@ window.NARRATION = {
    "id": "real-intro",
    "title": "Counting in today's dollars",
    "track": "real",
-   "audio": "audio/real-intro.mp3",
+   "audio": "audio/real-intro.mp3?v=b32845b6",
    "duration": 20.24,
    "cues": [
     {
@@ -82,7 +82,7 @@ window.NARRATION = {
    "id": "pair-1957",
    "title": "Ben from 1957, Arthur from 1982",
    "track": "real",
-   "audio": "audio/pair-1957.mp3",
+   "audio": "audio/pair-1957.mp3?v=0633f02f",
    "duration": 47.03,
    "cues": [
     {
@@ -111,7 +111,7 @@ window.NARRATION = {
    "id": "pair-1961",
    "title": "Ben from 1961, Arthur from 1986",
    "track": "real",
-   "audio": "audio/pair-1961.mp3",
+   "audio": "audio/pair-1961.mp3?v=eac62d0f",
    "duration": 44.28,
    "cues": [
     {
@@ -140,7 +140,7 @@ window.NARRATION = {
    "id": "windows",
    "title": "Every 39 years since 1945",
    "track": "real",
-   "audio": "audio/windows.mp3",
+   "audio": "audio/windows.mp3?v=4ed3d2ae",
    "duration": 60.63,
    "cues": [
     {
@@ -156,7 +156,7 @@ window.NARRATION = {
     {
      "start": 36.565,
      "end": 48.64,
-     "text": "Ramsey's twelve percent math says four hundred and seventy-six thousand. Only ten of these forty-three windows got there. None fell below half, so his hedge held, but most came up short."
+     "text": "Ramsey's twelve percent math says four hundred and seventy-six thousand. Only ten of these forty-three windows got there. None fell below half, so their hedge held, but most came up short."
     },
     {
      "start": 48.96,
@@ -169,7 +169,7 @@ window.NARRATION = {
    "id": "why",
    "title": "Why the late years decide it",
    "track": "real",
-   "audio": "audio/why.mp3",
+   "audio": "audio/why.mp3?v=a4f08c04",
    "duration": 26.105,
    "cues": [
     {
@@ -198,7 +198,7 @@ window.NARRATION = {
    "id": "takeaway",
    "title": "Same plan, different decades",
    "track": "real",
-   "audio": "audio/takeaway.mp3",
+   "audio": "audio/takeaway.mp3?v=52338429",
    "duration": 17.46,
    "cues": [
     {
@@ -222,8 +222,8 @@ window.NARRATION = {
    "id": "nominal-intro",
    "title": "Counting in plain dollars",
    "track": "nominal",
-   "audio": "audio/nominal-intro.mp3",
-   "duration": 14.066,
+   "audio": "audio/nominal-intro.mp3?v=12b6e856",
+   "duration": 14.09,
    "cues": [
     {
      "start": 0.0,
@@ -232,8 +232,8 @@ window.NARRATION = {
     },
     {
      "start": 8.52,
-     "end": 13.745,
-     "text": "Ramsey's target is the one from his chart: about one point five three million."
+     "end": 13.77,
+     "text": "Ramsey's target is the one from their chart: about one point five three million."
     }
    ]
   },
@@ -241,7 +241,7 @@ window.NARRATION = {
    "id": "pair-1957-nominal",
    "title": "Ben from 1957, Arthur from 1982",
    "track": "nominal",
-   "audio": "audio/pair-1957-nominal.mp3",
+   "audio": "audio/pair-1957-nominal.mp3?v=4a421e7f",
    "duration": 23.786,
    "cues": [
     {
@@ -265,7 +265,7 @@ window.NARRATION = {
    "id": "pair-1961-nominal",
    "title": "Ben from 1961, Arthur from 1986",
    "track": "nominal",
-   "audio": "audio/pair-1961-nominal.mp3",
+   "audio": "audio/pair-1961-nominal.mp3?v=dd37cec2",
    "duration": 27.185,
    "cues": [
     {
@@ -289,7 +289,7 @@ window.NARRATION = {
    "id": "windows-nominal",
    "title": "Every 39 years since 1945",
    "track": "nominal",
-   "audio": "audio/windows-nominal.mp3",
+   "audio": "audio/windows-nominal.mp3?v=bcb52b34",
    "duration": 48.205,
    "cues": [
     {
@@ -318,7 +318,7 @@ window.NARRATION = {
    "id": "why-nominal",
    "title": "Why the father usually wins on paper",
    "track": "nominal",
-   "audio": "audio/why-nominal.mp3",
+   "audio": "audio/why-nominal.mp3?v=bf00b2fd",
    "duration": 34.355,
    "cues": [
     {
@@ -347,7 +347,7 @@ window.NARRATION = {
    "id": "takeaway-nominal",
    "title": "Same plan, different decades",
    "track": "nominal",
-   "audio": "audio/takeaway-nominal.mp3",
+   "audio": "audio/takeaway-nominal.mp3?v=3fdd4065",
    "duration": 21.535,
    "cues": [
     {

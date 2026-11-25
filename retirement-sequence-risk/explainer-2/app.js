@@ -56,6 +56,13 @@
   const span = (t, a, b) => ease((t - a) / (b - a));
   const lin = (t, a, b) => clamp((t - a) / (b - a));
   const lerp = (a, b, t) => a + (b - a) * t;
+  const easeOut = (x) => 1 - Math.pow(1 - clamp(x), 3);
+  // overshoots a little past 1 before settling: things land instead of just appearing
+  const backOut = (x) => { x = clamp(x); const c = 1.6; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
+  // a sweep g (0..1) across n items, each taking k item-widths to finish: item i's own progress
+  const stag = (g, i, n, k = 4) => clamp((g * (n + k) - i) / k);
+  // a number counting up over `d` seconds from t0
+  const tally = (t, t0, d = 1.1) => easeOut(lin(t, t0, t0 + d));
 
   // ---------- formatting ----------
   const pct = (v, d = 1) => (v * 100).toFixed(d) + "%";
@@ -114,9 +121,52 @@
     else { ctx.moveTo(x, base); ctx.lineTo(x, end - r); ctx.quadraticCurveTo(x, end, x + r, end); ctx.lineTo(x + w - r, end); ctx.quadraticCurveTo(x + w, end, x + w, end - r); ctx.lineTo(x + w, base); }
     ctx.closePath(); ctx.fillStyle = color; ctx.fill();
   }
+  // a bar that grows from its baseline with a small overshoot; p is its own progress 0..1
+  function growBar(x, base, end, w, color, r, p) {
+    if (p <= 0) return;
+    bar(x, base, lerp(base, end, backOut(p)), w, color, r);
+  }
+  // scale about a point while drawing fn
+  function zoomAt(x, y, s, fn) { ctx.save(); ctx.translate(x, y); ctx.scale(s, s); ctx.translate(-x, -y); fn(); ctx.restore(); }
+  // the moving end of a line: a soft pulsing halo behind the dot
+  function glow(x, y, color, t) {
+    const r = 24 + 4 * Math.sin(t * 5);
+    const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+    g.addColorStop(0, rgba(color, 0.45)); g.addColorStop(1, rgba(color, 0));
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+    dot(x, y, 7, color, C.sunken, 3);
+  }
+  // a line of type that arrives word by word from t0; o.hi colors the listed words
+  function words(s, x, y, t, t0, o) {
+    o = o || {};
+    const size = o.size || 44, weight = o.weight || 700, fam = o.fam || "display", gap = o.gap || 0.11;
+    font(ctx, size, weight, fam);
+    const ws = s.split(" "), sp = ctx.measureText(" ").width, widths = ws.map((w) => ctx.measureText(w).width);
+    const total = widths.reduce((a, b) => a + b, 0) + sp * (ws.length - 1);
+    let cx = o.align === "center" ? x - total / 2 : o.align === "right" ? x - total : x;
+    ws.forEach((w, i) => {
+      const p = span(t, t0 + i * gap, t0 + i * gap + 0.4);
+      if (p > 0) alpha(p * (o.a == null ? 1 : o.a), () => text(w, cx, y + (1 - p) * 18, { size, weight, fam, color: o.hi && o.hi.includes(w) ? o.hiColor || C.fire : o.color || C.ink }));
+      cx += widths[i] + sp;
+    });
+  }
+  // a jolt that decays over `d` seconds after t0 (for crashes)
+  function shake(t, t0, amp = 12, d = 0.7) {
+    const k = t - t0;
+    if (k <= 0 || k >= d) return;
+    const e = Math.pow(1 - k / d, 2) * amp;
+    ctx.translate(Math.sin(k * 71) * e, Math.cos(k * 53) * e * 0.6);
+  }
+  function flash(t, t0, color, d = 0.9) {
+    const k = t - t0;
+    if (k <= 0 || k >= d) return;
+    ctx.fillStyle = rgba(color, 0.16 * Math.pow(1 - k / d, 2)); ctx.fillRect(-40, -40, W + 80, Hh + 80);
+  }
   function pill(x, y, label, kind, a) {
     const colors = { danger: [C.dangerSoft, C.danger], blue: [C.blueSoft, C.blue], neutral: [C.raised, C.muted], fire: [C.raised, C.fire] }[kind];
-    alpha(a == null ? 1 : a, () => {
+    a = a == null ? 1 : a;
+    if (a <= 0) return;
+    zoomAt(x, y, lerp(0.85, 1, backOut(a)), () => alpha(a, () => {
       font(ctx, 22, 600);
       const w = ctx.measureText(label).width + 54, h = 40;
       ctx.fillStyle = colors[0];
@@ -124,7 +174,7 @@
       ctx.strokeStyle = rgba(colors[1], 0.5); ctx.lineWidth = 1.5; ctx.stroke();
       dot(x - w / 2 + 21, y, 5.5, colors[1]);
       text(label, x - w / 2 + 36, y + 1, { size: 22, weight: 600, color: colors[1], base: "middle" });
-    });
+    }));
   }
   function eyebrow(num, title) {
     text(`${String(num).padStart(2, "0")}  ·  ${title.toUpperCase()}`, 56, 70, { size: 18, weight: 600, color: C.blue, spacing: 1.6 });
@@ -157,6 +207,18 @@
       font(ctx, 19, 400); cx += 36 + ctx.measureText(label).width + 30;
     });
   }
+
+  // ---------- hover details ----------
+  // Scenes register rectangles (canvas units) with an HTML summary; the stage shows it on mouseover.
+  // mark "line" draws a thin guide through the middle of the region instead of an outline (for lines).
+  let HOTS = [], mouse = null;
+  const hot = (x, y, w, h, html, mark) => {
+    const m = ctx.getTransform();
+    HOTS.push({ x: (m.a * x + m.e) / scale, y: (m.d * y + m.f) / scale, w: (m.a * w) / scale, h: (m.d * h) / scale, html, mark });
+  };
+  // the summary itself: a title, a note under it, then label/value rows (a third item marks the total)
+  const hvBox = (title, note, rows) => `<b>${title}</b>${note ? `<span class="hv-unit">${note}</span>` : ""}` +
+    rows.filter(Boolean).map(([k, v, total]) => `<div class="hv-row${total ? " hv-total" : ""}"><span>${k}</span><b>${v}</b></div>`).join("");
 
   // ---------- data ----------
   const idx = (y) => y - H.first;
@@ -211,10 +273,11 @@
   const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
   function avatar(x, y, r, letter, color, a) {
-    alpha(a, () => {
+    if (a <= 0) return;
+    zoomAt(x, y, lerp(0.4, 1, backOut(a)), () => alpha(a, () => {
       dot(x, y, r, color);
       text(letter, x, y + r * 0.36, { size: r * 1.05, weight: 700, fam: "display", align: "center", color: C.sunken });
-    });
+    }));
   }
   const rateText = (r) => (Math.abs(r) < 0.0005 ? "0.0%" : spct(r));
   // calendar eras behind a chart; plain-dollar charts also show what prices did
@@ -246,7 +309,7 @@
   SCENES.family = function (t, q) {
     const people = [[520, 250, 70, "B", "Ben", "the father", C.blue], [1080, 262, 56, "A", "Arthur", "his son", C.fire]];
     people.forEach(([x, y, r, l, name, tag, col], i) => {
-      const a = span(t, 0.4 + i * 0.5, 1.0 + i * 0.5);
+      const a = lin(t, 0.4 + i * 0.5, 1.1 + i * 0.5);
       avatar(x, y, r, l, col, a);
       alpha(a, () => text(name, x, 375, { size: 40, weight: 700, fam: "display", align: "center" }));
       alpha(span(t, q(1) + 0.4 + i * 1.2, q(1) + 1.0 + i * 1.2), () => text(tag, x, 412, { size: 24, color: C.muted, align: "center" }));
@@ -270,8 +333,10 @@
       const off = r === 1 ? shift * GEN * cell : 0, y = 540 + r * gapY;
       if (fill > 0) text(name, x0 - 18, y + 28, { size: 22, weight: 600, align: "right" });
       for (let k = 0; k < YEARS; k++) {
-        if (k / YEARS > fill) break;
-        ctx.beginPath(); ctx.roundRect(x0 + off + k * cell + 2, y + 8, cell - 4, 30, 3); ctx.fillStyle = col; ctx.fill();
+        const p = stag(fill, k, YEARS, 3);
+        if (p <= 0) break;
+        const cx = x0 + off + k * cell + cell / 2;
+        zoomAt(cx, y + 23, backOut(p), () => { ctx.beginPath(); ctx.roundRect(cx - cell / 2 + 2, y + 8, cell - 4, 30, 3); ctx.fillStyle = col; ctx.fill(); });
       }
     });
     alpha(shift, () => {
@@ -290,15 +355,29 @@
     const f = lin(t, 0.6, q(1) + 1.0), now = f * (GEN + YEARS);
     const tb = partial(steady.map((v, k) => [A.X(k), A.Y(v)]), clamp(now / YEARS), C.blue, 4);
     const ta = partial(steady.map((v, k) => [A.X(k + GEN), A.Y(v)]), clamp((now - GEN) / YEARS), C.fire, 4);
-    if (now > 0) dot(tb[0], tb[1], 7, C.blue, C.sunken, 3);
-    if (now > GEN) dot(ta[0], ta[1], 7, C.fire, C.sunken, 3);
+    if (now > 0) glow(tb[0], tb[1], C.blue, t);
+    if (now > GEN) glow(ta[0], ta[1], C.fire, t);
+    // Ben's balance every ten years, as his line passes: the curve is slow, then steep
+    [10, 20, 30].forEach((k) => alpha(span(now, k, k + 1.5), () => {
+      dot(A.X(k), A.Y(steady[k]), 4, C.blue);
+      text(money(steady[k]), A.X(k) - 8, A.Y(steady[k]) - 12, { size: 18, weight: 700, align: "right" });
+    }));
+    // each year on hover: where both of them stand
+    const colW = A.X(1) - A.X(0);
+    for (let k = 1; k <= GEN + YEARS; k++) {
+      if (k > now) break;
+      const b = k <= YEARS ? steady[k] : null, a = k >= GEN ? steady[k - GEN] : null;
+      hot(A.X(k) - colW / 2, A.y0, colW, A.y1 - A.y0, hvBox(`After ${k} year${k > 1 ? "s" : ""}`, "+12% every year, $2,000 deposited each January", [
+        b != null && [`Ben, age ${AGE0 + k - 1}`, dollars(b)],
+        k > YEARS && ["Ben", "retired"],
+        a != null && k > GEN && [`Arthur, age ${AGE0 + k - GEN - 1}`, dollars(a)],
+        k <= GEN && ["Arthur", "not started yet"],
+      ]), "line");
+    }
     alpha(span(t, q(1) + 0.6, q(1) + 1.4), () => {
-      text(`Both retire with ${money(steady[YEARS])}`, A.X(GEN + YEARS) - 10, A.Y(steady[YEARS]) - 30, { size: 28, weight: 700, fam: "display", align: "right" });
+      text(`Both retire with ${money(steady[YEARS] * tally(t, q(1) + 0.6, 1.2))}`, A.X(GEN + YEARS) - 10, A.Y(steady[YEARS]) - 30, { size: 28, weight: 700, fam: "display", align: "right" });
       text("+12% every year, $2,000 a year", A.X(1), A.Y(1.8e6), { size: 22, color: C.muted });
     });
-    const fork = span(t, q(2) + 7.0, q(2) + 7.8);
-    pill(560, 790, "Plain dollars, like Ramsey's chart", "fire", fork);
-    pill(1040, 790, "Today's dollars, after inflation", "blue", span(t, q(2) + 9.6, q(2) + 10.4));
   };
 
   // track intros: how this track counts, and Ramsey's target in those terms
@@ -307,7 +386,8 @@
     lines.forEach((l, i) => alpha(span(t, 0.9 + i * 1.4, 1.6 + i * 1.4), () => text(l, 800, 330 + i * 46, { size: 28, color: C.muted, align: "center" })));
     alpha(span(t, q(1), q(1) + 0.8), () => {
       text(D.projLabel, 800, 560, { size: 30, weight: 600, align: "center", color: C.muted });
-      text(money(D.proj), 800, 660, { size: 104, weight: 700, fam: "display", align: "center", color: C.fire });
+      zoomAt(800, 625, lerp(0.7, 1, backOut(lin(t, q(1) + 0.3, q(1) + 1.1))), () =>
+        text(money(D.proj * tally(t, q(1) + 0.3, 1.5)), 800, 660, { size: 104, weight: 700, fam: "display", align: "center", color: C.fire }));
       text(`after ${YEARS} years of $2,000 a year, like Arthur in Ramsey's chart`, 800, 720, { size: 24, color: C.muted, align: "center" });
     });
   }
@@ -320,6 +400,15 @@
     const raw = Math.max(Math.max(...ben.p, ...art.p) * 1.12, o.projAt != null ? D.proj * 1.3 : 0);
     const step = tickStep(raw), top = niceMax(raw, step);
     const A = axes({ x0: 200, x1: 1330, y0: 200, y1: 720, dx: [y0, end], dy: [0, top] });
+    const now = lerp(y0, y0 + YEARS, lin(t, o.benFrom, o.benTo)) + lin(t, o.artFrom, o.artTo) * GEN;
+    // when the drawing reaches calendar year Y (Ben's pass covers his window, Arthur's the rest)
+    const tAt = (Y) => (Y <= y0 + YEARS ? lerp(o.benFrom, o.benTo, (Y - y0) / YEARS) : lerp(o.artFrom, o.artTo, (Y - y0 - YEARS) / GEN));
+    // the big crashes either of them lived through: the picture jolts as each line reaches one
+    const crashes = [];
+    for (let y = y0; y < end; y++) if (D.rets[idx(y)] < -0.25) crashes.push({ y, r: D.rets[idx(y)], t: tAt(y + 0.6) });
+    crashes.forEach((c) => shake(t, c.t, 10));
+    // the calendar year, huge and faint, ticking behind the chart
+    if (now > y0 && now < end) text(String(Math.floor(now)), A.x1 - 10, A.y1 - 24, { size: 220, weight: 800, fam: "display", align: "right", color: rgba(C.ink, 0.06) });
     const ticks = []; for (let v = 0; v <= top + 1; v += step) ticks.push(v);
     eras(A, span(t, o.erasAt, o.erasAt + 0.8), D);
     yGrid(A, ticks, moneyTick);
@@ -327,15 +416,42 @@
     xLabels(A, xt, (v) => v);
     legend(A.x0, 150, [[C.blue, `Ben: ${y0}–${y0 + YEARS - 1}`], [C.fire, `Arthur: ${y0 + GEN}–${end - 1}`]]);
     if (o.projAt != null) ramseyLine(A, D, span(t, o.projAt, o.projAt + 0.8), `Ramsey: ${money(D.proj)}`);
-    const now = lerp(y0, y0 + YEARS, lin(t, o.benFrom, o.benTo)) + lin(t, o.artFrom, o.artTo) * GEN;
     const pts = (p, s) => p.map((v, k) => [A.X(s + k), A.Y(v)]);
     const tb = partial(pts(ben.p, y0), clamp((now - y0) / YEARS), C.blue, 4);
     const ta = partial(pts(art.p, y0 + GEN), clamp((now - y0 - GEN) / YEARS), C.fire, 4);
-    if (now > y0) dot(tb[0], tb[1], 7, C.blue, C.sunken, 3);
-    if (now > y0 + GEN) dot(ta[0], ta[1], 7, C.fire, C.sunken, 3);
+    if (now > y0) glow(tb[0], tb[1], C.blue, t);
+    if (now > y0 + GEN) glow(ta[0], ta[1], C.fire, t);
+    // each crash gets a red tag where it hit, on every line that was invested then
+    crashes.forEach((c) => {
+      const a = span(t, c.t, c.t + 0.4);
+      if (a <= 0) return;
+      const hit = [[ben, y0], [art, y0 + GEN]].filter(([w, s]) => c.y >= s && c.y < s + YEARS).map(([w, s]) => w.p[c.y - s + 1]);
+      const v = Math.max(...hit), x = A.X(c.y + 1), y = A.Y(v);
+      alpha(a, () => {
+        hit.forEach((h) => dot(A.X(c.y + 1), A.Y(h), 6, C.danger));
+        // under the dip, unless that would land on the year labels
+        const ly = y + 44 < A.y1 - 6 ? y + 40 : y - 16;
+        zoomAt(x, ly - 6, lerp(1.4, 1, backOut(a)), () => text(`${c.y}: ${Math.round(c.r * 100)}%`, x, ly, { size: 20, weight: 700, color: C.danger, align: "center" }));
+      });
+    });
+    // each calendar year on hover, once the lines have reached it
+    const colW = A.X(1) - A.X(0);
+    for (let y = y0; y < end; y++) {
+      if (y + 1 > now) break;
+      const bi = y - y0, ai = y - y0 - GEN, inBen = bi >= 0 && bi < YEARS, inArt = ai >= 0 && ai < YEARS;
+      hot(A.X(y + 1) - colW / 2, A.y0, colW, A.y1 - A.y0, hvBox(`${y}`, D.unit, [
+        [D.mode === "real" ? "Stocks, after inflation" : "Stocks", spct(D.rets[idx(y)])],
+        (inBen || inArt) && ["Each deposit", "$2,000"],
+        (inBen || inArt) && D.mode === "real" && ["The same deposit, then", dollars(deposit(y))],
+        inBen && [`Ben, age ${AGE0 + bi}, year end`, dollars(ben.p[bi + 1]), true],
+        !inBen && y >= y0 + YEARS && ["Ben, retired", money(ben.v)],
+        inArt && [`Arthur, age ${AGE0 + ai}, year end`, dollars(art.p[ai + 1]), !inBen],
+        !inArt && ["Arthur", "not started yet"],
+      ]), "line");
+    }
     const benY = A.Y(ben.v) - 16 < A.y0 + 90 ? A.Y(ben.v) + 34 : A.Y(ben.v) - 16;
-    alpha(span(t, o.benLabelAt, o.benLabelAt + 0.6), () => text(`Ben: ${money(ben.v)}`, A.X(y0 + YEARS) + 12, benY, { size: 26, weight: 700, fam: "display" }));
-    alpha(span(t, o.artLabelAt, o.artLabelAt + 0.6), () => text(`Arthur: ${money(art.v)}`, A.X(end) + 12, A.Y(art.v) + 8, { size: 26, weight: 700, fam: "display" }));
+    alpha(span(t, o.benLabelAt, o.benLabelAt + 0.6), () => text(`Ben: ${money(ben.v * tally(t, o.benLabelAt, 1.0))}`, A.X(y0 + YEARS) + 12, benY, { size: 26, weight: 700, fam: "display" }));
+    alpha(span(t, o.artLabelAt, o.artLabelAt + 0.6), () => text(`Arthur: ${money(art.v * tally(t, o.artLabelAt, 1.0))}`, A.X(end) + 12, A.Y(art.v) + 8, { size: 26, weight: 700, fam: "display" }));
     if (o.depAt != null) alpha(span(t, o.depAt, o.depAt + 0.8), () => {
       const bEnd = y0 + YEARS - 1, aStart = y0 + GEN, aEnd = end - 1;
       text("Each year's deposit in the dollars of the time", 1560, 104, { size: 18, color: C.muted, align: "right" });
@@ -346,6 +462,7 @@
     const who = sonWins ? "Arthur" : "Ben";
     const label = more >= 0.95 && more < 1.05 ? `${who} has twice as much` : more >= 1.05 && more < 2 ? `${who} has more than twice as much` : `${who} has ${pct(more, 0)} more`;
     pill(800, 805, `${D.mode === "real" ? "Same plan" : "On paper"}: ${label}`, sonWins ? "fire" : "blue", span(t, o.pillAt, o.pillAt + 0.6));
+    crashes.forEach((c) => flash(t, c.t, C.danger, 0.7));
   }
   SCENES["pair-1957"] = (t, q) => familyChart(t, SETS.real, 1957, { benFrom: 0.6, benTo: q(2) + 5.0, artFrom: q(3) + 0.2, artTo: q(3) + 6.0, erasAt: q(2) + 0.4,
     benLabelAt: q(2) + 5.4, artLabelAt: q(3) + 6.5, pillAt: q(3) + 10.0, depAt: q(1) });
@@ -372,12 +489,21 @@
     const ONE = [1969, 1970];
     const ram = span(t, q(2), q(2) + 0.8), pairs = span(t, q(3), q(3) + 0.8);
     D.WINDOWS.forEach((w, i) => {
-      if (i / D.WINDOWS.length > grow) return;
+      const p = stag(grow, i, D.WINDOWS.length, 5);
+      if (p <= 0) return;
       const hl = w === D.worst || w === D.best || (ONE.includes(w.y) && oneYear > 0);
       let a = 1;
       if (ext > 0 && ram === 0) a = lerp(1, hl ? 1 : 0.35, ext);
       if (ram > 0 && pairs === 0) a = lerp(1, w.v >= D.proj ? 1 : 0.35, ram);
-      alpha(a, () => bar(A.X(w.y) + 2, A.Y(0), A.Y(w.v), bw, C.blue, 3));
+      alpha(a, () => growBar(A.X(w.y) + 2, A.Y(0), A.Y(w.v), bw, C.blue, 3, p));
+      const son = D.win(w.y + GEN);
+      hot(A.X(w.y) + 2, A.y0, bw, A.y1 - A.y0, hvBox(`Started ${w.y}`, D.unit, [
+        ["Saved", `${w.y}–${w.y + YEARS - 1}`],
+        ["Grew to", dollars(w.v)],
+        [D.mode === "real" ? "Ramsey's math (12% − 4%)" : "Ramsey's math (12%)", dollars(D.proj)],
+        ["Share of Ramsey's number", pct(w.v / D.proj, 0)],
+        son && [`Son, ${w.y + GEN}–${w.y + GEN + YEARS - 1}`, dollars(son.v), true],
+      ]));
     });
     alpha(ext * (1 - ram), () => {
       const b = D.best, w = D.worst;
@@ -395,14 +521,14 @@
     alpha(ram * (1 - pairs), () => {
       line(A.x0, A.Y(D.proj / 2), A.x1, A.Y(D.proj / 2), C.muted, 1.5, [4, 6]);
       text(`Half of that: ${money(D.proj / 2)}`, A.x0 + 10, A.Y(D.proj / 2) - 10, { size: 18, weight: 600, color: C.muted });
-      counter(1440, 150, "REACHED RAMSEY'S NUMBER", `${D.reached} of ${D.WINDOWS.length}`, { align: "right", size: 40, color: C.fire });
+      counter(1440, 150, "REACHED RAMSEY'S NUMBER", `${Math.round(D.reached * tally(t, q(2) + 0.4))} of ${D.WINDOWS.length}`, { align: "right", size: 40, color: C.fire });
     });
     alpha(pairs, () => {
       if (D.sonAhead >= D.fatherAhead) {
-        counter(1440, 150, "SON AHEAD OF FATHER", `${D.sonAhead} of ${D.PAIRS.length}`, { align: "right", size: 40, color: C.fire });
+        counter(1440, 150, "SON AHEAD OF FATHER", `${Math.round(D.sonAhead * tally(t, q(3)))} of ${D.PAIRS.length}`, { align: "right", size: 40, color: C.fire });
         text(`One at least 25% ahead: ${D.quarter}`, 1440, 186, { size: 22, weight: 600, color: C.muted, align: "right" });
       } else {
-        counter(1440, 150, "FATHER AHEAD OF SON", `${D.fatherAhead} of ${D.PAIRS.length}`, { align: "right", size: 40, color: C.blue });
+        counter(1440, 150, "FATHER AHEAD OF SON", `${Math.round(D.fatherAhead * tally(t, q(3)))} of ${D.PAIRS.length}`, { align: "right", size: 40, color: C.blue });
         text(`in ${D.unit}`, 1440, 186, { size: 22, weight: 600, color: C.muted, align: "right" });
       }
     });
@@ -424,10 +550,11 @@
     const grow = lin(t, 0.3, o.growTo);
     const late = span(t, o.lateAt, o.lateAt + 0.8);
     for (let k = 0; k < YEARS; k++) {
-      if (k / YEARS > grow) break;
+      const p = stag(grow, k, YEARS, 4);
+      if (p <= 0) break;
       const a = lerp(1, k >= YEARS - 20 ? 1 : 0.3, late);
-      alpha(a, () => bar(A.X(y0 + k) + 1, A.Y(0), A.Y(sb[k]), w, C.blue, 2));
-      alpha(a * 0.9, () => bar(A.X(y0 + GEN + k) + 1, A.Y(0), A.Y(sa[k]), w, C.fire, 2));
+      alpha(a, () => growBar(A.X(y0 + k) + 1, A.Y(0), A.Y(sb[k]), w, C.blue, 2, p));
+      alpha(a * 0.9, () => growBar(A.X(y0 + GEN + k) + 1, A.Y(0), A.Y(sa[k]), w, C.fire, 2, p));
     }
     alpha(span(t, 0.8, 1.6) * (1 - late), () => text("First deposits: $2,000", A.X(y0) + 4, A.Y(0) - 40, { size: 22, weight: 700, color: C.blue }));
     // yearly return strip; in plain dollars, inflation rides on top as dots
@@ -435,14 +562,30 @@
     alpha(span(t, 0.4, 1.0), () => {
       line(rA.x0, rA.Y(0), rA.x1, rA.Y(0), C.lineStrong, 1);
       text(D.mode === "real" ? "Stock return each year, after inflation" : "Stock return each year, plain dollars", rA.x0, rA.y0 - 6, { size: 18, color: C.muted });
-      for (let y = y0; y < y0 + GEN + YEARS; y++) { const r = D.rets[idx(y)]; bar(rA.X(y) + 1, rA.Y(0), rA.Y(clamp(r, -0.4, 0.4)), w, r >= 0 ? rgba(C.ink, 0.45) : C.danger, 2); }
+      for (let y = y0; y < y0 + GEN + YEARS; y++) { const r = D.rets[idx(y)]; bar(rA.X(y) + 1, rA.Y(0), rA.Y(clamp(r, -0.4, 0.4)), w, r >= 0 ? C.blue : C.danger, 2); }
       xLabels(rA, [1960, 1970, 1980, 1990, 2000, 2010, 2020], (v) => v, rA.y1 + 28);
+      // the best and worst years get a label beside their bar (the strip is too short for more)
+      const yrs = []; for (let y = y0; y < y0 + GEN + YEARS; y++) yrs.push(y);
+      const byR = [...yrs].sort((a, b) => D.rets[idx(a)] - D.rets[idx(b)]);
+      [byR[0], byR[byR.length - 1]].forEach((y) => {
+        const r = D.rets[idx(y)], ye = rA.Y(clamp(r, -0.4, 0.4));
+        text(`${y} ${r >= 0 ? "+" : "−"}${Math.abs(Math.round(r * 100))}%`, rA.X(y) + w + 6, r >= 0 ? ye + 12 : ye, { size: 14, weight: 700, color: r >= 0 ? C.ink : C.danger });
+      });
     });
+    for (let y = y0; y < y0 + GEN + YEARS; y++) {
+      const bi = y - y0, ai = y - y0 - GEN;
+      hot(A.X(y), A.y0, A.X(1) - A.X(0), rA.y1 - A.y0, hvBox(`${y}`, D.unit, [
+        [D.mode === "real" ? "Stocks, after inflation" : "Stocks", spct(D.rets[idx(y)])],
+        D.mode === "nominal" && ["Prices", spct(H.infl[idx(y)])],
+        bi >= 0 && bi < YEARS && [`Ben's money invested (age ${AGE0 + bi})`, dollars(sb[bi])],
+        ai >= 0 && ai < YEARS && [`Arthur's money invested (age ${AGE0 + ai})`, dollars(sa[ai])],
+      ]));
+    }
     if (D.mode === "nominal") alpha(span(t, o.inflAt, o.inflAt + 0.8), () => {
       for (let y = y0; y < y0 + GEN + YEARS; y++) dot(rA.X(y) + 1 + w / 2, rA.Y(clamp(H.infl[idx(y)], -0.4, 0.4)), 4, C.fire);
       legend(rA.x1 - 230, rA.y0 - 6, [[C.fire, "Inflation that year", "dot"]]);
     });
-    if (o.note) alpha(span(t, o.noteAt, o.noteAt + 0.8), () => text(o.note, 1440, 150, { size: 30, weight: 700, fam: "display", align: "right" }));
+    if (o.note) words(o.note, 1440, 150, t, o.noteAt, { size: 30, align: "right", hi: ["Sequence", "risk,"] });
   }
   SCENES.why = (t, q) => whyChart(t, q, SETS.real, 1961, { growTo: q(1), lateAt: q(1), erasAt: q(2), note: "Sequence risk, at the end of saving", noteAt: q(3) });
   SCENES["why-nominal"] = (t, q) => {
@@ -457,8 +600,8 @@
     avatar(640, 240, 62, "B", C.blue, span(t, 0.3, 0.9));
     avatar(960, 250, 50, "A", C.fire, span(t, 0.5, 1.1));
     alpha(span(t, 0.8, 1.6), () => text(`Started at ${AGE0}. Never missed a year.`, 800, 390, { size: 32, weight: 600, align: "center", color: C.muted }));
-    alpha(span(t, q(1), q(1) + 0.8), () => {
-      text("Same plan. Different decades.", 800, 480, { size: 56, weight: 700, fam: "display", align: "center" });
+    words("Same plan. Different decades.", 800, 480, t, q(1), { size: 56, align: "center", gap: 0.16, hi: ["Different", "decades."] });
+    alpha(span(t, q(1) + 0.9, q(1) + 1.7), () => {
       if (D.mode === "real") {
         const b = D.biggest, w = b.gap > 0 ? "son" : "father";
         text(`Since 1945, a generation apart, the ${w} ended with up to ${pct(Math.abs(b.gap), 0)} more (father from ${b.y}, son from ${b.y + GEN}).`, 800, 540, { size: 24, color: C.muted, align: "center" });
@@ -466,15 +609,9 @@
         text(`Since 1945, only ${D.reached} of ${D.WINDOWS.length} windows reached Ramsey's ${money(D.proj)}, in plain dollars.`, 800, 540, { size: 24, color: C.muted, align: "center" });
       }
     });
-    alpha(span(t, q(2), q(2) + 0.8), () => {
-      if (D.mode === "real") {
-        text("12% every year assumes every stretch is the same.", 800, 690, { size: 40, weight: 700, fam: "display", align: "center" });
-        text("History says otherwise.", 800, 750, { size: 40, weight: 700, fam: "display", align: "center", color: C.blue });
-      } else {
-        text("Plain dollars or today's dollars,", 800, 690, { size: 40, weight: 700, fam: "display", align: "center" });
-        text("the lesson is the same.", 800, 750, { size: 40, weight: 700, fam: "display", align: "center", color: C.blue });
-      }
-    });
+    const [l1, l2] = D.mode === "real" ? ["12% every year assumes every stretch is the same.", "History says otherwise."] : ["Plain dollars or today's dollars,", "the lesson is the same."];
+    words(l1, 800, 690, t, q(2), { size: 40, align: "center", gap: 0.1 });
+    words(l2, 800, 750, t, q(2) + 1.4, { size: 40, align: "center", color: C.blue, gap: 0.16 });
   }
   SCENES.takeaway = (t, q) => takeawayCard(t, q, SETS.real);
   SCENES["takeaway-nominal"] = (t, q) => takeawayCard(t, q, SETS.nominal);
@@ -529,14 +666,49 @@
     tIn = inTrack ? 0 : keep;
     syncAudio(); draw(); ui();
   }
-  function showChoice(on) { choice.hidden = !on; }
-  choice.querySelectorAll("button").forEach((b) => b.addEventListener("click", () => {
+  function showChoice(on) { if (choice.hidden === on) choice.hidden = !on; }
+  // the buttons come up when the narrator offers the choice; playback waits at the end of the scene
+  const FORK_SHOW = (s) => s.cues[2].start + 7.0;
+  const forkOpen = (s, t) => s.id === FORK_AFTER && !chosen && started && t >= FORK_SHOW(s);
+  const endEl = document.getElementById("end"), endBtn = document.getElementById("endOther");
+  const otherTrack = () => (track === "real" ? "nominal" : "real");
+  function showEnd(on) {
+    if (on) {
+      // borrow the wording from the fork's own buttons
+      const src = choice.querySelector(`[data-pick="${otherTrack()}"]`);
+      endBtn.querySelector("b").textContent = `Watch again in ${src.querySelector("b").textContent.toLowerCase()}`;
+      endBtn.querySelector("span").textContent = src.querySelector("span").textContent;
+      endBtn.classList.toggle("choice__btn--fire", otherTrack() === "nominal");
+    }
+    if (endEl.hidden === on) endEl.hidden = !on;
+  }
+  endBtn.addEventListener("click", () => {
+    showEnd(false);
+    setTrack(otherTrack());
+    // skip the fork and the track's short intro card: start at the first chart
+    const fi = TIMES.findIndex((x) => x.id === FORK_AFTER);
+    seek(TIMES[Math.min(fi + 2, TIMES.length - 1)].start + 0.001, true);
+  });
+  function pick(tr) {
     showChoice(false);
-    setTrack(b.dataset.pick);
+    setTrack(tr);
     const fi = TIMES.findIndex((s) => s.id === FORK_AFTER);
     if (cur <= fi) { cur = fi + 1; tIn = 0; }
     setPlaying(true);
-  }));
+  }
+  choice.querySelectorAll("button").forEach((b) => b.addEventListener("click", () => pick(b.dataset.pick)));
+  // nobody picks: start plain dollars after a short wait
+  const AUTO_PICK = 15, timerEl = document.getElementById("choiceTimer");
+  let waitFrom = null;
+  setInterval(() => {
+    const s = TIMES[cur];
+    const waiting = s && s.id === FORK_AFTER && !chosen && !playing && started && tIn >= s.dur - 0.01;
+    if (!waiting) { waitFrom = null; if (timerEl.textContent) timerEl.textContent = ""; return; }
+    if (waitFrom == null) waitFrom = performance.now();
+    const left = Math.ceil(AUTO_PICK - (performance.now() - waitFrom) / 1000);
+    if (left <= 0) { waitFrom = null; pick("nominal"); return; }
+    timerEl.textContent = `Starting with plain dollars in ${left}…`;
+  }, 200);
   trackBtns.forEach((b) => b.addEventListener("click", () => { showChoice(false); setTrack(b.dataset.track); }));
   buildTimeline();
 
@@ -574,16 +746,28 @@
     syncAudio(); ui();
     if (p) requestAnimationFrame(tick);
   }
+  let heldScene = -1, held = 0; // waiting on a scene's narration to start
   function tick(now) {
     if (!playing) return;
     const dt = Math.min(0.1, (now - last) / 1000); last = now;
     const s = TIMES[cur];
-    // the audio is the clock while it plays; the picture runs on after it ends
-    if (s.audio && !s.audio.paused && !s.audio.ended && s.audio.currentTime > 0) tIn = s.audio.currentTime;
+    // the audio is the clock while it plays; the picture runs on after it ends.
+    // A new scene's audio can take a moment to start. Hold the picture at the start until it does,
+    // otherwise the scene plays ahead and then jumps back to 0 when the narration catches up.
+    // If the audio never starts (blocked, or failed to load), give up after a couple of seconds.
+    const a = s.audio;
+    if (heldScene !== cur) { heldScene = cur; held = 0; }
+    if (a && !a.paused && !a.ended && a.currentTime > 0) tIn = a.currentTime;
+    else if (a && !a.ended && a.currentTime === 0 && tIn < 0.05 && held < 2.5) held += dt;
     else tIn += dt;
     if (tIn >= s.dur) {
-      if (s.id === FORK_AFTER && !chosen) { tIn = s.dur - 0.001; setPlaying(false); showChoice(true); }
-      else if (cur < TIMES.length - 1) { cur++; tIn = 0; syncAudio(); }
+      if (s.id === FORK_AFTER && !chosen) { tIn = s.dur - 0.001; setPlaying(false); }
+      else if (cur < TIMES.length - 1) {
+        cur++; tIn = 0; syncAudio();
+        // start fetching the scene after this one, so its narration is ready when it comes up
+        const nx = TIMES[cur + 1];
+        if (nx && nx.audio && nx.audio.readyState < 2) nx.audio.load();
+      }
       else { tIn = s.dur; setPlaying(false); }
     }
     draw(); ui();
@@ -610,13 +794,56 @@
     const s = TIMES[cur];
     if (!s) return;
     const q = (i) => (s.cues[i] ? s.cues[i].start : s.dur);
-    eyebrow(cur + 1, s.title);
+    // each scene arrives: a quick fade and rise, the chapter label sliding in from the left
+    const t = started ? tIn : 4.0, enter = span(t, 0, 0.6);
+    alpha(enter, () => { ctx.save(); ctx.translate((1 - enter) * -40, 0); eyebrow(cur + 1, s.title); ctx.restore(); });
+    HOTS = [];
     ctx.save();
-    SCENES[s.id](started ? tIn : 4.0, q, s.dur);
+    if (!SCENES[s.id].ownEntrance) { ctx.globalAlpha = enter; ctx.translate(0, (1 - enter) * 28); }
+    SCENES[s.id](t, q, s.dur);
     ctx.restore();
+    const h = hovered();
+    markHover(h);
+    showHover(h);
     ctx.fillStyle = rgba(C.blue, 0.8);
     ctx.fillRect(0, Hh - 4, W * (started ? tIn / s.dur : 0), 4);
+    showChoice(forkOpen(s, tIn));
+    showEnd(started && !playing && cur === TIMES.length - 1 && tIn >= s.dur - 0.05);
   }
+
+  // ---------- hover ----------
+  const hoverEl = document.getElementById("hover");
+  function hovered() {
+    if (!mouse) return null;
+    for (let i = HOTS.length - 1; i >= 0; i--) {
+      const h = HOTS[i];
+      if (mouse.x >= h.x && mouse.x <= h.x + h.w && mouse.y >= h.y && mouse.y <= h.y + h.h) return h;
+    }
+    return null;
+  }
+  function markHover(h) {
+    if (!h) return;
+    ctx.strokeStyle = C.ink; ctx.lineWidth = 2;
+    if (h.mark === "line") { ctx.setLineDash([4, 4]); ctx.beginPath(); ctx.moveTo(h.x + h.w / 2, h.y); ctx.lineTo(h.x + h.w / 2, h.y + h.h); ctx.stroke(); ctx.setLineDash([]); }
+    else ctx.strokeRect(h.x - 2, h.y, h.w + 4, h.h);
+  }
+  function showHover(h) {
+    if (!hoverEl) return;
+    if (!h) { hoverEl.hidden = true; return; }
+    if (hoverEl.dataset.html !== h.html) { hoverEl.innerHTML = h.html; hoverEl.dataset.html = h.html; }
+    hoverEl.hidden = false;
+    const r = cv.getBoundingClientRect();
+    const px = mouse.cx - r.left, py = mouse.cy - r.top;
+    const w = hoverEl.offsetWidth, hh = hoverEl.offsetHeight;
+    hoverEl.style.left = Math.min(r.width - w - 8, Math.max(8, px + 16)) + "px";
+    hoverEl.style.top = Math.max(8, Math.min(r.height - hh - 8, py - hh - 12 < 8 ? py + 18 : py - hh - 12)) + "px";
+  }
+  cv.addEventListener("mousemove", (e) => {
+    const r = cv.getBoundingClientRect();
+    mouse = { x: ((e.clientX - r.left) / r.width) * W, y: ((e.clientY - r.top) / r.height) * Hh, cx: e.clientX, cy: e.clientY };
+    if (!playing) draw();
+  });
+  cv.addEventListener("mouseleave", () => { mouse = null; if (!playing) draw(); else showHover(null); });
 
   // ---------- controls ----------
   document.getElementById("start").addEventListener("click", () => { seek(0); setPlaying(true); });

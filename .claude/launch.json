@@ -339,7 +339,7 @@
         "http.server",
         "8835",
         "-d",
-        "retirement-sequence-risk"
+        "."
       ],
       "port": 8835
     }

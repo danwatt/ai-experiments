@@ -4,11 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Ben and Arthur, a generation apart</title>
-  <meta name="description" content="A narrated motion explainer: a father and son with the same 40-year investing plan, started 25 years apart, and how much the decades they got change what they retire with.">
+  <meta name="description" content="A narrated motion explainer: a father and son with the same 39-year investing plan from Ramsey Solutions, started 25 years apart, and how much the decades they got change what they retire with.">
   <link rel="stylesheet" href="../../bluebonnet-design-system/dist/bluebonnet.css">
   <style>
     body { min-height: 100vh; }
     .wrap { max-width: 1180px; margin: 0 auto; padding: var(--space-6) var(--space-6) var(--space-12); }
+    .back-sim { display: inline-block; margin-top: var(--space-2); font-size: 15px; font-weight: 600; color: var(--bluebonnet); text-decoration: none; }
+    .back-sim:hover { text-decoration: underline; }
     header { display: flex; gap: var(--space-4); align-items: flex-start; justify-content: space-between; flex-wrap: wrap; }
     header h1 { margin: 0 0 var(--space-1); }
     header p { margin: 0; color: var(--ink-muted); }
@@ -68,6 +70,10 @@
     .choice__btn--fire { border-color: var(--firewheel); }
     .choice__btn--fire b { color: var(--firewheel); }
     .choice__btn:hover { background: var(--bluebonnet-soft); }
+    .choice__timer { min-height: 20px; font-size: 14px; color: var(--ink-muted); }
+    .choice:not([hidden]) .choice__inner { animation: choice-in 0.45s ease-out; }
+    @keyframes choice-in { from { opacity: 0; transform: translateY(14px); } }
+    @media (prefers-reduced-motion: reduce) { .choice:not([hidden]) .choice__inner { animation: none; } }
     .tracks { display: inline-flex; align-items: center; gap: 2px; }
     .tracks__label { font-size: 14px; color: var(--ink-muted); margin-right: 4px; }
     .tracks [aria-pressed="true"] { background: var(--bluebonnet-soft); color: var(--ink); }
@@ -78,6 +84,24 @@
       .controls .grow { flex-basis: 100%; order: 3; }
     }
     @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+    /* the player (picture, caption, controls) shrinks to fit the window height, so on a wide but
+       short screen the caption and controls stay in view with the picture */
+    .wrap .stage, .wrap .caption, .wrap .controls { max-width: max(560px, calc((100svh - 210px) * 16 / 9)); margin-inline: auto; }
+    /* end screen: the other way of counting, or the simulator */
+    .choice__btn--link { text-decoration: none; }
+    .choice__btn--link b { color: var(--ink); }
+    .hover {
+      position: absolute; z-index: 3; pointer-events: none; min-width: 260px; max-width: 340px;
+      background: var(--surface-raised); color: var(--ink); border: 1px solid var(--line-strong); border-radius: var(--radius-md);
+      padding: 10px 14px; font-size: 14px; line-height: 20px; box-shadow: var(--shadow-2); font-variant-numeric: tabular-nums;
+    }
+    .hover[hidden] { display: none; }
+    .hover > b { font-size: 16px; }
+    .hover .hv-unit { display: block; color: var(--ink-muted); font-size: 12px; margin-bottom: 6px; }
+    .hover .hv-row { display: flex; justify-content: space-between; gap: 16px; }
+    .hover .hv-row b { white-space: nowrap; }
+    .hover .hv-row span { color: var(--ink-muted); }
+    .hover .hv-total { border-top: 1px solid var(--line); margin-top: 4px; padding-top: 4px; }
   </style>
 </head>
 <body>
@@ -86,7 +110,8 @@
     <div>
       <span class="text-label" style="color: var(--bluebonnet)">Retirement explainer</span>
       <h1>Ben and Arthur, a generation apart</h1>
-      <p id="sub">A father and son with Ramsey's Arthur plan, $2,000 a year from 27 to 65, started 25 years apart, across every window from 1945 to 2025. You choose plain or inflation-adjusted dollars. About 4 minutes.</p>
+      <p id="sub">A father and son with Ramsey Solutions' Arthur plan, $2,000 a year from 27 to 65, started 25 years apart, across every window from 1945 to 2025. You choose plain or inflation-adjusted dollars. About 4 minutes.</p>
+      <a class="back-sim" href="../">Try any year yourself in the 8% or 4% simulator <span aria-hidden="true">→</span></a>
     </div>
     <button class="bb-btn bb-btn--secondary bb-btn--sm" id="theme" type="button" aria-label="Switch to light theme">
       <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><span>Light</span>
@@ -95,6 +120,7 @@
 
   <div class="stage" id="stage">
     <canvas id="cv" aria-label="Animated explainer. The caption below follows the narration."></canvas>
+    <div class="hover" id="hover" hidden></div>
     <button class="start" id="start" type="button">
       <span class="start__inner">
         <span class="start__disc"><svg viewBox="0 0 24 24" width="36" height="36" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg></span>
@@ -102,6 +128,15 @@
         <span class="start__hint" id="startHint">Sound on. Space pauses, arrow keys skip.</span>
       </span>
     </button>
+    <div class="choice end" id="end" hidden>
+      <div class="choice__inner">
+        <span class="choice__q">Now see it the other way?</span>
+        <div class="choice__row">
+          <button class="choice__btn" type="button" id="endOther"><b></b><span></span></button>
+          <a class="choice__btn choice__btn--link" href="../"><b>Try the simulator</b><span>Any start year, withdrawal rate, fees, or way of counting dollars</span></a>
+        </div>
+      </div>
+    </div>
     <div class="choice" id="choice" hidden>
       <div class="choice__inner">
         <span class="choice__q">How should we count the dollars?</span>
@@ -109,6 +144,7 @@
           <button class="choice__btn choice__btn--fire" type="button" data-pick="nominal"><b>Plain dollars</b><span>$2,000 a year, balances as the statement showed them, like Ramsey's chart</span></button>
           <button class="choice__btn" type="button" data-pick="real"><b>Today's dollars</b><span>Deposits and balances adjusted for inflation to November 2026 prices, so every year compares fairly</span></button>
         </div>
+        <span class="choice__timer" id="choiceTimer" aria-live="polite"></span>
       </div>
     </div>
   </div>
@@ -158,7 +194,7 @@
 </div>
 
 <script src="../data.js"></script>
-<script src="narration.js"></script>
-<script src="app.js"></script>
+<script src="narration.js?v=3"></script>
+<script src="app.js?v=11"></script>
 </body>
 </html>

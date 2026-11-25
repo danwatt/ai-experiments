@@ -5,11 +5,11 @@ The source of truth is [narration.json](narration.json). This file is a readable
 
 ## 1. The 8% promise
 
-> Dave Ramsey tells retirees they can spend eight percent of their savings every year.
+> Ramsey Solutions tells retirees they can spend eight percent of their savings every year.
 
 *On screen:* Title: “Spend 8% of your savings, every year, forever?”
 
-> His math is simple. Stocks average twelve percent. Inflation takes four. That leaves eight.
+> Their math is simple. Stocks average twelve percent. Inflation takes four. That leaves eight.
 
 *On screen:* 12% − 4% = 8% builds up, one term at a time
 
