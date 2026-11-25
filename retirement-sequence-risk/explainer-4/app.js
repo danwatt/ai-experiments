@@ -72,7 +72,9 @@
     const FIXED = STARTS.map(fixedRun), PCT = STARTS.map(pctRun);
     const DONE = FIXED.filter((r) => r.n === HORIZON);
     const BUBBLE = FIXED.filter((r) => r.y0 >= 1997 && r.y0 <= 2008); // the twelve that started near the 2000 peak
-    const FUND_COLORS = () => [C.blue, C.paintbrush, C.winecup, C.fire];
+    // each fund keeps its color wherever it appears, whatever order the funds are listed in
+    const FUND_COLOR = (ticker) => ({ AGTHX: C.blue, AIVSX: C.paintbrush, ANWPX: C.winecup, CWGIX: C.fire })[ticker];
+    const FUND_COLORS = () => F.funds.map((f) => FUND_COLOR(f.ticker));
     const statusColor = (s) => (s === "ok" ? C.blue : s === "fail" ? C.danger : C.muted);
     const UNIT = "today's dollars (November 2026)";
     const outcome = (r) => (r.status === "fail" ? `out in ${r.y0 + Math.ceil(r.lasted) - 1}, ${r.lasted.toFixed(1)} yrs`
@@ -134,32 +136,52 @@
       [". That 4 percent keeps your nest egg, and therefore your income, "], ["ahead of inflation \u2019til death do you part", "b"], [".\u201D"],
     ];
     const alphaZero = (fn) => { ctx.save(); ctx.globalAlpha = 0; const v = fn(); ctx.restore(); return v; };
-    // Draw runs of [text, "b"?] wrapped to width w from (x, y); returns the height used.
+    // Draw runs of [text, "b"?, color?] wrapped to width w from (x, y): bold runs in ink unless given a color.
+    // o.align "center" centers each line on x. Returns the height used.
     function richText(x, y, w, runs, o) {
-      const size = o.size || 20, lh = o.lineHeight || size * 1.5, toks = [];
-      runs.forEach(([s, b]) => s.split(/(\s+)/).forEach((tk) => tk && toks.push({ tk, b: !!b })));
-      let cx = 0, cy = 0;
-      toks.forEach(({ tk, b }) => {
+      const size = o.size || 20, lh = o.lineHeight || size * 1.5, lines = [[]];
+      let cx = 0;
+      runs.forEach(([s, b, color]) => s.split(/(\s+)/).forEach((tk) => {
+        if (!tk) return;
         font(ctx, size, b ? 700 : 400);
-        const tw = ctx.measureText(tk).width;
-        if (/^\s+$/.test(tk)) { if (cx > 0) cx += tw; return; }
-        if (cx + tw > w && cx > 0) { cx = 0; cy += lh; }
-        text(tk, x + cx, y + cy, { size, weight: b ? 700 : 400, color: b ? C.ink : C.muted });
-        cx += tw;
+        const tw = ctx.measureText(tk).width, space = /^\s+$/.test(tk);
+        if (space) { if (cx > 0) { lines[lines.length - 1].push({ tk, tw, space }); cx += tw; } return; }
+        if (cx + tw > w && cx > 0) { const last = lines[lines.length - 1]; while (last.length && last[last.length - 1].space) last.pop(); lines.push([]); cx = 0; }
+        lines[lines.length - 1].push({ tk, tw, b: !!b, color }); cx += tw;
+      }));
+      lines.forEach((line, li) => {
+        const width = line.reduce((s, t) => s + t.tw, 0);
+        let lx = o.align === "center" ? x - width / 2 : x;
+        line.forEach((t) => {
+          if (!t.space) text(t.tk, lx, y + li * lh, { size, weight: t.b ? 700 : 400, color: t.color || (t.b ? C.ink : C.muted) });
+          lx += t.tw;
+        });
       });
-      return cy + lh * 0.3;
+      return (lines.length - 1) * lh + lh * 0.3;
     }
+
 
     const SCENES = {};
 
     // 1. Ramsey's four funds
     SCENES["four-funds"] = function (t, q) {
       const cols = FUND_COLORS();
+      // the book's own words (not narrated), each fund type in its card's color; it gives way to the headline
+      alpha(span(t, 0.4, 1.2) * (1 - q.span(1, -0.4, 0.3)), () => {
+        const [income, growth, intl, aggressive] = ["AIVSX", "AGTHX", "CWGIX", "ANWPX"].map(FUND_COLOR), by = 170;
+        const h = richText(800, by, 1340, [
+          ["\u201CI spread my retirement, investing evenly across four types of funds. "], ["Growth and Income", "b", income],
+          [" funds get 25 percent of my investment\u2026 "], ["Growth", "b", growth], [" funds get 25 percent of my investment\u2026 "],
+          ["International", "b", intl], [" funds get 25 percent of my investment\u2026 "], ["Aggressive Growth", "b", aggressive],
+          [" funds get the last 25 percent of my investment.\u201D"],
+        ], { size: 27, lineHeight: 42, align: "center" });
+        text("Dave Ramsey, The Total Money Makeover, chapter 9", 800, by + h + 26, { size: 18, color: C.muted, align: "center" });
+      });
       words("$1,000,000 on retirement day", 800, 250, t, q.at(1, 0.4), { size: 44, align: "center" });
       F.funds.forEach((f, i) => {
         const cx = 260 + i * 360;
         // each role and the fund that fills it arrive together, as the narrator names the role
-        const role = q.span(0, 4.0 + i * 1.3, 4.6 + i * 1.3), fund = q.lin(0, 4.0 + i * 1.3, 4.8 + i * 1.3);
+        const role = q.span(0, 4.6 + i * 1.3, 5.2 + i * 1.3), fund = q.lin(0, 4.6 + i * 1.3, 5.4 + i * 1.3);
         alpha(role, () => text(f.role.toUpperCase(), cx, 350, { size: 18, weight: 700, color: cols[i], align: "center", spacing: 1.4 }));
         statCard({ cx, top: 370, w: 320, h: 230, title: f.ticker, value: "", sub: "", color: cols[i], progress: fund });
         alpha(fund, () => {
@@ -205,7 +227,7 @@
           F.standIn[f.ticker] ? [`${F.standIn[f.ticker].by} stands in`, `${F.first}–${from - 1}`] : null]));
       });
       // CWGIX's missing years, filled by New Perspective
-      const yC = A.y0 + 40 + 3 * 88, s0 = A.X(stand.years[0]), s1 = A.X(stand.years[stand.years.length - 1] + 1), sp = q.span(0, 7.5, 8.3); // as the narrator gets to New Perspective standing in
+      const yC = A.y0 + 40 + F.funds.findIndex((f) => f.ticker === "CWGIX") * 88, s0 = A.X(stand.years[0]), s1 = A.X(stand.years[stand.years.length - 1] + 1), sp = q.span(0, 7.5, 8.3); // as the narrator gets to New Perspective standing in
       alpha(sp, () => {
         ctx.fillStyle = rgba(C.winecup, 0.45); ctx.beginPath(); ctx.roundRect(s0, yC - 8, s1 - s0, 30, 6); ctx.fill();
         ctx.strokeStyle = C.winecup; ctx.setLineDash([5, 4]); ctx.lineWidth = 2; ctx.stroke(); ctx.setLineDash([]);

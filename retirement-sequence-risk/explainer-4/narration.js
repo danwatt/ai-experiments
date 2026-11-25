@@ -7,17 +7,17 @@ window.NARRATION = {
    "id": "four-funds",
    "title": "Ramsey's four funds",
    "track": null,
-   "audio": "audio/four-funds.mp3?v=cf520ffb",
-   "duration": 19.915,
+   "audio": "audio/four-funds.mp3?v=8e316ab6",
+   "duration": 19.99,
    "cues": [
     {
      "start": 0.0,
-     "end": 10.0,
-     "text": "Ramsey Solutions recommends spreading your investments across four kinds of mutual funds: growth, growth and income, aggressive growth, and international."
+     "end": 10.075,
+     "text": "Ramsey Solutions recommends spreading your investments across four kinds of mutual funds: growth and income, growth, international, and aggressive growth."
     },
     {
-     "start": 10.32,
-     "end": 19.595,
+     "start": 10.395,
+     "end": 19.67,
      "text": "Say that after years of saving, you retire with a million dollars, a quarter of it in each, here in four American Funds that fit those labels."
     }
    ]

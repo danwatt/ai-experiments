@@ -2,10 +2,10 @@
 """Build funds.js: calendar-year total returns for the four American Funds Class A shares that stand in for
 Ramsey Solutions' four-fund mix, and for an S&P 500 index fund to compare with, kept apart from the main data.js.
 
-  growth             AGTHX  The Growth Fund of America        (launched 1973)
   growth and income  AIVSX  The Investment Company of America (launched 1934)
-  aggressive growth  ANWPX  New Perspective Fund              (launched 1973)
+  growth             AGTHX  The Growth Fund of America        (launched 1973)
   international      CWGIX  Capital World Growth and Income   (launched March 1993; full years from 1994)
+  aggressive growth  ANWPX  New Perspective Fund              (launched 1973)
   comparison         VFINX  Vanguard 500 Index Fund
 
 All returns are total returns at NAV: fund expenses taken out, sales charges not (a $1 million balance pays
@@ -28,10 +28,11 @@ Usage: python3 build-funds.py
 """
 import datetime, json, urllib.request
 
-FUNDS = [("AGTHX", "The Growth Fund of America", "growth", 1973),
-         ("AIVSX", "The Investment Company of America", "growth and income", 1934),
-         ("ANWPX", "New Perspective Fund", "aggressive growth", 1973),
-         ("CWGIX", "Capital World Growth and Income Fund", "international", 1993)]
+# in the order The Total Money Makeover lists the four kinds of funds
+FUNDS = [("AIVSX", "The Investment Company of America", "growth and income", 1934),
+         ("AGTHX", "The Growth Fund of America", "growth", 1973),
+         ("CWGIX", "Capital World Growth and Income Fund", "international", 1993),
+         ("ANWPX", "New Perspective Fund", "aggressive growth", 1973)]
 COMPARE = {"SP": "VFINX"}      # the comparison scene's S&P 500 index fund
 STAND_IN = {"CWGIX": "ANWPX"}  # whose returns fill the years before a fund's first full year
 FIRST, LAST = 1981, 2025

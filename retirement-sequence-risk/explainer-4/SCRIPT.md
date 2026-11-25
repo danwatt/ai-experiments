@@ -1,15 +1,17 @@
 # Ramsey's four funds: $1 million, 8% a year: script
 
-The source of truth is [narration.json](narration.json). $1,000,000 split evenly across four American Funds Class A shares (AGTHX, AIVSX, ANWPX, CWGIX), drawn evenly from all four, 30-year horizon, retirements starting every year from 1981. Before 1994, New Perspective (ANWPX) stands in for Capital World Growth and Income (CWGIX). Everything is in today's dollars. A comparison scene holds the same million in an S&P 500 index fund. Two rules: **8% of the start** ($80,000 a year, raised with inflation, end of year) and **8% of what's left** (8% of the balance each January).
+The source of truth is [narration.json](narration.json). $1,000,000 split evenly across four American Funds Class A shares (AIVSX, AGTHX, CWGIX, ANWPX), drawn evenly from all four, 30-year horizon, retirements starting every year from 1981. Before 1994, New Perspective (ANWPX) stands in for Capital World Growth and Income (CWGIX). Everything is in today's dollars. A comparison scene holds the same million in an S&P 500 index fund. Two rules: **8% of the start** ($80,000 a year, raised with inflation, end of year) and **8% of what's left** (8% of the balance each January).
 
 One track, no fork. Voiced with Kokoro (Heart) through Voicebox; about 4 minutes.
 
 
 ## 1. Ramsey's four funds
 
-> Ramsey Solutions recommends spreading your investments across four kinds of mutual funds: growth, growth and income, aggressive growth, and international.
+*On screen first, not narrated:* “I spread my retirement, investing evenly across four types of funds. **Growth and Income** funds get 25 percent of my investment… **Growth** funds get 25 percent of my investment… **International** funds get 25 percent of my investment… **Aggressive Growth** funds get the last 25 percent of my investment.” Dave Ramsey, The Total Money Makeover, chapter 9 (parentheticals cut; each fund type in its card's color). It gives way to the headline as the second line starts.
 
-*On screen:* one card per role as the narrator names it: Growth, AGTHX The Growth Fund of America · Growth and income, AIVSX The Investment Company of America · Aggressive growth, ANWPX New Perspective Fund · International, CWGIX Capital World Growth and Income Fund
+> Ramsey Solutions recommends spreading your investments across four kinds of mutual funds: growth and income, growth, international, and aggressive growth.
+
+*On screen:* one card per role as the narrator names it, in the book's order: Growth and income, AIVSX The Investment Company of America · Growth, AGTHX The Growth Fund of America · International, CWGIX Capital World Growth and Income Fund · Aggressive growth, ANWPX New Perspective Fund
 
 > Say that after years of saving, you retire with a million dollars, a quarter of it in each, here in four American Funds that fit those labels.
 

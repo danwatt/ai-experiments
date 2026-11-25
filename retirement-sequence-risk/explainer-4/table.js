@@ -5,8 +5,8 @@
   const F = window.FUNDS, H = window.HIST, root = document.getElementById("dataTable");
   if (!F || !H || !root) return;
   const COLS = [
-    ["AGTHX", "Growth Fund of America"], ["AIVSX", "Investment Company of America"], ["ANWPX", "New Perspective"],
-    ["CWGIX", "Capital World Growth and Income"], ["VFINX", "S&P 500 index fund"],
+    ["AIVSX", "Investment Company of America"], ["AGTHX", "Growth Fund of America"], ["CWGIX", "Capital World Growth and Income"],
+    ["ANWPX", "New Perspective"], ["VFINX", "S&P 500 index fund"],
   ];
   const ret = (t, i) => (t === "VFINX" ? F.compare.SP : F.returns[t])[i];
   const pct = (v) => (v >= 0 ? "+" : "−") + Math.abs(v * 100).toFixed(1) + "%";
