@@ -146,7 +146,7 @@
     <div>
       <span class="text-label" style="color: var(--bluebonnet)">Retirement explainer · Four funds</span>
       <h1>Ramsey's four funds: $1 million, 8% a year</h1>
-      <p id="sub">A million dollars split evenly across four American Funds that match Ramsey Solutions' four-fund mix, spent at 8% a year, in every retirement since 1981. In today's dollars. About 3½ minutes.</p>
+      <p id="sub">A million dollars split evenly across four American Funds that match Ramsey Solutions' four-fund mix, spent at 8% a year, in every retirement since 1981. In today's dollars. About 5½ minutes.</p>
       <a class="back-sim" href="../">Try any year yourself in the 8% or 4% simulator <span aria-hidden="true">→</span></a>
     </div>
     <button class="bb-btn bb-btn--secondary bb-btn--sm" id="theme" type="button" aria-label="Switch to light theme">
@@ -202,8 +202,10 @@
     <p>Each row is a retirement that started that year with $1 million in the four funds; each square is one year of it, in today's dollars. Read across a row to follow one retiree, or down a diagonal to see one calendar year hit everyone at once: 2008 runs from the first square of the 2008 row up to year 28 of the 1981 row. Hover a square for details.</p>
     <div class="bar">
       <div class="seg" role="group" aria-label="What the squares show">
-        <button type="button" data-matrix="pct" aria-pressed="true">Check: 8% of what's left</button>
-        <button type="button" data-matrix="fixed" aria-pressed="false">Balance: $80,000 a year</button>
+        <button type="button" data-matrix="pct8" aria-pressed="true">Check: 8% of what's left</button>
+        <button type="button" data-matrix="pct4" aria-pressed="false">Check: 4% of what's left</button>
+        <button type="button" data-matrix="fixed8" aria-pressed="false">Balance: $80,000 a year</button>
+        <button type="button" data-matrix="fixed4" aria-pressed="false">Balance: $40,000 a year</button>
       </div>
       <div class="legend" id="matrixLegend"></div>
     </div>
@@ -217,9 +219,10 @@
     <div>
       <h2>What the animation computes</h2>
       <p>Each retiree starts retirement on January 1 with $1,000,000 already saved in four American Funds Class A shares, a quarter in each, in the order the book lists them: The Investment Company of America (AIVSX, growth and income), The Growth Fund of America (AGTHX, growth), Capital World Growth and Income Fund (CWGIX, international) and New Perspective Fund (ANWPX, aggressive growth). Withdrawals come out of the four evenly; if one fund can't cover its share, the others make it up. Nothing is rebalanced.</p>
-      <p>Two ways to spend 8%. <b>8% of the start</b>: $80,000 at the end of every year, raised with inflation, for 30 years. <b>8% of what's left</b>: 8% of the balance every January, so it never runs out but the check moves with the market. Everything is in today's dollars (November 2026 prices).</p>
-      <p>Rebalancing back to a quarter each every year would have changed little: every finished retirement still lasts, and the same 8 of 12 from 1997–2008 run out, a few months later at most. It leaves a little more at the end and lifts the leanest 8%-of-what's-left checks by one or two thousand dollars. All four are large-company stock funds that move together (each lost 35–39% in 2008), so there's little to rebalance between. That assumes rebalancing is free, as in an IRA; in a taxable account it can trigger capital-gains tax.</p>
-      <p>The comparison holds the same million in an S&amp;P 500 index fund instead, with the same withdrawals.</p>
+      <p>Two ways to spend 8%, in the order the explainer takes them. <b>8% of what's left</b>, as the book lays it out: 8% of the balance every January, so it never runs out but the check moves with the market. <b>Never a pay cut</b>, taking at its word the book's suggestion of a cost-of-living raise every year: $80,000 on the first day of retirement and every January 1 after, raised with inflation, for 30 years; like 8% of what's left, each year's money comes out as the year starts. Everything is in today's dollars (November 2026 prices). The book's own example is $40,000 a year from $500,000; doubling both changes nothing but the scale.</p>
+      <p>Rebalancing back to a quarter each every year would have changed little: every finished retirement still lasts, and the same 10 of 12 from 1997–2008 run out, a few months later at most. It leaves a little more at the end and lifts the leanest 8%-of-what's-left checks by one or two thousand dollars. All four are large-company stock funds that move together (each lost 35–39% in 2008), so there's little to rebalance between. That assumes rebalancing is free, as in an IRA; in a taxable account it can trigger capital-gains tax.</p>
+      <p>Where an S&amp;P 500 index fund appears (the 2000 retiree, and the hover on every retirement), it holds the same million instead, with the same withdrawals.</p>
+      <p>The "Thirty years or twenty?" slide judges the same retirements over 20 years instead of 30, close to the average remaining life expectancy at 65 in the Social Security Administration's <a href="https://www.ssa.gov/oact/STATS/table4c6.html">actuarial life table</a>. A retirement that ran out before the span ended counts as running out even if it hasn't had the whole span; one that reached it lasted; later starts are too soon to tell. Only 1998 changes sides: it ran out in its 25th year.</p>
       <p>The aside on the first slide: Ramsey Solutions argues that a front-end sales charge pays for an advisor's help (<a href="https://www.daveramsey.com/blog/why-dave-prefers-up-front-fees">why Dave prefers up-front fees</a>, <a href="https://www.ramseysolutions.com/retirement/do-not-be-confused-by-mutual-fund-fees">mutual fund fees</a>); each SmartVestor Pro pays Ramsey Solutions a combination of fees (<a href="https://www.ramseysolutions.com/retirement/us/ga">SmartVestor</a>); and American Funds Class A shares carry a sales charge of up to 5.75%, less on larger purchases and none from $1 million (<a href="https://www.capitalgroup.com/advisor/investments/share-class-information/share-class-pricing.html">Capital Group share-class pricing</a>).</p>
     </div>
     <div>
@@ -227,8 +230,8 @@
       <ul>
         <li>Calendar-year total returns at NAV, with every dividend and capital-gain distribution reinvested and fund expenses included. Through the mid-1990s they are the funds' published returns: the calendar-year results in their prospectuses and ICA's annual report, filed with the SEC, and Morningstar's annual returns for the early 1980s, which agree with those filings to within a few tenths of a point where they overlap. Yahoo Finance's price history misses many of the distributions in those years and understates the funds by 1 to 13 points a year, so it is used only from 1995–98 on, where it matches the published figures and Capital Group's 1-, 3-, 5-, 10-, 15- and 20-year returns to within 0.01%. Sales charges paid while saving are in the past; only the balance on retirement day matters here. Inflation is the CPI series used across this project.</li>
         <li>The quotes on the first slide and the "8% of what's left" slide are from chapter 9 of <i>The Total Money Makeover</i>. On the first, the book's parenthetical asides (other names for each kind of fund, such as Large Cap or Blue Chip) are cut, marked with ellipses; on the second, the bold is added for emphasis.</li>
-        <li>The dotted line on the second slide marks when Ramsey's book <i>The Total Money Makeover</i>, which splits investments 25% each across growth and income, growth, international and aggressive growth funds, was published: September 2003, by Thomas Nelson (<a href="https://en.wikipedia.org/wiki/The_Total_Money_Makeover">Wikipedia</a>, <a href="https://www.bookreporter.com/reviews/the-total-money-makeover-a-proven-plan-for-financial-fitness">Bookreporter</a>).</li>
-        <li>Capital World Growth and Income began in March 1993, so for 1981–1993 its quarter uses New Perspective's returns instead, a global fund from the same family. Retirements start every year from 1981 to 2025; only 1981–1996 have a full 30 years.</li>
+        <li>The first slide's note and the dotted line on the 2002–2005 slide mark when Ramsey's book <i>The Total Money Makeover</i>, which splits investments 25% each across growth and income, growth, international and aggressive growth funds, was published: September 2003, by Thomas Nelson (<a href="https://en.wikipedia.org/wiki/The_Total_Money_Makeover">Wikipedia</a>, <a href="https://www.bookreporter.com/reviews/the-total-money-makeover-a-proven-plan-for-financial-fitness">Bookreporter</a>).</li>
+        <li>Capital World Growth and Income began in March 1993, so for 1981–1993 its quarter uses New Perspective's returns instead, a global fund from the same family. Retirements start every year from 1981 to 2025; only 1981–1996 have a full 30 years, and 1981–2006 a full 20.</li>
         <li>Every year's numbers, with a link to each source, are in the <a href="#data">data table</a> at the bottom of the page.</li>
         <li>The S&amp;P 500 comparison uses Vanguard 500 Index Fund (VFINX), built the same way, so its fees are included too.</li>
         <li>Rebuild with <code>python3 build-funds.py</code>, which writes this explainer's own <code>funds.js</code>.</li>
@@ -249,10 +252,10 @@
 
 <script src="../data.js"></script>
 <script src="funds.js?v=5"></script>
-<script src="narration.js?v=16"></script>
+<script src="narration.js?v=24"></script>
 <script src="../kit/explainer-kit.js?v=6"></script>
-<script src="app.js?v=46"></script>
+<script src="app.js?v=64"></script>
 <script src="table.js?v=3"></script>
-<script src="matrix.js?v=2"></script>
+<script src="matrix.js?v=4"></script>
 </body>
 </html>

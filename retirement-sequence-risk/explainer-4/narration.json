@@ -10,48 +10,11 @@
       ]
     },
     {
-      "id": "history",
-      "title": "How far back the funds go",
-      "lines": [
-        "Three of these funds go back decades. Capital World Growth and Income only started in 1993, so before 1994 its quarter uses New Perspective's returns, a global fund from the same family.",
-        "That gives a retirement starting every year from 1981 on. The first sixteen have had a full thirty years.",
-        "Ramsey's book The Total Money Makeover, which lays out this four-fund mix, came out in September 2003."
-      ]
-    },
-    {
-      "id": "retire-2000",
-      "title": "Retire in January 2000",
-      "lines": [
-        "Say you retired in January 2000 and took eighty thousand dollars a year, raised with inflation, a quarter from each fund.",
-        "The dot-com crash came first. Then in 2008 all four funds lost between thirty-five and thirty-nine percent.",
-        "The money ran out in 2013, thirteen years in. An S&P 500 index fund on its own would have run out four years sooner."
-      ]
-    },
-    {
-      "id": "every",
-      "title": "Every retirement since 1981",
-      "lines": [
-        "Here's every retirement that started from 1981 on, each taking eighty thousand of today's dollars a year.",
-        "All sixteen that have had a full thirty years made it, and every one ended with more than the million it started with.",
-        "But eight of the twelve that started from 1997 to 2008 have already run out, most within twenty years."
-      ]
-    },
-    {
-      "id": "book-years",
-      "title": "Retiring around the book: 2002 to 2005",
-      "lines": [
-        "Look closer at the four retirements around the book's release, from 2002 to 2005.",
-        "Retiring in 2003, the first year gained thirty-one percent, and by 2007 the million had grown to almost one and a half. Even after 2008, it still has more than a million left.",
-        "Retiring one year earlier, in 2002, the first year lost seventeen percent. The money never got back to a million, and it ran out in 2021.",
-        "The 2004 and 2005 retirees went into 2008 with much smaller cushions. One has nineteen thousand dollars left, and the other ran out in 2025."
-      ]
-    },
-    {
       "id": "percent",
-      "title": "Another way: 8% of what's left",
+      "title": "The book's way: 8% of what's left",
       "lines": [
-        "Now take eight percent of whatever is there each January instead. The money can't run out, but the paycheck rises and falls with the market.",
-        "For the 2000 retiree, the first check was eighty thousand. By 2003 it was forty-six thousand, and after 2008 it never again topped forty-five.",
+        "Here's the plan as the book lays it out: take eight percent of whatever is there each January. The money can't run out, but the paycheck rises and falls with the market.",
+        "Say you retired in January 2000. The first check was eighty thousand. By 2003 it was forty-six thousand, and after 2008 it never again topped forty-five.",
         "In its leanest year it paid thirty thousand dollars."
       ]
     },
@@ -67,30 +30,67 @@
     },
     {
       "id": "leanest",
-      "title": "Every retiree's leanest year",
+      "title": "Every retiree's range of checks",
       "lines": [
-        "Here's the leanest year for every retirement so far, taking eight percent of what's left.",
+        "Here's every retirement's range of checks so far, taking eight percent of what's left: the biggest year at the top, the leanest at the bottom, and the median year marked in between.",
         "Among the sixteen finished retirements, the typical leanest year paid about fifty-eight thousand dollars. The worst, retiring in 1996, got by one year on forty-nine thousand.",
-        "Those who retired around 2000 have already had years between thirty and thirty-seven thousand."
+        "Those who retired around 2000 have already had years between thirty and thirty-seven thousand, and their median year paid only forty to fifty."
       ]
     },
     {
-      "id": "compare",
-      "title": "Against an S&P 500 index fund",
+      "id": "retire-2000",
+      "title": "Another way: never take a pay cut",
       "lines": [
-        "How do the four funds compare with an S&P 500 index fund on its own, taking the same eighty thousand a year?",
-        "The S&P fund lasted in fifteen of the sixteen finished retirements. And ten of the twelve that started from 1997 to 2008 have run out, against eight for the four funds.",
-        "Taking eight percent of what's left, the four funds' typical leanest year was fifty-eight thousand dollars, against forty-four for the S&P fund.",
-        "At four percent instead of eight, neither ever ran out. And taking four percent of what's left, the typical retiree never got a check below the first one, forty thousand."
+        "Ramsey suggests a cost-of-living raise every year is possible. So try it the other way: take eighty thousand the first year, then raise it with inflation and never take a cut. Back to the 2000 retiree.",
+        "The dot-com crash came first. Then in 2008 all four funds lost between thirty-five and thirty-nine percent.",
+        "The money ran out in 2013, thirteen years in. An S&P 500 index fund on its own would have run out four years sooner."
+      ]
+    },
+    {
+      "id": "every",
+      "title": "Every retirement since 1981",
+      "lines": [
+        "Here's every retirement that started from 1981 on, each taking eighty thousand of today's dollars a year.",
+        "All sixteen that have had a full thirty years made it, and thirteen of them ended with more than the million they started with.",
+        "But ten of the twelve that started from 1997 to 2008 have already run out, most within twenty years."
+      ]
+    },
+    {
+      "id": "book-years",
+      "title": "Retiring around the book: 2002 to 2005",
+      "lines": [
+        "Look closer at the four retirements around the book's release, from 2002 to 2005.",
+        "Retiring in 2003, the first year gained thirty-one percent, and by 2007 the million had grown to almost one point four. Even after 2008, it still has seven hundred thousand left.",
+        "Retiring one year earlier, in 2002, the first year lost seventeen percent. The money never got back to a million, and it ran out in 2019.",
+        "The 2004 and 2005 retirees went into 2008 with much smaller cushions, and both ran out in 2023."
+      ]
+    },
+    {
+      "id": "in-2003",
+      "title": "Where things stood in 2003",
+      "lines": [
+        "Now go back to when the book was written. Say its numbers stop at the start of 2003: twenty-two retirements had begun since 1981, each taking eighty thousand a year, and not one had run out.",
+        "Fifteen still had more than the million they started with, three of them more than two million.",
+        "But the five that started from 1998 to 2002 were already down to between about five hundred fifty and eight hundred thousand. All five later ran out."
+      ]
+    },
+    {
+      "id": "horizon",
+      "title": "Thirty years or twenty?",
+      "lines": [
+        "So far, every retirement has had to last thirty years. What if it only had to last twenty, close to the average life expectancy at sixty-five?",
+        "At thirty years, all sixteen finished retirements lasted. But ten others ran out before reaching thirty, and nineteen are too recent to tell.",
+        "At twenty years, twenty-six have finished, and only nineteen of them lasted. Nearly the same retirements run out either way; twenty years just finishes more of them.",
+        "Taking eight percent of what's left, the money never runs out, but the worst leanest year falls from forty-nine thousand to thirty-four. And at forty thousand a year, every finished retirement lasted at both lengths."
       ]
     },
     {
       "id": "takeaway",
       "title": "What the four funds show",
       "lines": [
-        "Spread across four funds, eight percent lasted for every retirement that has had thirty years, and ran out for many that started near the 2000 peak.",
-        "Taking eight percent of what's left kept the money going, but many years paid far less than the eighty thousand planned.",
-        "Four funds or one index fund: at eight percent, the order of the years decides."
+        "Taking eight percent of what's left, as the book lays out, the money never ran out, but many years paid far less than the eighty thousand planned.",
+        "Taking eighty thousand with a raise every year lasted for every retirement that has had thirty years, and ran out for many that started near the 2000 peak.",
+        "At eight percent, the order of the years decides, over thirty years or twenty."
       ]
     }
   ]

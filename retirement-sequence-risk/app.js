@@ -29,6 +29,7 @@
   }
   const PRESETS = {
     ramsey: { wr: 8, stocks: 100, af: 0, rule: 0, save: 39, contrib: 2000, ret: 30 },
+    ramseyPct: { wr: 8, stocks: 100, af: 0, rule: 3, save: 39, contrib: 2000, ret: 30 },
     practiced: { wr: 8, stocks: 100, af: 1, rule: 0, save: 39, contrib: 2000, ret: 30 },
     bengen: { wr: 4, stocks: 50, af: 0, rule: 0 },
     four100: { wr: 4, stocks: 100, af: 0, rule: 0 },

@@ -23,126 +23,25 @@ window.NARRATION = {
    ]
   },
   {
-   "id": "history",
-   "title": "How far back the funds go",
-   "track": null,
-   "audio": "audio/history.mp3?v=061c1cfc",
-   "duration": 30.26,
-   "cues": [
-    {
-     "start": 0.0,
-     "end": 14.4,
-     "text": "Three of these funds go back decades. Capital World Growth and Income only started in 1993, so before 1994 its quarter uses New Perspective's returns, a global fund from the same family."
-    },
-    {
-     "start": 14.72,
-     "end": 22.17,
-     "text": "That gives a retirement starting every year from 1981 on. The first sixteen have had a full thirty years."
-    },
-    {
-     "start": 22.49,
-     "end": 29.94,
-     "text": "Ramsey's book The Total Money Makeover, which lays out this four-fund mix, came out in September 2003."
-    }
-   ]
-  },
-  {
-   "id": "retire-2000",
-   "title": "Retire in January 2000",
-   "track": null,
-   "audio": "audio/retire-2000.mp3?v=f4ecaaef",
-   "duration": 26.485,
-   "cues": [
-    {
-     "start": 0.0,
-     "end": 8.575,
-     "text": "Say you retired in January 2000 and took eighty thousand dollars a year, raised with inflation, a quarter from each fund."
-    },
-    {
-     "start": 8.895,
-     "end": 16.62,
-     "text": "The dot-com crash came first. Then in 2008 all four funds lost between thirty-five and thirty-nine percent."
-    },
-    {
-     "start": 16.94,
-     "end": 26.165,
-     "text": "The money ran out in 2013, thirteen years in. An S&P 500 index fund on its own would have run out four years sooner."
-    }
-   ]
-  },
-  {
-   "id": "every",
-   "title": "Every retirement since 1981",
-   "track": null,
-   "audio": "audio/every.mp3?v=2abf6397",
-   "duration": 23.11,
-   "cues": [
-    {
-     "start": 0.0,
-     "end": 7.4,
-     "text": "Here's every retirement that started from 1981 on, each taking eighty thousand of today's dollars a year."
-    },
-    {
-     "start": 7.72,
-     "end": 14.67,
-     "text": "All sixteen that have had a full thirty years made it, and every one ended with more than the million it started with."
-    },
-    {
-     "start": 14.99,
-     "end": 22.79,
-     "text": "But eight of the twelve that started from 1997 to 2008 have already run out, most within twenty years."
-    }
-   ]
-  },
-  {
-   "id": "book-years",
-   "title": "Retiring around the book: 2002 to 2005",
-   "track": null,
-   "audio": "audio/book-years.mp3?v=867b493d",
-   "duration": 44.055,
-   "cues": [
-    {
-     "start": 0.0,
-     "end": 6.45,
-     "text": "Look closer at the four retirements around the book's release, from 2002 to 2005."
-    },
-    {
-     "start": 6.77,
-     "end": 20.02,
-     "text": "Retiring in 2003, the first year gained thirty-one percent, and by 2007 the million had grown to almost one and a half. Even after 2008, it still has more than a million left."
-    },
-    {
-     "start": 20.34,
-     "end": 30.79,
-     "text": "Retiring one year earlier, in 2002, the first year lost seventeen percent. The money never got back to a million, and it ran out in 2021."
-    },
-    {
-     "start": 31.11,
-     "end": 43.735,
-     "text": "The 2004 and 2005 retirees went into 2008 with much smaller cushions. One has nineteen thousand dollars left, and the other ran out in 2025."
-    }
-   ]
-  },
-  {
    "id": "percent",
-   "title": "Another way: 8% of what's left",
+   "title": "The book's way: 8% of what's left",
    "track": null,
-   "audio": "audio/percent.mp3?v=4e5f1e18",
-   "duration": 24.535,
+   "audio": "audio/percent.mp3?v=96544c35",
+   "duration": 27.535,
    "cues": [
     {
      "start": 0.0,
-     "end": 8.775,
-     "text": "Now take eight percent of whatever is there each January instead. The money can't run out, but the paycheck rises and falls with the market."
+     "end": 10.35,
+     "text": "Here's the plan as the book lays it out: take eight percent of whatever is there each January. The money can't run out, but the paycheck rises and falls with the market."
     },
     {
-     "start": 9.095,
-     "end": 20.27,
-     "text": "For the 2000 retiree, the first check was eighty thousand. By 2003 it was forty-six thousand, and after 2008 it never again topped forty-five."
+     "start": 10.67,
+     "end": 23.27,
+     "text": "Say you retired in January 2000. The first check was eighty thousand. By 2003 it was forty-six thousand, and after 2008 it never again topped forty-five."
     },
     {
-     "start": 20.59,
-     "end": 24.215,
+     "start": 23.59,
+     "end": 27.215,
      "text": "In its leanest year it paid thirty thousand dollars."
     }
    ]
@@ -178,54 +77,155 @@ window.NARRATION = {
   },
   {
    "id": "leanest",
-   "title": "Every retiree's leanest year",
+   "title": "Every retiree's range of checks",
    "track": null,
-   "audio": "audio/leanest.mp3?v=260d4af2",
-   "duration": 25.085,
+   "audio": "audio/leanest.mp3?v=34067ced",
+   "duration": 33.61,
    "cues": [
     {
      "start": 0.0,
-     "end": 5.6,
-     "text": "Here's the leanest year for every retirement so far, taking eight percent of what's left."
+     "end": 11.05,
+     "text": "Here's every retirement's range of checks so far, taking eight percent of what's left: the biggest year at the top, the leanest at the bottom, and the median year marked in between."
     },
     {
-     "start": 5.92,
-     "end": 17.895,
+     "start": 11.37,
+     "end": 23.345,
      "text": "Among the sixteen finished retirements, the typical leanest year paid about fifty-eight thousand dollars. The worst, retiring in 1996, got by one year on forty-nine thousand."
     },
     {
-     "start": 18.215,
-     "end": 24.765,
-     "text": "Those who retired around 2000 have already had years between thirty and thirty-seven thousand."
+     "start": 23.665,
+     "end": 33.29,
+     "text": "Those who retired around 2000 have already had years between thirty and thirty-seven thousand, and their median year paid only forty to fifty."
     }
    ]
   },
   {
-   "id": "compare",
-   "title": "Against an S&P 500 index fund",
+   "id": "retire-2000",
+   "title": "Another way: never take a pay cut",
    "track": null,
-   "audio": "audio/compare.mp3?v=f22de426",
-   "duration": 41.555,
+   "audio": "audio/retire-2000.mp3?v=254a82e4",
+   "duration": 31.586,
    "cues": [
     {
      "start": 0.0,
-     "end": 7.775,
-     "text": "How do the four funds compare with an S&P 500 index fund on its own, taking the same eighty thousand a year?"
+     "end": 13.675,
+     "text": "Ramsey suggests a cost-of-living raise every year is possible. So try it the other way: take eighty thousand the first year, then raise it with inflation and never take a cut. Back to the 2000 retiree."
     },
     {
-     "start": 8.095,
-     "end": 20.62,
-     "text": "The S&P fund lasted in fifteen of the sixteen finished retirements. And ten of the twelve that started from 1997 to 2008 have run out, against eight for the four funds."
+     "start": 13.995,
+     "end": 21.72,
+     "text": "The dot-com crash came first. Then in 2008 all four funds lost between thirty-five and thirty-nine percent."
     },
     {
-     "start": 20.94,
-     "end": 30.315,
-     "text": "Taking eight percent of what's left, the four funds' typical leanest year was fifty-eight thousand dollars, against forty-four for the S&P fund."
+     "start": 22.04,
+     "end": 31.265,
+     "text": "The money ran out in 2013, thirteen years in. An S&P 500 index fund on its own would have run out four years sooner."
+    }
+   ]
+  },
+  {
+   "id": "every",
+   "title": "Every retirement since 1981",
+   "track": null,
+   "audio": "audio/every.mp3?v=6042e18b",
+   "duration": 23.085,
+   "cues": [
+    {
+     "start": 0.0,
+     "end": 7.4,
+     "text": "Here's every retirement that started from 1981 on, each taking eighty thousand of today's dollars a year."
     },
     {
-     "start": 30.635,
-     "end": 41.235,
-     "text": "At four percent instead of eight, neither ever ran out. And taking four percent of what's left, the typical retiree never got a check below the first one, forty thousand."
+     "start": 7.72,
+     "end": 14.795,
+     "text": "All sixteen that have had a full thirty years made it, and thirteen of them ended with more than the million they started with."
+    },
+    {
+     "start": 15.115,
+     "end": 22.765,
+     "text": "But ten of the twelve that started from 1997 to 2008 have already run out, most within twenty years."
+    }
+   ]
+  },
+  {
+   "id": "book-years",
+   "title": "Retiring around the book: 2002 to 2005",
+   "track": null,
+   "audio": "audio/book-years.mp3?v=a79a2238",
+   "duration": 41.255,
+   "cues": [
+    {
+     "start": 0.0,
+     "end": 6.45,
+     "text": "Look closer at the four retirements around the book's release, from 2002 to 2005."
+    },
+    {
+     "start": 6.77,
+     "end": 20.47,
+     "text": "Retiring in 2003, the first year gained thirty-one percent, and by 2007 the million had grown to almost one point four. Even after 2008, it still has seven hundred thousand left."
+    },
+    {
+     "start": 20.79,
+     "end": 30.99,
+     "text": "Retiring one year earlier, in 2002, the first year lost seventeen percent. The money never got back to a million, and it ran out in 2019."
+    },
+    {
+     "start": 31.31,
+     "end": 40.935,
+     "text": "The 2004 and 2005 retirees went into 2008 with much smaller cushions, and both ran out in 2023."
+    }
+   ]
+  },
+  {
+   "id": "in-2003",
+   "title": "Where things stood in 2003",
+   "track": null,
+   "audio": "audio/in-2003.mp3?v=ab2bc9d8",
+   "duration": 30.035,
+   "cues": [
+    {
+     "start": 0.0,
+     "end": 13.0,
+     "text": "Now go back to when the book was written. Say its numbers stop at the start of 2003: twenty-two retirements had begun since 1981, each taking eighty thousand a year, and not one had run out."
+    },
+    {
+     "start": 13.32,
+     "end": 18.67,
+     "text": "Fifteen still had more than the million they started with, three of them more than two million."
+    },
+    {
+     "start": 18.99,
+     "end": 29.715,
+     "text": "But the five that started from 1998 to 2002 were already down to between about five hundred fifty and eight hundred thousand. All five later ran out."
+    }
+   ]
+  },
+  {
+   "id": "horizon",
+   "title": "Thirty years or twenty?",
+   "track": null,
+   "audio": "audio/horizon.mp3?v=d4b47dbd",
+   "duration": 43.88,
+   "cues": [
+    {
+     "start": 0.0,
+     "end": 9.625,
+     "text": "So far, every retirement has had to last thirty years. What if it only had to last twenty, close to the average life expectancy at sixty-five?"
+    },
+    {
+     "start": 9.945,
+     "end": 19.42,
+     "text": "At thirty years, all sixteen finished retirements lasted. But ten others ran out before reaching thirty, and nineteen are too recent to tell."
+    },
+    {
+     "start": 19.74,
+     "end": 30.24,
+     "text": "At twenty years, twenty-six have finished, and only nineteen of them lasted. Nearly the same retirements run out either way; twenty years just finishes more of them."
+    },
+    {
+     "start": 30.56,
+     "end": 43.56,
+     "text": "Taking eight percent of what's left, the money never runs out, but the worst leanest year falls from forty-nine thousand to thirty-four. And at forty thousand a year, every finished retirement lasted at both lengths."
     }
    ]
   },
@@ -233,23 +233,23 @@ window.NARRATION = {
    "id": "takeaway",
    "title": "What the four funds show",
    "track": null,
-   "audio": "audio/takeaway.mp3?v=87b5cfc8",
-   "duration": 23.36,
+   "audio": "audio/takeaway.mp3?v=7c4f3587",
+   "duration": 25.16,
    "cues": [
     {
      "start": 0.0,
-     "end": 9.7,
-     "text": "Spread across four funds, eight percent lasted for every retirement that has had thirty years, and ran out for many that started near the 2000 peak."
+     "end": 8.875,
+     "text": "Taking eight percent of what's left, as the book lays out, the money never ran out, but many years paid far less than the eighty thousand planned."
     },
     {
-     "start": 10.02,
-     "end": 17.195,
-     "text": "Taking eight percent of what's left kept the money going, but many years paid far less than the eighty thousand planned."
+     "start": 9.195,
+     "end": 19.42,
+     "text": "Taking eighty thousand with a raise every year lasted for every retirement that has had thirty years, and ran out for many that started near the 2000 peak."
     },
     {
-     "start": 17.515,
-     "end": 23.04,
-     "text": "Four funds or one index fund: at eight percent, the order of the years decides."
+     "start": 19.74,
+     "end": 24.84,
+     "text": "At eight percent, the order of the years decides, over thirty years or twenty."
     }
    ]
   }

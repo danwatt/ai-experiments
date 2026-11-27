@@ -2,8 +2,7 @@
 
 The source of truth is [narration.json](narration.json). $1,000,000 split evenly across four American Funds Class A shares (AIVSX, AGTHX, CWGIX, ANWPX), drawn evenly from all four, 30-year horizon, retirements starting every year from 1981. Before 1994, New Perspective (ANWPX) stands in for Capital World Growth and Income (CWGIX). Everything is in today's dollars. A comparison scene holds the same million in an S&P 500 index fund. Two rules: **8% of the start** ($80,000 a year, raised with inflation, end of year) and **8% of what's left** (8% of the balance each January).
 
-One track, no fork. Voiced with Kokoro (Heart) through Voicebox; about 4 minutes.
-
+One track, no fork. Voiced with Kokoro (Heart) through Voicebox; about 5½ minutes.
 
 ## 1. Ramsey's four funds
 
@@ -17,83 +16,20 @@ One track, no fork. Voiced with Kokoro (Heart) through Voicebox; about 4 minutes
 
 *On screen:* “$1,000,000 on retirement day”, $250,000 under each card
 
+*On screen, not narrated:* under the CWGIX card, “Started 1993. Before 1994, New Perspective (ANWPX) stands in.”; the quote's attribution adds “first published September 2003”; and the aside's first line, “The Total Money Makeover, which lays out this four-fund mix, was first published in September 2003.”
+
 *On screen, not narrated:* “Ramsey Solutions favors front-loaded funds bought through an advisor, and its SmartVestor Pros pay it fees. American Funds' Class A shares, used here, carry a sales charge of up to 5.75%.” (sources in the page notes)
 
-
-## 2. How far back the funds go
-
-> Three of these funds go back decades. Capital World Growth and Income only started in 1993, so before 1994 its quarter uses New Perspective's returns, a global fund from the same family.
-
-*On screen:* a bar per fund for the years of returns used here, labelled with its launch year (ICA 1934, Growth Fund and New Perspective 1973, Capital World Growth and Income 1993); then a dashed segment on CWGIX's row for 1981–1993: “New Perspective stands in”
-
-> That gives a retirement starting every year from 1981 on. The first sixteen have had a full thirty years.
-
-*On screen:* “Blend starts: 1981” · “16 full 30-year retirements (1981–96)” · “still under 30 years”
-
-> Ramsey's book The Total Money Makeover, which lays out this four-fund mix, came out in September 2003.
-
-*On screen:* a dotted line at September 2003: “The Total Money Makeover, Ramsey's book, September 2003”
+## 2. The book's way: 8% of what's left
 
 
-## 3. Retire in January 2000
+*On screen throughout, not narrated:* a card quoting The Total Money Makeover, chapter 9: “You are secure and will leave a nice inheritance when you can **live off of 8 percent of your nest egg per year**. If you make 12 percent on your money average and inflation steals 4 percent, **8 percent is a dream number**. If you make 12 percent and only pull out 8 percent, you **grow your nest egg by 4 percent per year**. That 4 percent keeps your nest egg, and therefore your income, **ahead of inflation ’til death do you part**. You get a **cost-of-living raise from your nest egg every year**. If you can live with dignity on $40,000, you need a nest egg of only $500,000.”* (bold added; * “The book's example; this explainer doubles it to $80,000 a year from $1,000,000.”)
 
-> Say you retired in January 2000 and took eighty thousand dollars a year, raised with inflation, a quarter from each fund.
-
-*On screen:* The total balance and each fund's balance draw in year by year, with each year's average return after inflation below · “$80,000 a year, a quarter from each fund”
-
-> The dot-com crash came first. Then in 2008 all four funds lost between thirty-five and thirty-nine percent.
-
-*On screen:* The 2008 crash shakes the chart (−38%)
-
-> The money ran out in 2013, thirteen years in. An S&P 500 index fund on its own would have run out four years sooner.
-
-*On screen:* “Broke in 2013” · dashed line “S&P 500 alone: out in 2009”
-
-
-## 4. Every retirement since 1981
-
-> Here's every retirement that started from 1981 on, each taking eighty thousand of today's dollars a year.
-
-*On screen:* Years lasted for each start year 1981–2025: blue lasted 30, red ran out, gray still going
-
-> All sixteen that have had a full thirty years made it, and every one ended with more than the million it started with.
-
-*On screen:* “Finished 30 years: lasted 16 of 16” · “Least left after 30 years: $1.26M (1990)”
-
-> But eight of the twelve that started from 1997 to 2008 have already run out, most within twenty years.
-
-*On screen:* Spotlight on 1997–2008 · “Retired 1997–2008: already out 8 of 12”
-
-
-## 5. Retiring around the book: 2002 to 2005
-
-> Look closer at the four retirements around the book's release, from 2002 to 2005.
-
-*On screen:* Balances for retirements starting 2002–2005, today's dollars, with the four funds' average return each year (after inflation) as bars underneath; a shaded band for 2008 (−38%) and a dotted line at September 2003 for The Total Money Makeover
-
-> Retiring in 2003, the first year gained thirty-one percent, and by 2007 the million had grown to almost one and a half. Even after 2008, it still has more than a million left.
-
-*On screen:* The 2003 line draws in: up to $1.46M by the end of 2007 · “2003: $1.14M left”
-
-> Retiring one year earlier, in 2002, the first year lost seventeen percent. The money never got back to a million, and it ran out in 2021.
-
-*On screen:* The 2002 line draws in · “2002: out in 2021”
-
-> The 2004 and 2005 retirees went into 2008 with much smaller cushions. One has nineteen thousand dollars left, and the other ran out in 2025.
-
-*On screen:* The 2004 and 2005 lines draw in · “End of 2007, before the crash”: 2002 $986K · 2003 $1.46M · 2004 $1.11M · 2005 $1.07M · “2004: $19K left” · “2005: out in 2025”
-
-
-## 6. Another way: 8% of what's left
-
-
-*On screen throughout, not narrated:* a card quoting The Total Money Makeover, chapter 9: “You are secure and will leave a nice inheritance when you can **live off of 8 percent of your nest egg per year**. If you make 12 percent on your money average and inflation steals 4 percent, **8 percent is a dream number**. If you make 12 percent and only pull out 8 percent, you **grow your nest egg by 4 percent per year**. That 4 percent keeps your nest egg, and therefore your income, **ahead of inflation ’til death do you part**.” (bold added)
-
-> Now take eight percent of whatever is there each January instead. The money can't run out, but the paycheck rises and falls with the market.
+> Here's the plan as the book lays it out: take eight percent of whatever is there each January. The money can't run out, but the paycheck rises and falls with the market.
 
 *On screen:* “Take 8% of whatever is there, every January.”
 
-> For the 2000 retiree, the first check was eighty thousand. By 2003 it was forty-six thousand, and after 2008 it never again topped forty-five.
+> Say you retired in January 2000. The first check was eighty thousand. By 2003 it was forty-six thousand, and after 2008 it never again topped forty-five.
 
 *On screen:* The 2000 retiree's check each year against the $80,000 plan line · “2000: $80K” · “2003: $46K” · “after 2008: never above $45K”
 
@@ -101,8 +37,7 @@ One track, no fork. Voiced with Kokoro (Heart) through Voicebox; about 4 minutes
 
 *On screen:* “2023: $30K, the leanest year” · “Never runs out: $494K left in 2025”
 
-
-## 7. Checking Ramsey's numbers
+## 3. Checking Ramsey's numbers
 
 > That quote rests on three numbers. Here's each one for every retirement in the four funds since 1981.
 
@@ -120,51 +55,111 @@ One track, no fork. Voiced with Kokoro (Heart) through Voicebox; about 4 minutes
 
 *On screen:* Row “Nest egg grows 4%?”: yearly growth taking 8% of what's left · typical 2.3%, after inflation −0.2% a year · held (4% or more): 0 of 16
 
+## 4. Every retiree's range of checks
 
-## 8. Every retiree's leanest year
+> Here's every retirement's range of checks so far, taking eight percent of what's left: the biggest year at the top, the leanest at the bottom, and the median year marked in between.
 
-> Here's the leanest year for every retirement so far, taking eight percent of what's left.
-
-*On screen:* Leanest check so far for each start year, finished retirements in blue, unfinished in gray, $80,000 plan line
+*On screen:* Each start year's range of checks so far, biggest to leanest, opening out from the $80,000 first check: a dot at the leanest year, a bar at the median year; finished retirements in blue, unfinished in gray
 
 > Among the sixteen finished retirements, the typical leanest year paid about fifty-eight thousand dollars. The worst, retiring in 1996, got by one year on forty-nine thousand.
 
 *On screen:* “Typical leanest year, finished: $58K” · “1996: $49K”
 
-> Those who retired around 2000 have already had years between thirty and thirty-seven thousand.
+> Those who retired around 2000 have already had years between thirty and thirty-seven thousand, and their median year paid only forty to fifty.
 
 *On screen:* 1999–2001 highlighted · “Retired 1999–2001: leanest so far $30K–$37K”
 
+## 5. Another way: never take a pay cut
 
-## 9. Against an S&P 500 index fund
 
-> How do the four funds compare with an S&P 500 index fund on its own, taking the same eighty thousand a year?
+*On screen throughout, not narrated:* “You get a cost-of-living raise from your nest egg every year.” The Total Money Makeover, chapter 9
 
-*On screen:* Two rows of years-lasted bars, 1981–2010 (later starts are all still going): Ramsey's four funds; S&P 500 index fund (100% VFINX)
+> Ramsey suggests a cost-of-living raise every year is possible. So try it the other way: take eighty thousand the first year, then raise it with inflation and never take a cut. Back to the 2000 retiree.
 
-> The S&P fund lasted in fifteen of the sixteen finished retirements. And ten of the twelve that started from 1997 to 2008 have run out, against eight for the four funds.
+*On screen:* The total balance and each fund's balance draw in year by year, with each year's average return after inflation below · “$80,000 a year, a quarter from each fund”
 
-*On screen:* Columns “Lasted 30 yrs” 16 of 16 · 15 of 16 and “Ran out, 1997–2008 starts” 8 of 12 · 10 of 12
+> The dot-com crash came first. Then in 2008 all four funds lost between thirty-five and thirty-nine percent.
 
-> Taking eight percent of what's left, the four funds' typical leanest year was fifty-eight thousand dollars, against forty-four for the S&P fund.
+*On screen:* The 2008 crash shakes the chart (−38%)
 
-*On screen:* Column “Checks, 8% of what's left, first $80K”: $58K to $141K · $44K to $162K
+> The money ran out in 2013, thirteen years in. An S&P 500 index fund on its own would have run out four years sooner.
 
-> At four percent instead of eight, neither ever ran out. And taking four percent of what's left, the typical retiree never got a check below the first one, forty thousand.
+*On screen:* “Broke in 2013” · dashed line “S&P 500 alone: out in 2009”
 
-*On screen:* “At 4% a year instead of 8%, neither ever ran out” · column “Checks, 4% of what's left, first $40K”: $40K to $135K · $40K to $130K
+## 6. Every retirement since 1981
 
+> Here's every retirement that started from 1981 on, each taking eighty thousand of today's dollars a year.
+
+*On screen:* Years lasted for each start year 1981–2025: blue lasted 30, red ran out, gray still going
+
+> All sixteen that have had a full thirty years made it, and thirteen of them ended with more than the million they started with.
+
+*On screen:* “Finished 30 years: lasted 16 of 16” · “Least left after 30 years: $558K (1990)”
+
+> But ten of the twelve that started from 1997 to 2008 have already run out, most within twenty years.
+
+*On screen:* Spotlight on 1997–2008 · “Retired 1997–2008: already out 10 of 12”
+
+## 7. Retiring around the book: 2002 to 2005
+
+> Look closer at the four retirements around the book's release, from 2002 to 2005.
+
+*On screen:* Balances for retirements starting 2002–2005, today's dollars, with the four funds' average return each year (after inflation) as bars underneath; a shaded band for 2008 (−38%) and a dotted line at September 2003 for The Total Money Makeover
+
+> Retiring in 2003, the first year gained thirty-one percent, and by 2007 the million had grown to almost one point four. Even after 2008, it still has seven hundred thousand left.
+
+*On screen:* The 2003 line draws in: up to $1.39M by the end of 2007 · “2003: $706K left”
+
+> Retiring one year earlier, in 2002, the first year lost seventeen percent. The money never got back to a million, and it ran out in 2019.
+
+*On screen:* The 2002 line draws in · “2002: out in 2019”
+
+> The 2004 and 2005 retirees went into 2008 with much smaller cushions, and both ran out in 2023.
+
+*On screen:* The 2004 and 2005 lines draw in · “End of 2007, before the crash”: 2002 $935K · 2003 $1.39M · 2004 $1.07M · 2005 $1.05M · “2004: out in 2023” · “2005: out in 2023”
+
+## 8. Where things stood in 2003
+
+> Now go back to when the book was written. Say its numbers stop at the start of 2003: twenty-two retirements had begun since 1981, each taking eighty thousand a year, and not one had run out.
+
+*On screen:* One bar per retirement year, 1981–2002: the balance on January 1, 2003 (returns through 2002), today's dollars, $80,000 a year raised with inflation · dashed line at the $1,000,000 start · “Ran out by 2003: 0 of 22”
+
+> Fifteen still had more than the million they started with, three of them more than two million.
+
+*On screen:* The fifteen above $1M stay bright · “1982: $2.93M” · “Above $1,000,000: 15 of 22”
+
+> But the five that started from 1998 to 2002 were already down to between about five hundred fifty and eight hundred thousand. All five later ran out.
+
+*On screen:* The 1998–2002 bars turn red · “$556K to $811K” · a “What happened next” row under the bars: a dot for each that lasted 30 years (or, for 1997, is still going), a red cross and the year for each that ran out (2022, 2016, 2013, 2015, 2019) · “Retired 1998–2002: later ran out: 5 of 5”
+
+## 9. Thirty years or twenty?
+
+> So far, every retirement has had to last thirty years. What if it only had to last twenty, close to the average life expectancy at sixty-five?
+
+*On screen:* Two rows of 45 cells, one per start year 1981–2025, labeled “30 years” and “20 years”, each with a bracket over the retirements that have had the whole span (16 and 26)
+
+> At thirty years, all sixteen finished retirements lasted. But ten others ran out before reaching thirty, and nineteen are too recent to tell.
+
+*On screen:* The 30-year row fills: blue for lasted, red for ran out, gray for too soon · “16 lasted · 10 ran out · 19 too soon to tell” · table row “$80,000 a year, raised with inflation: finished retirements that lasted”: 16 of 16
+
+> At twenty years, twenty-six have finished, and only nineteen of them lasted. Nearly the same retirements run out either way; twenty years just finishes more of them.
+
+*On screen:* The 20-year row fills · “19 lasted · 9 ran out · 17 too soon to tell” · table: 19 of 26 · “1998 ran out in its 25th year: failed at 30, lasted at 20”
+
+> Taking eight percent of what's left, the money never runs out, but the worst leanest year falls from forty-nine thousand to thirty-four. And at forty thousand a year, every finished retirement lasted at both lengths.
+
+*On screen:* Table rows “8% of what's left: worst leanest year”: $49K (1996) · $34K (2000); “$40,000 a year, raised with inflation”: 16 of 16 · 26 of 26
 
 ## 10. What the four funds show
 
-> Spread across four funds, eight percent lasted for every retirement that has had thirty years, and ran out for many that started near the 2000 peak.
+> Taking eight percent of what's left, as the book lays out, the money never ran out, but many years paid far less than the eighty thousand planned.
 
-*On screen:* Card: “8% of the start, raised with inflation: 16 of 16” · “but 8 of 12 that started 1997–2008 already ran out”
+*On screen:* Card: “The book's way: 8% of what's left: $58K, typical leanest year” · “against the $80,000 planned”
 
-> Taking eight percent of what's left kept the money going, but many years paid far less than the eighty thousand planned.
+> Taking eighty thousand with a raise every year lasted for every retirement that has had thirty years, and ran out for many that started near the 2000 peak.
 
-*On screen:* Card: “8% of what's left: $58K, typical leanest year” · “against the $80,000 planned”
+*On screen:* Card: “$80,000, raised with inflation: 16 of 16” · “but 10 of 12 that started 1997–2008 already ran out”
 
-> Four funds or one index fund: at eight percent, the order of the years decides.
+> At eight percent, the order of the years decides, over thirty years or twenty.
 
-*On screen:* “Four funds or one index fund: at 8%, the order of the years decides.”
+*On screen:* “At 8%, the order of the years decides, over 30 years or 20.”
