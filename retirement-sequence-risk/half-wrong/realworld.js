@@ -8,7 +8,8 @@
   const LAST_START = 2013; // ten years after the book; retirements that began after 2006 are all still underway
   const m12 = Math.pow(1.12, 1 / 12) - 1, FAC = ((1 + m12) * (Math.pow(1 + m12, 12) - 1)) / (12 * m12);
   const DRAWS = { book: 0.08 * START, steel: (0.08 / FAC) * START }; // $40,000, or 7.52%: $37,598
-  const state = { draw: "book" };
+  // retirements that begin before 1981 (the S&P 500 index only) are hidden unless asked for: the funds start in 1981
+  const state = { draw: "book", early: false }, FROM = 1981;
   const infl = (y) => H.infl[y - H.first];
   const SERIES = [
     { name: "S&P 500 index", long: "the S&P 500 index (no costs)", first: Y0, r: (y) => H.stocks[y - H.first] },
@@ -48,8 +49,8 @@
   const mix = (c1, c2, u) => { const a = hex(c1), b = hex(c2); return `rgb(${a.map((v, i) => Math.round(v + (b[i] - v) * u)).join(",")})`; };
   let PAL;
   const fill = (o) => (o === "kept" ? PAL.kept : o === "shrank" ? PAL.shrank : PAL.out);
-  const LABEL = { kept: "Kept pace with inflation", shrank: "Lasted, but the nest egg shrank", out: "Ran out of money" };
-  const SO_FAR = { kept: "On pace so far", shrank: "Behind inflation so far" };
+  const LABEL = { kept: "Kept up with inflation", shrank: "Lasted, but shrank", out: "Ran out of money" };
+  const SO_FAR = { kept: "On track so far", shrank: "Falling behind so far" };
 
   const tip = $("#tip");
   function showTip(e, o) {
@@ -118,15 +119,15 @@
     const W0 = DRAWS[state.draw];
     document.querySelectorAll("[data-draw]").forEach((b) => b.setAttribute("aria-checked", String(b.dataset.draw === state.draw)));
     $("#rw-legend").innerHTML = ["kept", "shrank", "out"].map((k) => `<span><i style="background:${fill(k)}"></i>${LABEL[k]}${k === "kept" ? " (dotted)" : k === "out" ? " (crossed)" : ""}</span>`).join("") +
-      `<span><i class="partial" style="background:${fill("shrank")}"></i>Still underway: faded, as it stood at the end of ${LAST}</span>` +
-      `<span><i class="book"></i><span><cite>The Total Money Makeover</cite>, Sept 2003</span></span>`;
+      `<span><i class="partial" style="background:${fill("shrank")}"></i>Still underway (faded)</span>` +
+      `<span><i class="book"></i><span>Book published, 2003</span></span>`;
 
     // every retirement, every series and length
     const all = {};
     LENGTHS.forEach((len) => SERIES.forEach((s) => {
       const list = [];
       // every start year through ten years after the book, finished or still underway
-      for (let st = s.first; st <= LAST_START; st++) list.push(retire(s, st, len, W0));
+      for (let st = Math.max(s.first, state.early ? Y0 : FROM); st <= LAST_START; st++) list.push(retire(s, st, len, W0));
       all[len + s.name] = list;
     }));
     const count = (list, k) => list.filter((o) => o.outcome === k).length;
@@ -135,18 +136,18 @@
     // ---------- tiles: 30-year retirements
     $("#rw-tiles").innerHTML = SERIES.map((s) => {
       const l = done(all[30 + s.name]), u = open(all[30 + s.name]), k = count(l, "kept"), out = count(l, "out");
-      return `<div class="tile"><div class="label">${s.name}, 30-year retirements</div><div class="value">${k} of ${l.length}</div><div class="sub">finished and kept pace; ${out} ran out, ${l.length - k - out} shrank (retired ${l[0].st}–${l[l.length - 1].st}).` +
-        (u.length ? ` Still underway (${u[0].st}–${u[u.length - 1].st}): ${count(u, "kept")} on pace, ${count(u, "shrank")} behind, ${count(u, "out")} already ran out.` : "") + `</div></div>`;
+      return `<div class="tile"><div class="label">${s.name}: 30-year retirements that kept up</div><div class="value">${k} of ${l.length}</div><div class="sub">${out} ran out of money.` +
+        (u.length ? ` Of ${u.length} still underway, ${count(u, "out")} already have.` : "") + `</div></div>`;
     }).join("");
 
     // ---------- grid: a block per length, a row per series, a square per retirement at its first year
     const svg = $("#rw"); svg.innerHTML = "";
     const el = (tag, attrs, text) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (text != null) e.textContent = text; svg.appendChild(e); return e; };
-    const lastStart = LAST_START, n = lastStart - Y0 + 1;
+    const from = state.early ? Y0 : FROM, lastStart = LAST_START, n = lastStart - from + 1;
     const W = 1040, L = 118, R = 150, cw = (W - L - R) / n, h = 16, rowH = h + 4;
-    const x = (y) => L + (y - Y0) * cw;
+    const x = (y) => L + (y - from) * cw;
     let y = 30;
-    const axis = (yy) => { for (let yr = 1930; yr <= lastStart; yr += 10) el("text", { x: x(yr) + cw / 2, y: yy, "text-anchor": "middle" }, String(yr)); };
+    const axis = (yy) => { for (let yr = Math.ceil(from / 10) * 10; yr <= lastStart; yr += 10) el("text", { x: x(yr) + cw / 2, y: yy, "text-anchor": "middle" }, String(yr)); };
     axis(y); y += 10;
     const top = y;
     LENGTHS.forEach((len) => {
@@ -182,6 +183,7 @@
     svg.setAttribute("viewBox", `0 0 ${W} ${y + 30}`);
   }
   document.querySelectorAll("[data-draw]").forEach((b) => b.addEventListener("click", () => { state.draw = b.dataset.draw; draw(); }));
+  $("#rw-early").addEventListener("change", (e) => { state.early = e.target.checked; draw(); });
   new MutationObserver(draw).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
   draw();
 })();

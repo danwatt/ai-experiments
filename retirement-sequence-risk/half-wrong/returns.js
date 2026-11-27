@@ -5,7 +5,9 @@
   "use strict";
   const H = window.HIST, F = window.FUNDS;
   const GOAL = 0.12, Y0 = 1926, BOOK = 2003 + 8.5 / 12, WINDOWS = [10, 20, 30];
-  const state = { measure: "avg" };
+  // windows that begin before 1981 (the S&P 500 index only) are hidden unless asked for: the funds start in 1981
+  // the four funds one by one are hidden unless asked for; the blend (25% each) always shows
+  const state = { measure: "avg", early: false, funds: false }, FROM = 1981;
   const $ = (s) => document.querySelector(s);
   const pct = (v, d = 1) => (v < 0 ? "−" : "") + Math.abs(100 * v).toFixed(d) + "%";
   const spct = (v) => (v >= 0 ? "+" : "−") + Math.abs(v * 100).toFixed(1) + "%";
@@ -26,7 +28,7 @@
   const value = (o) => (state.measure === "avg" ? o.avg : o.cagr);
 
   // ---------- tiles: the simple average (how Ramsey states it) with the compound rate under it
-  const tile = (label, o) => `<div class="tile"><div class="label">${label}</div><div class="value">${pct(o.avg)}</div><div class="sub">average year; ${pct(o.cagr)} compounded</div></div>`;
+  const tile = (label, o) => `<div class="tile"><div class="label">${label}</div><div class="value">${pct(o.avg)}</div><div class="sub">simple average; ${pct(o.cagr)} compounded</div></div>`;
   const last = H.last;
   $("#ret-tiles").innerHTML =
     tile(`S&amp;P 500, ${Y0}–2002`, stretch(SERIES[0], Y0, 2002)) +
@@ -64,25 +66,26 @@
     PAL = { surface: css("surface-raised"), hit: css("bluebonnet"), miss: css("danger") };
     document.querySelectorAll("[data-measure]").forEach((b) => b.setAttribute("aria-checked", String(b.dataset.measure === state.measure)));
     $("#ret-measure-note").innerHTML = state.measure === "avg"
-      ? "<b>Average year:</b> each year's return added up and divided by the number of years, the way Ramsey states the 12%."
-      : "<b>Compounded:</b> the steady yearly rate that turns the starting money into the ending money, what a balance actually grew at.";
+      ? "Showing the <b>simple average</b>, the way Ramsey quotes the 12%."
+      : "Showing the <b>compounded</b> rate, what the money actually grew at.";
     const svg = $("#ret"); svg.innerHTML = "";
     const el = (tag, attrs, text) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (text != null) e.textContent = text; svg.appendChild(e); return e; };
-    const X0 = Y0 + WINDOWS[0] - 1, n = last - X0 + 1; // first year any window ends
+    const from = state.early ? Y0 : FROM, X0 = from + WINDOWS[0] - 1, n = last - X0 + 1; // first year any window ends
+    const tick0 = Math.ceil((X0 + 1) / 10) * 10;
     const W = 1040, L = 118, R = 104, cw = (W - L - R) / n, h = 16, rowH = h + 4;
     const x = (y) => L + (y - X0) * cw;
     let y = 30;
-    const axis = (yy) => { for (let yr = 1940; yr <= 2020; yr += 10) el("text", { x: x(yr) + cw / 2, y: yy, "text-anchor": "middle" }, String(yr)); };
+    const axis = (yy) => { for (let yr = tick0; yr <= last; yr += 10) el("text", { x: x(yr) + cw / 2, y: yy, "text-anchor": "middle" }, String(yr)); };
     axis(y); y += 10;
     const top = y;
     WINDOWS.forEach((w) => {
       el("text", { class: "group", x: 0, y: y + 14 }, `${w}-year windows`);
       el("text", { x: W - R + 10, y: y + 14 }, "reached 12%");
       y += 20;
-      SERIES.forEach((s) => {
+      SERIES.filter((s) => state.funds || !s.fund).forEach((s) => {
         el("text", { class: s.fund ? "series fund" : "series", x: s.fund ? 12 : 0, y: y + h - 4 }, s.name).appendChild(document.createElementNS(NS, "title")).textContent = s.sub;
         let hits = 0, cnt = 0;
-        for (let a = s.first; a + w - 1 <= last; a++) {
+        for (let a = Math.max(s.first, from); a + w - 1 <= last; a++) {
           const o = stretch(s, a, a + w - 1), v = value(o), xx = x(o.y1);
           const r = el("rect", { class: "cell", x: xx + 0.5, y, width: Math.max(1, cw - 1), height: h, rx: 1.5, fill: color(v) });
           r.addEventListener("mousemove", (e) => { r.classList.add("on"); showTip(e, s, o); });
@@ -95,6 +98,9 @@
       });
       y += 10;
     });
+    // the verdict quotes the 30-year windows on view, compounded, whatever the measure shown
+    const hit30 = (s) => { let k = 0, n = 0; for (let a = Math.max(s.first, from); a + 29 <= last; a++) { n++; if (stretch(s, a, a + 29).cagr >= GOAL) k++; } return `${k} of ${n}`; };
+    $("#ret-verdict-n").textContent = `${hit30(SERIES[0])} thirty-year stretches of the S&P 500${state.early ? "" : " since 1981"}, and ${hit30(SERIES[2])} for Ramsey's four funds,`;
     const bx = x(Math.floor(BOOK)) + (BOOK % 1) * cw;
     el("line", { x1: bx, x2: bx, y1: top - 4, y2: y - 8, class: "book" });
     el("text", { x: bx - 6, y: 12, "text-anchor": "end", class: "book-label" }, "The Total Money Makeover, Sept 2003");
@@ -105,6 +111,8 @@
     $("#ret-legend").innerHTML = `<span><i style="background:${color(GOAL - 0.06)}"></i>Short of 12%</span><span><i style="background:${color(GOAL + 0.06)}"></i>12% or more (dotted)</span><span><i class="book"></i><span><cite>The Total Money Makeover</cite>, Sept 2003</span></span>`;
   }
   document.querySelectorAll("[data-measure]").forEach((b) => b.addEventListener("click", () => { state.measure = b.dataset.measure; draw(); }));
+  $("#ret-early").addEventListener("change", (e) => { state.early = e.target.checked; draw(); });
+  $("#ret-funds").addEventListener("change", (e) => { state.funds = e.target.checked; draw(); });
   new MutationObserver(draw).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
   draw();
 })();

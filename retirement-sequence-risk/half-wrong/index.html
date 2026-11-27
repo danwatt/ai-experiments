@@ -108,6 +108,20 @@
   .rw-d-table tr.behind td:nth-child(5) { color: var(--danger); }
   svg.chart rect.cell { cursor: pointer; }
   svg.chart rect.cell:focus-visible { outline: none; stroke: var(--text-primary); stroke-width: 2.5; }
+  /* expandable "more detail" blocks */
+  details.more { margin-top: 12px; border-top: 1px solid var(--border); padding-top: 8px; }
+  details.more > summary { cursor: pointer; color: var(--bluebonnet); font-size: 14px; font-weight: 600; width: fit-content; }
+  details.more[open] > summary { margin-bottom: 6px; }
+  details.more + details.more { margin-top: 4px; border-top: 0; padding-top: 0; }
+  .opts label.early { display: inline-flex; align-items: center; gap: 6px; font-size: 13.5px; color: var(--text-secondary); cursor: pointer; margin-left: 8px; }
+  .opts label.early input { accent-color: var(--bluebonnet); }
+  .opts label.early small { color: var(--muted); }
+  /* saving section: three series, the reference categorical slots 1-3, validated for each theme */
+  :root { --sv-four: #2a78d6; --sv-vf: #eb6834; --sv-sp: #1baf7a; }
+  [data-theme="dark"] { --sv-four: #3987e5; --sv-vf: #d95926; --sv-sp: #199e70; }
+  svg.chart .svbar.on { stroke: var(--text-primary); stroke-width: 1.5; }
+  svg.chart .goal { stroke: var(--text-secondary); stroke-width: 1.5; stroke-dasharray: 6 4; }
+  svg.chart .goal--book { stroke: var(--text-primary); stroke-width: 2; }
   .verdict { margin: 14px 0 2px; padding: 10px 14px; border-left: 4px solid var(--v); background: var(--v-soft); border-radius: 0 8px 8px 0; max-width: 90ch; font-size: 14px; color: var(--text-secondary); }
   .verdict p { margin: 0; }
   .verdict p + p { margin-top: 4px; }
@@ -141,7 +155,7 @@
     <div>
     <p class="kicker"><i>The Total Money Makeover</i>, checked against history</p>
     <h1>What if I’m half wrong?</h1>
-    <p class="lede">Dave Ramsey asks it himself, right after telling a young couple they could have almost $8 million for retirement. His retirement math rests on a few round numbers. This page takes them one at a time and holds each up against what stocks, inflation and his own recommended funds actually did.</p>
+    <p class="lede">Dave Ramsey asks this himself, right after telling a young couple they could retire with <a href="#h-saving">almost $8 million</a>. His retirement plan rests on a few round numbers. Here is how each one held up against real history.</p>
     </div>
     <button class="bb-btn bb-btn--secondary bb-btn--sm" id="theme" type="button" aria-label="Switch to light theme">
       <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><span>Light</span>
@@ -157,75 +171,76 @@
   </section>
 
   <section class="card" aria-labelledby="h-claims">
-    <h2 id="h-claims">Four claims</h2>
+    <h2 id="h-claims">The plan in four numbers</h2>
     <ol class="claims">
       <li class="claim">
         <span class="big">12%</span>
-        <h3>Average return</h3>
-        <p><q>12 percent on your money [on] average</q> over time, from growth stock mutual funds.</p>
-        <a href="#h-returns">What stocks and the funds did ↓</a>
+        <h3>Stocks earn 12% a year</h3>
+        <p>On average, in good growth stock mutual funds.</p>
+        <a href="#h-returns">Did they? ↓</a>
       </li>
       <li class="claim">
         <span class="big">4%</span>
-        <h3>Inflation</h3>
-        <p><q>Inflation steals 4 percent</q>, so the money really grows 8% a year.</p>
-        <a href="#h-inflation">What prices did ↓</a>
+        <h3>Prices rise 4% a year</h3>
+        <p>Inflation takes 4 of the 12, leaving 8.</p>
+        <a href="#h-inflation">Did they? ↓</a>
       </li>
       <li class="claim">
         <span class="big">8%</span>
-        <h3>Withdrawal</h3>
-        <p><q>Live off of 8 percent of your nest egg per year</q>: $40,000 a year from $500,000.</p>
-        <a href="#h-timing">When the money comes out ↓</a>
+        <h3>You can spend 8% a year</h3>
+        <p>$40,000 a year from $500,000.</p>
+        <a href="#h-timing">Can you? ↓</a>
       </li>
       <li class="claim">
         <span class="big">Every <small>year</small></span>
-        <h3>A raise</h3>
-        <p><q>A cost-of-living raise from your nest egg every year</q>, ’til death do you part.</p>
+        <h3>You get a raise</h3>
+        <p>Your income keeps up with prices for life.</p>
+        <a href="#h-real">Did it? ↓</a>
       </li>
     </ol>
     <div class="math" aria-label="The arithmetic">
-      <span>12% return − 8% withdrawal = <b>4% growth</b>, matching 4% inflation</span>
-      <span>8% × $500,000 = <b>$40,000</b> a year</span>
+      <span>12% earned − 8% spent = <b>4% left over</b>, enough to keep up with 4% inflation</span>
     </div>
   </section>
 
   <section class="card" aria-labelledby="h-inflation">
-    <h2 id="h-inflation">Does inflation steal 4 percent?</h2>
-    <p class="note">US consumer prices, the last 100 years. Before the book, prices had risen about 3% a year over the long run, though closer to 5% over the 30 years just before it, which held the inflation of the 1970s and early '80s. Since the book they have risen about 2½% a year. Prices rose more than 4% in <span id="infl-count"></span>: 12 of them from 1968 to 1981, six around World War II and the Korean War, and only three since the book (2007, 2021 and 2022).</p>
+    <h2 id="h-inflation">Do prices rise 4% a year?</h2>
+    <p class="note">Over the last 100 years, prices rose about 3% a year. They ran hotter in the 1970s and early '80s, and cooler since the book came out.</p>
     <div class="tiles" id="infl-tiles"></div>
     <div class="legend" aria-hidden="true">
       <span><i style="background:var(--infl-high)"></i>Year above 4%</span>
       <span><i style="background:var(--infl-low)"></i>Year at or below 4%</span>
-      <span><i class="line"></i>10-year average, compounded</span>
+      <span><i class="line"></i>10-year average</span>
       <span><i class="dash"></i>Ramsey’s 4%</span>
-      <span><i class="book"></i><span><cite>The Total Money Makeover</cite>, Sept 2003</span></span>
+      <span><i class="book"></i><span>Book published, 2003</span></span>
     </div>
     <div class="scroll"><svg class="chart" id="infl" role="img" aria-label="US inflation each year from 1926 to 2025, with its 10-year average, against Ramsey's 4% and the book's September 2003 publication"></svg></div>
-    <details class="table">
-      <summary>Every year as a table</summary>
+    <div class="verdict verdict--good" role="note" aria-label="Verdict on the book's 4 percent inflation">
+      <p class="verdict__head"><span class="verdict__icon" aria-hidden="true">✓</span><b>Holds up</b> <span class="verdict__claim">4% inflation</span></p>
+      <p>If anything, 4% is a little high, which is the safe side to miss on. Prices rose 3% a year before the book and 2.6% a year since.</p>
+    </div>
+    <details class="more">
+      <summary>More detail</summary>
+      <p class="note">Prices rose more than 4% in <span id="infl-count"></span>: 12 of them from 1968 to 1981, six around World War II and the Korean War, and only three since the book (2007, 2021 and 2022). Over the 30 years just before the book, which held the 1970s, prices rose 4.9% a year, so 4% looked reasonable at the time.</p>
+      <p class="note">Inflation here is the December to December change in the Consumer Price Index (CPI-U): Robert Shiller's monthly CPI for 1926–1927 and Aswath Damodaran's series (NYU Stern) from 1928, the same figures the <a href="../">simulator</a> uses. Averages are compounded, the steady yearly rate that gets prices from start to end. Hover a year on the chart for its figures.</p>
       <div class="scroll"><table class="years" id="infl-table"></table></div>
     </details>
-    <p class="note">December to December change in the Consumer Price Index (CPI-U): Robert Shiller's monthly CPI for 1926–1927 and Aswath Damodaran's series (NYU Stern) from 1928, the same figures the <a href="../">simulator</a> uses. Hover a year for its figures. Averages are compounded: the steady yearly rate that gets prices from start to end.</p>
-    <div class="verdict verdict--good" role="note" aria-label="Verdict on the book's 4 percent inflation">
-      <p class="verdict__head"><span class="verdict__icon" aria-hidden="true">✓</span><b>Holds up</b> <span class="verdict__claim">the book's 4 percent inflation</span></p>
-      <p>4% is on the cautious side. Prices rose 3.0% a year over the long run before the book and 2.6% a year since it; only the 30 years just before it, with the inflation of the 1970s, ran hotter, at 4.9%. Planning for more inflation than arrives budgets bigger raises than prices need, which errs toward safety.</p>
-    </div>
   </section>
 
   <aside class="card aside" aria-labelledby="h-avg">
-    <p class="kicker">Aside</p>
-    <h2 id="h-avg">Average year or compounded: two ways to say “12% a year”</h2>
+    <p class="kicker">First, a quick aside</p>
+    <h2 id="h-avg">Two ways to average a return</h2>
     <div class="defs">
       <div class="def">
-        <h3>Average year <small>simple or arithmetic average</small></h3>
-        <p>Add up each year's return and divide by the number of years. This is how Ramsey states the 12%, and how most “historical average” figures are quoted.</p>
+        <h3>Simple average</h3>
+        <p>Add up each year's return and divide by the number of years. This is the 12% Ramsey quotes.</p>
       </div>
       <div class="def">
-        <h3>Compounded <small>CAGR, compound annual growth rate</small></h3>
-        <p>The one steady yearly rate that would turn the starting balance into the ending balance: (ending ÷ starting)<sup>1 ÷ years</sup> − 1. This is what the money actually grew at.</p>
+        <h3>Compounded</h3>
+        <p>The steady yearly rate your money actually grew at, start to finish. Also called CAGR.</p>
       </div>
     </div>
-    <h3>$10,000 over four years that average 12%</h3>
+    <p class="note">They aren't the same. Here is $10,000 over four years that average 12%:</p>
     <div class="scroll"><table class="ex">
       <thead><tr><th scope="col">Year</th><th scope="col">Return</th><th scope="col">Your balance</th><th scope="col">At a steady 12%</th></tr></thead>
       <tbody>
@@ -236,44 +251,94 @@
         <tr><td>4</td><td>+3%</td><td>$15,064</td><td>$15,735</td></tr>
       </tbody>
       <tfoot>
-        <tr><th scope="row">Average year</th><td>12.0%</td><td colspan="2">(30 − 10 + 25 + 3) ÷ 4</td></tr>
-        <tr><th scope="row">Compounded</th><td>10.8%</td><td colspan="2">($15,064 ÷ $10,000)<sup>1 ÷ 4</sup> − 1</td></tr>
+        <tr><th scope="row">Simple average</th><td>12.0%</td><td colspan="2"></td></tr>
+        <tr><th scope="row">Compounded</th><td>10.8%</td><td colspan="2"></td></tr>
       </tfoot>
     </table></div>
-    <p class="note">Same 12% average, but the balance ends $671 short of a steady 12%: it grew as if it had made 10.8% every year. A loss costs more than the same-sized gain makes back, because the gain then works on a smaller balance. The extreme case: +50% then −50% averages 0%, but $10,000 becomes $15,000 and then $7,500. The more the years swing, the further the compounded rate falls below the average; with steady returns the two are the same.</p>
-    <p class="note">Over decades the gap adds up. From 1926 to 2002 the S&amp;P 500 averaged 11.9% a year but compounded at 10.0%. $10,000 put in at the start of 1926 grew to <b>$15.2 million</b> by the end of 2002; a steady 11.9% a year would have made it <b>$59.3 million</b>. Ramsey's math, a nest egg that grows 12% a year, needs the compounded figure to be 12%.</p>
+    <p class="note">Same 12% average, but the money only grew as if it earned 10.8% a year. Losses hurt more than gains help: lose 10% and you need 11% just to get back. Over a long time the gap is huge. From 1926 to 2002 the S&amp;P 500 averaged 11.9% but compounded at 10.0%, and $10,000 became $15 million instead of $59 million.</p>
+    <details class="more">
+      <summary>The math</summary>
+      <p class="note">Simple average: (30 − 10 + 25 + 3) ÷ 4 = 12.0%. Compounded: (ending ÷ starting)<sup>1 ÷ years</sup> − 1 = ($15,064 ÷ $10,000)<sup>1 ÷ 4</sup> − 1 = 10.8%. The more the years swing, the further the compounded rate falls below the average; with steady returns the two are equal. In the extreme, +50% then −50% averages 0%, but $10,000 becomes $15,000 and then $7,500. For the book's math to work, a nest egg has to actually grow 12% a year, which means the compounded figure has to be 12%.</p>
+    </details>
   </aside>
 
   <section class="card" aria-labelledby="h-returns">
-    <h2 id="h-returns">Do stocks make 12 percent on average?</h2>
-    <p class="note">Ramsey points to the S&amp;P 500's historical average. Add up each year’s return and divide, and it was 11.9% a year from 1926 to 2002, 12% in round numbers, so as a simple average his figure holds, and it has held since the book. But a balance grows at the compound rate, which ups and downs pull lower: 10.0% a year before the book and 11.3% since. His four recommended funds did better before the book than after it; at the end of 2002 their own printed lifetime returns ran from 11.3% to 15.2% a year.</p>
+    <h2 id="h-returns">Do stocks earn 12% a year?</h2>
+    <p class="note">As a simple average, yes: the S&amp;P 500 averaged about 12% a year both before the book and since. But money grows at the compounded rate, which was lower: 10% a year before the book and 11.3% since.</p>
     <div class="tiles" id="ret-tiles"></div>
-    <h3>Over any one stretch of years</h3>
-    <p class="note">Each square is one window of years, placed at the year it ended. Most people save for 20 to 40 years, and the windows left of the dashed line had already ended when the book came out. The funds' record starts in 1981, so their rows start later; under the four-fund blend is each fund on its own. Capital World Growth and Income (CWGIX) began in 1993, so its row starts in 1994 and the blend uses New Perspective (ANWPX) in its place before then. Hover a square for its numbers.</p>
+    <h3>Over 10, 20 and 30 years at a time</h3>
+    <p class="note">Each square is one stretch of years, placed at the year it <b>ended</b>. Blue reached 12% a year; red fell short. Switch between the two kinds of average. The chart starts with stretches that began in 1981, when the funds' record starts; tick the box to see the S&amp;P 500 back to 1926.</p>
     <div class="opts">
-      <span class="ctl-label">Measure</span>
+      <span class="ctl-label">Average</span>
       <div class="seg" role="radiogroup" aria-label="Measure">
-        <button role="radio" data-measure="avg">Average year</button>
+        <button role="radio" data-measure="avg">Simple</button>
         <button role="radio" data-measure="cagr">Compounded</button>
       </div>
+      <label class="early"><input type="checkbox" id="ret-funds"> Show each of the four funds</label>
+      <label class="early"><input type="checkbox" id="ret-early"> Show 1926–1980 <small>(S&amp;P 500 index only)</small></label>
     </div>
     <p class="note" id="ret-measure-note"></p>
     <div class="legend" id="ret-legend" aria-hidden="true"></div>
     <div class="scroll"><svg class="chart grid-chart" id="ret" role="img" aria-label="Every 10, 20 and 30-year window for the S&amp;P 500 since 1926, VFINX, and Ramsey's four funds since 1981, blended and one by one, colored by whether it reached 12% a year"></svg></div>
-    <p class="note"><a href="../twelve/">Every 5, 10, 20 and 30-year window for each fund, the S&amp;P 500 since 1872, a target other than 12%, and each fund's lifetime return at every year-end →</a></p>
     <div class="verdict verdict--mixed" role="note" aria-label="Verdict on the book's 12 percent">
-      <p class="verdict__head"><span class="verdict__icon" aria-hidden="true">◐</span><b>Half right</b> <span class="verdict__claim">the book's 12 percent</span></p>
-      <p>As a simple average, 12% holds: the S&amp;P 500 averaged 11.9% a year from 1926 to 2002 and 12.7% since. As the rate the money actually grows, it falls short: 10.0% compounded before the book and 11.3% since. Only 19 of 71 thirty-year windows for the S&amp;P 500, and 3 of 16 for the four funds, compounded at 12% or more. The book's math needs the compounded figure.</p>
+      <p class="verdict__head"><span class="verdict__icon" aria-hidden="true">◐</span><b>Half right</b> <span class="verdict__claim">12% a year</span></p>
+      <p>As a simple average, 12% holds. As the rate money actually grows, it falls short: only <span id="ret-verdict-n">19 of 71 thirty-year stretches of the S&amp;P 500, and 3 of 16 for Ramsey's four funds,</span> grew at 12% a year or more.</p>
     </div>
+    <details class="more">
+      <summary>More detail</summary>
+      <p class="note">The rows are the S&amp;P 500 index itself (no costs), VFINX (Vanguard's S&amp;P 500 index fund, after its costs), and Ramsey's four American Funds, 25% each; tick “Show each of the four funds” to add a row for each. The funds' record starts in 1981. Capital World Growth and Income (CWGIX) began in 1993, so its row starts in 1994, and the four-fund blend uses New Perspective (ANWPX) in its place before then. Hover a square for its numbers.</p>
+      <p class="note">The funds did better before the book than after it. At the end of 2002, their own printed lifetime returns ran from 11.3% to 15.2% a year.</p>
+      <p class="note"><a href="../twelve/">Every 5, 10, 20 and 30-year stretch for each fund, the S&amp;P 500 back to 1872, a target other than 12%, and each fund's lifetime return at every year-end →</a></p>
+    </details>
+  </section>
+
+  <section class="card" aria-labelledby="h-saving">
+    <h2 id="h-saving">“What if I’m half wrong?” Saving $625 a month</h2>
+    <p class="note">The title of this page comes from a passage in the book where a young couple saves for retirement:</p>
+    <blockquote class="tmmo">
+      <p>“If Joe and Suzy invest $625 per month with no match into Roth IRAs from age thirty to age seventy, they will have <b>$7,588,545</b> tax-FREE! That is almost $8 million. <b>What if I’m half wrong?</b> What if you end up with only $4 million? <b>What if I’m six times wrong?</b> Sure beats the 97 out of 100 sixty-five-year-olds who can’t write a check for $600!”</p>
+      <footer>Dave Ramsey, <cite>The Total Money Makeover</cite>. Bold added.</footer>
+    </blockquote>
+    <p class="note">That is $625 a month for 40 years, $300,000 in all. Here is what it actually became over every 40-year stretch in the record, against the book's figure, its “half wrong” $4 million, and “six times wrong,” a sixth of the figure, about $1.26 million.</p>
+    <div class="tiles" id="sv-tiles"></div>
+    <div class="opts">
+      <span class="ctl-label">Deposit</span>
+      <div class="seg" role="radiogroup" aria-label="Monthly deposit">
+        <button role="radio" data-deposit="flat">$625 every month (the book)</button>
+        <button role="radio" data-deposit="raise">Raised 4% a year</button>
+      </div>
+      <label class="early"><input type="checkbox" id="sv-early"> Show 1926–1980 <small>(S&amp;P 500 index only)</small></label>
+    </div>
+    <div class="legend" id="sv-legend" aria-hidden="true"></div>
+    <div class="scroll"><svg class="chart" id="sv" role="img" aria-label="What $625 a month for 40 years became, for every 40-year stretch since 1981, against the book's $7.59 million, $4 million and $1.26 million"></svg></div>
+    <p class="note" id="sv-note-raise" hidden>Raising the deposit 4% a year, so it keeps up with the book's inflation, means putting in $712,691 instead of $300,000; by the last year it is $2,885 a month. Then every stretch reached $4 million, and the four funds reached the book's $7.59 million in 2 of 6, saving from 1981 and 1982. In the money of the year they started saving, the balances were worth $1.7 to $2.8 million, still about a third of the book's figure.</p>
+    <p class="note" id="sv-note-flat">None came close to $7.6 million. Most landed near the book's “half wrong” $4 million: the four funds reached it in 5 of 6 stretches, the S&amp;P 500 in 5 and VFINX in 4. But those are dollars 40 years later, after prices roughly tripled. In the money of the year they started saving, the balances were worth $1.2 to $2 million, four to six times less than the book's figure.</p>
+    <div class="verdict verdict--mixed" id="sv-verdict-raise" role="note" aria-label="Verdict on saving with 4% raises" hidden>
+      <p class="verdict__head"><span class="verdict__icon" aria-hidden="true">◐</span><b>Closer, at a cost</b> <span class="verdict__claim">raising the $625 by 4% a year</span></p>
+      <p>In plain dollars, every stretch ended above the book's “half wrong” $4 million, and the four funds reached $7.59 million twice. But that took $712,691 of savings instead of $300,000, and after inflation the balances were worth $1.7 to $2.8 million, still three to four times short of the book's figure.</p>
+    </div>
+    <div class="verdict verdict--mixed" id="sv-verdict-flat" role="note" aria-label="Verdict on the book's $7.6 million">
+      <p class="verdict__head"><span class="verdict__icon" aria-hidden="true">◐</span><b>Half wrong, as the book allows</b> <span class="verdict__claim">$625 a month becoming $7.6 million</span></p>
+      <p>In plain dollars, every stretch ended near the book's “half wrong” $4 million, never near $7.6 million. After inflation, it was closer to “six times wrong.” Still far better than not saving at all.</p>
+    </div>
+    <details class="more">
+      <summary>More detail</summary>
+      <p class="note">Even a perfectly steady 12% a year turns $625 a month for 40 years into about $6.1 million, not $7.6 million. The book's figure matches growth of 1% a month, which compounds to 12.7% a year. Raised 4% a year, a steady 12% makes about $8.8 million.</p>
+      <p class="note">With the funds' record starting in 1981, there are only six 40-year stretches, ending from 2020 to 2025. Tick the box to add the S&amp;P 500 back to 1926: of the 55 stretches that began from 1926 to 1980, 2 reached $7.59 million (saving from 1959 and 1960, ending at the 1999 peak), 45 reached $4 million, and all beat $1.26 million. Raising the deposit 4% a year, 20 of the 55 reached $7.59 million and all reached $4 million.</p>
+      <p class="note">Deposits come at the start of each month, and each year's return is spread evenly over its months. Fund returns are after their yearly costs but not the Class A sales charge, which would leave about 4% less. Roth IRAs began in 1998, and $7,500 a year is more than early IRA limits allowed; like the book, this ignores both, and taxes.</p>
+    </details>
   </section>
 
   <section class="card" aria-labelledby="h-timing">
-    <h2 id="h-timing">Can you live off 8 percent a year?</h2>
-    <p class="note">The book works a year at a time: make 12%, take out 8%, and the 4% left over keeps up with inflation. Nowhere does it specify when the money comes out.</p>
-    <p class="note">A simple reading is a yearly budget: <b>$40,000 a year</b> from <b>$500,000</b>, paid out monthly like a paycheck to cover bills and expenses, <b>$3,333 a month</b>, and raised 4% each January. But, as we will see in a moment, this falls short.</p>
-    <p class="note">An alternate reading would be to take out the entire <b>$40,000</b> at the start of the year, put into a savings account, and leave $460,000 to grow. This falls even further short, and even under ideal conditions runs out after 31 years.</p>
-    <p class="note">In order to succeed under the Ramsey advice, we need to end the year not at $500,000, but rather at that plus 4% to keep pace with inflation: $520,000.</p>
-    <h3>Four ways to draw the money, every year exactly 12% and 4%</h3>
+    <h2 id="h-timing">Can you spend 8% a year?</h2>
+    <p class="note">The book's math only works if the whole year's 12% arrives before any money is spent. Real retirees spend through the year, like a paycheck. Even in a perfect world, with exactly 12% returns and 4% inflation every single year, that matters.</p>
+    <p class="note">Take <b>$40,000 a year</b> from <b>$500,000</b>, paid monthly (<b>$3,333 a month</b>) and raised 4% each year. To keep up, the balance has to grow 4% a year too, to $520,000 after year one. Spent monthly, it only grows about 3.5%, and that small gap adds up.</p>
+    <ul class="fixes">
+      <li><b>Spent monthly, 8% runs out in year 38.</b></li>
+      <li><b>Taken all on January 1, it runs out in year 31.</b></li>
+      <li><b>The most you can spend monthly and keep up is 7.52%</b>, about $37,600 a year. To spend $40,000, you would need about $532,000, not $500,000.</li>
+    </ul>
+    <h3>Four ways to spend it, in a perfect 12% and 4% world</h3>
     <div class="opts">
       <span class="ctl-label">Dollars</span>
       <div class="seg" role="radiogroup" aria-label="Dollars">
@@ -284,48 +349,51 @@
     <p class="note" id="timing-note"></p>
     <div class="legend" id="timing-legend" aria-hidden="true"></div>
     <div class="scroll"><svg class="chart" id="timing" role="img" aria-label="The balance over 50 years for four ways to draw the money, every year exactly 12% returns and 4% inflation"></svg></div>
-    <div class="scroll"><table class="timing" id="timing-table"></table></div>
-    <p class="note">Drawn monthly like a paycheck, 8% runs out in year 38. Dividing out inflation instead of subtracting it, 12% ÷ 4% (1.12 ÷ 1.04), gives a real return of 7.69%; drawn monthly, that lasts to year 52 but still slowly falls behind. Drawn monthly, the rate that exactly keeps up is <b>7.52%</b>, and living on $40,000 then takes about <b>$532,000</b>, not $500,000.</p>
-    <div class="math-box">
-      <h3>Where 7.52% comes from</h3>
-      <p>If the whole year's 12% landed before any money came out, a check could be 8% of the balance: 12% growth − 8% out = 4% left, just enough to raise both by 4%. Drawn monthly, each payment leaves before the year is over and misses the growth it would have earned by year end: the January payment misses 12 months of it, the December payment one month. On average a dollar paid monthly would have grown <b>6.39%</b> by year end. So paying W monthly costs the balance as much as paying W × 1.0639 at year end, and the most it can pay is</p>
-      <p class="eq">8% ÷ 1.0639 = <b>7.52%</b></p>
-      <p>The 1.0639: with m = 1.12<sup>1/12</sup> − 1 = 0.949% a month, a payment at the start of month k grows (1 + m)<sup>13−k</sup> by year end, and the twelve average to (1 + m) × ((1 + m)<sup>12</sup> − 1) ÷ (12m) = 1.0639. The same idea gives the others: all on January 1 misses the whole 12%, 8% ÷ 1.12 = 7.14%; 7.69% is 8% ÷ 1.04, which divides out inflation but not the timing.</p>
-    </div>
-    <p class="note">Other ways to make monthly draws last at a steady 12%, each just enough on its own:</p>
-    <ul class="fixes">
-      <li><b>Earn 12.5% a year instead of 12%.</b> Counting 12% as “1% a month” does it, because 1% a month compounds to 12.7% a year. That is a different return, not a different time to take the money out.</li>
-      <li><b>Raise the check 3.5% a year instead of 4%.</b> The money lasts, but the income falls behind 4% inflation, so the “cost-of-living raise every year” is gone.</li>
-    </ul>
-    <p class="note">The book's “grow your nest egg by 4 percent per year” leaves no slack, so when the money comes out decides whether it lasts, before a single bad year. Real years are not steady, which the next section takes up.</p>
     <div class="verdict verdict--bad" role="note" aria-label="Verdict on the book's 8 percent">
-      <p class="verdict__head"><span class="verdict__icon" aria-hidden="true">✕</span><b>Falls short</b> <span class="verdict__claim">the book's 8 percent</span></p>
-      <p>Even with exactly 12% returns and 4% inflation every year, drawing 8% like a paycheck runs out in <b>year 38</b>, and drawing it all on January 1 runs out in <b>year 31</b>. The most that keeps up when drawn monthly is <b>7.52%</b>, so living on $40,000 takes about $532,000, not $500,000. The gap is small, but it opens before a single bad year.</p>
+      <p class="verdict__head"><span class="verdict__icon" aria-hidden="true">✕</span><b>Falls short</b> <span class="verdict__claim">spending 8% a year</span></p>
+      <p>Even with perfect years, spending 8% as a monthly paycheck runs out in year 38. The safe number is closer to 7.5%. The gap is small, but it shows up before a single bad year.</p>
     </div>
+    <details class="more">
+      <summary>Numbers for each line</summary>
+      <div class="scroll"><table class="timing" id="timing-table"></table></div>
+      <p class="note">7.69% comes from dividing out inflation instead of subtracting it: 1.12 ÷ 1.04 = 1.0769, a real return of 7.69%. Spent monthly, it lasts to year 52 but still slowly falls behind.</p>
+    </details>
+    <details class="more">
+      <summary>The math behind 7.52%</summary>
+      <p class="note">If the whole year's 12% landed before any money came out, the check could be 8% of the balance: 12% growth − 8% out = 4% left, just enough to raise both by 4%. Spent monthly, each payment leaves early and misses the growth it would have earned by year end: January's misses 12 months of it, December's one month. On average a dollar paid monthly would have grown 6.39% by year end, so paying it monthly costs the balance as much as paying 1.0639 times as much at year end. The most it can pay is <b>8% ÷ 1.0639 = 7.52%</b>.</p>
+      <p class="note">The 1.0639: with m = 1.12<sup>1/12</sup> − 1 = 0.949% a month, a payment at the start of month k grows (1 + m)<sup>13−k</sup> by year end, and the twelve average to (1 + m) × ((1 + m)<sup>12</sup> − 1) ÷ (12m) = 1.0639. All on January 1 misses the whole 12%: 8% ÷ 1.12 = 7.14%.</p>
+      <p class="note">Other ways to make monthly spending last at a steady 12%, each just enough on its own: earn 12.5% a year instead of 12% (counting 12% as “1% a month” does it, since that compounds to 12.7%), or raise the check 3.5% a year instead of 4%, which lasts but lets the income fall behind inflation.</p>
+    </details>
   </section>
+
   <section class="card" aria-labelledby="h-real">
     <h2 id="h-real">What actually happened</h2>
-    <p class="note">Now the real record, with the book's numbers and the most generous way to draw them. Each retiree starts with <b>$500,000</b> and takes <b>$40,000</b> the first year in twelve monthly payments, the timing that keeps the most money invested. Each January the check rises by the <b>actual inflation</b> of the year before instead of a flat 4%, so it always buys what $40,000 did at the start; in the few years prices fell, it falls with them. The money earns what the S&amp;P 500, VFINX or Ramsey's four funds actually returned that year.</p>
-    <p class="note">The book says the nest egg stays ahead of inflation ’til death do you part, so a retirement <b>keeps pace</b> here only if it ends with at least $500,000 in the dollars of the year it began. The second choice below draws 7.52% instead, the rate that ends each year with enough for a raise in the book's steady world.</p>
+    <p class="note">Now real history. Each retiree starts with <b>$500,000</b>, spends <b>$40,000</b> the first year as a monthly paycheck, and gets a raise each January equal to the actual inflation of the year before. The money earns what the S&amp;P 500, VFINX or Ramsey's four funds actually returned.</p>
+    <p class="note">A retirement <b>keeps up</b> if, at the end, the nest egg still buys at least what $500,000 did at the start, as the book describes.</p>
     <div class="opts">
       <span class="ctl-label">First year</span>
       <div class="seg" role="radiogroup" aria-label="First year's withdrawal">
         <button role="radio" data-draw="book">$40,000 (8%, the book)</button>
         <button role="radio" data-draw="steel">$37,598 (7.52%)</button>
       </div>
+      <label class="early"><input type="checkbox" id="rw-early"> Show retirements from 1926–1980 <small>(S&amp;P 500 index only)</small></label>
     </div>
     <div class="tiles" id="rw-tiles"></div>
     <h3>Every 20, 25 and 30-year retirement</h3>
-    <p class="note">Each square is one retirement, placed at the year it began. Retirements right of the dashed line began after the book came out. The grid runs through retirements that began in 2013, ten years after the book; those that began too recently to finish are shown faded, as they stood at the end of 2025: on pace, behind inflation, or already out of money. The counts on the right are for finished retirements, with the number still underway in brackets. The funds' record starts in 1981. Hover a square for its numbers, or click it to see that retirement year by year.</p>
+    <p class="note">Each square is one retiree, placed at the year they retired. Faded squares are still underway. Click one to see it year by year. The chart starts in 1981, when the funds' record starts; tick the box to see the S&amp;P 500 back to 1926.</p>
     <div class="legend" id="rw-legend" aria-hidden="true"></div>
     <div class="scroll"><svg class="chart" id="rw" role="img" aria-label="Every 20, 25 and 30-year retirement since 1926 on the S&amp;P 500, and since 1981 on VFINX and Ramsey's four funds, colored by whether it kept pace with inflation, shrank, or ran out"></svg></div>
-    <p class="note">At $40,000, over 30 years the S&amp;P 500 kept pace in 29 of 71 retirements and ran out in 35, including all but one that began from 1956 to 1977 and every one that began from 1926 to 1931. Ramsey's four funds kept pace in all 16 thirty-year retirements, but those all began from 1981 to 1996, at the start of the strongest run in the record; over 20 years, every retirement on the four funds that began from 1999 to 2002 ran out. Of the three 20-year retirements that began after the book, all ran out on the S&amp;P 500 and VFINX, and two of three on the four funds. The 30-year retirements still underway, those that began from 1997 to 2006, look worse: by the end of 2025, nine of the ten had already run out on the S&amp;P 500 and on VFINX, and eight of ten on the four funds.</p>
-    <p class="note">In the ten years after the book, it comes down to 2008. Every retirement that began from 2004 to 2008 has already run out on the S&amp;P 500 and VFINX, whether it was meant to last 20, 25 or 30 years, and so has every one on the four funds except the 20-year retirement from 2004, which lasted but shrank. Every retirement that began from 2009 to 2013, just after the crash, is on pace so far, carried by the long rise that followed. Drawing 7.52% saves a few of the 2004 to 2008 retirements from running out, but none of them keeps pace.</p>
+    <p class="note">Going back to 1926, about half of all 30-year retirements on the S&amp;P 500 ran out of money. Since 1981 the record looks better, for the S&amp;P 500 and Ramsey's four funds alike, because 1981 came just before the biggest boom in the record. Everyone who retired in the five years after the book came out, 2004 to 2008, has run out of money or fallen behind, whichever of the three they chose. Those who retired just after the 2008 crash are on track so far.</p>
     <div class="verdict verdict--bad" role="note" aria-label="Verdict on the real record">
       <p class="verdict__head"><span class="verdict__icon" aria-hidden="true">✕</span><b>Falls short, depending on the year</b> <span class="verdict__claim">$40,000 from $500,000 in real markets</span></p>
-      <p>With real returns and real inflation, the book's plan worked for some retirees and failed for others, and the difference was mostly the year they began. On the S&amp;P 500 about half of all 30-year retirements ran out of money, and fewer than half kept the nest egg ahead of inflation as the book describes. The four funds' perfect 30-year record covers only retirements that began from 1981 to 1996; of the ten that began from 1997 to 2006, eight have already run out. Every retirement that began in the five years after the book, 2004 to 2008, has run out or fallen behind; those that began just after the 2008 crash are on pace so far. Drawing 7.52% instead of 8% helps only a little.</p>
+      <p>The plan worked for some retirees and failed for others, and the biggest difference was the year they started. Spending 7.52% instead of 8% helps only a little.</p>
     </div>
-    <p class="note">Monthly payments at the start of each month; each year's return spread evenly over its months. Inflation is the December to December change in consumer prices. Fund returns are after their yearly costs but not the Class A sales charge, about 2% at $500,000. No taxes.</p>
+    <details class="more">
+      <summary>More detail</summary>
+      <p class="note">Over 30 years at $40,000, the S&amp;P 500 kept up in 29 of 71 retirements and ran out in 35, including every one that began from 1926 to 1931 and all but one from 1956 to 1977. The four funds kept up in all 16 thirty-year retirements, but those all began from 1981 to 1996. Of the ten 30-year retirements that began from 1997 to 2006, nine have already run out on the S&amp;P 500 and on VFINX, and eight on the four funds. Every retirement that began from 2004 to 2008 has run out, except the 20-year retirement on the four funds from 2004, which lasted but shrank. Every one from 2009 to 2013 is on track so far. Spending 7.52% saves a few of the 2004 to 2008 retirements from running out, but none of them keeps up.</p>
+      <p class="note">The 7.52% choice is the most that keeps up in the perfect world of the section above. The counts on the right of the grid are for finished retirements, with the number still underway in brackets; underway ones are judged as they stood at the end of 2025. The grid runs through retirements that began in 2013, ten years after the book.</p>
+      <p class="note">Payments come at the start of each month, and each year's return is spread evenly over its months. Inflation is the December to December change in consumer prices; in the few years prices fell, the check falls with them. Fund returns are after their yearly costs but not the Class A sales charge, about 2% at $500,000. No taxes.</p>
+    </details>
   </section>
 </main>
 <dialog class="rw-detail" id="rw-detail" aria-labelledby="rw-d-title">
@@ -340,9 +408,10 @@
 <script src="../data.js?v=1"></script>
 <script src="../explainer-4/funds.js?v=5"></script>
 <script src="app.js?v=2"></script>
-<script src="returns.js?v=3"></script>
-<script src="timing.js?v=19"></script>
-<script src="realworld.js?v=6"></script>
+<script src="returns.js?v=6"></script>
+<script src="timing.js?v=20"></script>
+<script src="realworld.js?v=8"></script>
+<script src="saving.js?v=4"></script>
 <script>
   // light/dark, shared with the simulator and explainers through the same saved setting
   (function () {

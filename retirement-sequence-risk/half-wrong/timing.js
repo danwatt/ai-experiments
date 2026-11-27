@@ -35,8 +35,8 @@
 
   const state = { dollars: "plain" }; // "plain" dollars, or "real": today's dollars, 4% inflation taken out
   const NOTE = {
-    plain: "The balance in plain dollars. To keep up with inflation, as the book describes, it has to grow 4% a year, from $500,000 to $520,000 after year 1 and about $3.55 million by year 50; only the 7.52% line does. The blue lines are all drawn monthly, at three different starting rates. Hover for each year.",
-    real: "The balance in today's dollars, with 4% inflation taken out. Keeping up with inflation, as the book describes, is a flat line at $500,000; only the 7.52% line stays on it. The blue lines are all drawn monthly, at three different starting rates. Hover for each year.",
+    plain: "The balance in plain dollars. To keep up with prices it has to grow 4% a year, to about $3.5 million after 50 years. Only the 7.52% line does. Hover for each year.",
+    real: "The balance after inflation. Keeping up means staying flat at $500,000. Only the 7.52% line does. Hover for each year.",
   };
   $("#timing-legend").innerHTML = CASES.map((c) => `<span>${key(c)}${c.name}</span>`).join("");
   const NS = "http://www.w3.org/2000/svg", svg = $("#timing"), tip = $("#tip");
