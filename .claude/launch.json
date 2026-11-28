@@ -330,6 +330,18 @@
         "games/2048-opus-5.2-high-all-out"
       ],
       "port": 8812
+    },
+    {
+      "name": "solitaire",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8791",
+        "-d",
+        "games/solitaire"
+      ],
+      "port": 8791
     }
   ]
 }

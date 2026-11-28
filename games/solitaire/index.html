@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Solitaire Parlor</title>
+<meta name="description" content="Spider, Classic Solitaire, Klondike, FreeCell, Pyramid and TriPeaks. No ads, works offline.">
+<meta name="theme-color" content="#14512d">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body data-table="green">
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h5v-6h4v6h5V10"/></symbol>
+    <symbol id="i-new" viewBox="0 0 24 24"><rect x="4" y="3" width="11" height="15" rx="2"/><path d="M9 21h9a2 2 0 0 0 2-2V8"/><path d="M9.5 7.5v6M6.5 10.5h6"/></symbol>
+    <symbol id="i-restart" viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v5h5"/></symbol>
+    <symbol id="i-undo" viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></symbol>
+    <symbol id="i-hint" viewBox="0 0 24 24"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></symbol>
+    <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.6 2.6 0 0 1 5 1c0 1.8-2.5 2.2-2.5 4"/><path d="M12 17.5v.01"/></symbol>
+    <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></symbol>
+    <symbol id="i-full" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></symbol>
+    <symbol id="i-exitfull" viewBox="0 0 24 24"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></symbol>
+    <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M8 15l2 2 4-4"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></symbol>
+    <symbol id="i-install" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 17v3h16v-3"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+    <symbol id="i-sound" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></symbol>
+    <symbol id="i-mute" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M17 9l5 5M22 9l-5 5"/></symbol>
+  </defs>
+</svg>
+
+<main id="menu" class="screen">
+  <header class="menu-head">
+    <div class="brand">
+      <div class="logo" aria-hidden="true"></div>
+      <div>
+        <h1>Solitaire Parlor</h1>
+        <p class="tag">Six classic card games. No ads, no fuss.</p>
+      </div>
+    </div>
+    <nav class="menu-nav">
+      <button class="pill" data-act="daily"><svg><use href="#i-cal"/></svg><span>Daily deals</span></button>
+      <button class="pill" data-act="stats"><svg><use href="#i-chart"/></svg><span>Statistics</span></button>
+      <button class="pill" data-act="settings"><svg><use href="#i-gear"/></svg><span>Settings</span></button>
+      <button class="pill" data-act="fullscreen"><svg><use href="#i-full"/></svg><span>Full screen</span></button>
+      <button class="pill install" data-act="install" hidden><svg><use href="#i-install"/></svg><span>Install</span></button>
+    </nav>
+  </header>
+  <section id="daily-strip" class="daily-strip"></section>
+  <section id="tiles" class="tiles"></section>
+  <footer class="menu-foot">Your games and scores are saved on this computer.</footer>
+</main>
+
+<section id="game" class="screen" hidden>
+  <header id="toolbar">
+    <div class="tb-group">
+      <button class="tb" data-act="menu" title="Back to all games (Esc)"><svg><use href="#i-home"/></svg><span>Menu</span></button>
+      <button class="tb" data-act="new" title="Deal a new game (N)"><svg><use href="#i-new"/></svg><span>New game</span></button>
+      <button class="tb" data-act="restart" title="Start this deal over"><svg><use href="#i-restart"/></svg><span>Restart</span></button>
+    </div>
+    <div class="tb-title">
+      <div class="tb-name" id="game-name"></div>
+      <div class="hud" id="hud"></div>
+    </div>
+    <div class="tb-group">
+      <button class="tb big" data-act="undo" title="Undo (Ctrl+Z)"><svg><use href="#i-undo"/></svg><span>Undo</span></button>
+      <button class="tb big" data-act="hint" title="Show a good move (H)"><svg><use href="#i-hint"/></svg><span>Hint</span></button>
+      <button class="tb" data-act="help" title="How to play"><svg><use href="#i-help"/></svg><span>Rules</span></button>
+      <button class="tb" data-act="sound" title="Sound on or off"><svg><use href="#i-sound"/></svg><span>Sound</span></button>
+      <button class="tb" data-act="settings" title="Settings"><svg><use href="#i-gear"/></svg><span>Settings</span></button>
+      <button class="tb" data-act="fullscreen" title="Full screen (F)"><svg><use href="#i-full"/></svg><span>Full screen</span></button>
+    </div>
+  </header>
+  <div id="board" class="board"></div>
+  <div id="stuck" class="stuck" hidden>
+    <span>No more moves left.</span>
+    <button data-act="undo">Undo</button>
+    <button data-act="restart">Restart</button>
+    <button data-act="new" class="primary">New game</button>
+    <button data-act="dismiss-stuck" class="x" title="Close"><svg><use href="#i-close"/></svg></button>
+  </div>
+</section>
+
+<canvas id="fx" aria-hidden="true"></canvas>
+<div id="floaters" aria-hidden="true"></div>
+<div id="celebrate"><canvas></canvas><div class="banner"></div><button class="continue" hidden>Continue</button></div>
+<div id="dialogs"></div>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
