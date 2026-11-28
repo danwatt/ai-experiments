@@ -1,0 +1,117 @@
+{
+  "voice": "Heart",
+  "scenes": [
+    {
+      "id": "promise",
+      "title": "The book's promise",
+      "lines": [
+        "In The Total Money Makeover, Dave Ramsey's retirement plan rests on a few round numbers.",
+        "Make twelve percent a year on average. Inflation takes four. So you can live off eight, and the four left over grows your nest egg and gives you a raise every year.",
+        "If you can live on forty thousand dollars a year, you need a nest egg of only five hundred thousand."
+      ]
+    },
+    {
+      "id": "joe-suzy",
+      "title": "What if I'm half wrong?",
+      "lines": [
+        "Then the book does the saving math: Joe and Suzy invest six hundred twenty-five dollars a month, from age thirty to seventy.",
+        "The book says they'll have seven million, five hundred eighty-eight thousand dollars.",
+        "Then it asks: What if I'm half wrong? What if you end up with only four million? What if I'm six times wrong?",
+        "Even six times wrong is about one point two six million. So let's check each number against history."
+      ]
+    },
+    {
+      "id": "inflation",
+      "title": "Do prices rise 4% a year?",
+      "lines": [
+        "Start with inflation: every year for the last century, against Ramsey's four percent.",
+        "Over the whole hundred years, prices rose about two point nine percent a year. Before the book, three.",
+        "But in the thirty years just before it, with the seventies inside, four point nine. So four percent looked right at the time.",
+        "Since the book, two point six. Four percent holds up, and if anything, it's on the safe side."
+      ]
+    },
+    {
+      "id": "averages",
+      "title": "Two ways to average",
+      "lines": [
+        "Next, twelve percent. There are two ways to average a return, and they aren't the same.",
+        "Take ten thousand dollars through four years: up thirty percent, down ten, up twenty-five, up three. That averages twelve percent.",
+        "But the money ends at fifteen thousand and sixty-four dollars. A steady twelve percent would have made fifteen thousand seven hundred thirty-five.",
+        "The money really grew ten point eight percent a year. Losses hurt more than gains help, and your nest egg grows at the compounded rate, not the average."
+      ]
+    },
+    {
+      "id": "twelve",
+      "title": "Do stocks earn 12% a year?",
+      "lines": [
+        "So did stocks make twelve? From 1926 to 2002, the S&P 500 averaged eleven point nine percent, but compounded at ten.",
+        "Over seventy-seven years, that gap is huge: ten thousand dollars became fifteen million, not the fifty-nine million its average suggests.",
+        "Since the book: an average of twelve point seven, compounded eleven point three."
+      ],
+      "say": { "S&P 500": "S and P five hundred" }
+    },
+    {
+      "id": "windows",
+      "title": "Every 30-year stretch since 1981",
+      "lines": [
+        "Now every thirty-year stretch since 1981, when the four funds' record starts.",
+        "Compounded, the S&P 500 reached twelve percent in none of sixteen. Ramsey's four funds, in three.",
+        "As an average, twelve percent holds. As what your money actually grows at, it's half right."
+      ],
+      "say": { "S&P 500": "S and P five hundred" }
+    },
+    {
+      "id": "saving",
+      "title": "Joe and Suzy, for real",
+      "lines": [
+        "Back to Joe and Suzy: six hundred twenty-five a month for forty years is three hundred thousand dollars put in.",
+        "The funds' record allows only six real forty-year stretches, ending from 2020 to 2025. They ended with three point six to five point nine million.",
+        "None came close to seven point six. Most landed near the book's half wrong, four million.",
+        "But prices roughly tripled over those forty years. In the money of the year they started, they were worth one point two to two million: closer to six times wrong."
+      ]
+    },
+    {
+      "id": "fine-print",
+      "title": "Where the $7.6 million comes from",
+      "lines": [
+        "Part of the gap is the book's own math. A perfectly steady twelve percent makes about six point one million, not seven point six.",
+        "The book's figure is closer to one percent a month, which compounds to almost thirteen percent a year.",
+        "What if Joe and Suzy raised their deposit four percent a year, to keep up with inflation? They'd put in seven hundred twelve thousand instead of three hundred.",
+        "The four funds then hit seven point five nine million in two of six. But after inflation, even the best was about a third of the book's figure."
+      ]
+    },
+    {
+      "id": "spending",
+      "title": "Can you spend 8% a year?",
+      "lines": [
+        "Now spending eight percent, in a perfect world: exactly twelve percent every year, exactly four percent inflation.",
+        "The book's math assumes the whole year's twelve percent arrives before you spend a dime. Real retirees spend monthly, like a paycheck.",
+        "Forty thousand from five hundred thousand, paid monthly and raised four percent a year, runs out in year thirty-eight.",
+        "Taken all on January first, it's gone in year thirty-one.",
+        "Even seven point six nine percent, dividing out inflation instead of subtracting it, lasts only to year fifty-two.",
+        "The most you can spend monthly and keep up is seven point five two percent. Forty thousand a year needs about five hundred thirty-two thousand."
+      ]
+    },
+    {
+      "id": "history",
+      "title": "What actually happened",
+      "lines": [
+        "Now real history. Five hundred thousand dollars, forty thousand the first year as a monthly check, and a raise each January for actual inflation.",
+        "Since 1981, of sixteen finished thirty-year retirements in the S&P 500, eleven kept up with inflation, and one ran out.",
+        "But 1981 came just before the biggest boom on record. Back to 1926, only twenty-nine of seventy-one kept up, and thirty-five ran out.",
+        "Everyone who retired from 2004 to 2008, just after the book, has already run out, in the S&P 500 and the four funds alike. Those who started just after the crash are on track so far.",
+        "The plan was the same for all of them. The biggest difference was the year they started."
+      ],
+      "say": { "S&P 500": "S and P five hundred" }
+    },
+    {
+      "id": "scorecard",
+      "title": "The scorecard",
+      "lines": [
+        "So, the scorecard. Four percent inflation holds up. Twelve percent is half right. Seven point six million is half wrong, as the book allows. Spending eight percent falls short.",
+        "None of this is a reason not to save: Joe and Suzy's real results still beat not saving by a mile.",
+        "The plan points the right way. Its numbers are just too tidy. Returns swing, retirees spend every month, and the year you start can matter more than any average."
+      ]
+    }
+  ]
+}

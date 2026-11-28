@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>What if I'm half wrong?</title>
+  <meta name="description" content="A narrated motion explainer: Dave Ramsey's retirement math from The Total Money Makeover (12% returns, 4% inflation, spending 8%, and $625 a month becoming $7.6 million) checked against a hundred years of real prices and returns.">
+  <link rel="stylesheet" href="../../bluebonnet-design-system/dist/bluebonnet.css">
+  <style>
+    body { min-height: 100vh; }
+    .wrap { max-width: 1180px; margin: 0 auto; padding: var(--space-6) var(--space-6) var(--space-12); }
+    .back-sim { display: inline-block; margin-top: var(--space-2); font-size: 15px; font-weight: 600; color: var(--bluebonnet); text-decoration: none; }
+    .back-sim:hover { text-decoration: underline; }
+    header { display: flex; gap: var(--space-4); align-items: flex-start; justify-content: space-between; flex-wrap: wrap; }
+    header h1 { margin: 0 0 var(--space-1); }
+    header p { margin: 0; color: var(--ink-muted); }
+    .stage {
+      position: relative; margin-top: var(--space-6); width: 100%; aspect-ratio: 16 / 9;
+      background: var(--surface-sunken); border: 1px solid var(--line); border-radius: var(--radius-md); overflow: hidden;
+    }
+    .stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+    .start {
+      position: absolute; inset: 0; display: grid; place-items: center; background: transparent; border: 0; cursor: pointer;
+      color: var(--ink); font: inherit;
+    }
+    .start[hidden] { display: none; }
+    .start__inner { display: grid; justify-items: center; gap: var(--space-3); }
+    .start__disc {
+      width: 88px; height: 88px; border-radius: var(--radius-pill); background: var(--bluebonnet); color: var(--on-bluebonnet);
+      display: grid; place-items: center; box-shadow: var(--shadow-2); transition: background-color 120ms;
+    }
+    .start:hover .start__disc { background: var(--bluebonnet-deep); }
+    .start__label { font-family: var(--font-display); font-weight: 600; font-size: 19px; }
+    .start__hint { color: var(--ink-muted); font-size: 14px; }
+    .caption {
+      min-height: 52px; margin: var(--space-3) 0 0; padding: var(--space-3) var(--space-4);
+      background: var(--surface-raised); border: 1px solid var(--line); border-radius: var(--radius-md);
+      font-size: 17px; line-height: 26px; max-width: none;
+    }
+    .caption[hidden] { display: none; }
+    .controls { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: center; margin-top: var(--space-3); }
+    .controls .grow { flex: 1 1 220px; display: flex; align-items: center; gap: var(--space-3); }
+    .time { font-size: 14px; color: var(--ink-muted); white-space: nowrap; min-width: 92px; text-align: right; }
+    input[type=range] { width: 100%; accent-color: var(--bluebonnet); }
+    .scrub { position: relative; flex: 1 1 auto; display: flex; align-items: center; }
+    .scrub input { position: relative; z-index: 1; margin: 0; background: transparent; }
+    /* chapter markers: notches that show above and below the track, under the thumb */
+    .ticks { position: absolute; left: 8px; right: 8px; top: 50%; height: 0; pointer-events: none; }
+    .ticks i { position: absolute; top: -9px; width: 2px; height: 18px; margin-left: -1px; border-radius: 1px; background: var(--ink-muted); opacity: .7; }
+    .scrub-tip {
+      position: absolute; bottom: calc(100% + 10px); transform: translateX(-50%); z-index: 3; pointer-events: none; white-space: nowrap;
+      display: flex; gap: 10px; align-items: baseline; padding: 6px 12px; font-size: 14px; line-height: 20px;
+      background: var(--surface-raised); color: var(--ink); border: 1px solid var(--line-strong); border-radius: var(--radius-md); box-shadow: var(--shadow-2);
+    }
+    .scrub-tip[hidden] { display: none; }
+    .scrub-tip span { color: var(--ink-muted); font-variant-numeric: tabular-nums; }
+    .notes { margin-top: var(--space-8); display: grid; gap: var(--space-6); grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+    .notes h2 { margin-top: 0; font-size: 19px; line-height: 26px; }
+    .notes p, .notes li { color: var(--ink-muted); font-size: 15px; line-height: 24px; }
+    .notes ul { padding-left: 18px; }
+      padding: 8px 12px; font-size: 13px; line-height: 19px; box-shadow: var(--shadow-2); white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .icon { width: 20px; height: 20px; stroke: currentColor; stroke-width: 1.75; fill: none; stroke-linecap: round; stroke-linejoin: round; vertical-align: -4px; }
+    .bb-btn .icon { margin-right: 6px; }
+    .hover {
+      position: absolute; z-index: 3; pointer-events: none; min-width: 260px; max-width: 340px;
+      background: var(--surface-raised); color: var(--ink); border: 1px solid var(--line-strong); border-radius: var(--radius-md);
+      padding: 10px 14px; font-size: 14px; line-height: 20px; box-shadow: var(--shadow-2); font-variant-numeric: tabular-nums;
+    }
+    .hover[hidden] { display: none; }
+    .hover > b { font-size: 16px; }
+    .hover .hv-unit { display: block; color: var(--ink-muted); font-size: 12px; margin-bottom: 6px; }
+    .hover .hv-row { display: flex; justify-content: space-between; gap: 16px; }
+    .hover .hv-row b { white-space: nowrap; }
+    .hover .hv-row span { color: var(--ink-muted); }
+    .hover .hv-total { border-top: 1px solid var(--line); margin-top: 4px; padding-top: 4px; }
+    .choice { position: absolute; inset: 0; display: grid; place-items: end center; padding-bottom: 6%; background: color-mix(in srgb, var(--surface-sunken) 55%, transparent); }
+    .choice[hidden] { display: none; }
+    .choice__inner { display: grid; justify-items: center; gap: var(--space-3); }
+    .choice__q { font-family: var(--font-display); font-weight: 600; font-size: 22px; }
+    .choice__row { display: flex; gap: var(--space-4); flex-wrap: wrap; justify-content: center; }
+    .choice__btn {
+      display: grid; gap: 4px; text-align: left; max-width: 300px; padding: var(--space-3) var(--space-4); cursor: pointer;
+      background: var(--surface-raised); color: var(--ink); font: inherit; border: 2px solid var(--bluebonnet); border-radius: var(--radius-md); box-shadow: var(--shadow-2);
+    }
+    .choice__btn b { font-size: 18px; color: var(--bluebonnet); }
+    .choice__btn span { font-size: 14px; line-height: 20px; color: var(--ink-muted); }
+    .choice__btn--fire { border-color: var(--firewheel); }
+    .choice__btn--fire b { color: var(--firewheel); }
+    .choice__btn:hover { background: var(--bluebonnet-soft); }
+    .choice__timer { min-height: 20px; font-size: 14px; color: var(--ink-muted); }
+    .choice:not([hidden]) .choice__inner { animation: choice-in 0.45s ease-out; }
+    @keyframes choice-in { from { opacity: 0; transform: translateY(14px); } }
+    @media (prefers-reduced-motion: reduce) { .choice:not([hidden]) .choice__inner { animation: none; } }
+    .tracks { display: inline-flex; align-items: center; gap: 2px; }
+    .tracks__label { font-size: 14px; color: var(--ink-muted); margin-right: 4px; }
+    .tracks [aria-pressed="true"] { background: var(--bluebonnet-soft); color: var(--ink); }
+    @media (max-width: 640px) {
+      .wrap { padding: var(--space-4) var(--space-4) var(--space-12); }
+      .caption { font-size: 15px; line-height: 22px; }
+      .time { min-width: 0; }
+      .controls .grow { flex-basis: 100%; order: 3; }
+    }
+    @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+    /* the player (picture, caption, controls) shrinks to fit the window height, so on a wide but
+       short screen the caption and controls stay in view with the picture */
+    .wrap .stage, .wrap .caption, .wrap .controls { max-width: max(560px, calc((100svh - 210px) * 16 / 9)); margin-inline: auto; }
+    /* end screen: the other way of counting, or the simulator */
+    .choice__btn--link { text-decoration: none; }
+    .choice__btn--link b { color: var(--ink); }
+      .stamp-key { display: inline-block; padding: 0 6px; border-radius: 4px; font-weight: 600; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <span class="text-label" style="color: var(--bluebonnet)">Retirement explainer · Checking the book</span>
+      <h1>What if I'm half wrong?</h1>
+      <p id="sub">Dave Ramsey's retirement math from <i>The Total Money Makeover</i>, one round number at a time, against a hundred years of real prices and returns. About 6 minutes.</p>
+      <a class="back-sim" href="../half-wrong/">Read the full page, with every chart to explore <span aria-hidden="true">→</span></a>
+    </div>
+    <button class="bb-btn bb-btn--secondary bb-btn--sm" id="theme" type="button" aria-label="Switch to light theme">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><span>Light</span>
+    </button>
+  </header>
+
+  <div class="stage" id="stage">
+    <canvas id="cv" aria-label="Animated explainer. The caption below follows the narration."></canvas>
+    <div class="hover" id="hover" hidden></div>
+    <button class="start" id="start" type="button">
+      <span class="start__inner">
+        <span class="start__disc"><svg viewBox="0 0 24 24" width="36" height="36" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg></span>
+        <span class="start__label">Play explainer</span>
+        <span class="start__hint" id="startHint">Sound on. Space pauses, arrow keys skip.</span>
+      </span>
+    </button>
+    <div class="choice end" id="end" hidden>
+      <div class="choice__inner">
+        <span class="choice__q">What next?</span>
+        <div class="choice__row">
+          <button class="choice__btn" type="button" id="endOther"><b></b><span></span></button>
+          <a class="choice__btn choice__btn--link" href="../half-wrong/"><b>Explore the full page</b><span>Every chart, with hover details, the S&amp;P 500 back to 1926 and each fund on its own</span></a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p class="caption" id="caption">&nbsp;</p>
+
+  <div class="controls">
+    <button class="bb-btn bb-btn--primary" id="play" type="button">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" id="playIcon"><path d="M7 5v14l12-7z"/></svg><span id="playLabel">Play</span>
+    </button>
+    <div class="grow">
+      <div class="scrub">
+        <div class="ticks" id="ticks" aria-hidden="true"></div>
+        <input type="range" id="scrub" min="0" max="1000" value="0" step="1" aria-label="Position">
+        <div class="scrub-tip" id="scrubTip" hidden></div>
+      </div>
+      <span class="time" id="time">0:00 / 0:00</span>
+    </div>
+    <button class="bb-btn bb-btn--quiet bb-btn--sm" id="mute" type="button" aria-pressed="false">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13" id="waves"/></svg><span id="muteLabel">Mute</span>
+    </button>
+    <button class="bb-btn bb-btn--quiet bb-btn--sm" id="cc" type="button" aria-pressed="true">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10 10.5a2 2 0 1 0 0 3M16 10.5a2 2 0 1 0 0 3"/></svg><span>Captions</span>
+    </button>
+  </div>
+
+  <section class="notes">
+    <div>
+      <h2>What the animation computes</h2>
+      <p>The same models as the <a href="../half-wrong/">“What if I'm half wrong?”</a> page, from the same data. <b>Inflation</b> is the December to December change in consumer prices, averaged by compounding. <b>Returns</b> are calendar-year total returns: the S&amp;P 500 index itself (dividends reinvested, no costs) back to 1926, and Ramsey's four American Funds (AIVSX, AGTHX, CWGIX, ANWPX), 25% each, from 1981, with New Perspective standing in for Capital World Growth and Income before 1994. The “simple average” adds up the yearly returns and divides; the “compounded” rate is the steady yearly rate that gets the money from start to finish.</p>
+      <p><b>Saving:</b> $625 at the start of every month for 40 years, each year's return spread evenly over its months; “in the money of the year they started” divides by the rise in prices over the 40 years. <b>The perfect world:</b> exactly 12% a year (0.949% a month) and 4% inflation, $40,000 from $500,000 raised 4% each January, paid monthly or all on January 1. <b>Real history:</b> $500,000, $40,000 the first year in twelve monthly payments, raised each January by the past year's actual inflation; a retirement keeps up if at the end it still buys what $500,000 did at the start. Retirements still underway are judged as they stood at the end of 2025.</p>
+    </div>
+    <div>
+      <h2>The data and the quotes</h2>
+      <ul>
+        <li>Prices and S&amp;P 500 returns are the series the simulator uses (<code>../data.js</code>): Robert Shiller's data to 1927 and Aswath Damodaran's from 1928. Fund returns are explainer 4's (<code>../explainer-4/funds.js</code>): calendar-year returns at NAV, after yearly fund costs but not the Class A sales charge.</li>
+        <li>The quotes are from chapter 9 of <i>The Total Money Makeover</i> (first published September 2003); on screen they are shortened, with the cuts marked.</li>
+        <li>The book's $7,588,545 is close to what 1% a month makes ($7.43 million with deposits at the start of each month); a steady 12% a year makes $6.12 million.</li>
+        <li>Roth IRAs began in 1998, and $7,500 a year is more than early IRA limits allowed; like the book, this ignores both, and taxes.</li>
+        <li>A historical simulation, not a forecast or financial advice.</li>
+      </ul>
+    </div>
+    <div>
+      <h2>More</h2>
+      <p>The <a href="../half-wrong/">full page</a> has every chart to explore, including the S&amp;P 500's 40-year savers back to 1926 and 20- and 25-year retirements. Explainer 4 runs <a href="../explainer-4/">a million dollars through the four funds at 8%</a>. The voice is Kokoro (Heart) rendered by a local Voicebox server; edit <code>narration.json</code> and run <code>python3 build_voice.py</code>.</p>
+    </div>
+  </section>
+</div>
+
+<script src="../data.js"></script>
+<script src="../explainer-4/funds.js?v=5"></script>
+<script src="narration.js?v=1"></script>
+<script src="../kit/explainer-kit.js?v=6"></script>
+<script src="app.js?v=4"></script>
+</body>
+</html>

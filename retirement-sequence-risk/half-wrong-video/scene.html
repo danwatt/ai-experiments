@@ -1,0 +1,816 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Half wrong video frames</title>
+<!-- The video's frames. render.js loads this page in headless Chrome, calls setup(facts, timing) and then
+     draw(t) for every frame time t (seconds) and screenshots the canvas. Every number comes from facts.json
+     (compute.js); every time comes from timing.json (voice.py). Open it in a browser with ?t=42 to look at
+     one moment (it fetches the two JSON files, so serve the folder over http for that). -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:ital,wght@0,400;0,600;0,700;0,800;1,500;1,600&display=block" rel="stylesheet">
+<style>html,body{margin:0;background:#0b0d1e;overflow:hidden}canvas{display:block}</style>
+</head>
+<body>
+<canvas id="c" width="1920" height="1080"></canvas>
+<script>
+"use strict";
+const W = 1920, H = 1080, cv = document.getElementById("c"), g = cv.getContext("2d");
+// Bluebonnet design system, dark theme (bluebonnet-design-system/dist/bluebonnet.css)
+const C = {
+  bg: "#0b0d1e", surface: "#11142a", raised: "#1a1e38", line: "#2c3156", lineS: "#6a72a3",
+  ink: "#e8eaf5", muted: "#a6acc9", blue: "#8fa4ff", blueDeep: "#c3cdff", blueSoft: "#232a5c", blueLight: "#3149a3",
+  gold: "#f6c453", goldLight: "#f2b230", red: "#ff94a8", brush: "#ff8a6b", green: "#8fd18a", wine: "#e58ac4",
+};
+const DISP = '"Bricolage Grotesque"', BODY = '"Public Sans"';
+let F, TM, S = {};
+
+// ---------- small math
+const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+const lerp = (a, b, u) => a + (b - a) * u;
+const P = (t, a, d) => clamp((t - a) / d);
+const E = {
+  out3: (u) => 1 - Math.pow(1 - u, 3),
+  in3: (u) => u * u * u,
+  io3: (u) => (u < 0.5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2),
+  outExpo: (u) => (u >= 1 ? 1 : 1 - Math.pow(2, -10 * u)),
+  outBack: (u) => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(u - 1, 3) + c1 * Math.pow(u - 1, 2); },
+};
+const pct = (v, d = 1) => (v < 0 ? "−" : "") + Math.abs(100 * v).toFixed(d) + "%";
+const spct = (v, d = 0) => (v < 0 ? "−" : "+") + Math.abs(100 * v).toFixed(d) + "%";
+const money = (v) => "$" + Math.round(v).toLocaleString("en-US");
+const mil = (v, d = 1) => "$" + (v / 1e6).toFixed(d) + "M";
+const hexA = (h, a) => { const n = parseInt(h.slice(1), 16); return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`; };
+const mix = (h1, h2, u) => { const a = parseInt(h1.slice(1), 16), b = parseInt(h2.slice(1), 16); const ch = (s) => Math.round(((a >> s) & 255) + ((((b >> s) & 255) - ((a >> s) & 255)) * u)); return `rgb(${ch(16)},${ch(8)},${ch(0)})`; };
+
+// ---------- drawing helpers
+function font(size, weight = 400, fam = BODY, italic = false) { g.font = `${italic ? "italic " : ""}${weight} ${size}px ${fam}`; }
+function txt(s, x, y, o = {}) {
+  g.save();
+  font(o.size || 40, o.weight || 400, o.fam || BODY, o.italic);
+  g.fillStyle = o.color || C.ink; g.globalAlpha *= o.alpha ?? 1;
+  g.textAlign = o.align || "left"; g.textBaseline = o.base || "alphabetic"; g.letterSpacing = (o.ls || 0) + "px";
+  g.fillText(s, x, y);
+  const w = g.measureText(s).width;
+  g.restore();
+  return w;
+}
+function tw(s, size, weight = 400, fam = BODY, ls = 0, italic = false) { g.save(); font(size, weight, fam, italic); g.letterSpacing = ls + "px"; const w = g.measureText(s).width; g.restore(); return w; }
+// tabular figures: every digit gets the widest digit's advance, so counters don't jitter
+function tab(s, x, y, o = {}) {
+  g.save();
+  font(o.size || 80, o.weight || 800, o.fam || DISP);
+  g.letterSpacing = "0px";
+  const dw = Math.max(...[..."0123456789"].map((d) => g.measureText(d).width));
+  const chars = [...s], ws = chars.map((ch) => (/\d/.test(ch) ? dw : g.measureText(ch).width + (o.ls || 0)));
+  const w = ws.reduce((a, b) => a + b, 0);
+  let cx = o.align === "center" ? x - w / 2 : o.align === "right" ? x - w : x;
+  g.fillStyle = o.color || C.ink; g.globalAlpha *= o.alpha ?? 1; g.textAlign = "left"; g.textBaseline = o.base || "alphabetic";
+  chars.forEach((ch, i) => { const off = /\d/.test(ch) ? (dw - g.measureText(ch).width) / 2 : 0; g.fillText(ch, cx + off, y); cx += ws[i]; });
+  g.restore();
+  return w;
+}
+// words rise into place one after another
+function words(s, x, y, t0, t, o = {}) {
+  const size = o.size || 60, parts = s.split(" ");
+  g.save();
+  font(size, o.weight || 800, o.fam || DISP, o.italic);
+  g.letterSpacing = (o.ls || 0) + "px"; g.textAlign = "left"; g.textBaseline = "alphabetic";
+  const sp = g.measureText(" ").width, ws = parts.map((p) => g.measureText(p).width);
+  const total = ws.reduce((a, b) => a + b, 0) + sp * (parts.length - 1);
+  let cx = o.align === "center" ? x - total / 2 : o.align === "right" ? x - total : x;
+  const base = g.globalAlpha;
+  parts.forEach((p, i) => {
+    const u = E.out3(P(t, t0 + i * (o.st ?? 0.07), o.dur ?? 0.55));
+    if (u > 0) {
+      g.globalAlpha = base * (o.alpha ?? 1) * u;
+      g.fillStyle = (o.colors && o.colors[i]) || o.color || C.ink;
+      g.fillText(p, cx, y + (1 - u) * size * 0.45);
+    }
+    cx += ws[i] + sp;
+  });
+  g.restore();
+  return total;
+}
+function rr(x, y, w, h, r) { g.beginPath(); g.roundRect(x, y, w, h, r); }
+function dashed(x1, y1, x2, y2, col, lw = 3, dash = [14, 10], alpha = 1) {
+  g.save(); g.globalAlpha *= alpha; g.strokeStyle = col; g.lineWidth = lw; g.setLineDash(dash); g.beginPath(); g.moveTo(x1, y1); g.lineTo(x2, y2); g.stroke(); g.restore();
+}
+function glyph(kind, x, y, s, col) {
+  g.save(); g.strokeStyle = col; g.fillStyle = col; g.lineWidth = s * 0.42; g.lineCap = "round"; g.lineJoin = "round";
+  if (kind === "ok") { g.beginPath(); g.moveTo(x - s * 0.85, y + s * 0.05); g.lineTo(x - s * 0.25, y + s * 0.65); g.lineTo(x + s * 0.9, y - s * 0.6); g.stroke(); }
+  else if (kind === "no") { g.beginPath(); g.moveTo(x - s * 0.62, y - s * 0.62); g.lineTo(x + s * 0.62, y + s * 0.62); g.moveTo(x + s * 0.62, y - s * 0.62); g.lineTo(x - s * 0.62, y + s * 0.62); g.stroke(); }
+  else { g.lineWidth = s * 0.28; g.beginPath(); g.arc(x, y, s * 0.82, 0, Math.PI * 2); g.stroke(); g.beginPath(); g.arc(x, y, s * 0.82, Math.PI / 2, Math.PI * 1.5); g.closePath(); g.fill(); }
+  g.restore();
+}
+const VCOL = { ok: C.green, half: C.gold, no: C.red };
+// a verdict stamp: slams in rotated, with a ring that ripples out
+function stamp(kind, label, x, y, t0, t, o = {}) {
+  const u = P(t, t0, 0.5);
+  if (u <= 0) return;
+  const col = VCOL[kind], size = o.size || 50, rot = ((o.rot ?? -4) * Math.PI) / 180;
+  const sc = lerp(2.1, 1, E.outBack(u)), a = clamp(u * 2.5) * (o.alpha ?? 1);
+  const lw = tw(label, size, 800, DISP, 3), h = size * 1.75, r = h / 2, w = lw + h + 46;
+  g.save();
+  g.translate(x, y); g.rotate(rot);
+  const v = P(t, t0 + 0.18, 0.7);
+  if (v > 0 && v < 1) { g.save(); g.globalAlpha = (1 - v) * 0.55 * a; g.strokeStyle = col; g.lineWidth = 4; const k = 1 + v * 0.35; rr((-w / 2) * k, (-h / 2) * k - v * 8, w * k, h * k + v * 16, r * k); g.stroke(); g.restore(); }
+  g.scale(sc, sc); g.globalAlpha = a;
+  rr(-w / 2, -h / 2, w, h, r); g.fillStyle = mix(C.surface, col, 0.16); g.fill(); g.lineWidth = 5; g.strokeStyle = col; g.stroke();
+  const gx = -w / 2 + r, gr = r * 0.66;
+  g.beginPath(); g.arc(gx, 0, gr, 0, Math.PI * 2); g.fillStyle = col; g.fill();
+  glyph(kind, gx, 0, gr * 0.55, C.bg);
+  font(size, 800, DISP); g.letterSpacing = "3px"; g.fillStyle = col; g.textBaseline = "middle"; g.fillText(label, gx + gr + 22, size * 0.06);
+  g.restore();
+  if (o.sub) txt(o.sub, x, y + h / 2 + 44, { size: 26, weight: 600, color: col, align: "center", alpha: a });
+}
+function heading(eyebrow, title, t, o = {}) {
+  const a = o.alpha ?? 1;
+  g.save(); g.globalAlpha = a;
+  const u = E.out3(P(t, 0.05, 0.5));
+  g.globalAlpha = a * u;
+  g.fillStyle = C.gold; g.fillRect(140, 132, 54 * u, 5);
+  txt(eyebrow, 210, 141, { size: 24, weight: 700, ls: 5, color: C.gold });
+  g.globalAlpha = a;
+  words(title, 140, 232, 0.18, t, { size: o.size || 74, weight: 800, st: 0.06, colors: o.colors });
+  g.restore();
+}
+
+// ---------- background: deep surface, two slow glows, a faint dot grid
+function bg(t) {
+  g.fillStyle = C.bg; g.fillRect(0, 0, W, H);
+  const gx = W * 0.22 + Math.sin(t * 0.13) * 220, gy = H * 0.25 + Math.cos(t * 0.1) * 120;
+  let rg = g.createRadialGradient(gx, gy, 0, gx, gy, 1150);
+  rg.addColorStop(0, "rgba(49,73,163,0.30)"); rg.addColorStop(1, "rgba(49,73,163,0)");
+  g.fillStyle = rg; g.fillRect(0, 0, W, H);
+  const hx = W * 0.85 + Math.cos(t * 0.09) * 160, hy = H * 0.95 + Math.sin(t * 0.12) * 80;
+  rg = g.createRadialGradient(hx, hy, 0, hx, hy, 900);
+  rg.addColorStop(0, "rgba(242,178,48,0.07)"); rg.addColorStop(1, "rgba(242,178,48,0)");
+  g.fillStyle = rg; g.fillRect(0, 0, W, H);
+  g.fillStyle = "rgba(232,234,245,0.055)";
+  for (let y = 24; y < H; y += 48) for (let x = 24; x < W; x += 48) { g.beginPath(); g.arc(x, y, 1.3, 0, Math.PI * 2); g.fill(); }
+}
+
+// ---------- scene timing
+function sc(id, T) {
+  const s = S[id], c = s.cues.map((q) => q.start - s.start), e = s.cues.map((q) => q.end - s.start);
+  return { t: T - s.start, c, e, d: s.end - s.start, at: (i, f) => c[i] + f * (e[i] - c[i]) };
+}
+const fadeOut = (t, t0, d = 0.4) => 1 - E.io3(P(t, t0, d));
+
+// ======================================================================= scenes
+// 1. The plan: 12 − 4 = 8, and $40,000 from $500,000
+function sOpen(T) {
+  const { t, c, e, at } = sc("open", T);
+  words("THE TOTAL MONEY MAKEOVER  ·  DAVE RAMSEY  ·  2003", W / 2, 200, 0.1, t, { size: 24, weight: 700, fam: BODY, ls: 6, color: C.muted, align: "center", st: 0.03 });
+  // line 0: the promise
+  const a0 = fadeOut(t, c[1] - 0.25, 0.35);
+  if (a0 > 0) {
+    g.save(); g.globalAlpha = a0;
+    words("Retirement,", W / 2, 470, c[0] + 0.05, t, { size: 140, align: "center" });
+    words("made simple.", W / 2, 640, c[0] + 0.7, t, { size: 140, align: "center", color: C.gold });
+    g.restore();
+  }
+  // line 1: the equation, then it shrinks up for line 2
+  const k = E.io3(P(t, c[2] - 0.1, 0.7));
+  const cy = lerp(590, 400, k), s = lerp(1, 0.62, k);
+  const parts = [
+    { s: "12%", col: C.gold, lab: "earned", t0: at(1, 0.0) },
+    { s: "−", col: C.muted, op: true, t0: at(1, 0.33) },
+    { s: "4%", col: C.red, lab: "inflation", t0: at(1, 0.36) },
+    { s: "=", col: C.muted, op: true, t0: at(1, 0.68) },
+    { s: "8%", col: C.blue, lab: "to live on", t0: at(1, 0.7) },
+  ];
+  const size = 230, gap = 54;
+  const ws = parts.map((p) => tw(p.s, p.op ? size * 0.7 : size, 800, DISP));
+  const total = ws.reduce((a, b) => a + b, 0) + gap * (parts.length - 1);
+  g.save(); g.translate(W / 2, cy); g.scale(s, s);
+  let x = -total / 2;
+  parts.forEach((p, i) => {
+    const u = P(t, p.t0, 0.5);
+    if (u > 0) {
+      const b = E.outBack(u);
+      g.save(); g.globalAlpha = clamp(u * 2);
+      g.translate(x + ws[i] / 2, 0); g.scale(lerp(0.5, 1, b), lerp(0.5, 1, b));
+      txt(p.s, 0, 70, { size: p.op ? size * 0.7 : size, weight: 800, fam: DISP, color: p.col, align: "center" });
+      if (p.lab) txt(p.lab.toUpperCase(), 0, 150, { size: 30, weight: 700, ls: 5, color: C.muted, align: "center" });
+      g.restore();
+    }
+    x += ws[i] + gap;
+  });
+  g.restore();
+  // line 2: $500,000 → $40,000 a year
+  if (t > c[2]) {
+    const u1 = E.out3(P(t, at(2, 0.05), 0.6)), u2 = E.out3(P(t, at(2, 0.4), 0.9));
+    const y = 790;
+    g.save(); g.globalAlpha = u1;
+    tab(money(40000), W / 2 + 120, y + (1 - u1) * 40, { size: 130, color: C.gold });
+    txt("A YEAR, FOR LIFE", W / 2 + 124, y + 64, { size: 28, weight: 700, ls: 5, color: C.muted });
+    g.restore();
+    if (u2 > 0) {
+      g.save(); g.globalAlpha = clamp(u2 * 2);
+      tab(money(5e5 * u2), W / 2 - 120, y + (1 - u2) * 40, { size: 130, color: C.blue, align: "right" });
+      txt("NEST EGG", W / 2 - 124, y + 64, { size: 28, weight: 700, ls: 5, color: C.muted, align: "right" });
+      g.restore();
+      // arrow
+      const v = E.out3(P(t, at(2, 0.55), 0.5));
+      g.save(); g.strokeStyle = C.ink; g.lineWidth = 6; g.lineCap = "round"; g.globalAlpha = v;
+      g.beginPath(); g.moveTo(W / 2 - 70, y - 44); g.lineTo(W / 2 - 70 + 140 * v, y - 44); g.stroke();
+      if (v > 0.9) { g.beginPath(); g.moveTo(W / 2 + 50, y - 64); g.lineTo(W / 2 + 72, y - 44); g.lineTo(W / 2 + 50, y - 24); g.stroke(); }
+      g.restore();
+    }
+  }
+}
+
+// 2. Joe and Suzy: $7,588,545, "half wrong" $4M, "six times wrong"
+function sJoe(T) {
+  const { t, c, e, at } = sc("joe", T), f = F.saving;
+  const out = fadeOut(t, c[3] - 0.2, 0.45);
+  if (out > 0) {
+    g.save(); g.globalAlpha = out;
+    words("Joe & Suzy", 140, 232, 0.15, t, { size: 96 });
+    const u = E.out3(P(t, at(0, 0.25), 0.6));
+    g.globalAlpha = out * u;
+    let x = 140;
+    x += txt(money(f.monthly), x, 310, { size: 40, weight: 800, color: C.gold });
+    x += txt(" a month  ·  age 30 to 70  ·  ", x, 310, { size: 40, weight: 500, color: C.muted });
+    txt(money(f.put) + " put in", x, 310, { size: 40, weight: 500, color: C.muted });
+    g.restore();
+    const L = 140, MAXW = 1640;
+    const rows = [
+      { v: f.book, col: C.gold, label: "the book", t0: c[1] + 0.1, dur: e[1] - c[1] - 0.2, count: true },
+      { v: f.half, col: C.blue, label: "“What if I’m half wrong?”", t0: at(2, 0.05), lab0: at(2, 0.0), val0: at(2, 0.42), dur: 0.9 },
+      { v: f.sixth, col: C.red, label: "“What if I’m six times wrong?”", t0: at(2, 0.66), lab0: at(2, 0.62), val0: at(2, 0.66), dur: 0.9, count: true },
+    ];
+    rows.forEach((r, i) => {
+      const y = 500 + i * 190;
+      const u = E.out3(P(t, r.t0, r.dur)), w = MAXW * (r.v / f.book) * u;
+      if (u <= 0) return;
+      g.save(); g.globalAlpha = out;
+      rr(L, y + 26, Math.max(4, w), 64, 10); g.fillStyle = r.col; g.fill();
+      // a track for the bar to grow along
+      g.globalAlpha = out * 0.12; rr(L, y + 26, MAXW, 64, 10); g.fillStyle = C.ink; g.fill();
+      g.globalAlpha = out;
+      const vv = r.count ? r.v * u : r.v, va = r.count ? 1 : E.out3(P(t, r.val0, 0.4));
+      const vw = tab(money(vv), L, y, { size: 92, color: C.ink, alpha: va });
+      const la = E.out3(P(t, r.lab0 ?? r.t0 + r.dur * 0.8, 0.5));
+      txt(r.label, L + Math.max(vw, tw(money(r.v), 92, 800, DISP)) + 34, y - 8, { size: 40, weight: 600, italic: i > 0, color: i ? r.col : C.muted, alpha: la });
+      g.restore();
+    });
+  }
+  // line 3: let's check — the five claims, as cards
+  if (t > c[3] - 0.2) {
+    words("Let’s check.", W / 2, 390, c[3], t, { size: 140, align: "center" });
+    const cards = [["4%", "inflation", C.red], ["12%", "returns", C.gold], [mil(f.book, 2), "saved", C.gold], ["8%", "spending", C.blue], [(F.last - F.inflation.y0 + 1) + " yrs", "real history", C.ink]];
+    const cw = 312, gap = 24, x0 = W / 2 - (cards.length * cw + (cards.length - 1) * gap) / 2;
+    cards.forEach(([big, small, col], i) => {
+      const u = P(t, c[3] + 0.35 + i * 0.12, 0.55);
+      if (u <= 0) return;
+      const b = E.outBack(u), x = x0 + i * (cw + gap), y = 520 + (1 - b) * 60;
+      g.save(); g.globalAlpha = clamp(u * 2);
+      rr(x, y, cw, 220, 18); g.fillStyle = C.raised; g.fill(); g.strokeStyle = C.line; g.lineWidth = 2; g.stroke();
+      g.fillStyle = col; g.fillRect(x + 28, y + 28, 40, 5);
+      txt(big, x + 28, y + 128, { size: big.length > 5 ? 58 : 80, weight: 800, fam: DISP, color: col });
+      txt(small.toUpperCase(), x + 28, y + 184, { size: 24, weight: 700, ls: 4, color: C.muted });
+      g.restore();
+    });
+  }
+}
+
+// 3. Inflation: one bar per year since 1926
+function sInflation(T) {
+  const { t, c, e, at } = sc("inflation", T), f = F.inflation;
+  heading("CLAIM 1  ·  INFLATION", "Do prices rise 4% a year?", t, { colors: [, , , C.red] });
+  const x0 = 150, x1 = 1780, yT = 360, yB = 940, lo = -0.12, hi = 0.2;
+  const n = f.series.length, slot = (x1 - x0) / n, bw = slot - 4;
+  const xv = (y) => x0 + (y - f.y0) * slot, yv = (v) => yT + ((hi - v) / (hi - lo)) * (yB - yT);
+  const ax = E.out3(P(t, 0.3, 0.6));
+  g.save(); g.globalAlpha = ax;
+  for (let v = lo; v <= hi + 1e-9; v += 0.04) {
+    g.fillStyle = Math.abs(v) < 1e-9 ? C.lineS : C.line; g.fillRect(x0, Math.round(yv(v)), x1 - x0, Math.abs(v) < 1e-9 ? 2 : 1);
+    txt(pct(v, 0), x0 - 14, yv(v) + 8, { size: 22, weight: 600, color: C.muted, align: "right" });
+  }
+  for (let y = 1930; y <= F.last; y += 10) txt(String(y), xv(y) + slot / 2, yB + 40, { size: 22, weight: 600, color: C.muted, align: "center" });
+  g.restore();
+  // bars sweep in left to right
+  const s0 = c[0] + 0.1;
+  f.series.forEach(([y, v], i) => {
+    const u = E.out3(P(t, s0 + i * 0.022, 0.4));
+    if (u <= 0) return;
+    const top = yv(v * u), z = yv(0);
+    g.fillStyle = v > 0.04 ? C.brush : C.blue;
+    g.globalAlpha = v > 0.04 ? 0.95 : 0.8;
+    rr(xv(y) + 2, Math.min(top, z), bw, Math.max(1, Math.abs(z - top)), 3); g.fill();
+  });
+  g.globalAlpha = 1;
+  // Ramsey's 4%
+  const d4 = E.out3(P(t, s0 + 0.8, 0.9));
+  if (d4 > 0) { dashed(x0, yv(0.04), x0 + (x1 - x0) * d4, yv(0.04), C.gold, 4, [16, 10]); txt("RAMSEY’S 4%", x0 + 14, yv(0.04) - 14, { size: 22, weight: 800, ls: 3, color: C.gold, alpha: d4 }); }
+  // the book
+  const bk = E.out3(P(t, s0 + 1.6, 0.5)), bx = xv(2003) + (8.5 / 12) * slot;
+  if (bk > 0) { dashed(bx, yB, bx, lerp(yB, yT - 6, bk), C.ink, 2, [4, 6], 0.7); txt("BOOK, 2003", bx - 10, yT + 18, { size: 20, weight: 700, ls: 3, color: C.ink, align: "right", alpha: bk * 0.85 }); }
+  // compounded rates as level lines, with callouts
+  const u1 = E.out3(P(t, at(1, 0.1), 0.9)), u2 = E.out3(P(t, at(1, 0.62), 0.8));
+  if (u1 > 0) {
+    g.save(); g.strokeStyle = C.blueDeep; g.lineWidth = 5; g.lineCap = "round"; g.beginPath(); g.moveTo(x0, yv(f.century)); g.lineTo(x0 + (x1 - x0) * u1, yv(f.century)); g.stroke(); g.restore();
+    g.save(); g.globalAlpha = u1;
+    tab(pct(f.century * u1), 1360, 250, { size: 110, color: C.blueDeep, align: "right" });
+    txt("A YEAR, " + f.y0 + "–" + F.last, 1360, 296, { size: 22, weight: 700, ls: 3, color: C.muted, align: "right" });
+    g.restore();
+  }
+  if (u2 > 0) {
+    const sx = xv(2003);
+    g.save(); g.strokeStyle = C.green; g.lineWidth = 5; g.lineCap = "round"; g.beginPath(); g.moveTo(sx, yv(f.sinceBook)); g.lineTo(sx + (x1 - sx) * u2, yv(f.sinceBook)); g.stroke(); g.restore();
+    g.save(); g.globalAlpha = u2;
+    tab(pct(f.sinceBook * u2), 1780, 250, { size: 110, color: C.green, align: "right" });
+    txt("SINCE THE BOOK", 1780, 296, { size: 22, weight: 700, ls: 3, color: C.muted, align: "right" });
+    g.restore();
+  }
+  // legend
+  const lg = E.out3(P(t, s0 + 2.0, 0.6));
+  if (lg > 0) {
+    g.save(); g.globalAlpha = lg;
+    let x = x0;
+    [[C.brush, "Year above 4%"], [C.blue, "At or below 4%"]].forEach(([col, s]) => { rr(x, 1006, 22, 22, 4); g.fillStyle = col; g.fill(); x += 34; x += txt(s, x, 1026, { size: 22, weight: 600, color: C.muted }) + 40; });
+    txt(`${f.yearsAbove4} of ${f.years} years topped 4%`, x1, 1026, { size: 22, weight: 600, color: C.muted, align: "right" });
+    g.restore();
+  }
+  stamp("ok", "HOLDS UP", 1490, 470, c[2] + 0.15, t);
+}
+
+// 4. Average vs compounded
+function sAverage(T) {
+  const { t, c, e, at } = sc("average", T), f = F.returns;
+  heading("CLAIM 2  ·  RETURNS", "Do stocks earn 12% a year?", t, { colors: [, , , C.gold] });
+  // part A: the four-year example
+  const aA = fadeOut(t, c[2] - 0.3, 0.4);
+  if (aA > 0) {
+    g.save(); g.globalAlpha = aA;
+    const marks = [0.23, 0.33, 0.45, 0.6]; // where each return is said in line 0
+    f.toy.forEach((r, i) => {
+      const u = E.out3(P(t, at(0, marks[i]), 0.45));
+      if (u <= 0) return;
+      const y = 410 + i * 92;
+      g.save(); g.globalAlpha = aA * u;
+      txt("YEAR " + (i + 1), 150, y, { size: 24, weight: 700, ls: 4, color: C.muted });
+      txt(spct(r), 330 + (1 - u) * 40, y + 8, { size: 76, weight: 800, fam: DISP, color: r < 0 ? C.red : C.blue });
+      g.restore();
+    });
+    const ua = E.out3(P(t, at(0, 0.78), 0.5)), uc = E.out3(P(t, at(1, 0.6), 0.5));
+    if (ua > 0) {
+      g.save(); g.globalAlpha = aA * ua; g.fillStyle = C.line; g.fillRect(150, 750, 520, 2);
+      txt("SIMPLE AVERAGE", 150, 810, { size: 24, weight: 700, ls: 4, color: C.muted });
+      tab(pct(f.toyAvg), 670, 822, { size: 76, color: C.gold, align: "right" });
+      g.restore();
+    }
+    if (uc > 0) {
+      g.save(); g.globalAlpha = aA * uc;
+      txt("COMPOUNDED", 150, 900, { size: 24, weight: 700, ls: 4, color: C.muted });
+      tab(pct(f.toyCagr * uc + f.toyAvg * (1 - uc)), 670, 912, { size: 76, color: C.blueDeep, align: "right" });
+      g.restore();
+    }
+    // chart: $10,000 over four years, a steady 12% against the real path
+    const X0 = 860, X1 = 1600, Y0 = 900, Y1 = 380, lo = 9000, hi = 16500;
+    const xv = (i) => X0 + (i / 4) * (X1 - X0), yv = (v) => Y0 - ((v - lo) / (hi - lo)) * (Y0 - Y1);
+    const ga = E.out3(P(t, c[0] + 0.2, 0.6));
+    g.save(); g.globalAlpha = aA * ga;
+    for (let v = 10000; v <= 16000; v += 2000) { g.fillStyle = C.line; g.fillRect(X0, yv(v), X1 - X0, 1); txt("$" + v / 1000 + "K", X0 - 14, yv(v) + 8, { size: 22, weight: 600, color: C.muted, align: "right" }); }
+    for (let i = 0; i <= 4; i++) txt(i ? "Year " + i : "Start", xv(i), Y0 + 44, { size: 22, weight: 600, color: C.muted, align: "center" });
+    g.restore();
+    const steady = [10000, ...f.steady12];
+    // the steady line draws with the chips, the real one year by year
+    const sp = E.io3(P(t, at(0, 0.2), 2.6)) * 4;
+    const path = (vals, k, col, lw, dash) => {
+      g.save(); g.globalAlpha = aA; g.strokeStyle = col; g.lineWidth = lw; g.lineJoin = "round"; g.lineCap = "round"; if (dash) g.setLineDash(dash);
+      g.beginPath(); g.moveTo(xv(0), yv(vals[0]));
+      for (let i = 1; i <= Math.ceil(k); i++) { const u = clamp(k - (i - 1)); g.lineTo(lerp(xv(i - 1), xv(i), u), lerp(yv(vals[i - 1]), yv(vals[i]), u)); }
+      g.stroke(); g.restore();
+    };
+    if (sp > 0) path(steady, sp, C.gold, 4, [14, 10]);
+    let kr = 0;
+    marks.forEach((m, i) => { kr += E.io3(P(t, at(0, m), 0.5)); });
+    if (kr > 0) {
+      path(f.toyBal, kr, C.blue, 6);
+      for (let i = 0; i <= Math.floor(kr); i++) {
+        g.save(); g.globalAlpha = aA; g.beginPath(); g.arc(xv(i), yv(f.toyBal[i]), 8, 0, Math.PI * 2); g.fillStyle = C.blue; g.fill(); g.restore();
+        if (i > 0 && i < 4) txt(money(f.toyBal[i]), xv(i), yv(f.toyBal[i]) + (f.toy[i - 1] < 0 ? 44 : -22), { size: 22, weight: 700, color: C.blue, align: "center", alpha: aA });
+      }
+    }
+    const ul = E.out3(P(t, c[1] + 0.2, 0.5));
+    if (ul > 0) {
+      g.save(); g.globalAlpha = aA * ul;
+      txt(money(steady[4]), X1 + 22, yv(steady[4]) - 6, { size: 40, weight: 800, fam: DISP, color: C.gold });
+      txt("steady 12%", X1 + 22, yv(steady[4]) + 26, { size: 22, weight: 600, color: C.gold });
+      txt(money(f.toyBal[4]), X1 + 22, yv(f.toyBal[4]) + 42, { size: 40, weight: 800, fam: DISP, color: C.blue });
+      txt("what you’d have", X1 + 22, yv(f.toyBal[4]) + 74, { size: 22, weight: 600, color: C.blue });
+      g.restore();
+    }
+    g.restore();
+  }
+  // part B: the S&P 500, 1926–2002
+  if (t > c[2] - 0.2) {
+    const sp = f.sp2602;
+    const u = E.out3(P(t, c[2] + 0.1, 0.5)), u1 = E.out3(P(t, at(2, 0.45), 0.7)), u2 = E.out3(P(t, at(2, 0.8), 0.7));
+    g.save(); g.globalAlpha = u * fadeOut(t, c[3] - 0.1, 0.5) * 0.65 + u * 0.35;
+    txt("S&P 500, 1926–2002", 150, 360, { size: 30, weight: 700, ls: 2, color: C.ink });
+    if (u1 > 0) { tab(pct(sp.avg * u1), 150, 520, { size: 150, color: C.gold, alpha: u1 }); txt("SIMPLE AVERAGE", 156, 568, { size: 24, weight: 700, ls: 4, color: C.muted, alpha: u1 }); }
+    if (u2 > 0) { tab(pct(sp.cagr * u2), 690, 520, { size: 150, color: C.blueDeep, alpha: u2 }); txt("COMPOUNDED", 696, 568, { size: 24, weight: 700, ls: 4, color: C.muted, alpha: u2 }); }
+    const u3 = E.out3(P(t, e[2] - 0.2, 0.6));
+    if (u3 > 0) txt(`$10,000 became ${"$" + Math.round(sp.end / 1e6)} million, not the ${"$" + Math.round(sp.avgGrow / 1e6)} million the average suggests.`, 150, 640, { size: 28, weight: 500, color: C.muted, alpha: u3 });
+    g.restore();
+  }
+  // part C: every 30-year stretch since 1981, compounded
+  if (t > c[3] - 0.2) {
+    const L = f.sp30since1981.list, n = L.length, cw = 92, gap = (1630 - n * cw) / (n - 1), y = 760, hh = 150;
+    const top = (v) => y + hh - (v / 0.14) * hh;
+    const u0 = E.out3(P(t, c[3] + 0.05, 0.5));
+    g.save(); g.globalAlpha = u0;
+    const hits = f.sp30since1981.hits;
+    let x = 150;
+    x += tab(String(hits), x, 728, { size: 60, color: C.red });
+    txt(` of ${n} thirty-year stretches since 1981 compounded 12%`, x, 726, { size: 36, weight: 700, color: C.ink });
+    g.restore();
+    L.forEach((o, i) => {
+      const u = E.out3(P(t, at(3, 0.15) + i * 0.06, 0.45));
+      if (u <= 0) return;
+      const xx = 150 + i * (cw + gap);
+      g.save(); g.globalAlpha = u;
+      rr(xx, y, cw, hh, 8); g.fillStyle = C.raised; g.fill();
+      const bt = lerp(y + hh, top(o.cagr), u);
+      g.save(); rr(xx, y, cw, hh, 8); g.clip(); g.fillStyle = mix(C.raised, C.red, 0.75); g.fillRect(xx, bt, cw, y + hh - bt); g.restore();
+      dashed(xx + 4, top(0.12), xx + cw - 4, top(0.12), C.gold, 3, [8, 6]);
+      txt(pct(o.cagr), xx + cw / 2, y + hh - 16, { size: 22, weight: 800, color: C.bg, align: "center" });
+      g.restore();
+    });
+    const ul = E.out3(P(t, at(3, 0.55), 0.6));
+    g.save(); g.globalAlpha = ul;
+    txt(`${L[0].a}–${L[0].b}`, 150, y + hh + 40, { size: 22, weight: 600, color: C.muted });
+    txt(`${L[n - 1].a}–${L[n - 1].b}`, 1780, y + hh + 40, { size: 22, weight: 600, color: C.muted, align: "right" });
+    txt("— — 12% a year", W / 2, y + hh + 40, { size: 22, weight: 700, color: C.gold, align: "center" });
+    g.restore();
+  }
+  stamp("half", "HALF RIGHT", 1490, 450, at(3, 0.8), t);
+}
+
+// 5. Saving $625 a month for 40 years
+function sSaving(T) {
+  const { t, c, e, at } = sc("saving", T), f = F.saving;
+  heading("CLAIM 3  ·  SAVING", "Does $625 a month make $7.59 million?", t, { size: 70, colors: [, , , , , C.gold, C.gold] });
+  const x0 = 220, x1 = 1380, yT = 340, yB = 920, hi = 8e6;
+  const xv = (y) => x0 + (y / 40) * (x1 - x0), yv = (v) => yB - (v / hi) * (yB - yT);
+  const ax = E.out3(P(t, 0.3, 0.6));
+  g.save(); g.globalAlpha = ax;
+  for (let v = 0; v <= hi; v += 2e6) { g.fillStyle = v ? C.line : C.lineS; g.fillRect(x0, yv(v), x1 - x0, v ? 1 : 2); txt(v ? "$" + v / 1e6 + "M" : "$0", x0 - 16, yv(v) + 8, { size: 22, weight: 600, color: C.muted, align: "right" }); }
+  [0, 10, 20, 30, 40].forEach((y) => txt(y === 0 ? "Age 30" : y === 40 ? "Age 70" : String(30 + y), xv(y), yB + 40, { size: 22, weight: 600, color: C.muted, align: "center" }));
+  g.restore();
+  // the book's goals
+  const goals = [[f.book, C.gold, `${mil(f.book, 2)}  the book`], [f.half, C.blueDeep, "$4M  “half wrong”"], [f.sixth, C.red, `${mil(f.sixth, 2)}  “six times wrong”`]];
+  const hl = [E.out3(P(t, at(1, 0.55), 0.4)) * fadeOut(t, c[2], 0.5), E.out3(P(t, at(1, 0.8), 0.4)) * fadeOut(t, c[2], 0.5), E.out3(P(t, at(2, 0.6), 0.4)) * fadeOut(t, c[3], 0.5)];
+  goals.forEach(([v, col, lab], i) => {
+    const u = E.out3(P(t, 0.5 + i * 0.18, 0.7));
+    if (u <= 0) return;
+    dashed(x0, yv(v), x0 + (x1 - x0) * u, yv(v), col, 3 + 3 * hl[i], [14, 10], 0.85);
+    txt(lab, x0 + 16, yv(v) - 14, { size: 24 + 4 * hl[i], weight: 800, color: col, alpha: u });
+  });
+  // 18 real stretches: three series x six start years. k morphs to after-inflation dollars and back
+  const kIn = E.io3(P(t, c[2] + 0.1, 1.3)), kOut = E.io3(P(t, c[3] + 0.1, 0.9)), k = kIn * (1 - kOut);
+  const grow = E.io3(P(t, c[0] + 0.3, e[0] - c[0] + 0.3)) * 40;
+  const dim = lerp(1, 0.35, E.out3(P(t, c[3] + 0.1, 0.6)));
+  const SER = [["vf", C.lineS, 3], ["sp", C.blueDeep, 3], ["four", C.blue, 4]];
+  let ends = [];
+  SER.forEach(([key, col, lw]) => f.runs[key].forEach((o) => {
+    const val = (y) => lerp(o.path[y], o.realPath[y], k);
+    g.save(); g.globalAlpha = 0.9 * dim; g.strokeStyle = col; g.lineWidth = lw; g.lineJoin = "round";
+    g.beginPath(); g.moveTo(xv(0), yv(0));
+    for (let y = 1; y <= Math.ceil(grow); y++) { const u = clamp(grow - (y - 1)); g.lineTo(lerp(xv(y - 1), xv(y), u), lerp(yv(val(y - 1)), yv(val(y)), u)); }
+    g.stroke();
+    if (grow >= 40) { g.beginPath(); g.arc(xv(40), yv(val(40)), 6, 0, Math.PI * 2); g.fillStyle = col; g.fill(); ends.push(val(40)); }
+    g.restore();
+  }));
+  // legend
+  const lg = E.out3(P(t, c[0] + 1.0, 0.6));
+  if (lg > 0) {
+    g.save(); g.globalAlpha = lg;
+    let x = x0;
+    [[C.blue, "Ramsey’s four funds"], [C.blueDeep, "S&P 500 index"], [C.lineS, "VFINX"]].forEach(([col, s]) => { g.fillStyle = col; g.fillRect(x, 1010, 30, 5); x += 42; x += txt(s, x, 1022, { size: 22, weight: 600, color: C.muted }) + 40; });
+    txt(`Saving from ${f.starts[0]}–${f.starts[f.starts.length - 1]}, ending ${f.ends[0]}–${f.ends[f.ends.length - 1]}`, x1, 1022, { size: 22, weight: 600, color: C.muted, align: "right" });
+    g.restore();
+  }
+  // the range of outcomes, bracketed at the right
+  const br = E.out3(P(t, c[1] + 0.1, 0.6)) * fadeOut(t, c[3] + 0.05, 0.4);
+  if (br > 0 && ends.length) {
+    const lo = Math.min(...ends), hiE = Math.max(...ends), bx = x1 + 34;
+    g.save(); g.globalAlpha = br; g.strokeStyle = k > 0.5 ? C.red : C.ink; g.lineWidth = 4;
+    g.beginPath(); g.moveTo(bx, yv(hiE)); g.lineTo(bx + 16, yv(hiE)); g.lineTo(bx + 16, yv(lo)); g.lineTo(bx, yv(lo)); g.stroke();
+    const col = k > 0.5 ? C.red : C.ink;
+    let ya = yv(hiE) + 20, yb = yv(lo) + 20;
+    if (yb - ya < 72) { const m = (ya + yb) / 2; ya = m - 36; yb = m + 36; }
+    txt(mil(hiE), bx + 40, ya, { size: 60, weight: 800, fam: DISP, color: col });
+    txt(mil(lo), bx + 40, yb, { size: 60, weight: 800, fam: DISP, color: col });
+    txt(k > 0.5 ? "IN THE MONEY OF" : "40 YEARS LATER", bx + 44, yb + 40, { size: 20, weight: 700, ls: 3, color: C.muted });
+    if (k > 0.5) txt("THE YEAR THEY BEGAN", bx + 44, yb + 66, { size: 20, weight: 700, ls: 3, color: C.muted });
+    g.restore();
+  }
+  // "none reached the book"
+  const nn = E.out3(P(t, at(1, 0.6), 0.5)) * fadeOut(t, c[2], 0.4);
+  if (nn > 0) txt(`${f.reachedBook} of 18 reached it`, x1 - 10, yv(f.book) + 46, { size: 28, weight: 800, color: C.gold, align: "right", alpha: nn });
+  stamp("half", "HALF WRONG", 820, 520, at(1, 0.84), t, { alpha: fadeOut(t, c[3] - 0.1, 0.4) * 0.75 + 0.25 });
+  // a perfectly steady 12%
+  const st = E.io3(P(t, c[3] + 0.3, 1.8));
+  if (st > 0) {
+    const p = f.steady12path, k2 = st * 40;
+    g.save(); g.strokeStyle = C.gold; g.lineWidth = 6; g.setLineDash([2, 12]); g.lineCap = "round";
+    g.beginPath(); g.moveTo(xv(0), yv(0));
+    for (let y = 1; y <= Math.ceil(k2); y++) { const u = clamp(k2 - (y - 1)); g.lineTo(lerp(xv(y - 1), xv(y), u), lerp(yv(p[y - 1]), yv(p[y]), u)); }
+    g.stroke(); g.restore();
+    if (st >= 1) {
+      const u = E.out3(P(t, c[3] + 2.1, 0.5));
+      g.save(); g.globalAlpha = u;
+      txt(mil(f.steady12), x1 + 40, yv(f.steady12) + 20, { size: 60, weight: 800, fam: DISP, color: C.gold });
+      txt("A STEADY 12%,", x1 + 44, yv(f.steady12) + 58, { size: 20, weight: 700, ls: 3, color: C.muted });
+      txt("EVERY SINGLE YEAR", x1 + 44, yv(f.steady12) + 84, { size: 20, weight: 700, ls: 3, color: C.muted });
+      txt(`The book’s figure takes about 1% a month: ${pct(f.onePctMonthYearly)} a year.`, x0 + 16, yv(f.book) + 46, { size: 26, weight: 600, color: C.gold, alpha: u });
+      g.restore();
+    }
+  }
+}
+
+// 6. Spending 8% in a perfect world
+function sSpend(T) {
+  const { t, c, e, at } = sc("spend", T), f = F.spending;
+  heading("CLAIM 4  ·  SPENDING", "Can you live off 8% a year?", t, { colors: [, , , , C.blue] });
+  // the perfect world, as chips
+  const chips = [["12% every year", C.gold, at(0, 0.5)], ["4% inflation every year", C.red, at(0, 0.62)], [`${money(f.draw)} from ${money(f.start)}, paid monthly`, C.blue, at(1, 0.05)]];
+  let cx = 140;
+  chips.forEach(([s, col, t0]) => {
+    const u = E.outBack(P(t, t0, 0.45)), w = tw(s, 28, 700) + 48;
+    if (P(t, t0, 0.45) > 0) {
+      g.save(); g.globalAlpha = clamp(P(t, t0, 0.45) * 2); g.translate(cx + w / 2, 330); g.scale(lerp(0.7, 1, u), lerp(0.7, 1, u));
+      rr(-w / 2, -30, w, 60, 30); g.fillStyle = hexA(col, 0.14); g.fill(); g.strokeStyle = col; g.lineWidth = 2.5; g.stroke();
+      txt(s, 0, 10, { size: 28, weight: 700, color: col, align: "center" });
+      g.restore();
+    }
+    cx += w + 20;
+  });
+  // chart in today's dollars: keeping up with prices means staying at $500,000
+  const x0 = 220, x1 = 1330, yT = 440, yB = 920, hi = 6e5;
+  const xv = (y) => x0 + (y / 50) * (x1 - x0), yv = (v) => yB - (v / hi) * (yB - yT);
+  const ax = E.out3(P(t, c[0] + 0.4, 0.6));
+  g.save(); g.globalAlpha = ax;
+  for (let v = 0; v <= hi; v += 2e5) { g.fillStyle = v ? C.line : C.lineS; g.fillRect(x0, yv(v), x1 - x0, v ? 1 : 2); txt(v ? "$" + v / 1000 + "K" : "$0", x0 - 16, yv(v) + 8, { size: 22, weight: 600, color: C.muted, align: "right" }); }
+  for (let y = 0; y <= 50; y += 10) txt(y ? "Year " + y : "Start", xv(y), yB + 40, { size: 22, weight: 600, color: C.muted, align: "center" });
+  txt("BALANCE IN TODAY’S DOLLARS", x0, yT - 30, { size: 20, weight: 700, ls: 3, color: C.muted });
+  g.restore();
+  const kp = E.out3(P(t, c[0] + 0.8, 1.0));
+  if (kp > 0) { dashed(x0, yv(f.start), x0 + (x1 - x0) * kp, yv(f.start), C.ink, 3, [12, 10], 0.6); txt("Keeping up with prices", x0 + 14, yv(f.start) - 16, { size: 24, weight: 600, color: C.ink, alpha: kp * 0.8 }); }
+  const line = (vals, k, col, lw) => {
+    g.save(); g.strokeStyle = col; g.lineWidth = lw; g.lineJoin = "round"; g.lineCap = "round";
+    g.beginPath(); g.moveTo(xv(0), yv(vals[0]));
+    for (let y = 1; y <= Math.ceil(k); y++) { const u = clamp(k - (y - 1)); g.lineTo(lerp(xv(y - 1), xv(y), u), lerp(yv(vals[y - 1]), yv(vals[y]), u)); }
+    g.stroke(); g.restore();
+  };
+  const gone = f.monthly8Gone, r8 = f.real.monthly8;
+  const k8 = E.io3(P(t, at(1, 0.1), (e[1] - c[1]) * 0.85)) * gone;
+  if (k8 > 0) {
+    line(r8, k8, C.red, 7);
+    const lx = xv(29.5), ly = yv(340e3);
+    txt("8%, paid monthly", lx, ly, { size: 26, weight: 800, color: C.red, alpha: E.out3(P(t, at(1, 0.68), 0.5)) });
+  }
+  const g8 = P(t, at(1, 0.88), 0.5);
+  if (g8 > 0) {
+    const gx = xv(gone), gy = yv(0);
+    g.save(); g.globalAlpha = (1 - g8) * 0.7; g.strokeStyle = C.red; g.lineWidth = 3; g.beginPath(); g.arc(gx, gy, 10 + g8 * 50, 0, Math.PI * 2); g.stroke(); g.restore();
+    g.beginPath(); g.arc(gx, gy, 11, 0, Math.PI * 2); g.fillStyle = C.red; g.fill();
+    const u = E.outBack(g8);
+    g.save(); g.translate(gx + 30, gy - 30); g.scale(u, u);
+    txt("Year " + gone, 0, 0, { size: 64, weight: 800, fam: DISP, color: C.red });
+    g.restore();
+  }
+  // the most that lasts
+  const k75 = E.io3(P(t, c[2] + 0.2, 1.6)) * 50;
+  if (k75 > 0) {
+    line(f.real.monthly752, k75, C.blue, 7);
+    txt("7.52%, paid monthly", x1 - 10, yv(f.start) - 18, { size: 26, weight: 800, color: C.blue, align: "right", alpha: E.out3(P(t, c[2] + 1.4, 0.5)) });
+  }
+  const ub = E.out3(P(t, at(2, 0.05), 0.6)), un = E.out3(P(t, at(2, 0.55), 0.6));
+  if (ub > 0) {
+    g.save(); g.globalAlpha = ub;
+    tab(pct(f.breakEven * ub, 2), 1420, 600, { size: 130, color: C.blue });
+    txt("THE MOST THAT LASTS", 1426, 646, { size: 22, weight: 700, ls: 3, color: C.muted });
+    g.restore();
+  }
+  if (un > 0) {
+    g.save(); g.globalAlpha = un;
+    txt(money(f.draw) + " A YEAR NEEDS", 1426, 760, { size: 22, weight: 700, ls: 3, color: C.muted });
+    tab("$" + Math.round((f.needFor40k * un) / 1000) + ",000", 1420, 850, { size: 84, color: C.gold });
+    txt("about, not " + money(f.start), 1426, 896, { size: 24, weight: 600, color: C.muted });
+    g.restore();
+  }
+  stamp("no", "FALLS SHORT", 1500, 215, at(1, 0.95), t);
+}
+
+// 7. Real retirements: every 30-year S&P 500 retirement since 1926
+function sHistory(T) {
+  const { t, c, e, at } = sc("history", T), f = F.realworld;
+  heading("REAL HISTORY  ·  S&P 500", "What actually happened", t);
+  const su = E.out3(P(t, c[0] + 0.3, 0.6));
+  txt(`${money(F.spending.start)}, ${money(F.spending.draw)} the first year, raised each year by actual inflation, for 30 years.`, 140, 310, { size: 30, weight: 500, color: C.muted, alpha: su });
+  const G = f.grid, first = G[0].st, n = G.length, x0 = 140, x1 = 1780, slot = (x1 - x0) / n, cw = slot - 4, y = 560, hh = 170;
+  const xs = (st) => x0 + (st - first) * slot;
+  const shr = mix(C.raised, C.red, 0.35);
+  const fill = (o) => (o.outcome === "kept" ? C.blue : o.outcome === "shrank" ? shr : C.red);
+  // reveal order follows the narration: 1981–1996, then 1926–1980 backwards, then 1997–2013
+  const when = (o) => o.st >= 1981 && !o.partial ? at(1, 0.05) + (o.st - 1981) * 0.05
+    : !o.partial ? c[2] + (1980 - o.st) * 0.022
+    : at(3, 0.0) + (o.st - 1997) * 0.03;
+  const dimOld = E.io3(P(t, c[3] + 0.2, 0.5)) * fadeOut(t, c[4], 0.5);
+  G.forEach((o) => {
+    const u = E.out3(P(t, when(o), 0.4));
+    if (u <= 0) return;
+    const hit = o.st >= 2004 && o.st <= 2008;
+    g.save(); g.globalAlpha = u * (o.partial ? 0.55 : 1) * (hit ? 1 : 1 - 0.6 * dimOld) * (o.partial && hit ? 1.6 : 1);
+    const hgt = hh * lerp(0.2, 1, u);
+    rr(xs(o.st) + 2, y + hh - hgt, cw, hgt, 3); g.fillStyle = fill(o); g.fill();
+    if (o.outcome === "out") { g.strokeStyle = C.bg; g.lineWidth = 2; g.beginPath(); const mx = xs(o.st) + 2 + cw / 2, my = y + hh - 14; g.moveTo(mx - 4, my - 4); g.lineTo(mx + 4, my + 4); g.moveTo(mx + 4, my - 4); g.lineTo(mx - 4, my + 4); g.stroke(); }
+    g.restore();
+  });
+  const ax = E.out3(P(t, at(1, 0.0), 0.5));
+  g.save(); g.globalAlpha = ax;
+  for (let yr = 1930; yr <= 2010; yr += 10) txt(String(yr), xs(yr) + slot / 2, y + hh + 38, { size: 22, weight: 600, color: C.muted, align: "center" });
+  txt("YEAR RETIRED", x0, y + hh + 38, { size: 18, weight: 700, ls: 3, color: C.muted, alpha: 0 });
+  g.restore();
+  // brackets with counts
+  const bracket = (a, b, col, label, u, alignRight) => {
+    if (u <= 0) return;
+    const xa = xs(a) + 2, xb = xs(b) + slot - 2, by = y - 26;
+    g.save(); g.globalAlpha = u; g.strokeStyle = col; g.lineWidth = 3;
+    g.beginPath(); g.moveTo(xa, by + 12); g.lineTo(xa, by); g.lineTo(xb, by); g.lineTo(xb, by + 12); g.stroke();
+    g.restore();
+    const lx = alignRight ? xb : (xa + xb) / 2;
+    label(lx, by - 22, u, alignRight ? "right" : "center");
+  };
+  const counter = (parts, x, yy, u, align) => {
+    // parts: [text, color, isNumber]
+    const size = 40, ws = parts.map(([s, , num]) => (num ? tw(s, 52, 800, DISP) + 6 : tw(s, size, 700)));
+    const total = ws.reduce((a, b) => a + b, 0);
+    let cx = align === "right" ? x - total : align === "center" ? x - total / 2 : x;
+    g.save(); g.globalAlpha = u;
+    parts.forEach(([s, col, num], i) => { if (num) txt(s, cx + 3, yy, { size: 52, weight: 800, fam: DISP, color: col }); else txt(s, cx, yy, { size: size, weight: 700, color: col }); cx += ws[i]; });
+    g.restore();
+  };
+  const b1 = E.out3(P(t, at(1, 0.3), 0.5)) * fadeOut(t, c[2], 0.4);
+  const k1 = Math.round(f.sp81.kept * E.out3(P(t, at(1, 0.55), 0.8)));
+  bracket(1981, 1996, C.blue, (x, yy, u, al) => counter([["Since 1981: ", C.ink], [String(k1), C.blue, 1], [` of ${f.sp81.n} kept up`, C.ink]], x, yy, u, al), b1);
+  const b2 = E.out3(P(t, c[2] + 0.2, 0.5)) * fadeOut(t, c[3], 0.4);
+  const k2 = Math.round(f.sp26.kept * E.out3(P(t, at(2, 0.3), 0.9))), o2 = Math.round(f.sp26.out * E.out3(P(t, at(2, 0.65), 0.8)));
+  bracket(1926, 1996, C.ink, (x, yy, u, al) => counter([["Since 1926: ", C.ink], [String(k2), C.blue, 1], [` of ${f.sp26.n} kept up  ·  `, C.ink], [String(o2), C.red, 1], [" ran out", C.ink]], x, yy, u, al), b2);
+  const b3 = E.out3(P(t, at(3, 0.35), 0.5));
+  const A = f.after2004to2008;
+  bracket(2004, 2008, C.red, (x, yy, u, al) => counter([["Retired 2004–2008: none kept up", C.red]], x, yy, u, al), b3, true);
+  const nb = E.out3(P(t, at(3, 0.7), 0.6));
+  txt(`All ${A.n} retirements from 2004–2008, on any of the three funds, over 20, 25 or 30 years: ${A.out} ran out, ${A.n - A.out - A.kept} shrank.`, x1, y + hh + 86, { size: 22, weight: 600, color: C.muted, align: "right", alpha: nb });
+  // legend
+  const lg = E.out3(P(t, at(1, 0.2), 0.6));
+  if (lg > 0) {
+    g.save(); g.globalAlpha = lg;
+    let x = x0;
+    [[C.blue, "Kept up with prices", 1], [shr, "Lasted, but shrank", 1], [C.red, "Ran out of money", 1], [C.red, "Still underway (faded)", 0.5]].forEach(([col, s, a]) => { g.globalAlpha = lg * a; rr(x, 912, 22, 22, 4); g.fillStyle = col; g.fill(); g.globalAlpha = lg; x += 34; x += txt(s, x, 932, { size: 22, weight: 600, color: C.muted }) + 36; });
+    g.restore();
+  }
+  words("The year you start matters most.", W / 2, 1010, c[4], t, { size: 56, align: "center", colors: [, , , , C.gold, C.gold] });
+  stamp("no", "FALLS SHORT", 1490, 205, c[4] + 0.1, t, { size: 44, sub: "depending on the year" });
+}
+
+// 8. The verdict
+function sClose(T) {
+  const { t, c, e, at } = sc("close", T), f = F.saving;
+  const a = fadeOut(t, c[2] - 0.15, 0.5);
+  if (a > 0) {
+    g.save(); g.globalAlpha = a;
+    words("THE SCORECARD", W / 2, 170, 0.05, t, { size: 26, weight: 700, fam: BODY, ls: 6, color: C.gold, align: "center", st: 0.04 });
+    const rows = [["Prices rise 4% a year", "ok", "HOLDS UP"], ["Stocks earn 12% a year", "half", "HALF RIGHT"], [`${money(f.monthly)} a month makes ${mil(f.book, 2)}`, "half", "HALF WRONG"], ["Live off 8% a year", "no", "FALLS SHORT"], ["Real retirements", "no", "DEPENDS ON THE YEAR"]];
+    rows.forEach(([claim, kind, verdict], i) => {
+      const u = E.out3(P(t, 0.15 + i * 0.16, 0.55));
+      if (u <= 0) return;
+      const y = 230 + i * 104, col = VCOL[kind], dimR = lerp(1, 0.55, E.io3(P(t, c[1] - 0.1, 0.5)));
+      g.save(); g.globalAlpha = a * u * dimR; g.translate((1 - u) * -60, 0);
+      rr(360, y, 1200, 84, 16); g.fillStyle = C.raised; g.fill();
+      g.fillStyle = col; rr(360, y, 10, 84, [16, 0, 0, 16]); g.fill();
+      txt(claim, 404, y + 56, { size: 40, weight: 700, fam: DISP, color: C.ink });
+      g.beginPath(); g.arc(1530 - tw(verdict, 28, 800, BODY, 3) - 34, y + 42, 18, 0, Math.PI * 2); g.fillStyle = col; g.fill();
+      glyph(kind, 1530 - tw(verdict, 28, 800, BODY, 3) - 34, y + 42, 10, C.raised);
+      txt(verdict, 1530, y + 52, { size: 28, weight: 800, ls: 3, color: col, align: "right" });
+      g.restore();
+    });
+    const u1 = E.out3(P(t, c[1], 0.5));
+    if (u1 > 0) {
+      words("Saving still beats not saving.", W / 2, 840, c[1], t, { size: 72, align: "center", colors: [, , C.gold] });
+      txt(`${money(f.put)} put in became ${mil(f.min)} to ${mil(f.max)} in every 40-year stretch since 1981.`, W / 2, 910, { size: 30, weight: 500, color: C.muted, align: "center", alpha: E.out3(P(t, c[1] + 0.6, 0.6)) });
+    }
+    g.restore();
+  }
+  // end card
+  if (t > c[2] - 0.2) {
+    words("The numbers are just", W / 2, 500, c[2], t, { size: 110, align: "center" });
+    words("too tidy.", W / 2, 640, c[2] + 0.3, t, { size: 150, align: "center", color: C.gold });
+    const u = E.out3(P(t, e[2] + 0.2, 0.7));
+    g.save(); g.globalAlpha = u;
+    txt("WHAT IF I’M HALF WRONG?", W / 2, 300, { size: 26, weight: 700, ls: 6, color: C.muted, align: "center" });
+    txt(`Data: S&P 500 total returns and CPI, ${F.inflation.y0}–${F.last} (Robert Shiller; Aswath Damodaran, NYU Stern) · Ramsey’s four American Funds and VFINX, 1981–${F.last}`, W / 2, 930, { size: 22, weight: 500, color: C.muted, align: "center" });
+    txt("Quotes: Dave Ramsey, The Total Money Makeover (2003). No taxes or sales charges. Not investment advice.", W / 2, 966, { size: 22, weight: 500, color: C.muted, align: "center" });
+    g.restore();
+  }
+}
+
+// ---------- the running header: the five claims, lit as they're judged
+const RAIL = [["inflation", "4%", "ok"], ["average", "12%", "half"], ["saving", "$7.59M", "half"], ["spend", "8%", "no"], ["history", "History", "no"]];
+function hud(T, cur) {
+  const ids = RAIL.map((r) => r[0]);
+  const s0 = S.inflation.start, s1 = S.history.end;
+  const a = E.io3(P(T, s0 - 0.3, 0.6)) * (1 - E.io3(P(T, s1 - 0.3, 0.6)));
+  if (a <= 0) return;
+  g.save(); g.globalAlpha = a;
+  txt("WHAT IF I’M HALF WRONG?", 140, 72, { size: 20, weight: 700, ls: 5, color: C.muted });
+  let x = 1780;
+  const ci = ids.indexOf(cur);
+  for (let i = RAIL.length - 1; i >= 0; i--) {
+    const [id, lab, kind] = RAIL[i], done = i < ci || (i === ci && T > S[id].end - 1.0), active = i === ci;
+    const w = tw(lab, 20, 800, BODY, 1) + (done ? 64 : 36);
+    x -= w;
+    rr(x, 46, w, 38, 19);
+    g.fillStyle = active ? C.raised : "rgba(26,30,56,0.6)"; g.fill();
+    g.strokeStyle = active ? C.gold : C.line; g.lineWidth = 2; g.stroke();
+    if (done) { g.beginPath(); g.arc(x + 22, 65, 10, 0, Math.PI * 2); g.fillStyle = VCOL[kind]; g.fill(); glyph(kind, x + 22, 65, 5.5, C.bg); }
+    txt(lab, x + (done ? 42 : 18), 72, { size: 20, weight: 800, ls: 1, color: active ? C.ink : C.muted });
+    x -= 12;
+  }
+  g.restore();
+}
+
+// ---------- frame: scenes, wipes between them, header, progress
+const DRAW = { open: sOpen, joe: sJoe, inflation: sInflation, average: sAverage, saving: sSaving, spend: sSpend, history: sHistory, close: sClose };
+const TR = 0.8;
+function drawScene(id, T) { DRAW[id](T); }
+function frame(T) {
+  const L = TM.scenes;
+  g.reset(); // a clean context every frame, whatever a scene left behind
+  let i = L.findIndex((s) => T < s.end);
+  if (i < 0) i = L.length - 1;
+  bg(T);
+  // a wipe straddles each scene boundary: the old scene to the right of the band, the new one behind it
+  const near = (j) => j > 0 && j < L.length && Math.abs(T - L[j].start) < TR / 2;
+  let j = near(i) ? i : near(i + 1) ? i + 1 : -1;
+  if (j < 0) { drawScene(L[i].id, T); }
+  else {
+    const u = E.io3((T - (L[j].start - TR / 2)) / TR), slant = 260, band = 220;
+    const lead = lerp(-band - slant, W + slant + band, u), trail = lead - band;
+    const poly = (xa, xb) => { g.beginPath(); g.moveTo(xa + slant / 2, 0); g.lineTo(xb + slant / 2, 0); g.lineTo(xb - slant / 2, H); g.lineTo(xa - slant / 2, H); g.closePath(); };
+    g.save(); poly(lead, W + slant * 2); g.clip(); drawScene(L[j - 1].id, T); g.restore();
+    g.save(); poly(-slant * 2, trail); g.clip(); bg(T); drawScene(L[j].id, T); g.restore();
+    g.save(); poly(trail, lead); g.fillStyle = C.blueLight; g.fill(); poly(lead - 34, lead); g.fillStyle = C.gold; g.fill(); poly(trail, trail + 10); g.fillStyle = C.blue; g.fill(); g.restore();
+  }
+  hud(T, L[i].id);
+  // progress along the bottom
+  g.fillStyle = "rgba(232,234,245,0.08)"; g.fillRect(0, H - 6, W, 6);
+  g.fillStyle = C.gold; g.fillRect(0, H - 6, W * clamp(T / TM.duration), 6);
+}
+
+// ---------- the poster frame
+function poster() {
+  g.reset();
+  bg(8);
+  const f = F.saving;
+  txt("THE TOTAL MONEY MAKEOVER, CHECKED AGAINST HISTORY", 140, 170, { size: 26, weight: 700, ls: 5, color: C.gold });
+  txt("What if I’m", 140, 320, { size: 150, weight: 800, fam: DISP });
+  txt("half wrong?", 140, 470, { size: 150, weight: 800, fam: DISP, color: C.gold });
+  const rows = [[f.book, f.book, C.gold, money(f.book), "the book’s $625 a month, age 30 to 70"], [f.min, f.max, C.blue, `${mil(f.min)}–${mil(f.max)}`, "every real 40-year stretch since 1981"], [f.realMin, f.realMax, C.red, `${mil(f.realMin)}–${mil(f.realMax)}`, "the same, after inflation"]];
+  rows.forEach(([lo, hi, col, big, lab], i) => {
+    const y = 620 + i * 140, L = 140, MAXW = 1640;
+    g.globalAlpha = 0.12; rr(L, y + 22, MAXW, 44, 8); g.fillStyle = C.ink; g.fill(); g.globalAlpha = 1;
+    rr(L, y + 22, MAXW * (hi / f.book), 44, 8); g.fillStyle = hexA(col, 0.45); g.fill();
+    rr(L, y + 22, MAXW * (lo / f.book), 44, 8); g.fillStyle = col; g.fill();
+    const w = txt(big, L, y, { size: 64, weight: 800, fam: DISP, color: C.ink });
+    txt(lab, L + w + 28, y - 4, { size: 30, weight: 600, color: col });
+  });
+}
+
+window.setup = (facts, timing) => { F = facts; TM = timing; TM.scenes.forEach((s) => (S[s.id] = s)); };
+window.draw = (t) => frame(t);
+window.drawPoster = () => poster();
+window.fontsReady = async () => {
+  const fams = [[DISP, [500, 700, 800]], [BODY, [400, 500, 600, 700, 800]]];
+  await Promise.all(fams.flatMap(([f, ws]) => ws.map((w) => document.fonts.load(`${w} 40px ${f}`))));
+  await document.fonts.load(`italic 600 40px ${BODY}`);
+  await document.fonts.ready;
+  return fams.every(([f, ws]) => ws.every((w) => document.fonts.check(`${w} 40px ${f}`)));
+};
+// preview in a browser: ?t=seconds
+if (location.search.includes("t=")) {
+  Promise.all([fetch("facts.json").then((r) => r.json()), fetch("timing.json").then((r) => r.json())]).then(async ([f, tm]) => {
+    setup(f, tm); await fontsReady(); draw(parseFloat(new URLSearchParams(location.search).get("t")));
+  });
+}
+</script>
+</body>
+</html>

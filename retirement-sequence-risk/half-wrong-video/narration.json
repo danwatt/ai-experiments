@@ -1,0 +1,85 @@
+{
+  "voice": "Heart",
+  "gap": 0.28,
+  "lead": 0.45,
+  "tail": 0.6,
+  "scenes": [
+    {
+      "id": "open",
+      "title": "The plan",
+      "lines": [
+        {"text": "Dave Ramsey makes retirement sound simple."},
+        {"text": "Earn 12%. Inflation takes 4%. Live off 8%.", "say": "Earn twelve percent. Inflation takes four. Live off eight."},
+        {"text": "$40,000 a year takes just $500,000.", "say": "Forty thousand a year takes just five hundred thousand."}
+      ]
+    },
+    {
+      "id": "joe",
+      "title": "Joe and Suzy",
+      "lines": [
+        {"text": "Joe and Suzy save $625 a month, age 30 to 70.", "say": "Joe and Suzy save six twenty-five a month, age thirty to seventy."},
+        {"text": "The book says: $7.59 million.", "say": "The book says: seven point five nine million dollars."},
+        {"text": "What if I'm half wrong? Four million. Six times wrong?"},
+        {"text": "Let's check, against real history."}
+      ]
+    },
+    {
+      "id": "inflation",
+      "title": "Inflation: 4%?",
+      "lines": [
+        {"text": "First: do prices rise 4% a year?", "say": "First: do prices rise four percent a year?"},
+        {"text": "Since 1926, about 2.9%. Since the book, 2.6%.", "say": "Since nineteen twenty-six, about two point nine. Since the book, two point six."},
+        {"text": "That one holds up."}
+      ]
+    },
+    {
+      "id": "average",
+      "title": "Stocks: 12%?",
+      "lines": [
+        {"text": "Next, the 12%. Up 30, down 10, up 25, up 3. That averages 12%.", "say": "Next, the twelve percent. Up thirty, down ten, up twenty-five, up three. That averages twelve."},
+        {"text": "But $10,000 grows as if it earned 10.8%.", "say": "But ten thousand dollars grows as if it earned ten point eight."},
+        {"text": "From 1926 to 2002, the S&P 500 averaged 11.9%, but compounded 10%.", "say": "From nineteen twenty-six to two thousand two, the S and P averaged eleven point nine, but compounded ten."},
+        {"text": "Since 1981, no 30-year stretch compounded 12%. Half right.", "say": "Since nineteen eighty-one, no thirty-year stretch compounded twelve. Half right."}
+      ]
+    },
+    {
+      "id": "saving",
+      "title": "Saving: $7.59 million?",
+      "lines": [
+        {"text": "Now Joe and Suzy, through all six real 40-year stretches since 1981.", "say": "Now Joe and Suzy, through all six real forty-year stretches since nineteen eighty-one."},
+        {"text": "$625 a month became $3.6 to $5.9 million. Never $7.6. Half wrong.", "say": "Six twenty-five a month became three point six to five point nine million. Never seven point six. Half wrong."},
+        {"text": "After inflation: $1.2 to $2 million. Closer to six times wrong.", "say": "After inflation: one point two to two million. Closer to six times wrong."},
+        {"text": "Even a steady 12% makes only $6.1 million.", "say": "Even a steady twelve percent makes only six point one million."}
+      ]
+    },
+    {
+      "id": "spend",
+      "title": "Spending: 8%?",
+      "lines": [
+        {"text": "Then the 8%. Picture a perfect world: 12% and 4%, every year.", "say": "Then the eight percent. Picture a perfect world: twelve and four, every year."},
+        {"text": "$40,000 from $500,000, paid monthly, runs out in year 38.", "say": "Forty thousand from five hundred thousand, paid monthly, runs out in year thirty-eight."},
+        {"text": "The most that lasts is 7.52%. $40,000 needs about $532,000.", "say": "The most that lasts is seven point five two percent. Forty thousand needs about five hundred thirty-two thousand."}
+      ]
+    },
+    {
+      "id": "history",
+      "title": "Real retirements",
+      "lines": [
+        {"text": "Now real markets, with real inflation."},
+        {"text": "Since 1981, 11 of 16 thirty-year S&P retirements kept up.", "say": "Since nineteen eighty-one, eleven of sixteen thirty-year S and P retirements kept up."},
+        {"text": "Back to 1926, just 29 of 71. 35 ran out.", "say": "Back to nineteen twenty-six, just twenty-nine of seventy-one. Thirty-five ran out."},
+        {"text": "Everyone who retired from 2004 to 2008 ran out or fell behind.", "say": "Everyone who retired from two thousand four to two thousand eight ran out, or fell behind."},
+        {"text": "The year you start matters most."}
+      ]
+    },
+    {
+      "id": "close",
+      "title": "The verdict",
+      "lines": [
+        {"text": "So, half wrong? About that, yes."},
+        {"text": "Saving still beats not saving, by a mile."},
+        {"text": "The numbers are just too tidy."}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,216 @@
+{
+ "voice": "Heart",
+ "fps": 30,
+ "duration": 145.405,
+ "scenes": [
+  {
+   "id": "open",
+   "title": "The plan",
+   "start": 0.0,
+   "end": 12.635,
+   "cues": [
+    {
+     "start": 0.45,
+     "end": 3.625,
+     "text": "Dave Ramsey makes retirement sound simple."
+    },
+    {
+     "start": 3.905,
+     "end": 8.005,
+     "text": "Earn 12%. Inflation takes 4%. Live off 8%."
+    },
+    {
+     "start": 8.285,
+     "end": 12.035,
+     "text": "$40,000 a year takes just $500,000."
+    }
+   ]
+  },
+  {
+   "id": "joe",
+   "title": "Joe and Suzy",
+   "start": 12.635,
+   "end": 29.25,
+   "cues": [
+    {
+     "start": 13.085,
+     "end": 17.81,
+     "text": "Joe and Suzy save $625 a month, age 30 to 70."
+    },
+    {
+     "start": 18.09,
+     "end": 21.765,
+     "text": "The book says: $7.59 million."
+    },
+    {
+     "start": 22.045,
+     "end": 25.745,
+     "text": "What if I'm half wrong? Four million. Six times wrong?"
+    },
+    {
+     "start": 26.025,
+     "end": 28.65,
+     "text": "Let's check, against real history."
+    }
+   ]
+  },
+  {
+   "id": "inflation",
+   "title": "Inflation: 4%?",
+   "start": 29.25,
+   "end": 40.76,
+   "cues": [
+    {
+     "start": 29.7,
+     "end": 32.775,
+     "text": "First: do prices rise 4% a year?"
+    },
+    {
+     "start": 33.055,
+     "end": 38.18,
+     "text": "Since 1926, about 2.9%. Since the book, 2.6%."
+    },
+    {
+     "start": 38.46,
+     "end": 40.16,
+     "text": "That one holds up."
+    }
+   ]
+  },
+  {
+   "id": "average",
+   "title": "Stocks: 12%?",
+   "start": 40.76,
+   "end": 65.725,
+   "cues": [
+    {
+     "start": 41.21,
+     "end": 47.81,
+     "text": "Next, the 12%. Up 30, down 10, up 25, up 3. That averages 12%."
+    },
+    {
+     "start": 48.09,
+     "end": 52.24,
+     "text": "But $10,000 grows as if it earned 10.8%."
+    },
+    {
+     "start": 52.52,
+     "end": 59.845,
+     "text": "From 1926 to 2002, the S&P 500 averaged 11.9%, but compounded 10%."
+    },
+    {
+     "start": 60.125,
+     "end": 65.125,
+     "text": "Since 1981, no 30-year stretch compounded 12%. Half right."
+    }
+   ]
+  },
+  {
+   "id": "saving",
+   "title": "Saving: $7.59 million?",
+   "start": 65.725,
+   "end": 90.49,
+   "cues": [
+    {
+     "start": 66.175,
+     "end": 71.8,
+     "text": "Now Joe and Suzy, through all six real 40-year stretches since 1981."
+    },
+    {
+     "start": 72.08,
+     "end": 79.755,
+     "text": "$625 a month became $3.6 to $5.9 million. Never $7.6. Half wrong."
+    },
+    {
+     "start": 80.035,
+     "end": 85.385,
+     "text": "After inflation: $1.2 to $2 million. Closer to six times wrong."
+    },
+    {
+     "start": 85.665,
+     "end": 89.89,
+     "text": "Even a steady 12% makes only $6.1 million."
+    }
+   ]
+  },
+  {
+   "id": "spend",
+   "title": "Spending: 8%?",
+   "start": 90.49,
+   "end": 110.225,
+   "cues": [
+    {
+     "start": 90.94,
+     "end": 95.94,
+     "text": "Then the 8%. Picture a perfect world: 12% and 4%, every year."
+    },
+    {
+     "start": 96.22,
+     "end": 101.92,
+     "text": "$40,000 from $500,000, paid monthly, runs out in year 38."
+    },
+    {
+     "start": 102.2,
+     "end": 109.625,
+     "text": "The most that lasts is 7.52%. $40,000 needs about $532,000."
+    }
+   ]
+  },
+  {
+   "id": "history",
+   "title": "Real retirements",
+   "start": 110.225,
+   "end": 134.795,
+   "cues": [
+    {
+     "start": 110.675,
+     "end": 113.65,
+     "text": "Now real markets, with real inflation."
+    },
+    {
+     "start": 113.93,
+     "end": 119.605,
+     "text": "Since 1981, 11 of 16 thirty-year S&P retirements kept up."
+    },
+    {
+     "start": 119.885,
+     "end": 125.335,
+     "text": "Back to 1926, just 29 of 71. 35 ran out."
+    },
+    {
+     "start": 125.615,
+     "end": 131.565,
+     "text": "Everyone who retired from 2004 to 2008 ran out or fell behind."
+    },
+    {
+     "start": 131.845,
+     "end": 134.195,
+     "text": "The year you start matters most."
+    }
+   ]
+  },
+  {
+   "id": "close",
+   "title": "The verdict",
+   "start": 134.795,
+   "end": 144.205,
+   "cues": [
+    {
+     "start": 135.245,
+     "end": 137.895,
+     "text": "So, half wrong? About that, yes."
+    },
+    {
+     "start": 138.175,
+     "end": 141.1,
+     "text": "Saving still beats not saving, by a mile."
+    },
+    {
+     "start": 141.38,
+     "end": 143.605,
+     "text": "The numbers are just too tidy."
+    }
+   ]
+  }
+ ]
+}
