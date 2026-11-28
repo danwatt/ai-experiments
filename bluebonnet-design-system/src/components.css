@@ -139,3 +139,37 @@ textarea.bb-field__control { min-height: 96px; resize: vertical; }
 .bb-table tr:last-child td { border-bottom: 0; }
 .bb-table tbody tr:hover td { background: var(--bluebonnet-soft); }
 .bb-table .bb-num { text-align: right; }
+
+/* ---------- Charts ----------
+   TanStack Charts reads its palette and tooltip chrome from --ts-chart-* custom properties, so any
+   chart on a Bluebonnet page picks these up. TanStack's default palette has six slots; pass
+   `theme` from dist/bluebonnet-charts.js for all eight. Axis text and grid follow currentColor. */
+:where(:root) {
+  --ts-chart-1: var(--chart-1);
+  --ts-chart-2: var(--chart-2);
+  --ts-chart-3: var(--chart-3);
+  --ts-chart-4: var(--chart-4);
+  --ts-chart-5: var(--chart-5);
+  --ts-chart-6: var(--chart-6);
+  --ts-chart-tooltip-background: var(--surface-raised);
+  --ts-chart-tooltip-color: var(--ink);
+  --ts-chart-tooltip-border: 1px solid var(--line);
+  --ts-chart-tooltip-border-radius: var(--radius-md);
+  --ts-chart-tooltip-shadow: var(--shadow-1);
+  --ts-chart-tooltip-font: 400 13px/18px var(--font-body);
+  --ts-chart-tooltip-padding: var(--space-2) var(--space-3);
+  --ts-chart-tooltip-active-row-background: var(--bluebonnet-soft);
+  --ts-chart-focus-fill: var(--surface-raised);
+  --ts-chart-crosshair-marker-fill: var(--surface-raised);
+  --ts-chart-crosshair-label-halo: var(--surface-raised);
+}
+.bb-chart { margin: 0; min-width: 0; color: var(--ink); font-family: var(--font-body); font-variant-numeric: tabular-nums; }
+.bb-chart__title { margin: 0; font: 600 19px/26px var(--font-display); color: var(--ink); text-wrap: balance; }
+.bb-chart__note { margin: var(--space-1) 0 0; font-size: 14px; line-height: 22px; color: var(--ink-muted); max-width: 65ch; }
+.bb-chart__plot { margin-top: var(--space-4); min-height: 120px; }
+.bb-chart__plot svg { display: block; overflow: visible; }
+.bb-chart__source { margin: var(--space-2) 0 0; font-size: 12px; line-height: 16px; color: var(--ink-muted); }
+.bb-chart__table { margin-top: var(--space-3); font-size: 14px; }
+.bb-chart__table summary { cursor: pointer; color: var(--bluebonnet); font-weight: 600; width: max-content; }
+.bb-chart__table .bb-table-wrap { margin-top: var(--space-2); max-height: 280px; overflow: auto; }
+.bb-chart__table :is(td, th):first-child { white-space: nowrap; }

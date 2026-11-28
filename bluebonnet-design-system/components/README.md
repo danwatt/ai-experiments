@@ -67,3 +67,13 @@ A bordered data table with an uppercase header row and tabular figures.
 - Use `caption` to say what the table shows and for when ("Sightings, week of Mar 30, 2026").
 - Put units in the header ("Route miles"), not in every cell.
 - The consumer provides `columns` (`key`, `label`, optional `numeric` and `render`) and `rows` (give each an `id`). Wide tables scroll sideways inside their own border.
+
+## Chart (CSS only)
+
+A frame for a TanStack Charts plot: `figure.bb-chart` with `bb-chart__title`, `bb-chart__note`, `bb-chart__plot` (the mount point) and `bb-chart__source`. There is no React component; mount the chart with `mountChart` or TanStack's own `<Chart>`.
+
+- The title states the finding. The note gives the measure, units and date range.
+- `.bb-chart` sets `color: var(--ink)`, which TanStack uses for axes, ticks and grid.
+- Put a `<details class="bb-chart__table">` with a `Table` under the plot, so every value can be read without color.
+- Up to eight series by default. Stacked bars and directly labeled lines can opt into twelve with `categorical(domain, { extended: true })`.
+- Colors, series limits and ramps are covered in [Charts](../README.md#charts).

@@ -6,6 +6,21 @@
 <title>Bluebonnet Design System</title>
 <meta name="description" content="Texas wildflower design tokens, a classless base layer and seven React components.">
 <link rel="stylesheet" href="dist/bluebonnet.css">
+<!-- TanStack Charts as the package's own ES modules, so charts.js imports read like app code. -->
+<script type="importmap">
+{
+  "imports": {
+    "@tanstack/charts": "https://cdn.jsdelivr.net/npm/@tanstack/charts@1.5.0/dist/index.js",
+    "@tanstack/charts/scales/band": "https://cdn.jsdelivr.net/npm/@tanstack/charts@1.5.0/dist/scales/band.js",
+    "@tanstack/charts/scales/linear": "https://cdn.jsdelivr.net/npm/@tanstack/charts@1.5.0/dist/scales/linear.js",
+    "@tanstack/charts/scales/point": "https://cdn.jsdelivr.net/npm/@tanstack/charts@1.5.0/dist/scales/point.js",
+    "@tanstack/charts/tooltip": "https://cdn.jsdelivr.net/npm/@tanstack/charts@1.5.0/dist/tooltip.js",
+    "d3-array": "https://cdn.jsdelivr.net/npm/d3-array@3.2.4/+esm",
+    "d3-scale": "https://cdn.jsdelivr.net/npm/d3-scale@4.0.2/+esm",
+    "d3-shape": "https://cdn.jsdelivr.net/npm/d3-shape@3.2.0/+esm"
+  }
+}
+</script>
 <style>
   /* Page layout only. Every color, size and font comes from Bluebonnet tokens. */
   .wrap { max-width: 1080px; margin: 0 auto; padding-block: var(--space-6) var(--space-12); padding-left: max(var(--space-4), env(safe-area-inset-left, 0px)); padding-right: max(var(--space-4), env(safe-area-inset-right, 0px)); }
@@ -56,6 +71,17 @@
   .row { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: center; }
   .stack { display: flex; flex-direction: column; gap: var(--space-4); }
   .classless { max-width: 65ch; }
+
+  .series { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: var(--space-3); margin-bottom: var(--space-6); }
+  .series__chip { height: 48px; border-radius: var(--radius-sm); }
+  .series div { min-width: 0; }
+  .series b { display: block; margin-top: var(--space-2); font: 600 13px/18px var(--font-mono); color: var(--ink); }
+  .series span { display: block; font-size: 13px; line-height: 18px; color: var(--ink-muted); }
+  .ramp-row { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: var(--space-3); align-items: center; margin-top: var(--space-3); }
+  .ramp-row > span { font: 500 13px/18px var(--font-mono); color: var(--ink-muted); }
+  .ramp { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; height: 32px; }
+  .ramp i { border-radius: 2px; }
+  .chart-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr)); gap: var(--space-6); margin-top: var(--space-6); }
   footer { margin-top: var(--space-12); padding-top: var(--space-6); border-top: 1px solid var(--line); color: var(--ink-muted); font-size: 14px; }
 </style>
 </head>
@@ -123,6 +149,42 @@
     <h2 id="h-comp">Live components</h2>
     <p>Rendered by React from <code>dist/bluebonnet.js</code>. Guidelines are in <a href="components/README.html">the component guide</a>.</p>
     <div class="demo-grid" id="components"><p>Loading React…</p></div>
+  </section>
+
+  <section aria-labelledby="h-charts">
+    <p class="text-label eyebrow">Charts</p>
+    <h2 id="h-charts">Data in the field</h2>
+    <p>Eight series colors in a fixed order, four more you opt into, one ramp for magnitude and one for values around a center. Assign series in order. Stop at eight unless the chart is a stack or labeled lines; past twelve, fold the rest into Other or use small multiples. The order was checked for colorblind separation between neighbors in both themes.</p>
+    <div class="series" id="series"></div>
+    <div class="ramp-row"><span>chart-seq-1–7</span><div class="ramp" id="ramp-seq"></div></div>
+    <div class="ramp-row"><span>chart-div-1–7</span><div class="ramp" id="ramp-div"></div></div>
+
+    <div class="chart-grid">
+      <figure class="bb-chart panel">
+        <h3 class="bb-chart__title">Peak bloom moves north through April</h3>
+        <p class="bb-chart__note">Field reports per week by region. Four series: a legend plus direct labels.</p>
+        <div class="bb-chart__plot" id="chart-reports"><p>Loading TanStack Charts…</p></div>
+        <p class="bb-chart__source">Sample data · <code>lineY</code>, slots 1–4</p>
+      </figure>
+      <figure class="bb-chart panel">
+        <h3 class="bb-chart__title">Bluebonnets lead every county</h3>
+        <p class="bb-chart__note">Sightings by species, stacked. All twelve series colors in order; 9–12 are opt-in.</p>
+        <div class="bb-chart__plot" id="chart-sightings"></div>
+        <p class="bb-chart__source">Sample data · <code>barX</code> with <code>stack()</code>, <code>categorical(…, { extended: true })</code></p>
+      </figure>
+      <figure class="bb-chart panel">
+        <h3 class="bb-chart__title">Ellis County peaks two weeks after Llano</h3>
+        <p class="bb-chart__note">Share of surveyed roadside in bloom. Sequential ramp, binned.</p>
+        <div class="bb-chart__plot" id="chart-bloom"></div>
+        <p class="bb-chart__source">Sample data · <code>cell</code> with <code>scaleThreshold</code>, <code>chart-seq</code></p>
+      </figure>
+      <figure class="bb-chart panel">
+        <h3 class="bb-chart__title">October made up for a dry September</h3>
+        <p class="bb-chart__note">Llano County rainfall against the 1991–2020 normal. Diverging ramp with a gray center.</p>
+        <div class="bb-chart__plot" id="chart-rain"></div>
+        <p class="bb-chart__source">Sample data · <code>barY</code> with <code>scaleThreshold</code>, <code>chart-div</code></p>
+      </figure>
+    </div>
   </section>
 
   <section aria-labelledby="h-classless">
@@ -197,7 +259,24 @@
   fetch("tokens.json").then(function (r) { return r.json(); }).then(function (t) {
     var theme0 = t.color.themes[0].id;
     var box = document.getElementById("swatches"); box.textContent = "";
+    var SERIES_NAMES = ["bluebonnet", "paintbrush", "agave", "firewheel", "winecup", "live oak", "verbena", "primrose", "mesquite", "blue sky", "lantana", "horsemint"];
+    var series = document.getElementById("series");
     t.color.tokens.forEach(function (tok) {
+      var m = /^chart-(\d+|other)$/.exec(tok.name);
+      if (!m) return;
+      series.appendChild(el("div", null, [
+        el("div", { class: "series__chip", style: "background:var(--" + tok.name + ")" }),
+        el("b", { text: tok.name }),
+        el("span", { text: m[1] === "other" ? "other" : SERIES_NAMES[+m[1] - 1] + (+m[1] > 8 ? " · opt-in" : "") })
+      ]));
+    });
+    ["seq", "div"].forEach(function (k) {
+      var box = document.getElementById("ramp-" + k);
+      for (var i = 1; i <= 7; i++) box.appendChild(el("i", { style: "background:var(--chart-" + k + "-" + i + ")", title: "chart-" + k + "-" + i }));
+    });
+
+    t.color.tokens.forEach(function (tok) {
+      if (/^chart-/.test(tok.name)) return;
       var v = tok.value, light = typeof v === "string" ? v : v[theme0], dark = typeof v === "string" ? v : (v.dark || light);
       var val = light === dark ? light : light + " · " + dark;
       var use = el("div", { class: "sw__use" }); use.appendChild(md(tok.usage || ""));
@@ -283,5 +362,6 @@
   ReactDOM.createRoot(document.getElementById("components")).render(h(Demo));
 })();
 </script>
+<script type="module" src="charts.js"></script>
 </body>
 </html>
