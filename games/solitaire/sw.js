@@ -1,6 +1,6 @@
 // Offline support: serve the app from cache, refresh the cache in the
 // background so updates arrive on the next visit.
-const CACHE = 'solitaire-v1';
+const CACHE = 'solitaire-v2';
 const FILES = [
   './', 'index.html', 'manifest.webmanifest', 'css/app.css',
   'js/app.js', 'js/store.js', 'js/winnable.js',
@@ -11,7 +11,7 @@ const FILES = [
 ];
 
 self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(FILES)).then(() => self.skipWaiting()));
+  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(FILES.map((f) => new Request(f, { cache: 'reload' })))).then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', (e) => {

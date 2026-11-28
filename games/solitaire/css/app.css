@@ -137,6 +137,9 @@ h1 { font-family: var(--serif); font-weight: 700; font-size: clamp(30px, 4vw, 46
 
 .board { position: relative; flex: 1; touch-action: none; overflow: hidden; }
 .slots, .cards { position: absolute; inset: 0; }
+/* The card layer covers the whole table; let clicks fall through it to empty piles (like the deck) underneath. */
+.cards { pointer-events: none; }
+.card { pointer-events: auto; }
 .slot {
   position: absolute; left: 0; top: 0; width: var(--cw); height: var(--ch); border-radius: var(--radius); transform-origin: 0 0;
   border: 2px solid rgba(255,255,255,.22); background: rgba(0,0,0,.1); display: grid; place-items: center;
