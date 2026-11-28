@@ -342,6 +342,18 @@
         "games/solitaire"
       ],
       "port": 8791
+    },
+    {
+      "name": "phase10-tracker",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8835",
+        "-d",
+        "games/phase10-tracker"
+      ],
+      "port": 8835
     }
   ]
 }

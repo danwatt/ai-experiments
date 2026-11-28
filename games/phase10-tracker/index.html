@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Phase 10 Tracker</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <h1>Phase 10 <span>tracker</span></h1>
+    <a class="back" href="../../">All demos</a>
+  </header>
+
+  <!-- Setup: names, starting phase and points (works for mid-game starts) -->
+  <main id="setup" hidden>
+    <section class="panel">
+      <h2>Players</h2>
+      <p class="hint">Add 2–8 players. For a game already underway, set each player's current phase and running total.</p>
+      <div id="setup-rows" class="setup-rows"></div>
+      <div class="row-buttons">
+        <button type="button" id="add-player" class="ghost">+ Add player</button>
+      </div>
+      <button type="button" id="start-game" class="primary big">Start game</button>
+      <p id="setup-error" class="error" role="alert" hidden></p>
+    </section>
+  </main>
+
+  <!-- Game -->
+  <main id="game" hidden>
+    <div class="status-bar">
+      <div>
+        <div class="round-label" id="round-label">Round 1</div>
+        <div class="game-banner" id="game-banner" hidden></div>
+      </div>
+      <div class="actions">
+        <button type="button" id="end-round" class="primary">End round</button>
+        <button type="button" id="undo" class="ghost">Undo last round</button>
+        <button type="button" id="new-game" class="ghost danger">New game</button>
+      </div>
+    </div>
+
+    <div class="layout">
+      <section class="panel">
+        <h2>Scores</h2>
+        <table class="scores">
+          <thead>
+            <tr><th>Player</th><th>Phase</th><th class="num">Total</th></tr>
+          </thead>
+          <tbody id="score-body"></tbody>
+        </table>
+        <p class="hint">Lowest total is in the lead (highlighted). Lower is better.</p>
+      </section>
+
+      <aside class="panel">
+        <h2>Phases in play</h2>
+        <ol id="phase-ref" class="phase-ref"></ol>
+      </aside>
+    </div>
+  </main>
+
+  <!-- End-of-round points entry -->
+  <dialog id="round-dialog">
+    <form id="round-form" method="dialog">
+      <h2>End of round <span id="dialog-round"></span></h2>
+      <p class="hint">Enter points each player scored this round. Tick "Completed" if they finished their phase; they advance next round.</p>
+      <div id="round-rows" class="round-rows"></div>
+      <div class="dialog-buttons">
+        <button type="button" id="round-cancel" class="ghost">Cancel</button>
+        <button type="submit" class="primary">Save round</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>
