@@ -68,6 +68,7 @@
   .demo-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: var(--space-6); }
   .panel { border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface-raised); padding: var(--space-6); min-width: 0; }
   .panel > h3 { margin-top: 0; }
+  .panel--wide { grid-column: 1 / -1; }
   .row { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: center; }
   .stack { display: flex; flex-direction: column; gap: var(--space-4); }
   .classless { max-width: 65ch; }
@@ -327,6 +328,7 @@
 
   function Demo() {
     var s = React.useState(""), acres = s[0], setAcres = s[1];
+    var c = React.useState(false), compact = c[0], setCompact = c[1];
     var bad = acres !== "" && !(parseFloat(acres) > 0);
     return h(React.Fragment, null,
       h("div", { className: "panel" }, h("h3", null, "Buttons"),
@@ -348,9 +350,10 @@
             h(B.Choice, { type: "radio", name: "stage", label: "Budding" }),
             h(B.Choice, { type: "radio", name: "stage", label: "Peak", defaultChecked: true })),
           h("div", { className: "row" }, h(B.Button, { type: "submit" }, "Save sighting")))),
-      h("div", { className: "panel" }, h("h3", null, "Tabs and table"),
+      h("div", { className: "panel panel--wide" }, h("h3", null, "Tabs and table"),
+        h(B.Choice, { label: "Compact rows", checked: compact, onChange: function (e) { setCompact(e.target.checked); } }),
         h(B.Tabs, { label: "Report sections", items: [
-          { id: "list", label: "Sightings", content: h(B.Table, { caption: "Week of Mar 30, 2026", rows: rows2, columns: [
+          { id: "list", label: "Sightings", content: h(B.Table, { compact: compact, caption: "Week of Mar 30, 2026", rows: rows2, columns: [
             { key: "county", label: "County" },
             { key: "stage", label: "Stage", render: function (r) { return h(B.Badge, { tone: tone[r.stage] }, r.stage); } },
             { key: "n", label: "Reports", numeric: true },

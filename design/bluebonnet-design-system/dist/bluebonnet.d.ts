@@ -59,6 +59,8 @@ export interface TableProps<Row = Record<string, unknown>> {
   columns: TableColumn<Row>[];
   rows: Row[];
   caption?: ReactNode;
+  /** Tighter rows and smaller type, for dense data. Off by default. */
+  compact?: boolean;
 }
 
 export declare function Button(p: ButtonProps): JSX.Element;

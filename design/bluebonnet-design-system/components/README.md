@@ -66,6 +66,7 @@ A bordered data table with an uppercase header row and tabular figures.
 - Pass `numeric` on columns of numbers so they right-align; all cells already use tabular figures.
 - Use `caption` to say what the table shows and for when ("Sightings, week of Mar 30, 2026").
 - Put units in the header ("Route miles"), not in every cell.
+- Pass `compact` (or add `bb-table--compact` to the `table`) for dense data people scan or compare: rows drop from 47px to about 29px (with badges) and type from 15px to 13px. Keep the default for tables with buttons or links in cells, and for anything read on a phone.
 - The consumer provides `columns` (`key`, `label`, optional `numeric` and `render`) and `rows` (give each an `id`). Wide tables scroll sideways inside their own border.
 
 ## Chart (CSS only)

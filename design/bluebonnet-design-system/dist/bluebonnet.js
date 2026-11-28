@@ -106,7 +106,7 @@
   function Table(p) {
     var cols = p.columns || [], rows = p.rows || [];
     return h("div", { className: cx("bb-table-wrap", p.className) },
-      h("table", { className: "bb-table" },
+      h("table", { className: cx("bb-table", p.compact && "bb-table--compact") },
         p.caption ? h("caption", null, p.caption) : null,
         h("thead", null, h("tr", null, cols.map(function (c) {
           return h("th", { key: c.key, scope: "col", className: c.numeric ? "bb-num" : undefined }, c.label);
