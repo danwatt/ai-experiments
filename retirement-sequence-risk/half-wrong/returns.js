@@ -63,7 +63,7 @@
   // ---------- the grid: a block per window length, a row per series, a square per window at its last year
   const NS = "http://www.w3.org/2000/svg";
   function draw() {
-    PAL = { surface: css("surface-raised"), hit: css("bluebonnet"), miss: css("danger") };
+    PAL = { surface: css("surface-raised"), hit: css("series-1"), miss: css("danger") };
     document.querySelectorAll("[data-measure]").forEach((b) => b.setAttribute("aria-checked", String(b.dataset.measure === state.measure)));
     $("#ret-measure-note").innerHTML = state.measure === "avg"
       ? "Showing the <b>simple average</b>, the way Ramsey quotes the 12%."

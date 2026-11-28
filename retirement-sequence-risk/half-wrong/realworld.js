@@ -115,7 +115,7 @@
   dlg.addEventListener("click", (e) => { if (e.target === dlg) dlg.close(); }); // a click on the backdrop closes it
 
   function draw() {
-    PAL = { kept: css("bluebonnet"), out: css("danger"), shrank: mix(css("surface-raised"), css("danger"), 0.3), surface: css("surface-raised") };
+    PAL = { kept: css("series-1"), out: css("danger"), shrank: mix(css("surface-raised"), css("danger"), 0.3), surface: css("surface-raised") };
     const W0 = DRAWS[state.draw];
     document.querySelectorAll("[data-draw]").forEach((b) => b.setAttribute("aria-checked", String(b.dataset.draw === state.draw)));
     $("#rw-legend").innerHTML = ["kept", "shrank", "out"].map((k) => `<span><i style="background:${fill(k)}"></i>${LABEL[k]}${k === "kept" ? " (dotted)" : k === "out" ? " (crossed)" : ""}</span>`).join("") +

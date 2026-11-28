@@ -18,9 +18,13 @@
   .math { display: flex; flex-wrap: wrap; gap: 6px 28px; margin: 12px 0 2px; font-size: 15px; font-variant-numeric: tabular-nums; color: var(--text-secondary); }
   .math b { color: var(--text-primary); }
   .claim a { margin-top: auto; padding-top: 4px; font-size: 13.5px; }
-  /* inflation chart: bars above the 4% claim in gold, at or below in blue (validated pairs for each theme) */
-  :root { --infl-low: #3149a3; --infl-high: #b28735; }
-  [data-theme="dark"] { --infl-low: #7c8edf; --infl-high: #ad873a; }
+  /* chart series, in Bluebonnet's order: bluebonnet, paintbrush, winecup, then firewheel gold. Light uses the
+     tokens as they are. Dark lightens the flowers for text (4.5:1), which is too light for fills, so the charts take
+     the same hues a step down. Gold is firewheel darkened so it reads as a mark on white. All validated per theme. */
+  :root { --series-1: var(--bluebonnet); --series-2: var(--paintbrush); --series-3: var(--winecup); --series-gold: #bc7f00; }
+  [data-theme="dark"] { --series-1: #7285dd; --series-2: #dd6c4e; --series-3: #a04c84; --series-gold: #b98a00; }
+  /* inflation chart: bars above the 4% claim in gold, at or below in blue */
+  :root { --infl-low: var(--series-1); --infl-high: var(--series-gold); }
   .legend { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 8px 0 4px; font-size: 13px; color: var(--text-secondary); }
   .legend span { display: inline-flex; align-items: center; gap: 6px; }
   .legend span span { display: inline; }
@@ -70,9 +74,8 @@
   table.ex thead th { font-size: 12.5px; color: var(--text-secondary); font-weight: 600; }
   table.ex tfoot th, table.ex tfoot td { font-weight: 700; color: var(--text-primary); border-bottom: 0; }
   table.ex tfoot td[colspan] { font-weight: 400; color: var(--muted); text-align: left; font-size: 13px; }
-  /* the timing aside: monthly (blue, three rates told apart by dash) and January 1; the reference categorical slots 1-2, validated for each theme */
-  :root { --t-m: #2a78d6; --t-start: #eb6834; }
-  [data-theme="dark"] { --t-m: #3987e5; --t-start: #d95926; }
+  /* the 8% section: monthly (blue, three rates told apart by dash) and January 1 */
+  :root { --t-m: var(--series-1); --t-start: var(--series-2); }
   .def p b { color: var(--text-primary); }
   svg.lkey line[stroke-dasharray] { stroke-linecap: round; }
   svg.lkey { width: 22px; height: 10px; margin-right: 6px; vertical-align: middle; flex: none; }
@@ -95,7 +98,7 @@
   .rw-detail h2 { margin: 0 32px 4px 0; font-size: 18px; }
   .rw-close { position: absolute; top: 10px; right: 12px; width: 32px; height: 32px; padding: 0; font-size: 20px; line-height: 1; border-radius: 8px; }
   .rw-detail svg.chart .bal { fill: none; stroke-width: 2.5; stroke-linejoin: round; }
-  .rw-detail svg.chart .bal--ok { stroke: var(--bluebonnet); }
+  .rw-detail svg.chart .bal--ok { stroke: var(--series-1); }
   .rw-detail svg.chart .bal--short { stroke: var(--danger); }
   .rw-detail svg.chart .need { fill: none; stroke: var(--text-secondary); stroke-width: 1.5; stroke-dasharray: 6 4; }
   .rw-detail svg.chart .gone-dot { fill: var(--danger); stroke: var(--surface-1); stroke-width: 2; }
@@ -116,9 +119,8 @@
   .opts label.early { display: inline-flex; align-items: center; gap: 6px; font-size: 13.5px; color: var(--text-secondary); cursor: pointer; margin-left: 8px; }
   .opts label.early input { accent-color: var(--bluebonnet); }
   .opts label.early small { color: var(--muted); }
-  /* saving section: three series, the reference categorical slots 1-3, validated for each theme */
-  :root { --sv-four: #2a78d6; --sv-vf: #eb6834; --sv-sp: #1baf7a; }
-  [data-theme="dark"] { --sv-four: #3987e5; --sv-vf: #d95926; --sv-sp: #199e70; }
+  /* saving section: three series, in the order they are listed */
+  :root { --sv-four: var(--series-1); --sv-sp: var(--series-2); --sv-vf: var(--series-3); }
   svg.chart .svbar.on { stroke: var(--text-primary); stroke-width: 1.5; }
   svg.chart .goal { stroke: var(--text-secondary); stroke-width: 1.5; stroke-dasharray: 6 4; }
   svg.chart .goal--book { stroke: var(--text-primary); stroke-width: 2; }
@@ -139,6 +141,10 @@
   svg.chart .gone { stroke: var(--surface-sunken); stroke-width: 2; }
   svg.chart text.tlabel { fill: var(--text-primary); font-weight: 600; }
   svg.chart .leader { stroke: var(--text-secondary); stroke-width: 1; }
+  svg.chart .seq-dot { stroke: var(--surface-1); stroke-width: 2; pointer-events: none; }
+  #seq-table th svg.lkey { width: 18px; }
+  #seq-table th.seq-group { text-align: center; color: var(--text-primary); border-bottom: 0; }
+  #seq-table thead th[rowspan] { vertical-align: bottom; }
   svg.chart .cross { stroke: var(--text-secondary); stroke-width: 1; stroke-dasharray: 3 3; pointer-events: none; }
   i.key { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: baseline; }
   table.timing { width: auto; border-collapse: collapse; font-variant-numeric: tabular-nums; font-size: 14px; margin: 10px 0 6px; background: var(--surface-1); }
@@ -366,6 +372,29 @@
     </details>
   </section>
 
+  <aside class="card aside" aria-labelledby="h-seq">
+    <p class="kicker">Another aside</p>
+    <h2 id="h-seq">Same years, different order</h2>
+    <p class="note">Real markets don't hand out 12% every year. They mix good years and bad, and the <b>order</b> they come in is called the <b>sequence of returns</b>. Here is $100,000 over five made-up years that average 12%, like the book: +40%, +25%, +10%, 0% and −15%. One investor gets the good years first, the other gets the same years backward.</p>
+    <div class="opts">
+      <span class="ctl-label">Each January</span>
+      <div class="seg" role="radiogroup" aria-label="Money in or out each January">
+        <button role="radio" data-seq="none">Nothing in or out</button>
+        <button role="radio" data-seq="out">Take out $8,000</button>
+        <button role="radio" data-seq="in">Put in $8,000</button>
+      </div>
+    </div>
+    <p class="note" id="seq-note"></p>
+    <div class="legend" id="seq-legend" aria-hidden="true"></div>
+    <div class="scroll"><svg class="chart" id="seq" role="img" aria-label="$100,000 over five years with the same returns in two orders, good years first and bad years first"></svg></div>
+    <div class="scroll"><table class="timing" id="seq-table"></table></div>
+    <p class="note">Nobody gets to pick their order. Retirees hope for the good years first; savers are better off with the bad years early. The next section shows which order real retirees got.</p>
+    <details class="more">
+      <summary>Why order only matters when money moves</summary>
+      <p class="note">With nothing in or out, the balance is just $100,000 × 1.40 × 1.25 × 1.10 × 1.00 × 0.85, and multiplying in any order gives the same answer. Take money out, and each withdrawal is sold at whatever the balance is worth that year. After a bad year, the same $8,000 is a bigger share of what's left, and that money never gets the good years that follow. Putting money in works the other way: deposits made after a fall buy in cheaply and ride the recovery. To keep the example simple, money moves on January 1 and the $8,000 never changes; the rest of the page uses monthly amounts and yearly raises.</p>
+    </details>
+  </aside>
+
   <section class="card" aria-labelledby="h-real">
     <h2 id="h-real">What actually happened</h2>
     <p class="note">Now real history. Each retiree starts with <b>$500,000</b>, spends <b>$40,000</b> the first year as a monthly paycheck, and gets a raise each January equal to the actual inflation of the year before. The money earns what the S&amp;P 500, VFINX or Ramsey's four funds actually returned.</p>
@@ -408,9 +437,10 @@
 <script src="../data.js?v=1"></script>
 <script src="../explainer-4/funds.js?v=5"></script>
 <script src="app.js?v=2"></script>
-<script src="returns.js?v=6"></script>
+<script src="returns.js?v=7"></script>
 <script src="timing.js?v=20"></script>
-<script src="realworld.js?v=8"></script>
+<script src="sequence.js?v=3"></script>
+<script src="realworld.js?v=9"></script>
 <script src="saving.js?v=4"></script>
 <script>
   // light/dark, shared with the simulator and explainers through the same saved setting
