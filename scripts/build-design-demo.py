@@ -400,7 +400,7 @@ page = f"""<!doctype html>
 <body>
 <div class="wrap">
   <div class="topbar">
-    <a href="../">← All experiments</a>
+    <a href="../../">← All experiments</a>
     {theme_seg}
   </div>
 

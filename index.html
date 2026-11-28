@@ -4,10 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>AI Experiments</title>
-  <link rel="stylesheet" href="bluebonnet-design-system/dist/bluebonnet.css">
+  <link rel="stylesheet" href="design/bluebonnet-design-system/dist/bluebonnet.css">
   <script>try { const t = localStorage.getItem("theme"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch {}</script>
   <style>
-    /* Page aliases onto Bluebonnet tokens (bluebonnet-design-system/). Theme follows the OS. */
+    /* Page aliases onto Bluebonnet tokens (design/bluebonnet-design-system/). Theme follows the OS. */
     :root {
       --paper: var(--surface); --paper-2: var(--surface-sunken); --ink-2: var(--ink-muted); --rule: var(--line);
       --accent: var(--bluebonnet); --card: var(--surface-raised);
@@ -45,7 +45,7 @@
     /* Sections */
     section.chapter { display: grid; grid-template-columns: 200px 1fr; gap: 32px; padding: 44px 0; border-bottom: 1px solid var(--rule); }
     @media (max-width: 820px) { section.chapter { grid-template-columns: 1fr; gap: 16px; } }
-    .chapter-head { position: sticky; top: 104px; align-self: start; padding: 14px 16px 16px; margin: -14px -16px 0; border-radius: var(--radius-md);
+    .chapter-head { position: sticky; top: 104px; align-self: start; padding: 14px 16px 16px; margin: 0 -16px; border-radius: var(--radius-md);
       background: color-mix(in srgb, var(--paper) 82%, transparent); -webkit-backdrop-filter: blur(8px) saturate(.8); backdrop-filter: blur(8px) saturate(.8); }
     @media (max-width: 820px) { .chapter-head { position: static; } }
     .num { font: 500 13px var(--mono); color: var(--paintbrush); }
@@ -104,7 +104,7 @@
 
   <main class="wrap" id="chapters"></main>
 
-  <footer class="wrap"><p>Games live in <code>games/</code>. Prompt and README pages are rendered from Markdown by the Pages build (<code>scripts/render-md.sh</code>).</p></footer>
+  <footer class="wrap"><p>Demos are grouped into one folder per section. Prompt and README pages are rendered from Markdown by the Pages build (<code>scripts/render-md.sh</code>).</p></footer>
 
   <script src="wildflower-bg.js"></script>
   <script src="grid-bg.js"></script>
